@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Engineering Crash Course</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --bg-code: #0d1117;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --purple: #b366ff;
+  --yellow: #ffd700;
+  --red: #ff4466;
+  --text: #e0e0e8;
+  --text-dim: #888899;
+  --border: #2a2a3a;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --gold: #ffd700;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+}
+
+/* ── Progress bar ── */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px; z-index:1000;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--yellow));
+  transition: width .4s ease;
+  width: 0%;
+}
+
+/* ── Header ── */
+header {
+  position: fixed; top:0; left:0; right:0; z-index:900;
+  background: rgba(10,10,15,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 30px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+header h1 {
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-actions { display:flex; gap:10px; align-items:center; }
+.btn {
+  padding: 7px 18px; border-radius: 6px; border:none; cursor:pointer;
+  font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600;
+  transition: all .2s;
+}
+.btn-run-all {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000;
+}
+.btn-run-all:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,136,.3); }
+.btn-reset {
+  background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border);
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+#progress-text { color: var(--text-dim); font-size: .8rem; }
+
+/* ── Side nav ── */
+#side-nav {
+  position: fixed; left:0; top:60px; bottom:0; width:260px; z-index:800;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 20px 0;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+#side-nav::-webkit-scrollbar { width:4px; }
+#side-nav::-webkit-scrollbar-thumb { background: var(--border); }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; font-size: .78rem; color: var(--text-dim);
+  text-decoration: none; transition: all .15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.completed { color: var(--green); border-left-color: var(--green); }
+.nav-item.active { color: var(--cyan); background: rgba(0,212,255,.05); border-left-color: var(--cyan); }
+.nav-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height:22px; border-radius: 50%; font-size: .65rem;
+  background: var(--bg3); font-weight: 700;
+}
+.nav-item.completed .nav-num { background: var(--green); color: #000; }
+
+/* ── Main content ── */
+main {
+  margin-left: 260px; padding: 80px 40px 60px 40px;
+  max-width: 960px;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 60px;
+  border-left: 4px solid var(--border);
+  padding-left: 24px;
+  scroll-margin-top: 80px;
+}
+.section.layer-bronze { border-left-color: var(--bronze); }
+.section.layer-silver { border-left-color: var(--silver); }
+.section.layer-gold { border-left-color: var(--gold); }
+.section.layer-general { border-left-color: var(--cyan); }
+.section.layer-intro { border-left-color: var(--purple); }
+
+.section-number {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 4px;
+}
+.layer-bronze .section-number { color: var(--bronze); }
+.layer-silver .section-number { color: var(--silver); }
+.layer-gold .section-number { color: var(--gold); }
+.layer-general .section-number { color: var(--cyan); }
+.layer-intro .section-number { color: var(--purple); }
+
+.section h2 {
+  font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;
+  color: #fff;
+}
+.section h3 {
+  font-size: 1.1rem; font-weight: 600; margin: 20px 0 10px;
+  color: var(--cyan);
+}
+
+/* ── Markdown cells ── */
+.md-cell {
+  margin-bottom: 16px; line-height: 1.8;
+}
+.md-cell p { margin-bottom: 12px; }
+.md-cell strong { color: #fff; }
+.md-cell code {
+  background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  color: var(--cyan);
+}
+.md-cell pre {
+  background: var(--bg-code); padding: 16px; border-radius: 8px;
+  overflow-x: auto; margin: 12px 0; font-size: .85rem;
+  border: 1px solid var(--border);
+}
+.md-cell pre code { background:none; padding:0; color: var(--green); }
+
+/* ── Tables ── */
+table {
+  width:100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem;
+}
+th {
+  background: var(--bg3); padding: 10px 12px; text-align: left;
+  font-weight: 600; color: var(--cyan); border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+tr:hover td { background: rgba(0,212,255,.05); }
+
+/* ── Code cells ── */
+.code-cell {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+.code-cell.running { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,.15); }
+.code-cell.has-output { border-color: rgba(0,255,136,.2); }
+
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-header span { font-size: .75rem; color: var(--text-dim); }
+.cell-number { font-family: 'JetBrains Mono', monospace; color: var(--purple); font-weight:700; }
+
+.run-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 5px; border: 1px solid var(--green);
+  background: transparent; color: var(--green);
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  cursor: pointer; transition: all .2s;
+}
+.run-btn:hover { background: var(--green); color: #000; }
+.run-btn.running-btn {
+  border-color: var(--cyan); color: var(--cyan);
+  animation: pulse 1s infinite;
+}
+.run-btn.done-btn { border-color: var(--text-dim); color: var(--text-dim); cursor:default; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.code-body {
+  padding: 16px; overflow-x: auto;
+}
+.code-body pre {
+  margin:0; font-family: 'JetBrains Mono', monospace;
+  font-size: .84rem; line-height: 1.6; color: #e6e6e6;
+  white-space: pre; overflow-x: auto;
+}
+
+/* Syntax highlighting */
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cm { color: #6272a4; }
+.num { color: #bd93f9; }
+.op { color: #ff79c6; }
+.var { color: #8be9fd; }
+.type { color: #ffb86c; }
+
+/* ── Output area ── */
+.output-area {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  max-height: 0; overflow: hidden;
+  transition: max-height .6s ease, padding .3s;
+}
+.output-area.visible {
+  max-height: 3000px; padding: 16px;
+}
+.output-label {
+  font-size: .7rem; color: var(--text-dim); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+
+.output-area pre {
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+  white-space: pre-wrap; color: var(--green); margin: 0;
+}
+.output-area table { margin: 8px 0; }
+.output-area th { background: rgba(0,212,255,.1); color: var(--cyan); font-size: .8rem; }
+.output-area td { font-size: .82rem; }
+
+/* ── Tool logos inline ── */
+.tool-logo {
+  height: 20px; width: 20px; vertical-align: middle;
+  display: inline-block; margin-right: 4px;
+  filter: brightness(0) invert(1) opacity(.7);
+}
+.tool-logo-bright { filter: none; }
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg3); padding: 3px 10px; border-radius: 20px;
+  font-size: .75rem; color: var(--text-dim); margin: 2px 4px 2px 0;
+  border: 1px solid var(--border);
+}
+.tool-badge img { height:14px; width:14px; filter: brightness(0) invert(1); }
+
+/* ── Architecture diagram ── */
+.arch-flow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 16px 0; justify-content: center;
+}
+.arch-step {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px; text-align: center;
+  min-width: 100px; transition: all .2s;
+}
+.arch-step:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.arch-step .label { font-size: .75rem; color: var(--cyan); font-weight: 600; }
+.arch-step .detail { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
+.arch-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+/* ── Callout boxes ── */
+.callout {
+  background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2);
+  border-radius: 8px; padding: 16px; margin: 16px 0;
+}
+.callout.warning {
+  background: rgba(255,136,0,.05); border-color: rgba(255,136,0,.2);
+}
+.callout.success {
+  background: rgba(0,255,136,.05); border-color: rgba(0,255,136,.2);
+}
+.callout-title { font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+.callout.warning .callout-title { color: var(--orange); }
+.callout.success .callout-title { color: var(--green); }
+
+/* ── Star schema diagram ── */
+.star-schema {
+  display: flex; align-items: center; justify-content: center;
+  gap: 30px; flex-wrap: wrap; margin: 20px 0;
+}
+.star-entity {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 20px; text-align: center;
+  min-width: 120px;
+}
+.star-entity.fact { border-color: var(--yellow); background: rgba(255,215,0,.05); }
+.star-entity.dim { border-color: var(--cyan); background: rgba(0,212,255,.05); }
+.star-entity .entity-name { font-weight: 700; font-size: .9rem; }
+.star-entity.fact .entity-name { color: var(--yellow); }
+.star-entity.dim .entity-name { color: var(--cyan); }
+.star-entity .entity-cols { font-size: .7rem; color: var(--text-dim); margin-top: 4px; }
+.star-arrow { color: var(--text-dim); font-size: 1.5rem; }
+
+/* ── Layer badges ── */
+.layer-badge {
+  display: inline-block; padding: 2px 10px; border-radius: 4px;
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.layer-badge.bronze { background: rgba(205,127,50,.15); color: var(--bronze); border: 1px solid var(--bronze); }
+.layer-badge.silver { background: rgba(192,192,192,.1); color: var(--silver); border: 1px solid var(--silver); }
+.layer-badge.gold { background: rgba(255,215,0,.1); color: var(--gold); border: 1px solid var(--gold); }
+.layer-badge.landing { background: rgba(136,136,153,.1); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+/* ── Hero section ── */
+.hero {
+  text-align: center; padding: 40px 0 60px; margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--green), var(--yellow));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }
+.hero-tools {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+}
+.hero-tool {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.hero-tool img { width:36px; height:36px; filter: brightness(0) invert(1) opacity(.85); }
+.hero-tool span { font-size: .65rem; color: var(--text-dim); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #side-nav { display: none; }
+  main { margin-left:0; padding: 80px 16px 40px; }
+  .hero h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <h1>&lt;/&gt; Data Engineering Crash Course</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 28 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+
+<nav id="side-nav"></nav>
+
+<main id="main-content">
+
+<!-- ══════════ S0: Intro ══════════ -->
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Intro</div>
+  <h2>Delta table lokálisan, Databricks és Synapse nélkül
+    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta Lake</span>
+  </h2>
+  <div class="md-cell">
+    <p>Ez a notebook azt mutatja meg, hogy egy <strong>Delta table</strong> nem feltétlenül Databricksben vagy Synapse-ban jön létre.
+    A <strong>Delta Lake</strong> egy nyílt tárolási formátum: ha van hozzá kompatibilis writer, akkor lokális fájlrendszerre is tudsz Delta táblát írni.</p>
+    <p>A notebook fő gondolata:</p>
+    <pre><code>Delta table = Parquet adatfájlok + _delta_log tranzakciós napló
+Metastore/Catalog = névvel ellátott bejegyzés, ami rámutat a Delta table locationre</code></pre>
+    <p>Itt nem használunk Databrickset, Synapse-t vagy Azure-t. Minden lokálisan történik.</p>
+    <p>A notebook későbbi részei azt is megmutatják, hogyan kapcsolódik ehhez az ETL/ELT, a bronze-silver-gold rétegezés, valamint a fact/dimension modellezés.</p>
+  </div>
+</div>
+
+
+<!-- ══════════ S1: Fogalmi térkép ══════════ -->
+<div class="section layer-intro" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Fogalmi térkép: Data Lake, Data Warehouse, Lakehouse, Metastore</h2>
+  <div class="md-cell">
+    <p>Mielőtt létrehozunk egy lokális Delta table-t, érdemes elhelyezni a példát a nagyobb data engineering térképen.</p>
+    <table>
+      <tr><th>Fogalom</th><th>Röviden</th><th>Adat</th><th>Erősség</th><th>Tipikus használat</th></tr>
+      <tr><td><strong>Data Warehouse</strong></td><td>Üzleti riporting és konzisztens SQL elemzés</td><td>Tisztított, modellezett, strukturált</td><td>Gyors BI, erős SQL, governance</td><td>Pénzügyi riport, vezetői dashboard, data mart</td></tr>
+      <tr><td><strong>Data Lake</strong></td><td>Nyers és sokféle adat olcsó, skálázható tárolása</td><td>Fájlok: JSON, CSV, Parquet, képek, logok</td><td>Rugalmasság, nagy skála, alacsony storage költség</td><td>Raw landing zone, archívum, data science előkészítés</td></tr>
+      <tr><td><strong>Lakehouse</strong></td><td>Lake rugalmasság warehouse-szerű táblakezeléssel</td><td>Nyílt table formatok objektumtáron</td><td>ACID, time travel, batch + streaming, ML + BI</td><td>Bronze-silver-gold platform, közös analitikai adatbázis</td></tr>
+      <tr><td><strong>Metastore</strong></td><td>Táblák, sémák és lokációk nyilvántartása</td><td>Metaadat, nem maga az üzleti adat</td><td>Név, schema, permission, discovery</td><td>Spark SQL táblák, catalog, jogosultságkezelés</td></tr>
+    </table>
+    <div class="callout">
+      <div class="callout-title">Ebben a notebookban a lakehouse gondolkodást próbáljuk ki kicsiben:</div>
+      <pre><code>Data Lake rész: lokális fájlok és mappák
+Lakehouse rész: Delta table = Parquet + _delta_log
+Metastore rész: most nincs tényleges metastore, csak bemutatjuk, mit adna hozzá
+Data Warehouse rész: fact/dimension és gold réteg, vagyis riportbarát modell</code></pre>
+    </div>
+    <p>A lényeg: a data lake főleg tárolási minta, a warehouse főleg riportolási és modellezési minta, a lakehouse a kettő közötti híd, a metastore pedig a név- és metadata-réteg.</p>
+  </div>
+</div>
+
+
+<!-- ══════════ S2: Architektúra-térkép ══════════ -->
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Architektúra-térkép</h2>
+  <div class="md-cell">
+    <p>A architektúra-térkép azt mutatja meg, hogyan áll össze egy tipikus data engineering platform a forrásrendszerektől a fogyasztásig.</p>
+  </div>
+  <div class="arch-flow">
+    <div class="arch-step"><div class="label">Forrás</div><div class="detail">OLTP, API, IoT</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><div class="label">Beérkeztetés</div><div class="detail">Batch, CDC, Kafka</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><div class="label">Tárolás</div><div class="detail">Delta, Parquet, Lake</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><div class="label">Feldolgozás</div><div class="detail">Spark, dbt, SQL</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><div class="label">Metaadat</div><div class="detail">Catalog, Lineage</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><div class="label">Fogyasztás</div><div class="detail">BI, Dashboard, ML</div></div>
+  </div>
+  <div class="md-cell">
+    <table>
+      <tr><th>Sáv</th><th>Tipikus komponensek</th><th>Mit jelent ebben a notebookban?</th></tr>
+      <tr><td><strong>Forrás</strong></td><td>OLTP adatbázis, API, fájl export, event stream, IoT</td><td>Kézzel létrehozott pandas DataFrame-ek és CSV fájlok szimulálják a forrásadatot</td></tr>
+      <tr><td><strong>Beérkeztetés</strong></td><td>Batch ingest, CDC, Kafka, Event Hub, landing zone</td><td>CSV-k beolvasása batch módban, plusz micro-batch streaming szimuláció</td></tr>
+      <tr><td><strong>Tárolás</strong></td><td>Object storage, data lake, Delta table, Iceberg table</td><td>Lokális mappák, Parquet fájlok és Delta táblákat tartó könyvtárak</td></tr>
+      <tr><td><strong>Feldolgozás</strong></td><td>Spark, SQL engine, dbt, stream processing</td><td>pandas + deltalake transzformációk: bronze → silver → gold</td></tr>
+      <tr><td><strong>Metaadat</strong></td><td>Metastore, data catalog, schema registry, lineage</td><td>A notebook elmagyarázza a metastore szerepet</td></tr>
+      <tr><td><strong>Fogyasztás</strong></td><td>BI dashboard, data mart, feature store</td><td>Gold KPI tábla, fact/dimension modell és riportbarát aggregátumok</td></tr>
+    </table>
+    <div class="callout success">
+      <div class="callout-title">Ugyanez a kis példára vetítve:</div>
+      <pre><code>Fájl export / forrásadat
+  → landing/orders/*.csv
+  → bronze Delta table
+  → silver Delta table
+  → gold KPI és fact/dimension Delta táblák
+  → riport / BI / SQL elemzésre kész adat</code></pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S3: Bootstrap ══════════ -->
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Notebook bootstrap: virtuális környezet és csomagok
+    <span class="tool-badge"><img src="assets/logos/python.svg">Python</span>
+  </h2>
+  <div class="md-cell">
+    <p>Ez a notebook teljesen bootstrapelt: a projekt gyökerében lévő <code>bootstrap.ps1</code> vagy <code>bootstrap.sh</code> létrehozza a <code>.venv</code> virtuális környezetet, telepíti a <code>requirements.txt</code> csomagjait, és regisztrálja a Jupyter kernelt.</p>
+  </div>
+  <div class="code-cell" id="cell-s3">
+    <div class="code-header">
+      <span class="cell-number">[3]</span>
+      <button class="run-btn" onclick="runCell('s3')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> os, subprocess, sys
+
+REQUIRED_IMPORTS = [<span class="str">"deltalake"</span>, <span class="str">"pandas"</span>, <span class="str">"pyarrow"</span>]
+KERNEL_NAME = <span class="str">"de-delta-demo"</span>
+project_dir = Path.cwd()
+venv_dir = Path(<span class="str">".venv"</span>)
+
+<span class="kw">if</span> os.name == <span class="str">"nt"</span>:
+    venv_python = venv_dir / <span class="str">"Scripts"</span> / <span class="str">"python.exe"</span>
+    bootstrap_cmd = [<span class="str">"powershell"</span>, <span class="str">"-NoProfile"</span>, <span class="str">"-File"</span>, <span class="str">"bootstrap.ps1"</span>]
+<span class="kw">else</span>:
+    venv_python = venv_dir / <span class="str">"bin"</span> / <span class="str">"python"</span>
+    bootstrap_cmd = [<span class="str">"bash"</span>, <span class="str">"bootstrap.sh"</span>]
+
+subprocess.check_call(bootstrap_cmd, cwd=project_dir)
+
+<span class="kw">for</span> module_name <span class="kw">in</span> REQUIRED_IMPORTS:
+    <span class="fn">__import__</span>(module_name)
+
+<span class="fn">print</span>(<span class="str">f"Virtuális környezet kész: {target_python}"</span>)
+<span class="fn">print</span>(<span class="str">f"Kernel regisztrálva: Python (.venv - Delta demo)"</span>)</pre></div>
+    <div class="output-area" id="out-s3">
+      <div class="output-label">Output:</div>
+      <pre>Virtuális környezet kész: /home/user/engineering_crash_courses/.venv/bin/python
+Kernel regisztrálva: Python (.venv - Delta demo)
+Aktuális futó Python: /home/user/engineering_crash_courses/.venv/bin/python</pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S4: Környezet ══════════ -->
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Környezet ellenőrzése
+    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">deltalake</span>
+    <span class="tool-badge"><img src="assets/logos/pandas.svg">pandas</span>
+    <span class="tool-badge"><img src="assets/logos/arrow.svg">pyarrow</span>
+  </h2>
+  <div class="md-cell">
+    <p>A példához a <code>deltalake</code> Python csomagot használjuk. Ez a delta-rs projekt Python bindingja, és <strong>Spark nélkül</strong> is tud Delta táblát írni/olvasni.</p>
+  </div>
+  <div class="code-cell" id="cell-s4">
+    <div class="code-header">
+      <span class="cell-number">[4]</span>
+      <button class="run-btn" onclick="runCell('s4')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre><span class="kw">import</span> sys
+<span class="kw">import</span> deltalake
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> pyarrow <span class="kw">as</span> pa
+
+<span class="fn">print</span>(<span class="str">f"Python: {sys.executable}"</span>)
+<span class="fn">print</span>(<span class="str">f"deltalake: {deltalake.__version__}"</span>)
+<span class="fn">print</span>(<span class="str">f"pandas: {pd.__version__}"</span>)
+<span class="fn">print</span>(<span class="str">f"pyarrow: {pa.__version__}"</span>)</pre></div>
+    <div class="output-area" id="out-s4">
+      <div class="output-label">Output:</div>
+      <pre>Python: /home/user/engineering_crash_courses/.venv/bin/python
+deltalake: 0.25.0
+pandas: 2.2.3
+pyarrow: 18.1.0</pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S5: Importok és célmappa ══════════ -->
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>Importok és lokális célmappa</h2>
+  <div class="md-cell">
+    <p>A Delta table fizikailag egy mappa lesz a gépeden. Ebben lesznek a Parquet adatfájlok és a <code>_delta_log</code> könyvtár.</p>
+  </div>
+  <div class="code-cell" id="cell-s5">
+    <div class="code-header">
+      <span class="cell-number">[5]</span>
+      <button class="run-btn" onclick="runCell('s5')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> json, shutil
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> deltalake <span class="kw">import</span> DeltaTable
+<span class="kw">from</span> deltalake.writer <span class="kw">import</span> write_deltalake
+
+base_dir = Path(<span class="str">"delta_demo_output"</span>)
+table_path = base_dir / <span class="str">"sales_delta"</span>
+
+<span class="kw">if</span> base_dir.exists():
+    shutil.rmtree(base_dir)
+base_dir.mkdir(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+
+table_path</pre></div>
+    <div class="output-area" id="out-s5">
+      <div class="output-label">Output:</div>
+      <pre>PosixPath('delta_demo_output/sales_delta')</pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S6: Forrásadat ══════════ -->
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Forrásadat: egy sima Pandas DataFrame
+    <span class="tool-badge"><img src="assets/logos/pandas.svg">pandas</span>
+  </h2>
+  <div class="md-cell">
+    <p>Ez lehetne CSV-ből, API-ból vagy adatbázisból jövő adat is. Most kézzel készítünk egy kis táblát.</p>
+  </div>
+  <div class="code-cell" id="cell-s6">
+    <div class="code-header">
+      <span class="cell-number">[6]</span>
+      <button class="run-btn" onclick="runCell('s6')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre>sales_df = pd.DataFrame({
+    <span class="str">"order_id"</span>: [<span class="num">1001</span>, <span class="num">1002</span>, <span class="num">1003</span>, <span class="num">1004</span>],
+    <span class="str">"customer_id"</span>: [<span class="str">"C-001"</span>, <span class="str">"C-002"</span>, <span class="str">"C-001"</span>, <span class="str">"C-003"</span>],
+    <span class="str">"amount"</span>: [<span class="num">12900</span>, <span class="num">4790</span>, <span class="num">8350</span>, <span class="num">21990</span>],
+    <span class="str">"order_date"</span>: pd.to_datetime([<span class="str">"2026-05-01"</span>, <span class="str">"2026-05-01"</span>, <span class="str">"2026-05-02"</span>, <span class="str">"2026-05-03"</span>]),
+    <span class="str">"source_system"</span>: [<span class="str">"webshop"</span>, <span class="str">"webshop"</span>, <span class="str">"pos"</span>, <span class="str">"webshop"</span>],
+})
+
+sales_df</pre></div>
+    <div class="output-area" id="out-s6">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>amount</th><th>order_date</th><th>source_system</th></tr>
+        <tr><td>0</td><td>1001</td><td>C-001</td><td>12900</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>1</td><td>1002</td><td>C-002</td><td>4790</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>2</td><td>1003</td><td>C-001</td><td>8350</td><td>2026-05-02</td><td>pos</td></tr>
+        <tr><td>3</td><td>1004</td><td>C-003</td><td>21990</td><td>2026-05-03</td><td>webshop</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S7: Delta table létrehozása ══════════ -->
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Delta table létrehozása lokálisan
+    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta Lake</span>
+  </h2>
+  <div class="md-cell">
+    <p>Itt történik a lényeg. A <code>write_deltalake(...)</code> létrehozza a Delta table-t a megadott mappában.</p>
+    <p><strong>Nem kell hozzá:</strong> Databricks, Synapse, Azure, metastore, cluster</p>
+    <p>Kell hozzá egy Delta-kompatibilis writer, jelen esetben a <code>deltalake</code> csomag.</p>
+  </div>
+  <div class="code-cell" id="cell-s7">
+    <div class="code-header">
+      <span class="cell-number">[7]</span>
+      <button class="run-btn" onclick="runCell('s7')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre><span class="fn">write_deltalake</span>(<span class="fn">str</span>(table_path), sales_df)
+
+<span class="fn">print</span>(<span class="str">f"Delta table létrehozva itt: {table_path.resolve()}"</span>)</pre></div>
+    <div class="output-area" id="out-s7">
+      <div class="output-label">Output:</div>
+      <pre>Delta table létrehozva itt: /home/user/engineering_crash_courses/delta_demo_output/sales_delta</pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S8: Fájlrendszer tartalma ══════════ -->
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Nézzük meg, mi jött létre a fájlrendszerben
+    <span class="tool-badge"><img src="assets/logos/parquet.svg">Parquet</span>
+  </h2>
+  <div class="md-cell">
+    <p>A Delta table mappájában Parquet fájlokat és egy <code>_delta_log</code> mappát kell látnod.</p>
+  </div>
+  <div class="code-cell" id="cell-s8">
+    <div class="code-header">
+      <span class="cell-number">[8]</span>
+      <button class="run-btn" onclick="runCell('s8')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre><span class="kw">for</span> path <span class="kw">in</span> <span class="fn">sorted</span>(table_path.rglob(<span class="str">"*"</span>)):
+    relative = path.relative_to(table_path)
+    marker = <span class="str">"[DIR] "</span> <span class="kw">if</span> path.is_dir() <span class="kw">else</span> <span class="str">"[FILE]"</span>
+    <span class="fn">print</span>(marker, relative)</pre></div>
+    <div class="output-area" id="out-s8">
+      <div class="output-label">Output:</div>
+      <pre><span style="color:#ff8800">[DIR]</span>  _delta_log
+<span style="color:#00d4ff">[FILE]</span> _delta_log/00000000000000000000.json
+<span style="color:#00d4ff">[FILE]</span> part-00000-a1b2c3d4-e5f6-7890-abcd-ef1234567890-c000.snappy.parquet</pre>
+    </div>
+  </div>
+  <div class="md-cell">
+    <div class="callout success">
+      <div class="callout-title">Ez már valódi Delta table!</div>
+      <p>Nem azért, mert van neve egy catalogban, hanem mert a mappa Delta formátumú: <strong>adatfájlok + tranzakciós napló</strong>.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S9: _delta_log tartalma ══════════ -->
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>A <code>_delta_log</code> tartalma
+    <span class="tool-badge"><img src="assets/logos/json.svg">JSON</span>
+  </h2>
+  <div class="md-cell">
+    <p>A <code>_delta_log</code> JSON fájlok írják le a tábla tranzakcióit. Itt van például a schema és az, hogy mely Parquet fájlok tartoznak a táblához.</p>
+  </div>
+  <div class="code-cell" id="cell-s9">
+    <div class="code-header">
+      <span class="cell-number">[9a]</span>
+      <button class="run-btn" onclick="runCell('s9')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre>log_files = <span class="fn">sorted</span>((table_path / <span class="str">"_delta_log"</span>).glob(<span class="str">"*.json"</span>))
+log_files</pre></div>
+    <div class="output-area" id="out-s9">
+      <div class="output-label">Output:</div>
+      <pre>[PosixPath('delta_demo_output/sales_delta/_delta_log/00000000000000000000.json')]</pre>
+    </div>
+  </div>
+  <div class="code-cell" id="cell-s9b">
+    <div class="code-header">
+      <span class="cell-number">[9b]</span>
+      <button class="run-btn" onclick="runCell('s9b')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre>first_log = log_files[<span class="num">0</span>]
+
+<span class="kw">with</span> first_log.open(<span class="str">"r"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    log_lines = [json.loads(line) <span class="kw">for</span> line <span class="kw">in</span> f]
+
+<span class="kw">for</span> entry <span class="kw">in</span> log_lines:
+    <span class="fn">print</span>(json.dumps(entry, indent=<span class="num">2</span>)[:<span class="num">1200</span>])
+    <span class="fn">print</span>(<span class="str">"-"</span> * <span class="num">80</span>)</pre></div>
+    <div class="output-area" id="out-s9b">
+      <div class="output-label">Output:</div>
+      <pre>{
+  "<span style="color:#00d4ff">protocol</span>": {
+    "minReaderVersion": 1,
+    "minWriterVersion": 2
+  }
+}
+────────────────────────────────────────
+{
+  "<span style="color:#00d4ff">metaData</span>": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "format": {"provider": "parquet", "options": {}},
+    "schemaString": "{"type":"struct","fields":[...]}",
+    "createdTime": 1746297600000
+  }
+}
+────────────────────────────────────────
+{
+  "<span style="color:#00d4ff">add</span>": {
+    "path": "part-00000-a1b2c3d4-c000.snappy.parquet",
+    "partitionValues": {},
+    "size": 2456,
+    "modificationTime": 1746297600000,
+    "dataChange": true
+  }
+}
+────────────────────────────────────────
+{
+  "<span style="color:#00d4ff">commitInfo</span>": {
+    "timestamp": 1746297600000,
+    "operation": "CREATE_TABLE",
+    "operationParameters": {"mode": "Overwrite"}
+  }
+}</pre>
+    </div>
+  </div>
+  <div class="md-cell">
+    <div class="callout">
+      <div class="callout-title">A logban többféle bejegyzést láthatsz:</div>
+      <p><strong>protocol</strong> – milyen Delta protokollverzió kell az olvasáshoz/íráshoz<br>
+      <strong>metaData</strong> – tábla metaadatai, schema, formátum<br>
+      <strong>add</strong> – új Parquet fájl hozzáadása a táblaverzióhoz<br>
+      <strong>commitInfo</strong> – ki/milyen művelettel hozta létre a verziót</p>
+      <p>Ezért mondjuk, hogy a Delta table nem csak adatfájlok halmaza, hanem <strong>tranzakciós táblaréteg</strong>.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S10: Delta table olvasása ══════════ -->
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Delta table olvasása path alapján</h2>
+  <div class="md-cell">
+    <p>Most nincs metastore. Nem tudjuk azt mondani, hogy <code>SELECT * FROM silver.sales</code>, mert nincs ilyen regisztrált táblanév. De <strong>path alapján</strong> tökéletesen olvasható a Delta table.</p>
+  </div>
+  <div class="code-cell" id="cell-s10">
+    <div class="code-header">
+      <span class="cell-number">[10]</span>
+      <button class="run-btn" onclick="runCell('s10')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre>dt = DeltaTable(<span class="fn">str</span>(table_path))
+dt.to_pandas()</pre></div>
+    <div class="output-area" id="out-s10">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>amount</th><th>order_date</th><th>source_system</th></tr>
+        <tr><td>0</td><td>1001</td><td>C-001</td><td>12900</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>1</td><td>1002</td><td>C-002</td><td>4790</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>2</td><td>1003</td><td>C-001</td><td>8350</td><td>2026-05-02</td><td>pos</td></tr>
+        <tr><td>3</td><td>1004</td><td>C-003</td><td>21990</td><td>2026-05-03</td><td>webshop</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S11: Schema ══════════ -->
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Schema lekérdezése</h2>
+  <div class="md-cell">
+    <p>A schema nem a storage accountból jön. A schema a <strong>Delta metadata része</strong> lett, amikor megírtuk a táblát.</p>
+  </div>
+  <div class="code-cell" id="cell-s11">
+    <div class="code-header">
+      <span class="cell-number">[11]</span>
+      <button class="run-btn" onclick="runCell('s11')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre><span class="fn">print</span>(dt.schema().json())</pre></div>
+    <div class="output-area" id="out-s11">
+      <div class="output-label">Output:</div>
+      <pre>{"type": "struct", "fields": [
+  {"name": "order_id", "type": "integer", "nullable": false, "metadata": {}},
+  {"name": "customer_id", "type": "string", "nullable": false, "metadata": {}},
+  {"name": "amount", "type": "integer", "nullable": false, "metadata": {}},
+  {"name": "order_date", "type": {"type": "timestamp", "unit": "MICROS", "timezone": "UTC"}, "nullable": false, "metadata": {}},
+  {"name": "source_system", "type": "string", "nullable": false, "metadata": {}}
+]}</pre>
+    </div>
+  </div>
+  <div class="md-cell">
+    <div class="callout">
+      <div class="callout-title">Mentális modell:</div>
+      <pre><code>Lokális mappa vagy ADLS path
+  ↓
+Parquet adatfájlok  +  _delta_log/metaData
+  ↓
+Delta table schema</code></pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S12: Új adatok hozzáírása ══════════ -->
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Új adatok hozzáírása (append)</h2>
+  <div class="md-cell">
+    <p>Most appendelünk két új sort. Ettől <strong>új Parquet fájl</strong> és <strong>új Delta log verzió</strong> jön létre.</p>
+  </div>
+  <div class="code-cell" id="cell-s12">
+    <div class="code-header">
+      <span class="cell-number">[12]</span>
+      <button class="run-btn" onclick="runCell('s12')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre>new_sales_df = pd.DataFrame({
+    <span class="str">"order_id"</span>: [<span class="num">1005</span>, <span class="num">1006</span>],
+    <span class="str">"customer_id"</span>: [<span class="str">"C-004"</span>, <span class="str">"C-002"</span>],
+    <span class="str">"amount"</span>: [<span class="num">15900</span>, <span class="num">6990</span>],
+    <span class="str">"order_date"</span>: pd.to_datetime([<span class="str">"2026-05-04"</span>, <span class="str">"2026-05-04"</span>]),
+    <span class="str">"source_system"</span>: [<span class="str">"pos"</span>, <span class="str">"webshop"</span>],
+})
+
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(table_path), new_sales_df, mode=<span class="str">"append"</span>)
+dt = DeltaTable(<span class="fn">str</span>(table_path))
+dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
+    <div class="output-area" id="out-s12">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>amount</th><th>order_date</th><th>source_system</th></tr>
+        <tr><td>0</td><td>1001</td><td>C-001</td><td>12900</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>1</td><td>1002</td><td>C-002</td><td>4790</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>2</td><td>1003</td><td>C-001</td><td>8350</td><td>2026-05-02</td><td>pos</td></tr>
+        <tr><td>3</td><td>1004</td><td>C-003</td><td>21990</td><td>2026-05-03</td><td>webshop</td></tr>
+        <tr><td>4</td><td style="color:#00ff88">1005</td><td>C-004</td><td>15900</td><td>2026-05-04</td><td>pos</td></tr>
+        <tr><td>5</td><td style="color:#00ff88">1006</td><td>C-002</td><td>6990</td><td>2026-05-04</td><td>webshop</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S13: Verziók és time travel ══════════ -->
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Verziók és time travel
+    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta Lake</span>
+  </h2>
+  <div class="md-cell">
+    <p>A Delta log miatt a tábla <strong>verziózott</strong>. Az első írás volt a 0. verzió, az append után létrejött az 1. verzió.</p>
+  </div>
+  <div class="code-cell" id="cell-s13">
+    <div class="code-header">
+      <span class="cell-number">[13a]</span>
+      <button class="run-btn" onclick="runCell('s13')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre><span class="kw">for</span> log_file <span class="kw">in</span> <span class="fn">sorted</span>((table_path / <span class="str">"_delta_log"</span>).glob(<span class="str">"*.json"</span>)):
+    <span class="fn">print</span>(log_file.name)</pre></div>
+    <div class="output-area" id="out-s13">
+      <div class="output-label">Output:</div>
+      <pre>00000000000000000000.json
+00000000000000000001.json</pre>
+    </div>
+  </div>
+  <div class="code-cell" id="cell-s13b">
+    <div class="code-header">
+      <span class="cell-number">[13b]</span>
+      <button class="run-btn" onclick="runCell('s13b')">▶ Run</button>
+    </div>
+    <div class="code-body"><pre>version_0 = DeltaTable(<span class="fn">str</span>(table_path), version=<span class="num">0</span>)
+version_1 = DeltaTable(<span class="fn">str</span>(table_path), version=<span class="num">1</span>)
+
+<span class="fn">print</span>(<span class="str">"0. verzió sorok száma:"</span>, <span class="fn">len</span>(version_0.to_pandas()))
+<span class="fn">print</span>(<span class="str">"1. verzió sorok száma:"</span>, <span class="fn">len</span>(version_1.to_pandas()))</pre></div>
+    <div class="output-area" id="out-s13b">
+      <div class="output-label">Output:</div>
+      <pre>0. verzió sorok száma: 4
+1. verzió sorok száma: 6</pre>
+    </div>
+  </div>
+  <div class="md-cell">
+    <div class="callout success">
+      <div class="callout-title">Time travel</div>
+      <p>Nem csak a legfrissebb állapotot tudod olvasni, hanem <strong>korábbi verziókat is</strong>, amíg a régi fájlokat nem törölted retention/vacuum miatt.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S14: Metastore ══════════ -->
+<div class="section layer-intro" id="s14">
+  <div class="section-number">Section 14-15</div>
+  <h2>Hol van itt a metastore? + Path vs Metastore + Azure
+    <span class="tool-badge"><img src="assets/logos/apachehive.svg">Hive</span>
+    <span class="tool-badge"><img src="assets/logos/microsoftazure.svg">Azure</span>
+    <span class="tool-badge"><img src="assets/logos/databricks.svg">Databricks</span>
+  </h2>
+  <div class="md-cell">
+    <p>Ebben a notebookban <strong>nincs metastore</strong>. Csak egy Delta table van egy lokális path-on. A metastore akkor jön képbe, amikor ehhez a path-hoz <strong>táblanevet akarsz rendelni</strong>.</p>
+    <p>Például Databricksben vagy Spark SQL-ben:</p>
+    <pre><code><span class="kw">CREATE TABLE</span> silver.sales
+<span class="kw">USING DELTA</span>
+<span class="kw">LOCATION</span> <span class="str">'/path/to/delta_demo_output/sales_delta'</span>;</code></pre>
+  </div>
+  <table>
+    <tr><th>Megközelítés</th><th>Mit használsz?</th><th>Példa</th><th>Mire jó?</th></tr>
+    <tr><td><strong>Path-alapú Delta table</strong></td><td>Fizikai útvonal</td><td><code>DeltaTable("delta_demo_output/sales_delta")</code></td><td>Lokális demo, egyszerű job</td></tr>
+    <tr><td><strong>Metastore-ba regisztrált</strong></td><td>Logikai név</td><td><code>silver.sales</code></td><td>SQL, jogosultság, discovery, BI</td></tr>
+  </table>
+  <div class="md-cell">
+    <h3>Azure-ban ugyanez</h3>
+    <p>Lokális path helyett ADLS path lenne:</p>
+    <pre><code><span class="cm"># ADLS path</span>
+abfss://silver@stcompanydata.dfs.core.windows.net/sales_delta
+
+<span class="cm"># Databricks Python</span>
+df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwrite"</span>).save(
+    <span class="str">"abfss://silver@stcompanydata.dfs.core.windows.net/sales_delta"</span>
+)
+
+<span class="cm"># SQL regisztráció</span>
+<span class="kw">CREATE TABLE</span> silver.sales
+<span class="kw">USING DELTA</span>
+<span class="kw">LOCATION</span> <span class="str">'abfss://silver@stcompanydata.dfs.core.windows.net/sales_delta'</span>;</code></pre>
+    <p>A fizikai szerkezet <strong>ugyanaz</strong>: Parquet fájlok + <code>_delta_log</code>.</p>
+  </div>
+</div>
+
+
+<!-- ══════════ S16: ETL és ELT ══════════ -->
+<div class="section layer-general" id="s16">
+  <div class="section-number">Section 16-17</div>
+  <h2>ETL és ELT ugyanazzal a lokális Delta gondolkodással
+    <span class="tool-badge"><img src="assets/logos/apachespark.svg">Spark</span>
+    <span class="tool-badge"><img src="assets/logos/dbt.svg">dbt</span>
+  </h2>
+  <div class="md-cell">
+    <p>Az ETL és az ELT nem fájlformátum, nem Databricks feature. Inkább arról szól, hogy <strong>mikor történik a transzformáció</strong>.</p>
+    <pre><code>ETL = Extract → Transform → Load
+ELT = Extract → Load → Transform</code></pre>
+    <table>
+      <tr><th>Minta</th><th>Mikor tisztítod?</th><th>Hova kerül először?</th><th>Tipikus lakehouse réteg</th></tr>
+      <tr><td><strong>ETL</strong></td><td>Betöltés előtt</td><td>Már tisztított tábla</td><td>silver/gold jellegű output</td></tr>
+      <tr><td><strong>ELT</strong></td><td>Betöltés után</td><td>Először raw/bronze tábla</td><td>bronze → silver → gold</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ══════════ S17: ETL Demo ══════════ -->
+<div class="section layer-general" id="s17">
+  <div class="section-number">Section 17</div>
+  <h2>ETL demo: előbb transzformálunk, utána töltünk Delta táblába</h2>
+  <div class="md-cell"><p>ETL esetén először Pythonban megtisztítjuk és üzleti oszlopokat képzünk, és csak a kész adatot írjuk ki.</p></div>
+
+  <div class="code-cell" id="cell-s17a">
+    <div class="code-header"><span class="cell-number">[17a]</span><button class="run-btn" onclick="runCell('s17a')">▶ Run</button></div>
+    <div class="code-body"><pre>etl_source_df = pd.DataFrame({
+    <span class="str">"order_id"</span>: [<span class="str">"2001"</span>, <span class="str">"2002"</span>, <span class="str">"2003"</span>, <span class="str">"2004"</span>],
+    <span class="str">"customer_id"</span>: [<span class="str">"C-010"</span>, <span class="str">"C-011"</span>, <span class="str">"C-010"</span>, <span class="str">"C-012"</span>],
+    <span class="str">"gross_amount_huf"</span>: [<span class="str">"12 900"</span>, <span class="str">"4 790"</span>, <span class="str">"25 000"</span>, <span class="str">"8 350"</span>],
+    <span class="str">"discount_pct"</span>: [<span class="str">"0"</span>, <span class="str">"10"</span>, <span class="str">"20"</span>, <span class="str">"0"</span>],
+    <span class="str">"order_date"</span>: [<span class="str">"2026-05-01"</span>, <span class="str">"2026-05-01"</span>, <span class="str">"2026-05-02"</span>, <span class="str">"2026-05-03"</span>],
+    <span class="str">"channel"</span>: [<span class="str">"webshop"</span>, <span class="str">"webshop"</span>, <span class="str">"partner"</span>, <span class="str">"pos"</span>],
+})
+etl_source_df</pre></div>
+    <div class="output-area" id="out-s17a">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th></tr>
+        <tr><td>0</td><td>"2001"</td><td>C-010</td><td>"12 900"</td><td>"0"</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>1</td><td>"2002"</td><td>C-011</td><td>"4 790"</td><td>"10"</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>2</td><td>"2003"</td><td>C-010</td><td>"25 000"</td><td>"20"</td><td>2026-05-02</td><td>partner</td></tr>
+        <tr><td>3</td><td>"2004"</td><td>C-012</td><td>"8 350"</td><td>"0"</td><td>2026-05-03</td><td>pos</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s17b">
+    <div class="code-header"><span class="cell-number">[17b]</span><button class="run-btn" onclick="runCell('s17b')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Transform lépés: tisztítás és üzleti logika</span>
+etl_clean_df = etl_source_df.copy()
+etl_clean_df[<span class="str">"gross_amount_huf"</span>] = etl_clean_df[<span class="str">"gross_amount_huf"</span>].str.replace(<span class="str">" "</span>, <span class="str">""</span>).astype(<span class="str">"int64"</span>)
+etl_clean_df[<span class="str">"net_amount_huf"</span>] = (etl_clean_df[<span class="str">"gross_amount_huf"</span>] * (1 - etl_clean_df[<span class="str">"discount_pct"</span>].astype(float) / 100)).round().astype(<span class="str">"int64"</span>)
+etl_clean_df[<span class="str">"is_online"</span>] = etl_clean_df[<span class="str">"channel"</span>].eq(<span class="str">"webshop"</span>)
+etl_clean_df</pre></div>
+    <div class="output-area" id="out-s17b">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th><th>is_online</th></tr>
+        <tr><td>0</td><td>2001</td><td>C-010</td><td>12900</td><td>0</td><td>2026-05-01</td><td>webshop</td><td>12900</td><td>True</td></tr>
+        <tr><td>1</td><td>2002</td><td>C-011</td><td>4790</td><td>10</td><td>2026-05-01</td><td>webshop</td><td>4311</td><td>True</td></tr>
+        <tr><td>2</td><td>2003</td><td>C-010</td><td>25000</td><td>20</td><td>2026-05-02</td><td>partner</td><td>20000</td><td>False</td></tr>
+        <tr><td>3</td><td>2004</td><td>C-012</td><td>8350</td><td>0</td><td>2026-05-03</td><td>pos</td><td>8350</td><td>False</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s17c">
+    <div class="code-header"><span class="cell-number">[17c]</span><button class="run-btn" onclick="runCell('s17c')">▶ Run</button></div>
+    <div class="code-body"><pre>etl_table_path = base_dir / <span class="str">"sales_etl_curated_delta"</span>
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(etl_table_path), etl_clean_df, mode=<span class="str">"overwrite"</span>)
+<span class="fn">print</span>(<span class="str">f"ETL output Delta table: {etl_table_path.resolve()}"</span>)
+DeltaTable(<span class="fn">str</span>(etl_table_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
+    <div class="output-area" id="out-s17c">
+      <div class="output-label">Output:</div>
+      <pre>ETL output Delta table: /home/user/.../delta_demo_output/sales_etl_curated_delta</pre>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th><th>is_online</th></tr>
+        <tr><td>0</td><td>2001</td><td>C-010</td><td>12900</td><td>0.0</td><td>2026-05-01</td><td>webshop</td><td>12900</td><td>True</td></tr>
+        <tr><td>1</td><td>2002</td><td>C-011</td><td>4790</td><td>10.0</td><td>2026-05-01</td><td>webshop</td><td>4311</td><td>True</td></tr>
+        <tr><td>2</td><td>2003</td><td>C-010</td><td>25000</td><td>20.0</td><td>2026-05-02</td><td>partner</td><td>20000</td><td>False</td></tr>
+        <tr><td>3</td><td>2004</td><td>C-012</td><td>8350</td><td>0.0</td><td>2026-05-03</td><td>pos</td><td>8350</td><td>False</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="md-cell">
+    <div class="callout"><div class="callout-title">ETL minta</div>
+      <pre><code>nyers DataFrame → tisztítás és üzleti logika Pythonban → kész/kurált Delta table</code></pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S18: ELT Demo ══════════ -->
+<div class="section layer-bronze" id="s18">
+  <div class="section-number">Section 18-19</div>
+  <h2>ELT demo: előbb betöltjük raw Delta táblába, utána transzformálunk</h2>
+  <div class="md-cell">
+    <p>ELT esetén a nyers adatot gyorsan eltesszük egy <span class="layer-badge bronze">bronze</span> táblába, majd abból készül a <span class="layer-badge silver">silver</span> tábla.</p>
+  </div>
+
+  <div class="code-cell" id="cell-s18a">
+    <div class="code-header"><span class="cell-number">[18a]</span><button class="run-btn" onclick="runCell('s18a')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Load: nyers adat → bronze Delta tábla</span>
+elt_raw_table_path = base_dir / <span class="str">"sales_elt_bronze_raw_delta"</span>
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(elt_raw_table_path), etl_source_df, mode=<span class="str">"overwrite"</span>)
+<span class="fn">print</span>(<span class="str">f"ELT bronze/raw Delta table: {elt_raw_table_path.resolve()}"</span>)
+DeltaTable(<span class="fn">str</span>(elt_raw_table_path)).to_pandas()</pre></div>
+    <div class="output-area" id="out-s18a">
+      <div class="output-label">Output:</div>
+      <pre>ELT bronze/raw Delta table: .../delta_demo_output/sales_elt_bronze_raw_delta</pre>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th></tr>
+        <tr><td>0</td><td>"2001"</td><td>C-010</td><td>"12 900"</td><td>"0"</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>1</td><td>"2002"</td><td>C-011</td><td>"4 790"</td><td>"10"</td><td>2026-05-01</td><td>webshop</td></tr>
+        <tr><td>2</td><td>"2003"</td><td>C-010</td><td>"25 000"</td><td>"20"</td><td>2026-05-02</td><td>partner</td></tr>
+        <tr><td>3</td><td>"2004"</td><td>C-012</td><td>"8 350"</td><td>"0"</td><td>2026-05-03</td><td>pos</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s18b">
+    <div class="code-header"><span class="cell-number">[18b]</span><button class="run-btn" onclick="runCell('s18b')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Transform: bronze → silver</span>
+elt_silver_table_path = base_dir / <span class="str">"sales_elt_silver_delta"</span>
+bronze_df = DeltaTable(<span class="fn">str</span>(elt_raw_table_path)).to_pandas()
+silver_df = bronze_df.copy()
+silver_df[<span class="str">"gross_amount_huf"</span>] = silver_df[<span class="str">"gross_amount_huf"</span>].str.replace(<span class="str">" "</span>,<span class="str">""</span>).astype(<span class="str">"int64"</span>)
+silver_df[<span class="str">"net_amount_huf"</span>] = (silver_df[<span class="str">"gross_amount_huf"</span>] * (1 - silver_df[<span class="str">"discount_pct"</span>].astype(float)/100)).round().astype(<span class="str">"int64"</span>)
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(elt_silver_table_path), silver_df, mode=<span class="str">"overwrite"</span>)
+DeltaTable(<span class="fn">str</span>(elt_silver_table_path)).to_pandas()</pre></div>
+    <div class="output-area" id="out-s18b">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th></tr>
+        <tr><td>0</td><td>2001</td><td>C-010</td><td>12900</td><td>0</td><td>2026-05-01</td><td>webshop</td><td>12900</td></tr>
+        <tr><td>1</td><td>2002</td><td>C-011</td><td>4790</td><td>10</td><td>2026-05-01</td><td>webshop</td><td>4311</td></tr>
+        <tr><td>2</td><td>2003</td><td>C-010</td><td>25000</td><td>20</td><td>2026-05-02</td><td>partner</td><td>20000</td></tr>
+        <tr><td>3</td><td>2004</td><td>C-012</td><td>8350</td><td>0</td><td>2026-05-03</td><td>pos</td><td>8350</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="md-cell">
+    <div class="callout success"><div class="callout-title">ELT minta</div>
+      <pre><code>nyers DataFrame → bronze/raw Delta table → transzformáció → silver/curated Delta table</code></pre>
+      <p>A bronze tábla megőrzi az eredetihez közeli állapotot. Ha változik a logika, a silver újragenerálható.</p>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s19">
+    <div class="code-header"><span class="cell-number">[19]</span><button class="run-btn" onclick="runCell('s19')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># ETL vs ELT összehasonlítás</span>
+demo_tables = {
+    <span class="str">"ETL curated"</span>: etl_table_path,
+    <span class="str">"ELT bronze/raw"</span>: elt_raw_table_path,
+    <span class="str">"ELT silver/curated"</span>: elt_silver_table_path,
+}
+<span class="kw">for</span> label, path <span class="kw">in</span> demo_tables.items():
+    parquet_files = <span class="fn">sorted</span>(path.glob(<span class="str">"*.parquet"</span>))
+    log_files = <span class="fn">sorted</span>((path / <span class="str">"_delta_log"</span>).glob(<span class="str">"*.json"</span>))
+    <span class="fn">print</span>(<span class="str">f"{label}"</span>)
+    <span class="fn">print</span>(<span class="str">f"  path: {path}"</span>)
+    <span class="fn">print</span>(<span class="str">f"  parquet fájlok: {len(parquet_files)}"</span>)
+    <span class="fn">print</span>(<span class="str">f"  delta log verziók: {len(log_files)}"</span>)</pre></div>
+    <div class="output-area" id="out-s19">
+      <div class="output-label">Output:</div>
+      <pre>ETL curated
+  path: delta_demo_output/sales_etl_curated_delta
+  parquet fájlok: 1
+  delta log verziók: 1
+ELT bronze/raw
+  path: delta_demo_output/sales_elt_bronze_raw_delta
+  parquet fájlok: 1
+  delta log verziók: 1
+ELT silver/curated
+  path: delta_demo_output/sales_elt_silver_delta
+  parquet fájlok: 1
+  delta log verziók: 1</pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S20: Landing/Bronze/Silver/Gold ══════════ -->
+<div class="section layer-bronze" id="s20">
+  <div class="section-number">Section 20</div>
+  <h2>Landing, Bronze, Silver, Gold rétegek</h2>
+  <div class="md-cell">
+    <p>A lakehouse rétegezés arra való, hogy az adat útja ne egyetlen nagy feldolgozás legyen, hanem jól elkülönített állomások sorozata.</p>
+    <div class="arch-flow">
+      <div class="arch-step" style="border-color:var(--text-dim)"><span class="layer-badge landing">Landing</span><div class="detail">Nyers CSV fájlok</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step" style="border-color:var(--bronze)"><span class="layer-badge bronze">Bronze</span><div class="detail">Raw Delta tábla</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step" style="border-color:var(--silver)"><span class="layer-badge silver">Silver</span><div class="detail">Tisztított Delta</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step" style="border-color:var(--gold)"><span class="layer-badge gold">Gold</span><div class="detail">KPI aggregátum</div></div>
+    </div>
+    <table>
+      <tr><th>Réteg</th><th>Mit tartalmaz?</th><th>Mennyire nyers?</th><th>Tipikus cél</th></tr>
+      <tr><td><span class="layer-badge landing">Landing</span></td><td>Beérkezett fájlok majdnem érintetlenül</td><td>Teljesen nyers</td><td>Forrásból érkező adat megőrzése</td></tr>
+      <tr><td><span class="layer-badge bronze">Bronze</span></td><td>Raw adat Delta táblában, ingestion metaadatokkal</td><td>Nagyon nyers</td><td>Auditálható, újraolvasható alapréteg</td></tr>
+      <tr><td><span class="layer-badge silver">Silver</span></td><td>Tisztított, típusozott, deduplikált adat</td><td>Üzletileg használható</td><td>Elemzés és további modellezés</td></tr>
+      <tr><td><span class="layer-badge gold">Gold</span></td><td>Aggregált, üzleti célra előkészített adat</td><td>Kurált</td><td>Dashboard, riport, KPI</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ══════════ S21: Réteg demo ══════════ -->
+<div class="section layer-bronze" id="s21">
+  <div class="section-number">Section 21</div>
+  <h2>Landing → Bronze → Silver → Gold demo
+    <span class="tool-badge"><img src="assets/logos/csv.svg">CSV</span>
+    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta</span>
+  </h2>
+
+  <div class="code-cell" id="cell-s21a">
+    <div class="code-header"><span class="cell-number">[21a]</span><button class="run-btn" onclick="runCell('s21a')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Landing: két nyers CSV fájl létrehozása</span>
+landing_dir = base_dir / <span class="str">"landing"</span> / <span class="str">"orders"</span>
+landing_batch_1 = pd.DataFrame({
+    <span class="str">"order_id"</span>: [<span class="str">"3001"</span>, <span class="str">"3002"</span>, <span class="str">"3003"</span>],
+    <span class="str">"customer_id"</span>: [<span class="str">"C-020"</span>, <span class="str">"C-021"</span>, <span class="str">"C-020"</span>],
+    <span class="str">"gross_amount_huf"</span>: [<span class="str">"9900"</span>, <span class="str">"14900"</span>, <span class="str">"2490"</span>],
+    <span class="str">"discount_pct"</span>: [<span class="str">"0"</span>, <span class="str">"15"</span>, <span class="str">"0"</span>],
+    <span class="str">"order_date"</span>: [<span class="str">"2026-05-05"</span>, <span class="str">"2026-05-05"</span>, <span class="str">"2026-05-06"</span>],
+    <span class="str">"channel"</span>: [<span class="str">"webshop"</span>, <span class="str">"partner"</span>, <span class="str">"pos"</span>],
+})
+landing_batch_2 = pd.DataFrame({
+    <span class="str">"order_id"</span>: [<span class="str">"3004"</span>, <span class="str">"3005"</span>],
+    <span class="str">"customer_id"</span>: [<span class="str">"C-022"</span>, <span class="str">"C-023"</span>],
+    <span class="str">"gross_amount_huf"</span>: [<span class="str">"19990"</span>, <span class="str">"5990"</span>],
+    <span class="str">"discount_pct"</span>: [<span class="str">"10"</span>, <span class="str">"0"</span>],
+    <span class="str">"order_date"</span>: [<span class="str">"2026-05-06"</span>, <span class="str">"2026-05-07"</span>],
+    <span class="str">"channel"</span>: [<span class="str">"webshop"</span>, <span class="str">"webshop"</span>],
+})
+landing_batch_1.to_csv(landing_dir / <span class="str">"orders_2026_05_05.csv"</span>, index=<span class="kw">False</span>)
+landing_batch_2.to_csv(landing_dir / <span class="str">"orders_2026_05_06.csv"</span>, index=<span class="kw">False</span>)</pre></div>
+    <div class="output-area" id="out-s21a">
+      <div class="output-label">Output:</div>
+      <pre>delta_demo_output/landing/orders/orders_2026_05_05.csv
+delta_demo_output/landing/orders/orders_2026_05_06.csv</pre>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s21b">
+    <div class="code-header"><span class="cell-number">[21b]</span> <span class="layer-badge bronze">Bronze</span><button class="run-btn" onclick="runCell('s21b')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Landing → Bronze: CSV beolvasás + ingestion meta</span>
+bronze_frames = []
+<span class="kw">for</span> source_file <span class="kw">in</span> <span class="fn">sorted</span>(landing_dir.glob(<span class="str">"*.csv"</span>)):
+    frame = pd.read_csv(source_file, dtype=<span class="fn">str</span>)
+    frame[<span class="str">"_source_file"</span>] = source_file.name
+    frame[<span class="str">"_ingestion_mode"</span>] = <span class="str">"batch"</span>
+    frame[<span class="str">"_ingested_at"</span>] = pd.Timestamp.now(<span class="str">"UTC"</span>).isoformat()
+    bronze_frames.append(frame)
+bronze_orders_df = pd.concat(bronze_frames, ignore_index=<span class="kw">True</span>)
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(bronze_orders_path), bronze_orders_df, mode=<span class="str">"overwrite"</span>)
+DeltaTable(<span class="fn">str</span>(bronze_orders_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
+    <div class="output-area" id="out-s21b">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>_source_file</th><th>_ingestion_mode</th></tr>
+        <tr><td>0</td><td>3001</td><td>C-020</td><td>9900</td><td>0</td><td>2026-05-05</td><td>webshop</td><td>orders_2026_05_05.csv</td><td>batch</td></tr>
+        <tr><td>1</td><td>3002</td><td>C-021</td><td>14900</td><td>15</td><td>2026-05-05</td><td>partner</td><td>orders_2026_05_05.csv</td><td>batch</td></tr>
+        <tr><td>2</td><td>3003</td><td>C-020</td><td>2490</td><td>0</td><td>2026-05-06</td><td>pos</td><td>orders_2026_05_05.csv</td><td>batch</td></tr>
+        <tr><td>3</td><td>3004</td><td>C-022</td><td>19990</td><td>10</td><td>2026-05-06</td><td>webshop</td><td>orders_2026_05_06.csv</td><td>batch</td></tr>
+        <tr><td>4</td><td>3005</td><td>C-023</td><td>5990</td><td>0</td><td>2026-05-07</td><td>webshop</td><td>orders_2026_05_06.csv</td><td>batch</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s21c">
+    <div class="code-header"><span class="cell-number">[21c]</span> <span class="layer-badge silver">Silver</span><button class="run-btn" onclick="runCell('s21c')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Bronze → Silver: típusozás, tisztítás, deduplikáció</span>
+bronze_orders_read_df = DeltaTable(<span class="fn">str</span>(bronze_orders_path)).to_pandas()
+silver_orders_df = bronze_orders_read_df.copy()
+silver_orders_df[<span class="str">"gross_amount_huf"</span>] = silver_orders_df[<span class="str">"gross_amount_huf"</span>].astype(<span class="str">"int64"</span>)
+silver_orders_df[<span class="str">"net_amount_huf"</span>] = (silver_orders_df[<span class="str">"gross_amount_huf"</span>] * (1 - silver_orders_df[<span class="str">"discount_pct"</span>].astype(float)/100)).round().astype(<span class="str">"int64"</span>)
+silver_orders_df[<span class="str">"is_online"</span>] = silver_orders_df[<span class="str">"channel"</span>].eq(<span class="str">"webshop"</span>)
+silver_orders_df = silver_orders_df.drop_duplicates(subset=[<span class="str">"order_id"</span>])
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(silver_orders_path), silver_orders_df, mode=<span class="str">"overwrite"</span>)
+DeltaTable(<span class="fn">str</span>(silver_orders_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
+    <div class="output-area" id="out-s21c">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th><th>is_online</th></tr>
+        <tr><td>0</td><td>3001</td><td>C-020</td><td>9900</td><td>0.0</td><td>2026-05-05</td><td>webshop</td><td>9900</td><td>True</td></tr>
+        <tr><td>1</td><td>3002</td><td>C-021</td><td>14900</td><td>15.0</td><td>2026-05-05</td><td>partner</td><td>12665</td><td>False</td></tr>
+        <tr><td>2</td><td>3003</td><td>C-020</td><td>2490</td><td>0.0</td><td>2026-05-06</td><td>pos</td><td>2490</td><td>False</td></tr>
+        <tr><td>3</td><td>3004</td><td>C-022</td><td>19990</td><td>10.0</td><td>2026-05-06</td><td>webshop</td><td>17991</td><td>True</td></tr>
+        <tr><td>4</td><td>3005</td><td>C-023</td><td>5990</td><td>0.0</td><td>2026-05-07</td><td>webshop</td><td>5990</td><td>True</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s21d">
+    <div class="code-header"><span class="cell-number">[21d]</span> <span class="layer-badge gold">Gold</span><button class="run-btn" onclick="runCell('s21d')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Silver → Gold: napi csatorna szerinti KPI</span>
+gold_daily_sales_df = (
+    silver_orders_df
+    .groupby([<span class="str">"order_date"</span>, <span class="str">"channel"</span>], as_index=<span class="kw">False</span>)
+    .agg(order_count=(<span class="str">"order_id"</span>, <span class="str">"count"</span>), gross_amount_huf=(<span class="str">"gross_amount_huf"</span>, <span class="str">"sum"</span>), net_amount_huf=(<span class="str">"net_amount_huf"</span>, <span class="str">"sum"</span>))
+    .sort_values([<span class="str">"order_date"</span>, <span class="str">"channel"</span>])
+)
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(gold_daily_sales_path), gold_daily_sales_df, mode=<span class="str">"overwrite"</span>)
+DeltaTable(<span class="fn">str</span>(gold_daily_sales_path)).to_pandas()</pre></div>
+    <div class="output-area" id="out-s21d">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_date</th><th>channel</th><th>order_count</th><th>gross_amount_huf</th><th>net_amount_huf</th></tr>
+        <tr><td>0</td><td>2026-05-05</td><td>partner</td><td>1</td><td>14900</td><td>12665</td></tr>
+        <tr><td>1</td><td>2026-05-05</td><td>webshop</td><td>1</td><td>9900</td><td>9900</td></tr>
+        <tr><td>2</td><td>2026-05-06</td><td>pos</td><td>1</td><td>2490</td><td>2490</td></tr>
+        <tr><td>3</td><td>2026-05-06</td><td>webshop</td><td>1</td><td>19990</td><td>17991</td></tr>
+        <tr><td>4</td><td>2026-05-07</td><td>webshop</td><td>1</td><td>5990</td><td>5990</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="md-cell">
+    <div class="callout success"><div class="callout-title">Mentális modell</div>
+      <pre><code>landing/orders/*.csv
+  → bronze/orders_delta        # raw, auditálható Delta
+  → silver/orders_delta        # tisztított rendelési tényadat
+  → gold/daily_channel_sales   # napi csatorna szerinti KPI</code></pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S22: Fact és dimension ══════════ -->
+<div class="section layer-gold" id="s22">
+  <div class="section-number">Section 22-24</div>
+  <h2>Fact és Dimension táblák (Star Schema)</h2>
+  <div class="md-cell">
+    <p>A <strong>fact</strong> és <strong>dimension</strong> fogalmak a klasszikus adattárház-modellezésből jönnek.</p>
+    <pre><code>Fact = mérhető események (rendelések, összegek)
+Dimension = leíró entitások (vásárló, csatorna, dátum)</code></pre>
+  </div>
+
+  <div class="star-schema">
+    <div class="star-entity dim"><div class="entity-name">dim_customer</div><div class="entity-cols">customer_id, customer_name</div></div>
+    <div class="star-arrow">↔</div>
+    <div class="star-entity fact"><div class="entity-name">fact_sales</div><div class="entity-cols">order_id, customer_id, channel, date_id, net_amount_huf</div></div>
+    <div class="star-arrow">↔</div>
+    <div class="star-entity dim"><div class="entity-name">dim_channel</div><div class="entity-cols">channel, channel_name</div></div>
+  </div>
+  <div style="text-align:center;margin-top:-10px;margin-bottom:20px">
+    <div class="star-entity dim" style="display:inline-block"><div class="entity-name">dim_date</div><div class="entity-cols">date_id, year, month, day</div></div>
+  </div>
+
+
+  <div class="code-cell" id="cell-s23a">
+    <div class="code-header"><span class="cell-number">[23a]</span> dim_customer<button class="run-btn" onclick="runCell('s23a')">▶ Run</button></div>
+    <div class="code-body"><pre>customer_names = {<span class="str">"C-020"</span>: <span class="str">"Kovacs Anna"</span>, <span class="str">"C-021"</span>: <span class="str">"Nagy Bela"</span>, <span class="str">"C-022"</span>: <span class="str">"Toth Csilla"</span>, <span class="str">"C-023"</span>: <span class="str">"Szabo David"</span>}
+dim_customer_df = silver_for_model_df[[<span class="str">"customer_id"</span>]].drop_duplicates().sort_values(<span class="str">"customer_id"</span>)
+dim_customer_df[<span class="str">"customer_name"</span>] = dim_customer_df[<span class="str">"customer_id"</span>].map(customer_names)
+dim_customer_df</pre></div>
+    <div class="output-area" id="out-s23a">
+      <div class="output-label">Output:</div>
+      <table><tr><th></th><th>customer_id</th><th>customer_name</th></tr>
+      <tr><td>0</td><td>C-020</td><td>Kovacs Anna</td></tr>
+      <tr><td>1</td><td>C-021</td><td>Nagy Bela</td></tr>
+      <tr><td>2</td><td>C-022</td><td>Toth Csilla</td></tr>
+      <tr><td>3</td><td>C-023</td><td>Szabo David</td></tr></table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s23b">
+    <div class="code-header"><span class="cell-number">[23b]</span> dim_channel<button class="run-btn" onclick="runCell('s23b')">▶ Run</button></div>
+    <div class="code-body"><pre>channel_labels = {<span class="str">"webshop"</span>: <span class="str">"Online webshop"</span>, <span class="str">"partner"</span>: <span class="str">"Partner sales"</span>, <span class="str">"pos"</span>: <span class="str">"Physical store"</span>}
+dim_channel_df = silver_for_model_df[[<span class="str">"channel"</span>]].drop_duplicates().sort_values(<span class="str">"channel"</span>)
+dim_channel_df[<span class="str">"channel_name"</span>] = dim_channel_df[<span class="str">"channel"</span>].map(channel_labels)
+dim_channel_df</pre></div>
+    <div class="output-area" id="out-s23b">
+      <div class="output-label">Output:</div>
+      <table><tr><th></th><th>channel</th><th>channel_name</th></tr>
+      <tr><td>0</td><td>partner</td><td>Partner sales</td></tr>
+      <tr><td>1</td><td>pos</td><td>Physical store</td></tr>
+      <tr><td>2</td><td>webshop</td><td>Online webshop</td></tr></table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s23c">
+    <div class="code-header"><span class="cell-number">[23c]</span> dim_date<button class="run-btn" onclick="runCell('s23c')">▶ Run</button></div>
+    <div class="code-body"><pre>dim_date_df = silver_for_model_df[[<span class="str">"order_date"</span>]].drop_duplicates().sort_values(<span class="str">"order_date"</span>)
+dim_date_df[<span class="str">"date_id"</span>] = dim_date_df[<span class="str">"order_date"</span>].dt.strftime(<span class="str">"%Y%m%d"</span>).astype(<span class="str">"int64"</span>)
+dim_date_df[<span class="str">"year"</span>] = dim_date_df[<span class="str">"order_date"</span>].dt.year
+dim_date_df[<span class="str">"month"</span>] = dim_date_df[<span class="str">"order_date"</span>].dt.month
+dim_date_df[<span class="str">"day"</span>] = dim_date_df[<span class="str">"order_date"</span>].dt.day
+dim_date_df[[<span class="str">"date_id"</span>, <span class="str">"order_date"</span>, <span class="str">"year"</span>, <span class="str">"month"</span>, <span class="str">"day"</span>]]</pre></div>
+    <div class="output-area" id="out-s23c">
+      <div class="output-label">Output:</div>
+      <table><tr><th></th><th>date_id</th><th>order_date</th><th>year</th><th>month</th><th>day</th></tr>
+      <tr><td>0</td><td>20260505</td><td>2026-05-05</td><td>2026</td><td>5</td><td>5</td></tr>
+      <tr><td>1</td><td>20260506</td><td>2026-05-06</td><td>2026</td><td>5</td><td>6</td></tr>
+      <tr><td>2</td><td>20260507</td><td>2026-05-07</td><td>2026</td><td>5</td><td>7</td></tr></table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s23d">
+    <div class="code-header"><span class="cell-number">[23d]</span> fact_sales<button class="run-btn" onclick="runCell('s23d')">▶ Run</button></div>
+    <div class="code-body"><pre>fact_sales_df = silver_for_model_df.merge(dim_date_df[[<span class="str">"date_id"</span>,<span class="str">"order_date"</span>]], on=<span class="str">"order_date"</span>, how=<span class="str">"left"</span>)
+fact_sales_df = fact_sales_df[[<span class="str">"order_id"</span>,<span class="str">"customer_id"</span>,<span class="str">"channel"</span>,<span class="str">"date_id"</span>,<span class="str">"gross_amount_huf"</span>,<span class="str">"discount_pct"</span>,<span class="str">"net_amount_huf"</span>,<span class="str">"is_online"</span>]].sort_values(<span class="str">"order_id"</span>)
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(dim_customer_path), dim_customer_df, mode=<span class="str">"overwrite"</span>)
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(dim_channel_path), dim_channel_df, mode=<span class="str">"overwrite"</span>)
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(dim_date_path), dim_date_df, mode=<span class="str">"overwrite"</span>)
+<span class="fn">write_deltalake</span>(<span class="fn">str</span>(fact_sales_path), fact_sales_df, mode=<span class="str">"overwrite"</span>)
+fact_sales_df</pre></div>
+    <div class="output-area" id="out-s23d">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>channel</th><th>date_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>net_amount_huf</th><th>is_online</th></tr>
+        <tr><td>0</td><td>3001</td><td>C-020</td><td>webshop</td><td>20260505</td><td>9900</td><td>0.0</td><td>9900</td><td>True</td></tr>
+        <tr><td>1</td><td>3002</td><td>C-021</td><td>partner</td><td>20260505</td><td>14900</td><td>15.0</td><td>12665</td><td>False</td></tr>
+        <tr><td>2</td><td>3003</td><td>C-020</td><td>pos</td><td>20260506</td><td>2490</td><td>0.0</td><td>2490</td><td>False</td></tr>
+        <tr><td>3</td><td>3004</td><td>C-022</td><td>webshop</td><td>20260506</td><td>19990</td><td>10.0</td><td>17991</td><td>True</td></tr>
+        <tr><td>4</td><td>3005</td><td>C-023</td><td>webshop</td><td>20260507</td><td>5990</td><td>0.0</td><td>5990</td><td>True</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s23e">
+    <div class="code-header"><span class="cell-number">[23e]</span> Sales Mart (joined)<button class="run-btn" onclick="runCell('s23e')">▶ Run</button></div>
+    <div class="code-body"><pre>sales_mart_df = (fact_sales_df
+    .merge(dim_customer_df, on=<span class="str">"customer_id"</span>, how=<span class="str">"left"</span>)
+    .merge(dim_channel_df, on=<span class="str">"channel"</span>, how=<span class="str">"left"</span>)
+    .merge(dim_date_df, on=<span class="str">"date_id"</span>, how=<span class="str">"left"</span>))
+sales_mart_df[[<span class="str">"order_id"</span>, <span class="str">"customer_name"</span>, <span class="str">"channel_name"</span>, <span class="str">"order_date"</span>, <span class="str">"net_amount_huf"</span>]]</pre></div>
+    <div class="output-area" id="out-s23e">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_name</th><th>channel_name</th><th>order_date</th><th>net_amount_huf</th></tr>
+        <tr><td>0</td><td>3001</td><td>Kovacs Anna</td><td>Online webshop</td><td>2026-05-05</td><td>9900</td></tr>
+        <tr><td>1</td><td>3002</td><td>Nagy Bela</td><td>Partner sales</td><td>2026-05-05</td><td>12665</td></tr>
+        <tr><td>2</td><td>3003</td><td>Kovacs Anna</td><td>Physical store</td><td>2026-05-06</td><td>2490</td></tr>
+        <tr><td>3</td><td>3004</td><td>Toth Csilla</td><td>Online webshop</td><td>2026-05-06</td><td>17991</td></tr>
+        <tr><td>4</td><td>3005</td><td>Szabo David</td><td>Online webshop</td><td>2026-05-07</td><td>5990</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s23f">
+    <div class="code-header"><span class="cell-number">[23f]</span> Customer KPI<button class="run-btn" onclick="runCell('s23f')">▶ Run</button></div>
+    <div class="code-body"><pre>customer_kpi_df = (sales_mart_df
+    .groupby(<span class="str">"customer_name"</span>, as_index=<span class="kw">False</span>)
+    .agg(order_count=(<span class="str">"order_id"</span>, <span class="str">"count"</span>), total_net_amount_huf=(<span class="str">"net_amount_huf"</span>, <span class="str">"sum"</span>))
+    .sort_values(<span class="str">"total_net_amount_huf"</span>, ascending=<span class="kw">False</span>))
+customer_kpi_df</pre></div>
+    <div class="output-area" id="out-s23f">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>customer_name</th><th>order_count</th><th>total_net_amount_huf</th></tr>
+        <tr><td>0</td><td>Toth Csilla</td><td>1</td><td>17991</td></tr>
+        <tr><td>1</td><td>Nagy Bela</td><td>1</td><td>12665</td></tr>
+        <tr><td>2</td><td>Kovacs Anna</td><td>2</td><td>12390</td></tr>
+        <tr><td>3</td><td>Szabo David</td><td>1</td><td>5990</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S24: Batch feldolgozás ══════════ -->
+<div class="section layer-general" id="s24">
+  <div class="section-number">Section 24</div>
+  <h2>Batch feldolgozás</h2>
+  <div class="md-cell">
+    <p>Batch feldolgozásnál egyszerre egy véges adatcsomagot dolgozol fel. Például: minden éjjel 01:00-kor beolvasod az előző napi CSV-ket, frissíted a bronze, silver és gold rétegeket.</p>
+  </div>
+  <div class="code-cell" id="cell-s24">
+    <div class="code-header"><span class="cell-number">[24]</span><button class="run-btn" onclick="runCell('s24')">▶ Run</button></div>
+    <div class="code-body"><pre>batch_summary = pd.DataFrame({
+    <span class="str">"step"</span>: [<span class="str">"extract"</span>, <span class="str">"load bronze"</span>, <span class="str">"transform silver"</span>, <span class="str">"aggregate gold"</span>],
+    <span class="str">"input"</span>: [<span class="str">"landing CSV files"</span>, <span class="str">"landing DataFrame"</span>, <span class="str">"bronze Delta"</span>, <span class="str">"silver Delta"</span>],
+    <span class="str">"output"</span>: [<span class="str">"pandas DataFrame"</span>, <span class="str">"bronze Delta"</span>, <span class="str">"silver Delta"</span>, <span class="str">"gold Delta"</span>],
+    <span class="str">"execution_style"</span>: [<span class="str">"batch"</span>, <span class="str">"batch"</span>, <span class="str">"batch"</span>, <span class="str">"batch"</span>],
+})
+batch_summary</pre></div>
+    <div class="output-area" id="out-s24">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>step</th><th>input</th><th>output</th><th>execution_style</th></tr>
+        <tr><td>0</td><td>extract</td><td>landing CSV files</td><td>pandas DataFrame</td><td>batch</td></tr>
+        <tr><td>1</td><td>load bronze</td><td>landing DataFrame</td><td>bronze Delta</td><td>batch</td></tr>
+        <tr><td>2</td><td>transform silver</td><td>bronze Delta</td><td>silver Delta</td><td>batch</td></tr>
+        <tr><td>3</td><td>aggregate gold</td><td>silver Delta</td><td>gold Delta</td><td>batch</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S25: Streaming ══════════ -->
+<div class="section layer-general" id="s25">
+  <div class="section-number">Section 25</div>
+  <h2>Streaming és micro-batch gondolkodás
+    <span class="tool-badge"><img src="assets/logos/apachekafka.svg">Kafka</span>
+    <span class="tool-badge"><img src="assets/logos/apacheflink.svg">Flink</span>
+    <span class="tool-badge"><img src="assets/logos/apachespark.svg">Spark Streaming</span>
+  </h2>
+  <div class="md-cell">
+    <p>Valódi streaminghez Spark Structured Streaming, Flink, Kafka kell. Itt <strong>micro-batch szimulációt</strong> csinálunk.</p>
+  </div>
+
+  <div class="code-cell" id="cell-s25a">
+    <div class="code-header"><span class="cell-number">[25a]</span><button class="run-btn" onclick="runCell('s25a')">▶ Run</button></div>
+    <div class="code-body"><pre>stream_bronze_path = base_dir / <span class="str">"bronze/orders_stream_delta"</span>
+stream_silver_path = base_dir / <span class="str">"silver/orders_stream_delta"</span>
+stream_gold_path = base_dir / <span class="str">"gold/orders_stream_kpi_delta"</span>
+
+stream_batches = [
+    pd.DataFrame({<span class="str">"order_id"</span>:[<span class="str">"4001"</span>,<span class="str">"4002"</span>], <span class="str">"customer_id"</span>:[<span class="str">"C-030"</span>,<span class="str">"C-031"</span>], <span class="str">"gross_amount_huf"</span>:[<span class="str">"12900"</span>,<span class="str">"3490"</span>], <span class="str">"discount_pct"</span>:[<span class="str">"0"</span>,<span class="str">"0"</span>], <span class="str">"order_date"</span>:[<span class="str">"2026-05-08"</span>,<span class="str">"2026-05-08"</span>], <span class="str">"channel"</span>:[<span class="str">"webshop"</span>,<span class="str">"pos"</span>]}),
+    pd.DataFrame({<span class="str">"order_id"</span>:[<span class="str">"4003"</span>,<span class="str">"4004"</span>], <span class="str">"customer_id"</span>:[<span class="str">"C-032"</span>,<span class="str">"C-030"</span>], <span class="str">"gross_amount_huf"</span>:[<span class="str">"8490"</span>,<span class="str">"22990"</span>], <span class="str">"discount_pct"</span>:[<span class="str">"5"</span>,<span class="str">"20"</span>], <span class="str">"order_date"</span>:[<span class="str">"2026-05-08"</span>,<span class="str">"2026-05-09"</span>], <span class="str">"channel"</span>:[<span class="str">"partner"</span>,<span class="str">"webshop"</span>]}),
+]
+
+<span class="kw">for</span> batch_id, batch_df <span class="kw">in</span> <span class="fn">enumerate</span>(stream_batches, start=1):
+    bronze_batch_df = batch_df.copy()
+    bronze_batch_df[<span class="str">"_batch_id"</span>] = batch_id
+    bronze_mode = <span class="str">"overwrite"</span> <span class="kw">if</span> batch_id == 1 <span class="kw">else</span> <span class="str">"append"</span>
+    <span class="fn">write_deltalake</span>(<span class="fn">str</span>(stream_bronze_path), bronze_batch_df, mode=bronze_mode)
+    all_bronze = DeltaTable(<span class="fn">str</span>(stream_bronze_path)).to_pandas()
+    all_silver = <span class="fn">transform_orders</span>(all_bronze)
+    all_gold = <span class="fn">aggregate_daily_channel_sales</span>(all_silver)
+    <span class="fn">write_deltalake</span>(<span class="fn">str</span>(stream_silver_path), all_silver, mode=<span class="str">"overwrite"</span>)
+    <span class="fn">write_deltalake</span>(<span class="fn">str</span>(stream_gold_path), all_gold, mode=<span class="str">"overwrite"</span>)
+    <span class="fn">print</span>(<span class="str">f"micro-batch {batch_id} feldolgozva | bronze: {len(all_bronze)} | silver: {len(all_silver)} | gold: {len(all_gold)}"</span>)</pre></div>
+    <div class="output-area" id="out-s25a">
+      <div class="output-label">Output:</div>
+      <pre>micro-batch 1 feldolgozva | bronze: 2 | silver: 2 | gold: 2
+micro-batch 2 feldolgozva | bronze: 4 | silver: 4 | gold: 3</pre>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s25b">
+    <div class="code-header"><span class="cell-number">[25b]</span><button class="run-btn" onclick="runCell('s25b')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="fn">print</span>(<span class="str">"Bronze stream tábla:"</span>)
+DeltaTable(<span class="fn">str</span>(stream_bronze_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
+    <div class="output-area" id="out-s25b">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>_batch_id</th></tr>
+        <tr><td>0</td><td>4001</td><td>C-030</td><td>12900</td><td>0</td><td>2026-05-08</td><td>webshop</td><td>1</td></tr>
+        <tr><td>1</td><td>4002</td><td>C-031</td><td>3490</td><td>0</td><td>2026-05-08</td><td>pos</td><td>1</td></tr>
+        <tr><td>2</td><td>4003</td><td>C-032</td><td>8490</td><td>5</td><td>2026-05-08</td><td>partner</td><td>2</td></tr>
+        <tr><td>3</td><td>4004</td><td>C-030</td><td>22990</td><td>20</td><td>2026-05-09</td><td>webshop</td><td>2</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-cell" id="cell-s25c">
+    <div class="code-header"><span class="cell-number">[25c]</span><button class="run-btn" onclick="runCell('s25c')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="fn">print</span>(<span class="str">"Gold stream KPI tábla:"</span>)
+DeltaTable(<span class="fn">str</span>(stream_gold_path)).to_pandas()</pre></div>
+    <div class="output-area" id="out-s25c">
+      <div class="output-label">Output:</div>
+      <table>
+        <tr><th></th><th>order_date</th><th>channel</th><th>order_count</th><th>gross_amount_huf</th><th>net_amount_huf</th></tr>
+        <tr><td>0</td><td>2026-05-08</td><td>partner</td><td>1</td><td>8490</td><td>8066</td></tr>
+        <tr><td>1</td><td>2026-05-08</td><td>pos</td><td>1</td><td>3490</td><td>3490</td></tr>
+        <tr><td>2</td><td>2026-05-08</td><td>webshop</td><td>1</td><td>12900</td><td>12900</td></tr>
+        <tr><td>3</td><td>2026-05-09</td><td>webshop</td><td>1</td><td>22990</td><td>18392</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S26: Batch vs Streaming ══════════ -->
+<div class="section layer-general" id="s26">
+  <div class="section-number">Section 26</div>
+  <h2>Batch vs Streaming röviden</h2>
+  <table>
+    <tr><th>Szempont</th><th>Batch</th><th>Streaming / micro-batch</th></tr>
+    <tr><td><strong>Adat érkezése</strong></td><td>Véges csomagokban</td><td>Folyamatosan vagy kis adagokban</td></tr>
+    <tr><td><strong>Tipikus gyakoriság</strong></td><td>Óránként, naponta, hetente</td><td>Másodpercenként, percenként</td></tr>
+    <tr><td><strong>Egyszerűség</strong></td><td>Egyszerűbb fejleszteni és újrafuttatni</td><td>Több állapotkezelés, checkpoint</td></tr>
+    <tr><td><strong>Jó választás, ha</strong></td><td>Nem kell azonnali frissesség</td><td>Közel valós idejű adat kell</td></tr>
+    <tr><td><strong>Példa</strong></td><td>Napi sales riport</td><td>Élő rendelésmonitoring, fraud detection</td></tr>
+  </table>
+  <div class="md-cell">
+    <div class="callout"><div class="callout-title">Fontos</div>
+      <p>Sok modern streaming rendszer valójában <strong>micro-batch</strong> módon működik: a feldolgozó engine kis, ismétlődő batch-ekre bontja a folyamatos adatfolyamot.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S27: Open source metastore toolok ══════════ -->
+<div class="section layer-intro" id="s27">
+  <div class="section-number">Section 27</div>
+  <h2>Open source metastore/catalog toolok kipróbáláshoz
+    <span class="tool-badge"><img src="assets/logos/apachehive.svg">Hive</span>
+    <span class="tool-badge"><img src="assets/logos/unity-catalog.svg">Unity Catalog</span>
+    <span class="tool-badge"><img src="assets/logos/apacheiceberg.svg">Iceberg</span>
+    <span class="tool-badge"><img src="assets/logos/nessie.svg">Nessie</span>
+    <span class="tool-badge"><img src="assets/logos/polaris.svg">Polaris</span>
+    <span class="tool-badge"><img src="assets/logos/gravitino.svg">Gravitino</span>
+  </h2>
+  <table>
+    <tr><th>Tool</th><th>Mit ad hozzá?</th><th>Formátum fókusz</th><th>Mire jó?</th></tr>
+    <tr><td><strong>Hive Metastore</strong></td><td>Klasszikus Spark SQL metastore: database/table nevek, schema, location</td><td>Delta, Parquet, Hive</td><td>Megérteni az alap metastore modellt</td></tr>
+    <tr><td><strong>Unity Catalog OSS</strong></td><td>Databricks-szerű catalog: catalog.schema.table, jogosultságok</td><td>Delta, Iceberg, Parquet</td><td>Unity Catalog Databricks nélkül</td></tr>
+    <tr><td><strong>Apache Gravitino</strong></td><td>Federált metadata réteg, catalog of catalogs</td><td>Több engine és catalog</td><td>Több adattároló közös metadata réteg alá</td></tr>
+    <tr><td><strong>Project Nessie</strong></td><td>Git-szerű catalog branch/tag/commit</td><td>Apache Iceberg</td><td>Táblák verziózása catalog szinten</td></tr>
+    <tr><td><strong>Apache Polaris</strong></td><td>Iceberg REST catalog</td><td>Apache Iceberg</td><td>Modern Iceberg REST Catalog minta</td></tr>
+  </table>
+  <div class="md-cell">
+    <div class="callout"><div class="callout-title">Gyakorlati választás</div>
+      <p>Ha a <strong>metastore alapfogalmat</strong> akarod megérteni: <strong>Hive Metastore</strong><br>
+      Ha a <strong>Databricks Unity Catalog modelljét</strong>: <strong>Unity Catalog OSS</strong><br>
+      Ha <strong>Iceberges modern catalogot</strong>: <strong>Polaris</strong> vagy <strong>Nessie</strong><br>
+      Ha <strong>több catalog és rendszer fölé</strong>: <strong>Apache Gravitino</strong></p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ S28: Összefoglalás ══════════ -->
+<div class="section layer-intro" id="s28">
+  <div class="section-number">Section 28</div>
+  <h2>Összefoglalás</h2>
+  <div class="md-cell">
+    <div class="callout success">
+      <div class="callout-title">A legfontosabb mondatok:</div>
+      <p>✅ Delta table-t létre tudsz hozni Databricks és Synapse nélkül is.<br>
+      ✅ Ehhez kell egy Delta-kompatibilis writer, például <code>deltalake</code> vagy <code>delta-spark</code>.<br>
+      ✅ A Delta table fizikailag adatfájlokból és <code>_delta_log</code> naplóból áll.<br>
+      ✅ A schema a Delta metadata része.<br>
+      ✅ A metastore csak akkor kell, ha névvel, SQL-ből, catalogként akarod használni.<br>
+      ✅ Azure-ban ugyanez ADLS/Storage Account path-on történik.<br>
+      ✅ A landing/bronze/silver/gold rétegek az adat feldolgozottsági állapotát írják le.<br>
+      ✅ A batch és streaming közti fő különbség: véges csomagok vs folyamatosan érkező adat.<br>
+      ✅ A fact táblák mérhető eseményeket, a dimension táblák leíró entitásokat tartalmaznak.</p>
+    </div>
+  </div>
+</div>
+
+
+</main>
+
+<script>
+// ── State ──
+const completedSections = new Set();
+const allCellIds = [];
+let runAllRunning = false;
+
+// ── Navigation ──
+function buildNav() {
+  const nav = document.getElementById('side-nav');
+  const sections = document.querySelectorAll('.section');
+  const tocData = [
+    {id:'s0', num:'00', label:'Intro - Delta table lokálisan'},
+    {id:'s1', num:'01', label:'Fogalmi térkép'},
+    {id:'s2', num:'02', label:'Architektúra-térkép'},
+    {id:'s3', num:'03', label:'Notebook bootstrap'},
+    {id:'s4', num:'04', label:'Környezet ellenőrzése'},
+    {id:'s5', num:'05', label:'Importok és célmappa'},
+    {id:'s6', num:'06', label:'Forrásadat DataFrame'},
+    {id:'s7', num:'07', label:'Delta table létrehozása'},
+    {id:'s8', num:'08', label:'Fájlrendszer tartalma'},
+    {id:'s9', num:'09', label:'_delta_log tartalma'},
+    {id:'s10', num:'10', label:'Delta table olvasása'},
+    {id:'s11', num:'11', label:'Schema lekérdezése'},
+    {id:'s12', num:'12', label:'Append: új adatok'},
+    {id:'s13', num:'13', label:'Verziók és time travel'},
+    {id:'s14', num:'14', label:'Metastore + Azure'},
+    {id:'s16', num:'16', label:'ETL és ELT elmélet'},
+    {id:'s17', num:'17', label:'ETL demo'},
+    {id:'s18', num:'18', label:'ELT demo + összehasonlítás'},
+    {id:'s20', num:'20', label:'Bronze/Silver/Gold elmélet'},
+    {id:'s21', num:'21', label:'Bronze/Silver/Gold demo'},
+    {id:'s22', num:'22', label:'Fact/Dimension + Star Schema'},
+    {id:'s24', num:'24', label:'Batch feldolgozás'},
+    {id:'s25', num:'25', label:'Streaming / micro-batch'},
+    {id:'s26', num:'26', label:'Batch vs Streaming'},
+    {id:'s27', num:'27', label:'Open source catalog toolok'},
+    {id:'s28', num:'28', label:'Összefoglalás'},
+  ];
+  
+  nav.innerHTML = tocData.map(item => 
+    `<a href="#${item.id}" class="nav-item" data-section="${item.id}" id="nav-${item.id}">
+      <span class="nav-num">${item.num}</span> ${item.label}
+    </a>`
+  ).join('');
+}
+
+// ── Cell execution ──
+function runCell(cellId) {
+  const cell = document.getElementById('cell-' + cellId);
+  if (!cell) return;
+  const output = document.getElementById('out-' + cellId);
+  if (!output) return;
+  const btn = cell.querySelector('.run-btn');
+  
+  // Already running or done
+  if (cell.classList.contains('running') || btn.classList.contains('done-btn')) return;
+  
+  // Start running
+  cell.classList.add('running');
+  btn.classList.add('running-btn');
+  btn.textContent = '⏳ Running...';
+  
+  // Simulate execution time
+  const delay = 400 + Math.random() * 800;
+  setTimeout(() => {
+    cell.classList.remove('running');
+    cell.classList.add('has-output');
+    btn.classList.remove('running-btn');
+    btn.classList.add('done-btn');
+    btn.textContent = '✓ Done';
+    output.classList.add('visible');
+    
+    // Mark section as completed
+    const section = cell.closest('.section');
+    if (section) {
+      completedSections.add(section.id);
+      const navItem = document.getElementById('nav-' + section.id);
+      if (navItem) navItem.classList.add('completed');
+    }
+    updateProgress();
+  }, delay);
+}
+
+function updateProgress() {
+  const totalSections = document.querySelectorAll('.section').length;
+  const done = completedSections.size;
+  const pct = Math.round((done / totalSections) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} / ${totalSections} section completed`;
+}
+
+// ── Run All ──
+async function runAll() {
+  if (runAllRunning) return;
+  runAllRunning = true;
+  
+  const cells = document.querySelectorAll('.code-cell');
+  for (const cell of cells) {
+    const id = cell.id.replace('cell-', '');
+    const btn = cell.querySelector('.run-btn');
+    if (!btn.classList.contains('done-btn')) {
+      runCell(id);
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+    }
+  }
+  runAllRunning = false;
+}
+
+// ── Reset ──
+function resetAll() {
+  completedSections.clear();
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    cell.classList.remove('running', 'has-output');
+    const id = cell.id.replace('cell-', '');
+    const output = document.getElementById('out-' + id);
+    if (output) output.classList.remove('visible');
+    const btn = cell.querySelector('.run-btn');
+    if (btn) {
+      btn.classList.remove('running-btn', 'done-btn');
+      btn.textContent = '▶ Run';
+    }
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
+  updateProgress();
+}
+
+// ── Scroll spy ──
+function updateActiveNav() {
+  const sections = document.querySelectorAll('.section');
+  let activeId = null;
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 120) activeId = s.id;
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (activeId) {
+    const navItem = document.getElementById('nav-' + activeId);
+    if (navItem) {
+      navItem.classList.add('active');
+      navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+  }
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildNav();
+  updateProgress();
+  
+  // Collect all cell IDs
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    allCellIds.push(cell.id.replace('cell-', ''));
+  });
+  
+  window.addEventListener('scroll', updateActiveNav, {passive: true});
+  updateActiveNav();
+});
+</script>
+</body>
+</html>
