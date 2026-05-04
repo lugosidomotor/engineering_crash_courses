@@ -371,7 +371,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <main id="main-content">
 <div class="section layer-intro" id="s0">
   <div class="section-number">Section 00</div>
-  <h2>AI Data Engineering: adatok ML-hez <span class="tool-badge"><img src="assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="assets/logos/dbt.svg">dbt</span></h2>
+  <h2>AI Data Engineering: adatok ML-hez <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
   <div class="md-cell"><p>AI-specifikus adat-pipelineok: feature store, streaming, adatelőkészítés ML-hez.</p></div><div class="callout"><div class="callout-title">Tartalom</div><p>Pipeline → Feature Eng → Feature Store → Streaming → Quality → Delta Lake → Catalog</p></div>
 </div>
 <div class="section layer-intro" id="s1">
@@ -406,7 +406,7 @@ df["age_bucket"] = pd.cut(df.age, bins=[0,30,40,50,100])
 </div>
 <div class="section layer-intro" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>Feature Store: Feast <span class="tool-badge"><img src="assets/logos/feast.svg">Feast</span></h2>
+  <h2>Feature Store: Feast <span class="tool-badge"><img src="../assets/logos/feast.svg">Feast</span></h2>
   <div class="md-cell"><p>A <strong>Feast</strong> biztosítja a train/serve konzisztenciát.</p></div><div class="code-cell" id="cell-s6"><div class="code-header"><span class="cell-number">[s6]</span><button class="run-btn" onclick="runCell('s6')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Feast feature definitions</span>
 user = Entity(name=<span class="str">"user_id"</span>, value_type=ValueType.INT64)
 user_features = FeatureView(
@@ -442,7 +442,7 @@ Online: {user_id:[42], age:[35.0]}</pre></div></div><table><tr><th></th><th>Offl
 </div>
 <div class="section layer-intro" id="s8">
   <div class="section-number">Section 08</div>
-  <h2>Streaming: Apache Kafka <span class="tool-badge"><img src="assets/logos/apachekafka.svg">Kafka</span></h2>
+  <h2>Streaming: Apache Kafka <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
   <div class="md-cell"><p><strong>Apache Kafka</strong>: valós idejű esemény-streaming. ML-hez: online feature frissítés, real-time predikciók.</p></div><div class="code-cell" id="cell-s8"><div class="code-header"><span class="cell-number">[s8]</span><button class="run-btn" onclick="runCell('s8')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> kafka <span class="kw">import</span> KafkaProducer
 <span class="kw">import</span> json
 
@@ -466,7 +466,7 @@ Updated user 17
 </div>
 <div class="section layer-intro" id="s10">
   <div class="section-number">Section 10</div>
-  <h2>Data Quality <span class="tool-badge"><img src="assets/logos/greatexpectations.svg">GE</span></h2>
+  <h2>Data Quality <span class="tool-badge"><img src="../assets/logos/greatexpectations.svg">GE</span></h2>
   <div class="md-cell"><p><strong>Great Expectations</strong>: adatminőség-ellenőrzés. Rossz adat = rossz modell.</p></div><div class="code-cell" id="cell-s10"><div class="code-header"><span class="cell-number">[s10]</span><button class="run-btn" onclick="runCell('s10')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">import</span> great_expectations <span class="kw">as</span> gx
 suite = gx.ExpectationSuite(<span class="str">"user_features"</span>)
 suite.add_expectation(ExpectColumnValuesToBeBetween(column=<span class="str">"age"</span>,min_value=<span class="num">0</span>,max_value=<span class="num">120</span>))
@@ -479,7 +479,7 @@ Overall: PASSED ✓</pre></div></div>
 </div>
 <div class="section layer-intro" id="s11">
   <div class="section-number">Section 11</div>
-  <h2>dbt: SQL transzformációk <span class="tool-badge"><img src="assets/logos/dbt.svg">dbt</span></h2>
+  <h2>dbt: SQL transzformációk <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
   <div class="md-cell"><p><strong>dbt</strong>: SQL transzformációk version control-lal.</p></div><div class="code-cell" id="cell-s11"><div class="code-header"><span class="cell-number">[s11]</span><button class="run-btn" onclick="runCell('s11')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># models/staging/stg_purchases.sql</span>
 <span class="kw">WITH</span> purchases <span class="kw">AS</span> (
     <span class="kw">SELECT</span> * <span class="kw">FROM</span> {{ source(<span class="str">'raw'</span>,<span class="str">'purchases'</span>) }}
@@ -496,7 +496,7 @@ OK fct_user_stats [50k in 2.8s]</pre></div></div>
 </div>
 <div class="section layer-intro" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>End-to-end Pipeline <span class="tool-badge"><img src="assets/logos/airflow.svg">Airflow</span></h2>
+  <h2>End-to-end Pipeline <span class="tool-badge"><img src="../assets/logos/airflow.svg">Airflow</span></h2>
   <div class="md-cell"><p>A teljes pipeline forrástól a Feature Store-ig:</p></div><div class="arch-flow"><div class="arch-step"><strong>Extract</strong><div class="detail">API/DB</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Load</strong><div class="detail">Bronze</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Transform</strong><div class="detail">Silver</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Validate</strong><div class="detail">Quality</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Publish</strong><div class="detail">Gold</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Store</strong><div class="detail">Feature Store</div></div></div><div class="code-cell" id="cell-s12"><div class="code-header"><span class="cell-number">[s12]</span><button class="run-btn" onclick="runCell('s12')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Airflow DAG</span>
 <span class="kw">with</span> DAG(<span class="str">"feature_pipeline"</span>,schedule=<span class="str">"@daily"</span>) <span class="kw">as</span> dag:
     extract >> transform >> validate >> publish
@@ -506,7 +506,7 @@ Rows: 1.2M</pre></div></div>
 </div>
 <div class="section layer-intro" id="s13">
   <div class="section-number">Section 13</div>
-  <h2>Delta Lake <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta</span></h2>
+  <h2>Delta Lake <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta</span></h2>
   <div class="md-cell"><p><strong>Delta Lake</strong>: ACID tranzakciók, time travel, schema evolution.</p></div><div class="code-cell" id="cell-s13"><div class="code-header"><span class="cell-number">[s13]</span><button class="run-btn" onclick="runCell('s13')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Delta operations</span>
 df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"append"</span>).save(<span class="str">"/data/features"</span>)
 
@@ -526,7 +526,7 @@ Merge: 50k updated, 2k inserted</pre></div></div>
 </div>
 <div class="section layer-intro" id="s15">
   <div class="section-number">Section 15</div>
-  <h2>CDC: Change Data Capture <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Debezium</span></h2>
+  <h2>CDC: Change Data Capture <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Debezium</span></h2>
   <div class="md-cell"><p><strong>CDC (Change Data Capture)</strong>: DB változások valós időben a streaming pipeline-ba.</p></div><div class="code-cell" id="cell-s15"><div class="code-header"><span class="cell-number">[s15]</span><button class="run-btn" onclick="runCell('s15')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Debezium CDC: PostgreSQL → Kafka</span>
 config = {
     <span class="str">"connector.class"</span>: <span class="str">"PostgresConnector"</span>,

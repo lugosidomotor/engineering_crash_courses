@@ -375,7 +375,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <div class="section layer-intro" id="s0">
   <div class="section-number">Intro</div>
   <h2>Delta table lokálisan, Databricks és Synapse nélkül
-    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta Lake</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
   </h2>
   <div class="md-cell">
     <p>Ez a notebook azt mutatja meg, hogy egy <strong>Delta table</strong> nem feltétlenül Databricksben vagy Synapse-ban jön létre.
@@ -461,7 +461,7 @@ Data Warehouse rész: fact/dimension és gold réteg, vagyis riportbarát modell
 <div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
   <h2>Notebook bootstrap: virtuális környezet és csomagok
-    <span class="tool-badge"><img src="assets/logos/python.svg">Python</span>
+    <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span>
   </h2>
   <div class="md-cell">
     <p>Ez a notebook teljesen bootstrapelt: a projekt gyökerében lévő <code>bootstrap.ps1</code> vagy <code>bootstrap.sh</code> létrehozza a <code>.venv</code> virtuális környezetet, telepíti a <code>requirements.txt</code> csomagjait, és regisztrálja a Jupyter kernelt.</p>
@@ -507,9 +507,9 @@ Aktuális futó Python: /home/user/engineering_crash_courses/.venv/bin/python</p
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
   <h2>Környezet ellenőrzése
-    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">deltalake</span>
-    <span class="tool-badge"><img src="assets/logos/pandas.svg">pandas</span>
-    <span class="tool-badge"><img src="assets/logos/arrow.svg">pyarrow</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">deltalake</span>
+    <span class="tool-badge"><img src="../assets/logos/pandas.svg">pandas</span>
+    <span class="tool-badge"><img src="../assets/logos/arrow.svg">pyarrow</span>
   </h2>
   <div class="md-cell">
     <p>A példához a <code>deltalake</code> Python csomagot használjuk. Ez a delta-rs projekt Python bindingja, és <strong>Spark nélkül</strong> is tud Delta táblát írni/olvasni.</p>
@@ -577,7 +577,7 @@ table_path</pre></div>
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
   <h2>Forrásadat: egy sima Pandas DataFrame
-    <span class="tool-badge"><img src="assets/logos/pandas.svg">pandas</span>
+    <span class="tool-badge"><img src="../assets/logos/pandas.svg">pandas</span>
   </h2>
   <div class="md-cell">
     <p>Ez lehetne CSV-ből, API-ból vagy adatbázisból jövő adat is. Most kézzel készítünk egy kis táblát.</p>
@@ -614,7 +614,7 @@ sales_df</pre></div>
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
   <h2>Delta table létrehozása lokálisan
-    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta Lake</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
   </h2>
   <div class="md-cell">
     <p>Itt történik a lényeg. A <code>write_deltalake(...)</code> létrehozza a Delta table-t a megadott mappában.</p>
@@ -641,7 +641,7 @@ sales_df</pre></div>
 <div class="section layer-general" id="s8">
   <div class="section-number">Section 08</div>
   <h2>Nézzük meg, mi jött létre a fájlrendszerben
-    <span class="tool-badge"><img src="assets/logos/parquet.svg">Parquet</span>
+    <span class="tool-badge"><img src="../assets/logos/parquet.svg">Parquet</span>
   </h2>
   <div class="md-cell">
     <p>A Delta table mappájában Parquet fájlokat és egy <code>_delta_log</code> mappát kell látnod.</p>
@@ -675,7 +675,7 @@ sales_df</pre></div>
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
   <h2>A <code>_delta_log</code> tartalma
-    <span class="tool-badge"><img src="assets/logos/json.svg">JSON</span>
+    <span class="tool-badge"><img src="../assets/logos/json.svg">JSON</span>
   </h2>
   <div class="md-cell">
     <p>A <code>_delta_log</code> JSON fájlok írják le a tábla tranzakcióit. Itt van például a schema és az, hogy mely Parquet fájlok tartoznak a táblához.</p>
@@ -863,7 +863,7 @@ dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
   <h2>Verziók és time travel
-    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta Lake</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
   </h2>
   <div class="md-cell">
     <p>A Delta log miatt a tábla <strong>verziózott</strong>. Az első írás volt a 0. verzió, az append után létrejött az 1. verzió.</p>
@@ -910,9 +910,9 @@ version_1 = DeltaTable(<span class="fn">str</span>(table_path), version=<span cl
 <div class="section layer-intro" id="s14">
   <div class="section-number">Section 14-15</div>
   <h2>Hol van itt a metastore? + Path vs Metastore + Azure
-    <span class="tool-badge"><img src="assets/logos/apachehive.svg">Hive</span>
-    <span class="tool-badge"><img src="assets/logos/microsoftazure.svg">Azure</span>
-    <span class="tool-badge"><img src="assets/logos/databricks.svg">Databricks</span>
+    <span class="tool-badge"><img src="../assets/logos/apachehive.svg">Hive</span>
+    <span class="tool-badge"><img src="../assets/logos/microsoftazure.svg">Azure</span>
+    <span class="tool-badge"><img src="../assets/logos/databricks.svg">Databricks</span>
   </h2>
   <div class="md-cell">
     <p>Ebben a notebookban <strong>nincs metastore</strong>. Csak egy Delta table van egy lokális path-on. A metastore akkor jön képbe, amikor ehhez a path-hoz <strong>táblanevet akarsz rendelni</strong>.</p>
@@ -950,8 +950,8 @@ df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwr
 <div class="section layer-general" id="s16">
   <div class="section-number">Section 16-17</div>
   <h2>ETL és ELT ugyanazzal a lokális Delta gondolkodással
-    <span class="tool-badge"><img src="assets/logos/apachespark.svg">Spark</span>
-    <span class="tool-badge"><img src="assets/logos/dbt.svg">dbt</span>
+    <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span>
+    <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span>
   </h2>
   <div class="md-cell">
     <p>Az ETL és az ELT nem fájlformátum, nem Databricks feature. Inkább arról szól, hogy <strong>mikor történik a transzformáció</strong>.</p>
@@ -1162,8 +1162,8 @@ ELT silver/curated
 <div class="section layer-bronze" id="s21">
   <div class="section-number">Section 21</div>
   <h2>Landing → Bronze → Silver → Gold demo
-    <span class="tool-badge"><img src="assets/logos/csv.svg">CSV</span>
-    <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta</span>
+    <span class="tool-badge"><img src="../assets/logos/csv.svg">CSV</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta</span>
   </h2>
 
   <div class="code-cell" id="cell-s21a">
@@ -1447,9 +1447,9 @@ batch_summary</pre></div>
 <div class="section layer-general" id="s25">
   <div class="section-number">Section 25</div>
   <h2>Streaming és micro-batch gondolkodás
-    <span class="tool-badge"><img src="assets/logos/apachekafka.svg">Kafka</span>
-    <span class="tool-badge"><img src="assets/logos/apacheflink.svg">Flink</span>
-    <span class="tool-badge"><img src="assets/logos/apachespark.svg">Spark Streaming</span>
+    <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span>
+    <span class="tool-badge"><img src="../assets/logos/apacheflink.svg">Flink</span>
+    <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark Streaming</span>
   </h2>
   <div class="md-cell">
     <p>Valódi streaminghez Spark Structured Streaming, Flink, Kafka kell. Itt <strong>micro-batch szimulációt</strong> csinálunk.</p>
@@ -1542,12 +1542,12 @@ DeltaTable(<span class="fn">str</span>(stream_gold_path)).to_pandas()</pre></div
 <div class="section layer-intro" id="s27">
   <div class="section-number">Section 27</div>
   <h2>Open source metastore/catalog toolok kipróbáláshoz
-    <span class="tool-badge"><img src="assets/logos/apachehive.svg">Hive</span>
-    <span class="tool-badge"><img src="assets/logos/unity-catalog.svg">Unity Catalog</span>
-    <span class="tool-badge"><img src="assets/logos/apacheiceberg.svg">Iceberg</span>
-    <span class="tool-badge"><img src="assets/logos/nessie.svg">Nessie</span>
-    <span class="tool-badge"><img src="assets/logos/polaris.svg">Polaris</span>
-    <span class="tool-badge"><img src="assets/logos/gravitino.svg">Gravitino</span>
+    <span class="tool-badge"><img src="../assets/logos/apachehive.svg">Hive</span>
+    <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span>
+    <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span>
+    <span class="tool-badge"><img src="../assets/logos/nessie.svg">Nessie</span>
+    <span class="tool-badge"><img src="../assets/logos/polaris.svg">Polaris</span>
+    <span class="tool-badge"><img src="../assets/logos/gravitino.svg">Gravitino</span>
   </h2>
   <table>
     <tr><th>Tool</th><th>Mit ad hozzá?</th><th>Formátum fókusz</th><th>Mire jó?</th></tr>

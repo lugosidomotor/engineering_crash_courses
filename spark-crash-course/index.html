@@ -371,7 +371,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <main id="main-content">
 <div class="section layer-intro" id="s0">
   <div class="section-number">Section 00</div>
-  <h2>Apache Spark: Big Data feldolgozás <span class="tool-badge"><img src="assets/logos/apachespark.svg">Spark</span></h2>
+  <h2>Apache Spark: Big Data feldolgozás <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
   <div class="md-cell"><p>Az <strong>Apache Spark</strong> a big data feldolgozás iparági standardja. Elosztott, in-memory feldolgozás, ami 100x gyorsabb a Hadoop MapReduce-nál.</p></div><div class="callout"><div class="callout-title">Miről szól?</div><p>Spark Session &rarr; RDD &rarr; DataFrame &rarr; SQL &rarr; Streaming &rarr; MLlib &rarr; Optimizer &rarr; Delta Lake</p></div>
 </div>
 <div class="section layer-intro" id="s1">
@@ -566,7 +566,7 @@ Filter (age > 30) → Join → Aggregate
 </div>
 <div class="section layer-intro" id="s14">
   <div class="section-number">Section 14</div>
-  <h2>Delta Lake + Spark <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta</span></h2>
+  <h2>Delta Lake + Spark <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta</span></h2>
   <div class="code-cell" id="cell-s14"><div class="code-header"><span class="cell-number">[s14]</span><button class="run-btn" onclick="runCell('s14')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Delta Lake + Spark integráció</span>\n\n<span class="cm"># Write</span>\ndf.write.format(<span class="str">"delta"</span>) \\\n    .mode(<span class="str">"overwrite"</span>) \\\n    .partitionBy(<span class="str">"date"</span>) \\\n    .save(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># Read</span>\ndelta_df = spark.read.format(<span class="str">"delta"</span>).load(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># Time travel</span>\nyesterday = spark.read.format(<span class="str">"delta"</span>) \\\n    .option(<span class="str">"versionAsOf"</span>, <span class="num">5</span>) \\\n    .load(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># MERGE (upsert)</span>\n<span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable\ndt = DeltaTable.forPath(spark, <span class="str">"/delta/users"</span>)\ndt.alias(<span class="str">"target"</span>).merge(\n    updates.alias(<span class="str">"source"</span>),\n    <span class="str">"target.id = source.id"</span>\n).whenMatchedUpdateAll() \\\n .whenNotMatchedInsertAll() \\\n .execute()\n\n<span class="fn">print</span>(<span class="str">f"Delta version: {dt.history().first().version}"</span>)',)</pre></div><div class="output-area" id="out-s14"><div class="output-label">Output:</div><pre>Delta version: 42
 Operation: MERGE
 Rows updated: 15,234

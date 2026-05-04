@@ -371,7 +371,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <main id="main-content">
 <div class="section layer-intro" id="s0">
   <div class="section-number">Section 00</div>
-  <h2>LLM alkalmazások fejlesztése RAG-pipeline-nal <span class="tool-badge"><img src="assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="assets/logos/python.svg">Python</span></h2>
+  <h2>LLM alkalmazások fejlesztése RAG-pipeline-nal <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
   <div class="md-cell"><p>Ez a kurzus azt mutatja meg, hogyan építs <strong>LLM-re épülő alkalmazásokat</strong> a prototípustól az éles üzemeltetésig.</p><pre><code>RAG = Retrieval-Augmented Generation
 = a modell nem csak a saját tudásából válaszol,
   hanem egy dokumentumtárból is keres releváns információt</code></pre><p>Nem modelleket tanítunk &mdash; <strong>alkalmazásokat építünk</strong> meglévő LLM-ek (OpenAI GPT, Anthropic Claude) köré.</p><div class="callout"><div class="callout-title">Miről szól?</div><p>LLM API &rarr; Prompt engineering &rarr; Embeddingek &rarr; Vektoradatbázis &rarr; RAG pipeline &rarr; Evaluáció &rarr; Monitoring &rarr; Éles üzem</p></div></div>
@@ -399,7 +399,7 @@ key = os.getenv(<span class="str">"OPENAI_API_KEY"</span>)
 </div>
 <div class="section layer-intro" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>OpenAI API alapok <span class="tool-badge"><img src="assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>OpenAI API alapok <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
   <div class="md-cell"><p>A Chat Completions API: <strong>system</strong> (utasítás), <strong>user</strong> (kérdés), <strong>assistant</strong> (válasz).</p></div><div class="code-cell" id="cell-s4"><div class="code-header"><span class="cell-number">[s4]</span><button class="run-btn" onclick="runCell('s4')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
 client = OpenAI()
 response = client.chat.completions.create(
@@ -450,7 +450,7 @@ kutya&harr;python: 0.3214</pre></div></div>
 </div>
 <div class="section layer-intro" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>Vektoradatbázis: ChromaDB <span class="tool-badge"><img src="assets/logos/chroma.svg">Chroma</span></h2>
+  <h2>Vektoradatbázis: ChromaDB <span class="tool-badge"><img src="../assets/logos/chroma.svg">Chroma</span></h2>
   <div class="code-cell" id="cell-s7"><div class="code-header"><span class="cell-number">[s7]</span><button class="run-btn" onclick="runCell('s7')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">import</span> chromadb
 cl=chromadb.Client()
 col=cl.create_collection(<span class="str">"docs"</span>)
@@ -508,7 +508,7 @@ Pass rate: A=100% B=67%</pre></div></div>
 </div>
 <div class="section layer-intro" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>LangChain alapok <span class="tool-badge"><img src="assets/logos/langchain.svg">LangChain</span></h2>
+  <h2>LangChain alapok <span class="tool-badge"><img src="../assets/logos/langchain.svg">LangChain</span></h2>
   <div class="md-cell"><p>A <strong>LangChain</strong> a legnépszerűbb LLM framework: chains, prompts, output parsers, LCEL.</p></div><div class="code-cell" id="cell-s12"><div class="code-header"><span class="cell-number">[s12]</span><button class="run-btn" onclick="runCell('s12')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
 <span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
 <span class="kw">from</span> langchain_core.output_parsers <span class="kw">import</span> StrOutputParser
@@ -544,14 +544,14 @@ agent=create_tool_calling_agent(llm,tools,prompt)
 </div>
 <div class="section layer-intro" id="s14">
   <div class="section-number">Section 14</div>
-  <h2>Monitoring és cost tracking <span class="tool-badge"><img src="assets/logos/grafana.svg">Grafana</span></h2>
+  <h2>Monitoring és cost tracking <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
   <div class="md-cell"><p>Éles üzemben: token usage, latency, quality score.</p></div><div class="code-cell" id="cell-s14"><div class="code-header"><span class="cell-number">[s14]</span><button class="run-btn" onclick="runCell('s14')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># LLM metrikák</span>
 <span class="fn">print</span>(<span class="str">f"Összköltség: $0.0543"</span>)
 <span class="fn">print</span>(<span class="str">f"Átl latency: 1054ms"</span>)</pre></div><div class="output-area" id="out-s14"><div class="output-label">Output:</div><table><tr><th></th><th>time</th><th>model</th><th>tok_in</th><th>tok_out</th><th>lat_ms</th><th>cost</th></tr><tr><td>0</td><td>10:01</td><td>gpt-4o</td><td>245</td><td>156</td><td>890</td><td>$0.009</td></tr><tr><td>1</td><td>10:02</td><td>gpt-4o</td><td>312</td><td>203</td><td>1230</td><td>$0.012</td></tr><tr><td>2</td><td>10:03</td><td>gpt-4o</td><td>189</td><td>98</td><td>670</td><td>$0.006</td></tr><tr><td>3</td><td>10:04</td><td>gpt-4o</td><td>456</td><td>312</td><td>1560</td><td>$0.018</td></tr><tr><td>4</td><td>10:05</td><td>gpt-4o</td><td>278</td><td>167</td><td>920</td><td>$0.009</td></tr></table></div></div>
 </div>
 <div class="section layer-intro" id="s15">
   <div class="section-number">Section 15</div>
-  <h2>Streamlit chat interface <span class="tool-badge"><img src="assets/logos/streamlit.svg">Streamlit</span></h2>
+  <h2>Streamlit chat interface <span class="tool-badge"><img src="../assets/logos/streamlit.svg">Streamlit</span></h2>
   <div class="code-cell" id="cell-s15"><div class="code-header"><span class="cell-number">[s15]</span><button class="run-btn" onclick="runCell('s15')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># app.py</span>
 <span class="kw">import</span> streamlit <span class="kw">as</span> st
 st.title(<span class="str">"RAG Chatbot"</span>)

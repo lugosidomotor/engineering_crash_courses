@@ -371,7 +371,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <main id="main-content">
 <div class="section layer-intro" id="s0">
   <div class="section-number">Section 00</div>
-  <h2>ML modellek éles üzemeltetése <span class="tool-badge"><img src="assets/logos/mlflow.svg">MLflow</span> <span class="tool-badge"><img src="assets/logos/docker.svg">Docker</span></h2>
+  <h2>ML modellek éles üzemeltetése <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span> <span class="tool-badge"><img src="../assets/logos/docker.svg">Docker</span></h2>
   <div class="md-cell"><p>Hogyan juttassunk ML modellt <strong>dev-től production-ig</strong>.</p></div><div class="callout"><div class="callout-title">Tartalom</div><p>MLflow→Registry→Docker→K8s→Monitor→Canary→FeatureStore</p></div>
 </div>
 <div class="section layer-intro" id="s1">
@@ -391,7 +391,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 </div>
 <div class="section layer-intro" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>MLflow Tracking <span class="tool-badge"><img src="assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>MLflow Tracking <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
   <div class="code-cell" id="cell-s4"><div class="code-header"><span class="cell-number">[s4]</span><button class="run-btn" onclick="runCell('s4')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">import</span> mlflow
 mlflow.set_experiment(<span class="str">"cls"</span>)
 <span class="kw">with</span> mlflow.start_run():
@@ -407,7 +407,7 @@ client.transition_model_version_stage(<span class="str">"churn"</span>,<span cla
 </div>
 <div class="section layer-intro" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>FastAPI serving <span class="tool-badge"><img src="assets/logos/fastapi.svg">FastAPI</span></h2>
+  <h2>FastAPI serving <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
   <div class="code-cell" id="cell-s6"><div class="code-header"><span class="cell-number">[s6]</span><button class="run-btn" onclick="runCell('s6')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
 app=FastAPI()
 model=mlflow.sklearn.load_model(<span class="str">"models:/churn/Production"</span>)
@@ -416,7 +416,7 @@ model=mlflow.sklearn.load_model(<span class="str">"models:/churn/Production"</sp
 </div>
 <div class="section layer-intro" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>Docker <span class="tool-badge"><img src="assets/logos/docker.svg">Docker</span></h2>
+  <h2>Docker <span class="tool-badge"><img src="../assets/logos/docker.svg">Docker</span></h2>
   <div class="code-cell" id="cell-s7"><div class="code-header"><span class="cell-number">[s7]</span><button class="run-btn" onclick="runCell('s7')">&#9654; Run</button></div><div class="code-body"><pre># Dockerfile
 FROM python:3.11-slim
 RUN pip install -r requirements.txt
@@ -425,7 +425,7 @@ EXPOSE 8000</pre></div><div class="output-area" id="out-s7"><div class="output-l
 </div>
 <div class="section layer-intro" id="s8">
   <div class="section-number">Section 08</div>
-  <h2>Kubernetes <span class="tool-badge"><img src="assets/logos/kubernetes.svg">K8s</span></h2>
+  <h2>Kubernetes <span class="tool-badge"><img src="../assets/logos/kubernetes.svg">K8s</span></h2>
   <div class="code-cell" id="cell-s8"><div class="code-header"><span class="cell-number">[s8]</span><button class="run-btn" onclick="runCell('s8')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># deployment.yaml</span>
 <span class="kw">replicas</span>: <span class="num">3</span>
 <span class="kw">image</span>: churn:v3
@@ -433,7 +433,7 @@ EXPOSE 8000</pre></div><div class="output-area" id="out-s7"><div class="output-l
 </div>
 <div class="section layer-intro" id="s9">
   <div class="section-number">Section 09</div>
-  <h2>CI/CD <span class="tool-badge"><img src="assets/logos/github.svg">GitHub</span></h2>
+  <h2>CI/CD <span class="tool-badge"><img src="../assets/logos/github.svg">GitHub</span></h2>
   <div class="code-cell" id="cell-s9"><div class="code-header"><span class="cell-number">[s9]</span><button class="run-btn" onclick="runCell('s9')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># GitHub Actions</span>
 <span class="kw">steps</span>:
 - pytest tests/ --cov
@@ -443,7 +443,7 @@ EXPOSE 8000</pre></div><div class="output-area" id="out-s7"><div class="output-l
 </div>
 <div class="section layer-intro" id="s10">
   <div class="section-number">Section 10</div>
-  <h2>Prometheus+Grafana <span class="tool-badge"><img src="assets/logos/prometheus.svg">Prom</span></h2>
+  <h2>Prometheus+Grafana <span class="tool-badge"><img src="../assets/logos/prometheus.svg">Prom</span></h2>
   <div class="code-cell" id="cell-s10"><div class="code-header"><span class="cell-number">[s10]</span><button class="run-btn" onclick="runCell('s10')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> prometheus_client <span class="kw">import</span> Counter, Histogram
 P=Counter(<span class="str">"preds"</span>); L=Histogram(<span class="str">"lat"</span>)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><pre>preds 15420, lat_p95=142ms</pre></div></div><table><tr><th>Metric</th><th>Now</th><th>Alert</th></tr><tr><td>Latency</td><td>142ms</td><td>>500ms</td></tr><tr><td>Error</td><td>0.3%</td><td>>1%</td></tr><tr><td>Drift</td><td>0.12</td><td>>0.3</td></tr></table>
 </div>
@@ -467,7 +467,7 @@ P=Counter(<span class="str">"preds"</span>); L=Histogram(<span class="str">"lat"
 </div>
 <div class="section layer-intro" id="s14">
   <div class="section-number">Section 14</div>
-  <h2>Feature Store <span class="tool-badge"><img src="assets/logos/feast.svg">Feast</span></h2>
+  <h2>Feature Store <span class="tool-badge"><img src="../assets/logos/feast.svg">Feast</span></h2>
   <div class="code-cell" id="cell-s14"><div class="code-header"><span class="cell-number">[s14]</span><button class="run-btn" onclick="runCell('s14')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Feast FeatureView</span>
 FeatureView(<span class="str">"user"</span>,features=[Feature(<span class="str">"age"</span>,Float),Feature(<span class="str">"income"</span>,Float)],online=<span class="num">True</span>)</pre></div><div class="output-area" id="out-s14"><div class="output-label">Output:</div><pre>Offline: Delta, Online: Redis</pre></div></div>
 </div>
