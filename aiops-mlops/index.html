@@ -13,7 +13,7 @@
   <a href="../index.html" class="back-btn" title="Vissza">&#8592;</a>
   <h1>&lt;/&gt; AIOps &amp; MLOps Crash Course</h1>
   <div class="header-actions">
-    <span id="progress-text">0 / 0 section completed</span>
+    <span id="progress-text">0 / 15 section completed</span>
     <button class="btn btn-run-all" onclick="runAll()">Run All</button>
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
@@ -29,44 +29,44 @@
     <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span>
   </h2>
   <div class="md-cell">
-    <p>Ebben a kurzusban egy <strong>churn predikcio modellt</strong> viszunk vegig a teljes elettartam-cikluson: kiserlet a tanitas, regisztracio, validacio, deployment, monitoring es drift detektalas.</p>
+    <p>Ebben a kurzusban egy <strong>churn predikció modellt</strong> viszunk végig a teljes élettartam-cikluson: kísérlet a tanítás, regisztráció, validáció, deployment, monitoring es drift detektálás.</p>
     <div class="callout">
       <div class="callout-title">Projekt: WebShop Pro Churn Model</div>
-      <p>A <strong>WebShop Pro</strong> felhasznaloi adatokbol epitunk churn modellt, amit aztan FastAPI-n szolgaltatunk ki, Docker-be csomagolunk, monitorozunk es drift-et detektalunk rajta.</p>
+      <p>A <strong>WebShop Pro</strong> felhasználói adatokból építünk churn modellt, amit aztán FastAPI-n szolgáltatunk ki, Docker-be csomagolunk, monitorozunk es drift-et detektálunk rajta.</p>
     </div>
     <div class="callout success">
       <div class="callout-title">Learning outcome</div>
-      <p>A kurzus vegere fel fogsz epiteni egy ML pipeline-t kiserlet kovetessel, modell regisztracioval, FastAPI szolgaltatassal, Docker kontenerizacioval es monitoringgal.</p>
+      <p>A kurzus végére fel fogsz építeni egy ML pipeline-t kísérlet követéssel, modell regisztrációval, FastAPI szolgáltatással, Docker konténerizációval es monitoringgal.</p>
     </div>
   </div>
 </div>
 
-<!-- S1: Fogalmi terkep -->
+<!-- S1: Fogalmi térkép -->
 <div class="section layer-general" id="s1">
   <div class="section-number">Section 01</div>
-  <h2>Fogalmi terkep: MLOps, CI/CD, drift, registry <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>Fogalmi térkép: MLOps, CI/CD, drift, registry <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
   <div class="md-cell">
     <table>
-      <tr><th>Fogalom</th><th>Magyarazat</th></tr>
-      <tr><td><strong>MLOps</strong></td><td>ML modellek teljes elettartam-ciklusanak kezelese: tanitas, deployment, monitoring</td></tr>
-      <tr><td><strong>Experiment tracking</strong></td><td>Kiserletek naplozasa: parameterek, metrikak, modellek</td></tr>
-      <tr><td><strong>Model Registry</strong></td><td>Modell verzokezeles: staging, production, archived</td></tr>
-      <tr><td><strong>CI/CD</strong></td><td>Continuous Integration/Deployment: automatizalt teszteles es kiszolgalas</td></tr>
-      <tr><td><strong>Drift</strong></td><td>Adat eltolodas: ha az uj adatok elternek a tanito adatoktol</td></tr>
-      <tr><td><strong>A/B testing</strong></td><td>Ket modell verzio parhuzamos tesztelese</td></tr>
+      <tr><th>Fogalom</th><th>Magyarázat</th></tr>
+      <tr><td><strong>MLOps</strong></td><td>ML modellek teljes élettartam-ciklusának kezelése: tanítás, deployment, monitoring</td></tr>
+      <tr><td><strong>Experiment tracking</strong></td><td>Kísérletek naplózása: paraméterek, metrikák, modellek</td></tr>
+      <tr><td><strong>Model Registry</strong></td><td>Modell verziókezelés: staging, production, archived</td></tr>
+      <tr><td><strong>CI/CD</strong></td><td>Continuous Integration/Deployment: automatizált tesztelés es kiszolgálás</td></tr>
+      <tr><td><strong>Drift</strong></td><td>Adat eltolódás: ha az új adatok eltérnek a tanító adatoktol</td></tr>
+      <tr><td><strong>A/B testing</strong></td><td>Két modell verzió párhuzamos tesztelése</td></tr>
     </table>
     <div class="callout">
-      <div class="callout-title">Mentalis modell</div>
-      <p><strong>ML egyedul:</strong> Jupyter notebook, tanitas, kesz. Nincs verzio, nincs monitoring.</p>
-      <p><strong>ML + MLOps:</strong> Kiserlet naplozas → modell regisztracio → automatizalt teszt → deployment → monitoring → drift eszleles → ujra tanitas.</p>
+      <div class="callout-title">Mentális modell</div>
+      <p><strong>ML egyedül:</strong> Jupyter notebook, tanítás, kész. Nincs verzió, nincs monitoring.</p>
+      <p><strong>ML + MLOps:</strong> Kísérlet naplózás → modell regisztráció → automatizált teszt → deployment → monitoring → drift észlelés → újra tanítás.</p>
     </div>
   </div>
 </div>
 
-<!-- S2: Architekturaterkep -->
+<!-- S2: Architektúratérkép -->
 <div class="section layer-general" id="s2">
   <div class="section-number">Section 02</div>
-  <h2>Architekturaterkep: ML pipeline <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
+  <h2>Architektúratérkép: ML pipeline <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
   <div class="md-cell">
     <div class="arch-flow">
       <div class="arch-step">📊 Adatok</div>
@@ -75,7 +75,7 @@
       <div class="arch-arrow">→</div>
       <div class="arch-step">📋 MLflow</div>
       <div class="arch-arrow">→</div>
-      <div class="arch-step">✅ Validacio</div>
+      <div class="arch-step">✅ Validáció</div>
     </div>
     <div class="arch-flow">
       <div class="arch-step">📦 Registry</div>
@@ -88,15 +88,15 @@
     </div>
     <div class="callout">
       <div class="callout-title">Demo vs Production</div>
-      <p><strong>Demoban:</strong> lokalis MLflow, egy model, nincs CI/CD. <strong>Productionben:</strong> Kubernetes, model store (S3), feature store, Prometheus/Grafana, canary deployment, rollback, auth.</p>
+      <p><strong>Demoban:</strong> lokális MLflow, egy model, nincs CI/CD. <strong>Productionben:</strong> Kubernetes, model store (S3), feature store, Prometheus/Grafana, canary deployment, rollback, auth.</p>
     </div>
   </div>
 </div>
 
-<!-- S3: Kornyezet -->
+<!-- S3: Környezet -->
 <div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
-  <h2>Kornyezet elokeszitese <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Környezet elokeszitese <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
   <div class="code-cell" id="cell-s3">
     <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s3')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># pip install mlflow scikit-learn pandas fastapi uvicorn</span>
@@ -107,10 +107,10 @@
 <span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score, f1_score
 <span class="kw">import</span> mlflow
 
-<span class="fn">print</span>(<span class="str">"MLOps kornyezet keszen"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">"MLOps környezet készen"</span>)</pre></div>
     <div class="output-area" id="out-s3">
       <div class="output-label">Output:</div>
-      <pre><span class="log-mlflow">[mlflow]</span> <span class="log-ok">MLOps kornyezet keszen</span></pre>
+      <pre><span class="log-mlflow">[mlflow]</span> <span class="log-ok">MLOps környezet készen</span></pre>
     </div>
   </div>
 </div>
@@ -118,11 +118,11 @@
 <!-- S4: MLflow alapok -->
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>MLflow alapok: kiserlet kovetes <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
-  <div class="md-cell"><p>Az <strong>MLflow</strong> a legnepszerubb ML kiserlet koveto. Naplozza a parametereket, metrikakat es a modelleket.</p></div>
+  <h2>MLflow alapok: kísérlet követés <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <div class="md-cell"><p>Az <strong>MLflow</strong> a legnépszerűbb ML kísérlet követő. Naplózza a paramétereket, metrikákat es a modelleket.</p></div>
   <div class="code-cell" id="cell-s4">
     <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('s4')">▶ Run</button></div>
-    <div class="code-body"><pre><span class="cm"># MLflow kiserlet beallitas</span>
+    <div class="code-body"><pre><span class="cm"># MLflow kísérlet beallitas</span>
 mlflow.set_experiment(<span class="str">"webshop-churn"</span>)
 
 <span class="cm"># Szintetikus churn adatok</span>
@@ -140,7 +140,7 @@ data = pd.DataFrame({
 data[<span class="str">"churn"</span>] = ((data[<span class="str">"last_days"</span>] > <span class="num">180</span>) & (data[<span class="str">"is_active"</span>] == <span class="num">0</span>)).astype(<span class="kw">int</span>)
 
 <span class="fn">print</span>(data.head())
-<span class="fn">print</span>(<span class="str">f"\\nChurn arany: {data['churn'].mean():.2%}"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">f"\\nChurn arány: {data['churn'].mean():.2%}"</span>)</pre></div>
     <div class="output-area" id="out-s4">
       <div class="output-label">Output:</div>
       <pre><span class="log-mlflow">[mlflow]</span> <span class="log-dim">age  income  purchases  last_days  is_active  churn</span>
@@ -150,23 +150,23 @@ data[<span class="str">"churn"</span>] = ((data[<span class="str">"last_days"</s
 <span class="log-dim">3   38   67234          8        312          0      1</span>
 <span class="log-dim">4   19   45123         23         34          1      0</span>
 
-<span class="log-step">[step]</span> <span class="log-info">Churn arany: 21.00%</span></pre>
+<span class="log-step">[step]</span> <span class="log-info">Churn arány: 21.00%</span></pre>
     </div>
   </div>
 </div>
 
-<!-- S5: Kiserlet kovetes -->
+<!-- S5: Kísérlet követés -->
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>Kiserlet kovetes: parameterek es metrikak <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
-  <div class="md-cell"><p>Az MLflow <code>log_param</code>, <code>log_metric</code>, <code>log_model</code> fuggvenyeivel naplozzuk a kiserletet.</p></div>
+  <h2>Kísérlet követés: paraméterek es metrikák <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <div class="md-cell"><p>Az MLflow <code>log_param</code>, <code>log_metric</code>, <code>log_model</code> függvényeivel naplózzuk a kísérletet.</p></div>
   <div class="code-cell" id="cell-s5">
     <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('s5')">▶ Run</button></div>
     <div class="code-body"><pre>X = data.drop(<span class="str">"churn"</span>, axis=<span class="num">1</span>)
 y = data[<span class="str">"churn"</span>]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
 
-<span class="cm"># Tobb kiserlet kulonbozo parameterekkel</span>
+<span class="cm"># Több kísérlet különböző paraméterekkel</span>
 <span class="kw">for</span> n_estimators <span class="kw">in</span> [<span class="num">50</span>, <span class="num">100</span>, <span class="num">200</span>]:
     <span class="kw">with</span> mlflow.start_run(run_name=<span class="str">f"rf_{n_estimators}"</span>):
         model = RandomForestClassifier(n_estimators=n_estimators, random_state=<span class="num">42</span>)
@@ -191,18 +191,18 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demoban:</strong> lokalis MLflow. <strong>Productionben:</strong> remote tracking server (pl. Databricks), artifact store (S3), access control.</p>
+    <p><strong>Demoban:</strong> lokális MLflow. <strong>Productionben:</strong> remote tracking server (pl. Databricks), artifact store (S3), access control.</p>
   </div>
 </div>
 
-<!-- S6: Model regisztracio -->
+<!-- S6: Model regisztráció -->
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>Model Registry: modell verziozas <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
-  <div class="md-cell"><p>A Model Registry-ben a modellek <strong>None → Staging → Production → Archived</strong> elettartam-cikluson mennek keresztul.</p></div>
+  <h2>Model Registry: modell verziózas <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <div class="md-cell"><p>A Model Registry-ben a modellek <strong>None → Staging → Production → Archived</strong> élettartam-cikluson mennek keresztül.</p></div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
-    <div class="code-body"><pre><span class="cm"># Modell regisztralasa a legjobb futasbol</span>
+    <div class="code-body"><pre><span class="cm"># Modell regisztrálása a legjobb futásból</span>
 best_run = mlflow.search_runs(
     experiment_names=[<span class="str">"webshop-churn"</span>],
     order_by=[<span class="str">"metrics.f1_score DESC"</span>]
@@ -210,13 +210,13 @@ best_run = mlflow.search_runs(
 
 model_uri = <span class="str">f"runs:/{best_run.run_id}/model"</span>
 
-<span class="cm"># Regisztracio</span>
+<span class="cm"># Regisztráció</span>
 mlflow.register_model(
     model_uri=model_uri,
     name=<span class="str">"webshop-churn-classifier"</span>
 )
 
-<span class="fn">print</span>(<span class="str">f"Regisztralt modell: {best_run.run_id[:8]}"</span>)
+<span class="fn">print</span>(<span class="str">f"Regisztrált modell: {best_run.run_id[:8]}"</span>)
 <span class="fn">print</span>(<span class="str">f"F1 score: {best_run['metrics.f1_score']:.3f}"</span>)
 
 <span class="cm"># Staging -> Production promotion</span>
@@ -226,25 +226,25 @@ client.transition_model_version_stage(
     version=<span class="num">1</span>,
     stage=<span class="str">"Production"</span>
 )
-<span class="fn">print</span>(<span class="str">"Modell Production stage-re allitva!"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">"Modell Production stage-re állítva!"</span>)</pre></div>
     <div class="output-area" id="out-s6">
       <div class="output-label">Output:</div>
-      <pre><span class="log-mlflow">[mlflow]</span> <span class="log-ok">Regisztralt modell:</span> <span class="log-info">a3f7c2e1</span>
+      <pre><span class="log-mlflow">[mlflow]</span> <span class="log-ok">Regisztrált modell:</span> <span class="log-info">a3f7c2e1</span>
 <span class="log-mlflow">[mlflow]</span> F1 score: <span class="log-info">0.875</span>
-<span class="log-mlflow">[mlflow]</span> <span class="log-ok">Modell Production stage-re allitva!</span></pre>
+<span class="log-mlflow">[mlflow]</span> <span class="log-ok">Modell Production stage-re állítva!</span></pre>
     </div>
   </div>
   <div class="callout">
-    <div class="callout-title">Verzio kezeles</div>
-    <p>Minden regisztracio uj verziot hoz letre. A production modell mindig egy specifikus verzio, amit barmikor vissza lehet allitani.</p>
+    <div class="callout-title">Verzió kezelés</div>
+    <p>Minden regisztráció új verziót hoz létre. A production modell mindig egy specifikus verzió, amit bármikor vissza lehet állítani.</p>
   </div>
 </div>
 
-<!-- S7: Churn modell epites -->
+<!-- S7: Churn modell építés -->
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>Churn modell epites: teljes pipeline <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span> <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
-  <div class="md-cell"><p>Epitunk egy uj, jobb modellt feature engineering-gel. A cel: a churn valoszinuseg megbizhato predikcioja.</p></div>
+  <h2>Churn modell építés: teljes pipeline <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span> <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <div class="md-cell"><p>Építünk egy új, jobb modellt feature engineering-gel. A cél: a churn valószínűség megbízható predikciója.</p></div>
   <div class="code-cell" id="cell-s7">
     <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('s7')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># Feature engineering</span>
@@ -292,14 +292,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
   </div>
 </div>
 
-<!-- S8: Model validacio -->
+<!-- S8: Model validáció -->
 <div class="section layer-general" id="s8">
   <div class="section-number">Section 08</div>
-  <h2>Model validacio: gateway a productionhoz <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
-  <div class="md-cell"><p>Uj modell csak akkor mehet productionre, ha <strong>validacios kriteriumokat</strong> teljesiti.</p></div>
+  <h2>Model validáció: gateway a productionhoz <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell"><p>Új modell csak akkor mehet productionre, ha <strong>validációs kriteriumokat</strong> teljesiti.</p></div>
   <div class="code-cell" id="cell-s8">
     <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('s8')">▶ Run</button></div>
-    <div class="code-body"><pre><span class="cm"># Validacios kriteriumok</span>
+    <div class="code-body"><pre><span class="cm"># Validációs kriteriumok</span>
 THRESHOLDS = {<span class="str">"min_accuracy"</span>: <span class="num">0.90</span>, <span class="str">"min_f1"</span>: <span class="num">0.85</span>}
 
 <span class="kw">def</span> <span class="fn">validate_model</span>(model, X_test, y_test, thresholds):
@@ -341,25 +341,25 @@ validation = <span class="fn">validate_model</span>(model, X_test, y_test, THRES
     </div>
   </div>
   <div class="callout">
-    <div class="callout-title">Production validacio</div>
-    <p>Valojaban: bias audit, fairness check, latency benchmark, memory usage, adversarial tesztek, regression vs baseline model.</p>
+    <div class="callout-title">Production validáció</div>
+    <p>Valójában: bias audit, fairness check, latency benchmark, memory usage, adversarial tesztek, regression vs baseline model.</p>
   </div>
 </div>
 
-<!-- S9: FastAPI szolgaltatas -->
+<!-- S9: FastAPI szolgáltatás -->
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
   <h2>FastAPI: model serving <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
-  <div class="md-cell"><p>A tanitott modellt <strong>FastAPI</strong> REST API-val szolgaltatjuk ki. igy barmilyen alkalmazas HTTP-n tudja hasznalni.</p></div>
+  <div class="md-cell"><p>A tanított modellt <strong>FastAPI</strong> REST API-val szolgáltatjuk ki. így bármilyen alkalmazás HTTP-n tudja használni.</p></div>
   <div class="code-cell" id="cell-s9">
     <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('s9')">▶ Run</button></div>
-    <div class="code-body"><pre><span class="cm"># app.py - FastAPI szolgaltatas</span>
+    <div class="code-body"><pre><span class="cm"># app.py - FastAPI szolgáltatás</span>
 <span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
 <span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
 
 app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 
-<span class="cm"># Modell betoltese MLflow-bol</span>
+<span class="cm"># Modell betöltése MLflow-bol</span>
 <span class="cm"># model = mlflow.sklearn.load_model("models:/webshop-churn-classifier/Production")</span>
 
 <span class="kw">class</span> <span class="fn">CustomerData</span>(BaseModel):
@@ -380,10 +380,10 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
             <span class="str">"risk_level"</span>: <span class="str">"HIGH"</span> <span class="kw">if</span> proba > <span class="num">0.7</span> <span class="kw">else</span> <span class="str">"MEDIUM"</span> <span class="kw">if</span> proba > <span class="num">0.3</span> <span class="kw">else</span> <span class="str">"LOW"</span>}
 
 <span class="cm"># uvicorn app:app --host 0.0.0.0 --port 8000</span>
-<span class="fn">print</span>(<span class="str">"FastAPI app keszen!"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">"FastAPI app készen!"</span>)</pre></div>
     <div class="output-area" id="out-s9">
       <div class="output-label">Output:</div>
-      <pre><span class="log-fastapi">[api]</span> <span class="log-ok">FastAPI app keszen!</span>
+      <pre><span class="log-fastapi">[api]</span> <span class="log-ok">FastAPI app készen!</span>
 <span class="log-cmd">$ curl -X POST http://localhost:8000/predict \</span>
   <span class="log-cmd">-H "Content-Type: application/json" \</span>
   <span class="log-cmd">-d '{"age":35,"income":45000,"purchases":5,"last_days":250,"is_active":0}'</span>
@@ -392,16 +392,16 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
     </div>
   </div>
   <details>
-    <summary>🔬 Feladat: API teszteles</summary>
-    <div class="md-cell"><p>Kuldd el ugyanezt a kerest mas parameterekkel. Milyen eredmenyt kapsz egy aktiv, sokat vasarlo felhasznalora?</p></div>
+    <summary>🔬 Feladat: API tesztelés</summary>
+    <div class="md-cell"><p>Küldd el ugyanezt a kérést más paraméterekkel. Milyen eredményt kapsz egy aktív, sokat vásárló felhasználóra?</p></div>
   </details>
 </div>
 
-<!-- S10: Docker kontenerizacio -->
+<!-- S10: Docker konténerizáció -->
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
-  <h2>Docker kontenerizacio <span class="tool-badge"><img src="../assets/logos/docker.svg">Docker</span></h2>
-  <div class="md-cell"><p>A modellt <strong>Docker kontenerbe</strong> csomagoljuk, hogy barmilyen kornyezetben ugyanugy mukodjon.</p></div>
+  <h2>Docker konténerizáció <span class="tool-badge"><img src="../assets/logos/docker.svg">Docker</span></h2>
+  <div class="md-cell"><p>A modellt <strong>Docker konténerbe</strong> csomagoljuk, hogy bármilyen környezetben ugyanúgy működjön.</p></div>
   <div class="code-cell" id="cell-s10">
     <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('s10')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># Dockerfile</span>
@@ -417,7 +417,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 <span class="cm"># docker build -t webshop-churn-api .</span>
 <span class="cm"># docker run -p 8000:8000 webshop-churn-api</span>
 
-<span class="fn">print</span>(<span class="str">"Dockerfile keszen!"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">"Dockerfile készen!"</span>)</pre></div>
     <div class="output-area" id="out-s10">
       <div class="output-label">Output:</div>
       <pre><span class="log-docker">[docker]</span> <span class="log-cmd">$ docker build -t webshop-churn-api .</span>
@@ -434,16 +434,16 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
     </div>
   </div>
   <div class="callout">
-    <div class="callout-title">Miert Docker?</div>
-    <p><strong>Reprodukálhatosag:</strong> ugyanaz a kornyezet mindenutt. <strong>Skalazhatoseg:</strong> Kubernetes-ben tobb peldany. <strong>Izolacio:</strong> nincs fuggosegi konfliktus.</p>
+    <div class="callout-title">Miért Docker?</div>
+    <p><strong>Reprodukálhatóság:</strong> ugyanaz a környezet mindenütt. <strong>Skálázhatóság:</strong> Kubernetes-ben több példány. <strong>Izoláció:</strong> nincs függőségi konfliktus.</p>
   </div>
 </div>
 
 <!-- S11: CI/CD pipeline -->
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
-  <h2>CI/CD pipeline: automatizalt deployment <span class="tool-badge"><img src="../assets/logos/github.svg">GitHub</span></h2>
-  <div class="md-cell"><p>A <strong>CI/CD</strong> automatizalja: teszteles → Docker build → deployment. Minden git push aktiválja.</p></div>
+  <h2>CI/CD pipeline: automatizált deployment <span class="tool-badge"><img src="../assets/logos/github.svg">GitHub</span></h2>
+  <div class="md-cell"><p>A <strong>CI/CD</strong> automatizálja: tesztelés → Docker build → deployment. Minden git push aktiválja.</p></div>
   <div class="code-cell" id="cell-s11">
     <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('s11')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># .github/workflows/deploy.yml</span>
@@ -464,11 +464,11 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 <span class="cm">#       - run: docker push registry/churn-api:latest</span>
 
 <span class="fn">print</span>(<span class="str">"CI/CD pipeline konfigurálva!"</span>)
-<span class="fn">print</span>(<span class="str">"Minden push → teszt → validacio → deploy"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">"Minden push → teszt → validáció → deploy"</span>)</pre></div>
     <div class="output-area" id="out-s11">
       <div class="output-label">Output:</div>
-      <pre><span class="log-gh">[ci]</span> <span class="log-ok">CI/CD pipeline konfiguralva!</span>
-<span class="log-gh">[ci]</span> <span class="log-dim">Minden push → teszt → validacio → deploy</span>
+      <pre><span class="log-gh">[ci]</span> <span class="log-ok">CI/CD pipeline konfigurálva!</span>
+<span class="log-gh">[ci]</span> <span class="log-dim">Minden push → teszt → validáció → deploy</span>
 
 <span class="log-gh">[ci]</span> <span class="log-cmd">$ git push origin main</span>
 <span class="log-gh">[ci]</span> <span class="log-ok">✓ Tests passed (12/12)</span>
@@ -482,18 +482,18 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 <!-- S12: Monitoring es drift -->
 <div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>Monitoring es drift detektalas <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
+  <h2>Monitoring es drift detektálás <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
   <div class="md-cell">
-    <p>A modell deployment utan <strong>monitorozni kell</strong>. Ket tipikus problema:</p>
+    <p>A modell deployment után <strong>monitorozni kell</strong>. Két tipikus probléma:</p>
     <ul>
-      <li><strong>Data drift:</strong> az input adatok eltolodnak (pl. tobb idos vasarlo)</li>
-      <li><strong>Concept drift:</strong> a kapcsolat valtozik az input es output kozott</li>
+      <li><strong>Data drift:</strong> az input adatok eltolódnak (pl. több idós vásárló)</li>
+      <li><strong>Concept drift:</strong> a kapcsolat változik az input es output között</li>
     </ul>
   </div>
   <div class="code-cell" id="cell-s12">
     <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('s12')">▶ Run</button></div>
     <div class="code-body"><pre><span class="kw">def</span> <span class="fn">detect_drift</span>(reference_data, current_data, threshold=<span class="num">0.05</span>):
-    <span class="cm"># Egyszeru drift detektalas: feature atlagok osszehasonlitasa</span>
+    <span class="cm"># Egyszerű drift detektálás: feature átlagok összehasonlítása</span>
     drift_detected = <span class="kw">False</span>
     alerts = []
 
@@ -504,11 +504,11 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 
         <span class="kw">if</span> change > threshold:
             drift_detected = <span class="kw">True</span>
-            alerts.append(<span class="str">f"⚠️ {col}: {ref_mean:.1f} → {cur_mean:.1f} ({change:.1%} valtozas)"</span>)
+            alerts.append(<span class="str">f"⚠️ {col}: {ref_mean:.1f} → {cur_mean:.1f} ({change:.1%} változás)"</span>)
 
     <span class="kw">return</span> drift_detected, alerts
 
-<span class="cm"># Szimulalt uj adat (drift: tobb idos, magasabb jovedelem)</span>
+<span class="cm"># Szimulált új adat (drift: több idós, magasabb jövedelem)</span>
 new_data = pd.DataFrame({
     <span class="str">"age"</span>: np.random.randint(<span class="num">40</span>, <span class="num">80</span>, <span class="num">200</span>),
     <span class="str">"income"</span>: np.random.randint(<span class="num">60000</span>, <span class="num">150000</span>, <span class="num">200</span>),
@@ -520,34 +520,34 @@ new_data = pd.DataFrame({
 drift, alerts = <span class="fn">detect_drift</span>(X_train, new_data)
 <span class="kw">for</span> a <span class="kw">in</span> alerts:
     <span class="fn">print</span>(a)
-<span class="fn">print</span>(<span class="str">f"\\nDrift: {'DETECTALVA!' if drift else 'Nincs'}"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">f"\\nDrift: {'DETECTÁLVA!' if drift else 'Nincs'}"</span>)</pre></div>
     <div class="output-area" id="out-s12">
       <div class="output-label">Output:</div>
-      <pre><span class="log-grafana">[monitor]</span> <span class="log-warn">⚠️ age: 43.2 → 59.8 (38.3% valtozas)</span>
-<span class="log-grafana">[monitor]</span> <span class="log-warn">⚠️ income: 69451.3 → 104832.7 (50.9% valtozas)</span>
+      <pre><span class="log-grafana">[monitor]</span> <span class="log-warn">⚠️ age: 43.2 → 59.8 (38.3% változás)</span>
+<span class="log-grafana">[monitor]</span> <span class="log-warn">⚠️ income: 69451.3 → 104832.7 (50.9% változás)</span>
 
-<span class="log-grafana">[monitor]</span> <span class="log-warn">Drift: DETECTALVA!</span></pre>
+<span class="log-grafana">[monitor]</span> <span class="log-warn">Drift: DETECTÁLVA!</span></pre>
     </div>
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demoban:</strong> egyszeru atlag osszehasonlitas. <strong>Productionben:</strong> KS-test, PSI (Population Stability Index), Evidently AI, Prometheus metrikak, Grafana dashboard, auto-retrain trigger.</p>
+    <p><strong>Demoban:</strong> egyszerű átlag összehasonlítás. <strong>Productionben:</strong> KS-test, PSI (Population Stability Index), Evidently AI, Prometheus metrikák, Grafana dashboard, auto-retrain trigger.</p>
   </div>
 </div>
 
-<!-- S13: A/B teszteles -->
+<!-- S13: A/B tesztelés -->
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
-  <h2>A/B teszteles: ket modell osszehasonlitasa <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
-  <div class="md-cell"><p>A/B teszt = ket modell verzio parhuzamos futtatasa, hogy valos adatokon merheto legyen melyik jobb.</p></div>
+  <h2>A/B tesztelés: két modell összehasonlítása <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell"><p>A/B teszt = két modell verzió párhuzamos futtatása, hogy valós adatokon mérhető legyen melyik jobb.</p></div>
   <div class="code-cell" id="cell-s13">
     <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('s13')">▶ Run</button></div>
-    <div class="code-body"><pre><span class="cm"># A/B teszt szimulator</span>
+    <div class="code-body"><pre><span class="cm"># A/B teszt szimulátor</span>
 np.random.seed(<span class="num">42</span>)
 n_requests = <span class="num">1000</span>
 
 <span class="cm"># Model A: jelenlegi (acc=0.950)</span>
-<span class="cm"># Model B: uj, featured engineering (acc=0.965)</span>
+<span class="cm"># Model B: új, featured engineering (acc=0.965)</span>
 
 results_a = {<span class="str">"correct"</span>: <span class="num">0</span>, <span class="str">"total"</span>: <span class="num">0</span>}
 results_b = {<span class="str">"correct"</span>: <span class="num">0</span>, <span class="str">"total"</span>: <span class="num">0</span>}
@@ -564,45 +564,45 @@ results_b = {<span class="str">"correct"</span>: <span class="num">0</span>, <sp
 <span class="fn">print</span>(<span class="str">f"Model A: {results_a['correct']}/{results_a['total']} = {results_a['correct']/results_a['total']:.3f}"</span>)
 <span class="fn">print</span>(<span class="str">f"Model B: {results_b['correct']}/{results_b['total']} = {results_b['correct']/results_b['total']:.3f}"</span>)
 
-<span class="cm"># Statisztikai szignifikancia (egyszeru z-test)</span>
+<span class="cm"># Statisztikai szignifikancia (egyszerű z-test)</span>
 improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span class="str">"total"</span>]) - (results_a[<span class="str">"correct"</span>]/results_a[<span class="str">"total"</span>])
-<span class="fn">print</span>(<span class="str">f"\\nJobbulas: {improvement:+.3f}"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">f"\\nJobbulás: {improvement:+.3f}"</span>)</pre></div>
     <div class="output-area" id="out-s13">
       <div class="output-label">Output:</div>
       <pre><span class="log-step">[ab-test]</span> Model A: <span class="log-info">758/798 = 0.950</span>
 <span class="log-step">[ab-test]</span> Model B: <span class="log-info">193/202 = 0.955</span>
 
-<span class="log-ok">Jobbulas: +0.006</span></pre>
+<span class="log-ok">Jobbulás: +0.006</span></pre>
     </div>
   </div>
   <div class="callout">
     <div class="callout-title">Production A/B</div>
-    <p>Valojaban: canary deployment (1% forgalom), statisztikai szignifikancia szamitas, gradual rollout, automatikus rollback ha rosszabb.</p>
+    <p>Valójában: canary deployment (1% forgalom), statisztikai szignifikancia számítás, gradual rollout, automatikus rollback ha rosszabb.</p>
   </div>
 </div>
 
-<!-- S14: Osszefoglalas -->
+<!-- S14: Összefoglalás -->
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
-  <h2>Osszefoglalas <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span> <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
+  <h2>Összefoglalás <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span> <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
   <div class="md-cell">
     <div class="callout success">
-      <div class="callout-title">Mit epitettunk?</div>
-      <p>Egy teljes ML pipeline-t a tanitastol a monitoringig:</p>
+      <div class="callout-title">Mit építettünk?</div>
+      <p>Egy teljes ML pipeline-t a tanítástól a monitoringig:</p>
       <ul>
-        <li>✅ MLflow kiserlet kovetes (parameterek, metrikak, modellek)</li>
-        <li>✅ Model Registry (verziozas, staging → production)</li>
-        <li>✅ Churn modell epitese feature engineering-gel</li>
-        <li>✅ Automatizalt model validacio</li>
-        <li>✅ FastAPI REST API szolgaltatas</li>
-        <li>✅ Docker kontenerizacio</li>
+        <li>✅ MLflow kísérlet követés (paraméterek, metrikák, modellek)</li>
+        <li>✅ Model Registry (verziózas, staging → production)</li>
+        <li>✅ Churn modell építése feature engineering-gel</li>
+        <li>✅ Automatizalt model validáció</li>
+        <li>✅ FastAPI REST API szolgáltatás</li>
+        <li>✅ Docker konténerizáció</li>
         <li>✅ CI/CD pipeline (teszt → build → deploy)</li>
-        <li>✅ Monitoring es drift detektalas</li>
-        <li>✅ A/B teszteles</li>
+        <li>✅ Monitoring es drift detektálás</li>
+        <li>✅ A/B tesztelés</li>
       </ul>
     </div>
     <div class="callout">
-      <div class="callout-title">Kovetkezo lepesek</div>
+      <div class="callout-title">Következő lépések</div>
       <ul>
         <li><strong>AI Engineering kurzus:</strong> RAG, chatbot, OpenAI API</li>
         <li><strong>AI Data Engineer kurzus:</strong> feature store, adat pipeline</li>
@@ -617,7 +617,7 @@ improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span cla
       <div class="arch-arrow">→</div>
       <div class="arch-step">📋 MLflow</div>
       <div class="arch-arrow">→</div>
-      <div class="arch-step">✅ Validacio</div>
+      <div class="arch-step">✅ Validáció</div>
     </div>
     <div class="arch-flow">
       <div class="arch-step">📦 Registry</div>
@@ -653,8 +653,9 @@ improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span cla
 <script>
 window.COURSE_CONFIG = {
   slug: 'aiops-mlops',
-  toc: [{"id": "s0", "num": "00", "label": "Intro - Churn modell deployment"}, {"id": "s1", "num": "01", "label": "Fogalmi terkep"}, {"id": "s2", "num": "02", "label": "Architekturaterkep"}, {"id": "s3", "num": "03", "label": "Kornyezet"}, {"id": "s4", "num": "04", "label": "MLflow alapok"}, {"id": "s5", "num": "05", "label": "Kiserlet kovetes"}, {"id": "s6", "num": "06", "label": "Model regisztracio"}, {"id": "s7", "num": "07", "label": "Churn modell epites"}, {"id": "s8", "num": "08", "label": "Model validacio"}, {"id": "s9", "num": "09", "label": "FastAPI szolgaltatas"}, {"id": "s10", "num": "10", "label": "Docker kontenerizacio"}, {"id": "s11", "num": "11", "label": "CI/CD pipeline"}, {"id": "s12", "num": "12", "label": "Monitoring es drift"}, {"id": "s13", "num": "13", "label": "A/B teszteles"}, {"id": "s14", "num": "14", "label": "Osszefoglalas"}]
+  toc: [{"id": "s0", "num": "00", "label": "Intro - Churn modell deployment"}, {"id": "s1", "num": "01", "label": "Fogalmi térkép"}, {"id": "s2", "num": "02", "label": "Architektúratérkép"}, {"id": "s3", "num": "03", "label": "Környezet"}, {"id": "s4", "num": "04", "label": "MLflow alapok"}, {"id": "s5", "num": "05", "label": "Kísérlet követés"}, {"id": "s6", "num": "06", "label": "Model regisztráció"}, {"id": "s7", "num": "07", "label": "Churn modell építés"}, {"id": "s8", "num": "08", "label": "Model validáció"}, {"id": "s9", "num": "09", "label": "FastAPI szolgáltatás"}, {"id": "s10", "num": "10", "label": "Docker konténerizáció"}, {"id": "s11", "num": "11", "label": "CI/CD pipeline"}, {"id": "s12", "num": "12", "label": "Monitoring es drift"}, {"id": "s13", "num": "13", "label": "A/B tesztelés"}, {"id": "s14", "num": "14", "label": "Összefoglalás"}]
 };
 </script>
 <script src="../shared/course.js"></script>
+</body>
 </html>
