@@ -1,60 +1,130 @@
 // ── Engineering Crash Courses - Shared JS ──
 (function() {
-  const CFG = window.COURSE_CONFIG || {};
-  const COURSE_SLUG = CFG.slug || 'unknown';
-  const tocData = CFG.toc || [];
+  var CFG = window.COURSE_CONFIG || {};
+  var COURSE_SLUG = CFG.slug || 'unknown';
+  var tocData = CFG.toc || [];
   
-  const completedSections = new Set();
-  const allCellIds = [];
-  let runAllRunning = false;
+  var completedSections = new Set();
+  var allCellIds = [];
+  var runAllRunning = false;
 
   // ── Restore from localStorage ──
   try {
-    const saved = JSON.parse(localStorage.getItem('ecc:' + COURSE_SLUG + ':completed') || '[]');
-    saved.forEach(id => completedSections.add(id));
+    var saved = JSON.parse(localStorage.getItem('ecc:' + COURSE_SLUG + ':completed') || '[]');
+    saved.forEach(function(id) { completedSections.add(id); });
   } catch(e) {}
 
   // ── Build TOC Nav ──
-  const nav = document.getElementById('side-nav');
+  var nav = document.getElementById('side-nav');
   if (nav && tocData.length) {
-    nav.innerHTML = tocData.map(item => 
-      '<a class="nav-item" href="#' + item.id + '" data-section="' + item.id + '" id="nav-' + item.id + '">' +
-      '<span class="nav-num">' + item.num + '</span> ' + item.label + '</a>'
-    ).join('');
+    nav.innerHTML = tocData.map(function(item) {
+      return '<a class="nav-item" href="#' + item.id + '" data-section="' + item.id + '" id="nav-' + item.id + '">' +
+        '<span class="nav-num">' + item.num + '</span> ' + item.label + '</a>';
+    }).join('');
   }
+
+  // ── Add copy buttons to code cells ──
+  document.querySelectorAll('.code-cell').forEach(function(cell) {
+    var header = cell.querySelector('.code-header');
+    if (!header) return;
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.onclick = function() {
+      var code = cell.querySelector('.code-body pre');
+      if (!code) return;
+      var text = code.textContent;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function() {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+        });
+      } else {
+        // Fallback
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      }
+    };
+    header.appendChild(btn);
+  });
+
+  // ── Mobile nav toggle ──
+  var toggle = document.createElement('button');
+  toggle.className = 'nav-toggle';
+  toggle.textContent = '☰';
+  toggle.onclick = function() {
+    if (nav) nav.classList.toggle('open');
+  };
+  document.body.appendChild(toggle);
+
+  // Close nav on link click (mobile)
+  if (nav) {
+    nav.addEventListener('click', function(e) {
+      if (e.target.closest('.nav-item') && window.innerWidth <= 900) {
+        nav.classList.remove('open');
+      }
+    });
+  }
+
+  // ── Quiz handling ──
+  document.querySelectorAll('.quiz-box').forEach(function(box) {
+    var correctIdx = parseInt(box.dataset.answer) || 0;
+    var options = box.querySelectorAll('.quiz-option');
+    var feedback = box.querySelector('.quiz-feedback');
+    var answered = false;
+    
+    options.forEach(function(opt, idx) {
+      opt.addEventListener('click', function() {
+        if (answered) return;
+        answered = true;
+        if (idx === correctIdx) {
+          opt.classList.add('correct');
+          if (feedback) { feedback.textContent = '✓ Helyes!'; feedback.style.color = '#00ff88'; }
+        } else {
+          opt.classList.add('wrong');
+          options[correctIdx].classList.add('correct');
+          if (feedback) { feedback.textContent = '✗ Nem egészen. A helyes válasz zöld.'; feedback.style.color = '#ff4466'; }
+        }
+      });
+    });
+  });
 
   // ── Progress ──
   function updateProgress() {
-    const totalSections = Math.max(tocData.length, document.querySelectorAll('.section[id]').length);
-    const done = completedSections.size;
-    const pct = totalSections > 0 ? Math.round((done / totalSections) * 100) : 0;
-    const bar = document.getElementById('progress-bar');
+    var totalSections = Math.max(tocData.length, document.querySelectorAll('.section[id]').length);
+    var done = completedSections.size;
+    var pct = totalSections > 0 ? Math.round((done / totalSections) * 100) : 0;
+    var bar = document.getElementById('progress-bar');
     if (bar) bar.style.width = pct + '%';
-    const txt = document.getElementById('progress-text');
+    var txt = document.getElementById('progress-text');
     if (txt) txt.textContent = done + ' / ' + totalSections + ' section completed';
   }
 
   // ── Run Cell (with animation) ──
   window.runCell = function(cellId) {
-    const cell = document.getElementById('cell-' + cellId);
+    var cell = document.getElementById('cell-' + cellId);
     if (!cell) return;
-    const output = document.getElementById('out-' + cellId);
+    var output = document.getElementById('out-' + cellId);
     if (!output) return;
-    const btn = cell.querySelector('.run-btn');
+    var btn = cell.querySelector('.run-btn');
 
     if (cell.classList.contains('running') || (btn && btn.classList.contains('done-btn'))) return;
 
-    if (!allCellIds.includes(cellId)) allCellIds.push(cellId);
+    if (allCellIds.indexOf(cellId) === -1) allCellIds.push(cellId);
 
-    // Start running
     cell.classList.add('running');
     if (btn) {
       btn.classList.add('running-btn');
       btn.textContent = '⏳ Running...';
     }
 
-    // Simulate execution
-    const delay = 400 + Math.random() * 800;
+    var delay = 400 + Math.random() * 800;
     setTimeout(function() {
       cell.classList.remove('running');
       cell.classList.add('has-output');
@@ -65,10 +135,10 @@
       }
       output.classList.add('visible');
 
-      // Mark section completed
       var section = cell.closest('.section');
       if (section) {
         completedSections.add(section.id);
+        section.classList.add('completed');
         try {
           localStorage.setItem('ecc:' + COURSE_SLUG + ':completed', JSON.stringify(Array.from(completedSections)));
         } catch(e) {}
@@ -113,6 +183,11 @@
     });
     document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('completed', 'active'); });
     document.querySelectorAll('.section.completed').forEach(function(s) { s.classList.remove('completed'); });
+    // Reset quiz
+    document.querySelectorAll('.quiz-option').forEach(function(o) {
+      o.classList.remove('correct', 'wrong');
+    });
+    document.querySelectorAll('.quiz-feedback').forEach(function(f) { f.textContent = ''; });
     updateProgress();
   };
 
@@ -129,7 +204,7 @@
       var navItem = document.getElementById('nav-' + activeId);
       if (navItem) {
         navItem.classList.add('active');
-        navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+        if (navItem.scrollIntoView) navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
       }
     }
   }
@@ -139,6 +214,7 @@
     completedSections.forEach(function(sectionId) {
       var section = document.getElementById(sectionId);
       if (section) {
+        section.classList.add('completed');
         var navItem = document.getElementById('nav-' + sectionId);
         if (navItem) navItem.classList.add('completed');
         section.querySelectorAll('.code-cell').forEach(function(cell) {

@@ -339,11 +339,101 @@ tr:hover td { background: rgba(0,212,255,.05); }
 .hero-tool img { width:36px; height:36px; filter: brightness(0) invert(1) opacity(.85); }
 .hero-tool span { font-size: .65rem; color: var(--text-dim); }
 
+/* ── Copy button ── */
+.copy-btn {
+  padding: 3px 10px; border-radius: 4px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+  cursor: pointer; transition: all .2s; margin-left: 8px;
+}
+.copy-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+/* ── Estimated time badge ── */
+.time-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .72rem; color: var(--text-dim); margin-left: 12px;
+}
+
+/* ── Section completed ── */
+.section.completed { opacity: 1; }
+.section.completed .section-number::after {
+  content: ' ✓'; color: var(--green);
+}
+
+/* ── Quiz ── */
+.quiz-box {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px; margin: 20px 0;
+}
+.quiz-box h3 { color: var(--yellow); margin-bottom: 12px; font-size: 1rem; }
+.quiz-option {
+  display: block; width: 100%; text-align: left;
+  padding: 10px 16px; margin: 6px 0; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--bg2);
+  color: var(--text); cursor: pointer; font-size: .88rem;
+  transition: all .2s; font-family: 'Inter', sans-serif;
+}
+.quiz-option:hover { border-color: var(--cyan); background: rgba(0,212,255,.05); }
+.quiz-option.correct { border-color: var(--green); background: rgba(0,255,136,.1); color: var(--green); }
+.quiz-option.wrong { border-color: var(--red); background: rgba(255,68,102,.1); color: var(--red); }
+.quiz-feedback { margin-top: 10px; font-size: .85rem; font-weight: 600; }
+
+/* ── Glossary ── */
+.glossary-term {
+  border-bottom: 1px dashed var(--cyan); cursor: help;
+  position: relative;
+}
+.glossary-term:hover::after {
+  content: attr(data-def);
+  position: absolute; bottom: 100%; left: 0; z-index: 100;
+  background: var(--bg3); border: 1px solid var(--cyan);
+  border-radius: 6px; padding: 8px 12px;
+  font-size: .78rem; color: var(--text); white-space: normal;
+  width: 280px; pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+}
+
+/* ── Mobile nav toggle ── */
+.nav-toggle {
+  display: none; position: fixed; bottom: 20px; right: 20px; z-index: 950;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--cyan); color: var(--bg);
+  border: none; font-size: 1.3rem; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,212,255,.4);
+  transition: all .2s;
+}
+.nav-toggle:hover { transform: scale(1.1); }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  #side-nav { display: none; }
-  main { margin-left:0; padding: 80px 16px 40px; }
+  #side-nav { 
+    display: none; width: 100%; height: auto; max-height: 50vh;
+    position: fixed; bottom: 0; top: auto; left: 0; right: 0;
+    z-index: 950; border-right: none; border-top: 1px solid var(--border);
+  }
+  #side-nav.open { display: block; }
+  .nav-toggle { display: flex; align-items: center; justify-content: center; }
+  main { margin-left:0; padding: 80px 16px 100px; }
+  header { padding: 10px 16px; }
+  header h1 { font-size: .9rem; }
   .hero h1 { font-size: 1.8rem; }
+  .header-actions .btn { padding: 5px 12px; font-size: .78rem; }
+  #progress-text { display: none; }
+  .section h2 { font-size: 1.3rem; }
+  .code-body pre { font-size: .76rem; }
+  .output-area pre { font-size: .76rem; }
+  .arch-flow { gap: 4px; }
+  .arch-step { padding: 6px 10px; min-width: 70px; font-size: .8rem; }
+  .quiz-option { font-size: .82rem; padding: 8px 12px; }
+}
+
+@media (max-width: 600px) {
+  main { padding: 70px 12px 100px; }
+  .section { padding-left: 16px; border-left-width: 3px; }
+  .hero h1 { font-size: 1.4rem; }
+  table { font-size: .8rem; }
+  th, td { padding: 6px 8px; }
 }
 
 .back-btn {
