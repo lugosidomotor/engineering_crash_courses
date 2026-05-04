@@ -411,7 +411,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <div class="section layer-intro" id="s1">
   <div class="section-number">Section 01</div>
   <h2>Táblák és adattípusok</h2>
-  <div class="md-cell"><p>A relációs adatbázis adatokat táblákban tárolja. Minden táblának van sémája.</p></div><table><tr><th>Típus</th><th>Leírás</th><th>Példa</th></tr><tr><td>['INT', 'Egész szám', 'customer_id']</td><td>['VARCHAR(n)', 'Szöveg', 'name']</td><td>['DECIMAL(p,s)', 'Tizedes', 'price']</td><td>['TIMESTAMP', 'Dátum+idő', 'created_at']</td><td>['BOOLEAN', 'Igaz/hamis', 'is_active']</td></tr></table><div class="code-cell" id="cell-1"><div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('1')">&#9654; Run</button></div><div class="code-body"><pre>-- Create customers table
+  <div class="md-cell"><p>A relációs adatbázis adatokat táblákban tárolja. Minden táblának van sémája.</p></div><table><tr><th>Típus</th><th>Leírás</th><th>Példa</th></tr><tr><td>INT</td><td>Egész szám</td><td>customer_id</td><td>VARCHAR(n)</td><td>Szöveg</td><td>name</td><td>DECIMAL(p,s)</td><td>Tizedes</td><td>price</td><td>TIMESTAMP</td><td>Dátum+idő</td><td>created_at</td><td>BOOLEAN</td><td>Igaz/hamis</td><td>is_active</td></tr></table><div class="code-cell" id="cell-1"><div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('1')">&#9654; Run</button></div><div class="code-body"><pre>-- Create customers table
 CREATE TABLE customers (
     customer_id   INT PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
@@ -466,7 +466,7 @@ Phone    |          62 | 18949.38 |    399.99</pre></div></div>
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
   <h2>JOIN: Táblák összekapcsolása</h2>
-  <div class="md-cell"><p>A JOIN a relációs adatbázisok legerősebb művelete.</p></div><table><tr><th>JOIN típus</th><th>Leírás</th></tr><tr><td>['INNER JOIN', 'Mindkét táblában meglévő sorok']</td><td>['LEFT JOIN', 'Bal tábla összes + jobb egyezések']</td><td>['FULL JOIN', 'Mindkét tábla összes sora']</td></tr></table><div class="code-cell" id="cell-5"><div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('5')">&#9654; Run</button></div><div class="code-body"><pre>SELECT c.name AS customer, p.name AS product,
+  <div class="md-cell"><p>A JOIN a relációs adatbázisok legerősebb művelete.</p></div><table><tr><th>JOIN típus</th><th>Leírás</th></tr><tr><td>INNER JOIN</td><td>Mindkét táblában meglévő sorok</td><td>LEFT JOIN</td><td>Bal tábla összes + jobb egyezések</td><td>FULL JOIN</td><td>Mindkét tábla összes sora</td></tr></table><div class="code-cell" id="cell-5"><div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('5')">&#9654; Run</button></div><div class="code-body"><pre>SELECT c.name AS customer, p.name AS product,
        oi.quantity, oi.unit_price,
        oi.quantity * oi.unit_price AS line_total
 FROM customers c
@@ -561,7 +561,7 @@ order_items |   1850000 | 342.10</pre></div></div>
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
   <h2>Tranzakciók: ACID</h2>
-  <div class="md-cell"><p>ACID = Atomicity, Consistency, Isolation, Durability.</p></div><table><tr><th>Tulajdonság</th><th>Leírás</th></tr><tr><td>['Atomicity', 'Vagy minden végrehajtódik, vagy sem']</td><td>['Consistency', 'Érvényes állapot a tranzakció után']</td><td>['Isolation', 'Párhuzamos tranzakciók elszigeteltek']</td><td>['Durability', 'Commit-ált adatok tartósan tárolódnak']</td></tr></table><div class="code-cell" id="cell-11"><div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('11')">&#9654; Run</button></div><div class="code-body"><pre>BEGIN TRANSACTION;
+  <div class="md-cell"><p>ACID = Atomicity, Consistency, Isolation, Durability.</p></div><table><tr><th>Tulajdonság</th><th>Leírás</th></tr><tr><td>Atomicity</td><td>Vagy minden végrehajtódik, vagy sem</td><td>Consistency</td><td>Érvényes állapot a tranzakció után</td><td>Isolation</td><td>Párhuzamos tranzakciók elszigeteltek</td><td>Durability</td><td>Commit-ált adatok tartósan tárolódnak</td></tr></table><div class="code-cell" id="cell-11"><div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('11')">&#9654; Run</button></div><div class="code-body"><pre>BEGIN TRANSACTION;
 UPDATE accounts SET balance = balance - 500 WHERE account_id = 1;
 UPDATE accounts SET balance = balance + 500 WHERE account_id = 2;
 COMMIT;</pre></div><div class="output-area" id="out-11"><div class="output-label">Output:</div><pre>Query OK, COMMIT successful</pre></div></div>
@@ -584,7 +584,7 @@ SELECT * FROM vw_customer_orders WHERE order_count &gt; 3;</pre></div><div class
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
   <h2>Adatmodellezés alapjai</h2>
-  <div class="md-cell"><p>Három szint: konceptuális, logikai és fizikai.</p></div><table><tr><th>Szint</th><th>Leírás</th><th>Kinek</th></tr><tr><td>['Konceptuális', 'Üzleti entitások', 'Üzleti elemzők']</td><td>['Logikai', 'Táblák, oszlopok, kulcsok', 'Data modelerek']</td><td>['Fizikai', 'Indexek, partitioning', 'DBA']</td></tr></table><div class="callout "><div class="callout-title">WebShop Pro</div><p>Customers, Products, Orders, Order Items, Categories, Payments, Shipments, Reviews.</p></div>
+  <div class="md-cell"><p>Három szint: konceptuális, logikai és fizikai.</p></div><table><tr><th>Szint</th><th>Leírás</th><th>Kinek</th></tr><tr><td>Konceptuális</td><td>Üzleti entitások</td><td>Üzleti elemzők</td><td>Logikai</td><td>Táblák, oszlopok, kulcsok</td><td>Data modelerek</td><td>Fizikai</td><td>Indexek, partitioning</td><td>DBA</td></tr></table><div class="callout "><div class="callout-title">WebShop Pro</div><p>Customers, Products, Orders, Order Items, Categories, Payments, Shipments, Reviews.</p></div>
 </div>
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
@@ -610,7 +610,7 @@ CREATE TABLE dim_customer (
 <div class="section layer-general" id="s15">
   <div class="section-number">Section 15</div>
   <h2>SCD: Lassan változó dimenziók</h2>
-  <div class="md-cell"><p>SCD stratégiák a dimenzió táblák történeti nyomon követéséhez.</p></div><table><tr><th>SCD típus</th><th>Stratégia</th></tr><tr><td>['Type 0', 'Soha nem változik']</td><td>['Type 1', 'Felülírás']</td><td>['Type 2', 'Új sor + időintervallum']</td><td>['Type 3', 'Régi + új oszlop']</td></tr></table><div class="code-cell" id="cell-15"><div class="code-header"><span class="cell-number">[15]</span><button class="run-btn" onclick="runCell('15')">&#9654; Run</button></div><div class="code-body"><pre>-- SCD Type 2
+  <div class="md-cell"><p>SCD stratégiák a dimenzió táblák történeti nyomon követéséhez.</p></div><table><tr><th>SCD típus</th><th>Stratégia</th></tr><tr><td>Type 0</td><td>Soha nem változik</td><td>Type 1</td><td>Felülírás</td><td>Type 2</td><td>Új sor + időintervallum</td><td>Type 3</td><td>Régi + új oszlop</td></tr></table><div class="code-cell" id="cell-15"><div class="code-header"><span class="cell-number">[15]</span><button class="run-btn" onclick="runCell('15')">&#9654; Run</button></div><div class="code-body"><pre>-- SCD Type 2
 UPDATE dim_customer SET valid_to = '2024-06-01', is_current = FALSE
 WHERE customer_id = 1 AND is_current = TRUE;
 
@@ -626,7 +626,7 @@ FROM dim_customer WHERE customer_id = 1;</pre></div><div class="output-area" id=
 <div class="section layer-general" id="s16">
   <div class="section-number">Section 16</div>
   <h2>Normalizálás</h2>
-  <div class="md-cell"><p>Normalizálás csökkenti a redundanciát, denormalizálás javítja az olvasást.</p></div><table><tr><th>NF</th><th>Szabály</th></tr><tr><td>['1NF', 'Atomi értékek']</td><td>['2NF', 'Nincs részleges függőség']</td><td>['3NF', 'Nincs tranzitív függőség']</td></tr></table><div class="callout success"><div class="callout-title">Mikor mit?</div><p>OLTP: normalizált. OLAP: denormalizált (star schema).</p></div>
+  <div class="md-cell"><p>Normalizálás csökkenti a redundanciát, denormalizálás javítja az olvasást.</p></div><table><tr><th>NF</th><th>Szabály</th></tr><tr><td>1NF</td><td>Atomi értékek</td><td>2NF</td><td>Nincs részleges függőség</td><td>3NF</td><td>Nincs tranzitív függőség</td></tr></table><div class="callout success"><div class="callout-title">Mikor mit?</div><p>OLTP: normalizált. OLAP: denormalizált (star schema).</p></div>
 </div>
 <div class="section layer-general" id="s17">
   <div class="section-number">Section 17</div>
