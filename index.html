@@ -105,8 +105,14 @@ img{max-width:100%;display:block}
 
 /* ── Course Grid ── */
 .course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
-.course-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:14px;padding:24px;transition:all .25s;position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit}
+.course-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:14px;transition:all .25s;position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;overflow:hidden}
 .course-card:hover{border-color:rgba(88,166,255,.45);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+/* Card cover image */
+.card-cover{position:relative;height:160px;overflow:hidden}
+.card-cover img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.course-card:hover .card-cover img{transform:scale(1.05)}
+.card-cover-overlay{position:absolute;bottom:0;left:0;right:0;padding:10px 16px;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.card-body{padding:16px 24px 0;display:flex;flex-direction:column;flex:1}
 /* Card icon */
 .card-title-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .card-icon{width:36px;height:36px;flex-shrink:0;filter:brightness(0) invert(1) opacity(.85)}
@@ -129,7 +135,7 @@ img{max-width:100%;display:block}
 .card-stack{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
 .stack-chip{display:flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;background:rgba(255,255,255,.04);font-size:.75rem;color:#8b949e;font-weight:500}
 .stack-chip img{width:14px;height:14px}
-.card-footer{margin-top:auto;padding-top:14px;border-top:1px solid rgba(48,54,61,.4)}
+.card-footer{margin-top:auto;padding-top:14px;padding-bottom:24px;border-top:1px solid rgba(48,54,61,.4)}
 .card-btn{display:block;text-align:center;padding:10px;border-radius:8px;font-size:.88rem;font-weight:600;transition:all .15s}
 .card-btn-ready{background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.25)}
 .card-btn-ready:hover{background:rgba(63,185,80,.2);text-decoration:none}
@@ -257,9 +263,9 @@ img{max-width:100%;display:block}
       <h3>🏗️ Foundation</h3>
       <p class="path-meta">Alapozás · 3 kurzus · Kezdő</p>
       <ol class="path-steps">
-        <li><a href="./sql-data-modeling/">SQL & Data Modeling</a> <span class="step-tag">Kész</span></li>
-        <li><a href="./python-data-engineering/">Python for Data Engineering</a> <span class="step-tag">Kész</span></li>
-        <li><a href="./docker-local-data-platform/">Docker & Local Data Platform</a> <span class="step-tag">Kész</span></li>
+        <li><a href="./sql-data-modeling/">SQL & Data Modeling</a></li>
+        <li><a href="./python-data-engineering/">Python for Data Engineering</a></li>
+        <li><a href="./docker-local-data-platform/">Docker & Local Data Platform</a></li>
       </ol>
     </div>
 
@@ -404,6 +410,7 @@ img{max-width:100%;display:block}
 const COURSES = [
   {
     "slug": "delta-table-crash-course",
+    "image": "./assets/images/delta-table-crash-course.jpg",
     "title": "Delta Table Crash Course",
     "description": "Tanuld meg a Delta Lake alapjait a nulláról: Bronze/Silver/Gold lakehouse adatmodell építése, ACID tranzakciók, time travel, séma verziózás és adatminőség garantálása lépésről lépésre.",
     "path": ["Foundation", "Data Engineering"],
@@ -418,6 +425,7 @@ const COURSES = [
   },
   {
     "slug": "spark-crash-course",
+    "image": "./assets/images/spark-crash-course.jpg",
     "title": "Apache Spark Crash Course",
     "description": "Nagy volumenű adatfeldolgozás Apache Sparkkal: DataFrame API, katalizátor optimalizáló, partitioning, shuffle és ETL pipeline építés valós adatokon.",
     "path": ["Data Engineering"],
@@ -432,6 +440,7 @@ const COURSES = [
   },
   {
     "slug": "ai-engineering",
+    "image": "./assets/images/ai-engineering.jpg",
     "title": "AI Engineering",
     "description": "Építs RAG alapú ügyfélszolgálati chatbotot: OpenAI API, embeddings, ChromaDB vektoros keresés, structured outputs és Streamlit UI — a nulláról production-ig.",
     "path": ["AI Engineering"],
@@ -446,6 +455,7 @@ const COURSES = [
   },
   {
     "slug": "aiops-mlops",
+    "image": "./assets/images/aiops-mlops.jpg",
     "title": "AIOps & MLOps",
     "description": "ML modell üzemeltetés a nulláról: MLflow kísérletkövetés, modell regisztráció, FastAPI serving, Docker konténerizáció, CI/CD pipeline, monitoring és drift detektálás.",
     "path": ["AI Engineering", "Data Engineering"],
@@ -460,6 +470,7 @@ const COURSES = [
   },
   {
     "slug": "ai-data-engineer",
+    "image": "./assets/images/ai-data-engineer.jpg",
     "title": "AI Data Engineer",
     "description": "Feature store és data quality pipeline építése: online/offline feature-ök, Kafka streaming, Feast feature store, dbt analytics, Great Expectations validáció és data lineage.",
     "path": ["Data Engineering", "AI Engineering"],
@@ -474,6 +485,7 @@ const COURSES = [
   },
   {
     "slug": "sql-data-modeling",
+    "image": "./assets/images/sql-data-modeling.jpg",
     "title": "SQL & Data Modeling",
     "description": "SQL és analitikai adatmodellezési alapok data engineering és analytics engineering munkához: SELECT, JOIN, CTE, window functions, star schema, SCD.",
     "path": ["Foundation", "Data Engineering"],
@@ -488,6 +500,7 @@ const COURSES = [
   },
   {
     "slug": "python-data-engineering",
+    "image": "./assets/images/python-data-engineering.jpg",
     "title": "Python for Data Engineering",
     "description": "Gyakorlati Python alapok adatfeldolgozási, ETL és pipeline-fejlesztési feladatokhoz: virtualenv, pandas, pathlib, logging, pydantic, CLI, unit test.",
     "path": ["Foundation", "Data Engineering", "AI Engineering"],
@@ -502,6 +515,7 @@ const COURSES = [
   },
   {
     "slug": "docker-local-data-platform",
+    "image": "./assets/images/docker-local-data-platform.jpg",
     "title": "Docker & Local Data Platform",
     "description": "Lokális data platform építése Docker Compose segítségével: Postgres, MinIO, Spark, Airflow, MLflow, Prometheus és Grafana egyetlen paranccsal.",
     "path": ["Foundation", "Data Engineering", "AI Engineering"],
@@ -516,6 +530,7 @@ const COURSES = [
   },
   {
     "slug": "airflow-orchestration",
+    "image": "./assets/images/airflow-orchestration.jpg",
     "title": "Airflow & Orchestration",
     "description": "Adatpipeline-ok ütemezése, monitorozása és hibakezelése Apache Airflow-val: DAG, operator, sensor, schedule, retry, backfill, XCom, connections.",
     "path": ["Data Engineering"],
@@ -530,6 +545,7 @@ const COURSES = [
   },
   {
     "slug": "dbt-analytics-engineering",
+    "image": "./assets/images/dbt-analytics-engineering.jpg",
     "title": "dbt Analytics Engineering",
     "description": "Analitikai modellezés, tesztelés, dokumentáció és lineage dbt-vel: staging, intermediate, mart modellek, schema tests, incremental models.",
     "path": ["Data Engineering", "Analytics Engineering"],
@@ -544,6 +560,7 @@ const COURSES = [
   },
   {
     "slug": "databricks-lakehouse",
+    "image": "./assets/images/databricks-lakehouse.jpg",
     "title": "Databricks Lakehouse",
     "description": "Modern lakehouse fejlesztés Databricks környezetben: notebooks, Jobs, Unity Catalog, Delta Live Tables, MLflow és workflow-k valós adatokon.",
     "path": ["Data Engineering", "AI Engineering"],
@@ -558,6 +575,7 @@ const COURSES = [
   },
   {
     "slug": "llmops-genai-production",
+    "image": "./assets/images/llmops-genai-production.jpg",
     "title": "LLMOps / GenAI Production",
     "description": "Production GenAI és RAG alkalmazások üzemeltetése: prompt versioning, eval dataset, hallucination tesztek, latency monitoring, guardrails, fallback model.",
     "path": ["AI Engineering"],
@@ -643,22 +661,27 @@ function renderCourses() {
 
     return `
       <a href="${c.url}" class="course-card">
-        <div class="card-top">
-          <div class="card-badges">${diffBadge}${pathBadges}</div>
-          <span class="card-number">#${String(i+1).padStart(2,'0')}</span>
+        <div class="card-cover">
+          <img src="${c.image}" alt="${c.title}" loading="lazy">
+          <div class="card-cover-overlay">
+            <div class="card-badges">${diffBadge}${pathBadges}</div>
+            <span class="card-number">#${String(i+1).padStart(2,'0')}</span>
+          </div>
         </div>
-        <div class="card-title-row">
-          ${iconSvg}
-          <h3>${c.title}</h3>
+        <div class="card-body">
+          <div class="card-title-row">
+            ${iconSvg}
+            <h3>${c.title}</h3>
+          </div>
+          <p class="card-desc">${c.description}</p>
+          <div class="card-build"><strong>Mit építesz:</strong> ${c.whatYouBuild}</div>
+          <div class="card-meta">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${c.estimatedTime}</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>${c.sectionCount} szekció</span>
+          </div>
+          <div class="card-stack">${stackChips}</div>
+          <div class="card-footer"><span class="card-btn card-btn-ready">→ Kurzus megnyitása</span></div>
         </div>
-        <p class="card-desc">${c.description}</p>
-        <div class="card-build"><strong>Mit építesz:</strong> ${c.whatYouBuild}</div>
-        <div class="card-meta">
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${c.estimatedTime}</span>
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>${c.sectionCount} szekció</span>
-        </div>
-        <div class="card-stack">${stackChips}</div>
-        <div class="card-footer"><span class="card-btn card-btn-ready">→ Kurzus megnyitása</span></div>
       </a>`;
   }).join('');
 }
