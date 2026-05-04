@@ -1249,6 +1249,14 @@ st.title(<span class="str">"WebShop Pro Support Bot"</span>)
 <script>// ── State ──
 const completedSections = new Set();
 const allCellIds = [];
+const COURSE_SLUG = 'ai-engineering';
+
+// Restore from localStorage
+try {
+  const saved = JSON.parse(localStorage.getItem('ecc:' + COURSE_SLUG + ':completed') || '[]');
+  saved.forEach(id => completedSections.add(id));
+} catch(e) {}
+
 let runAllRunning = false;
 
 // ── Navigation ──
@@ -1316,6 +1324,10 @@ function runCell(cellId) {
     const section = cell.closest('.section');
     if (section) {
       completedSections.add(section.id);
+      // Persist to localStorage
+      try {
+        localStorage.setItem('ecc:' + COURSE_SLUG + ':completed', JSON.stringify([...completedSections]));
+      } catch(e) {}
       const navItem = document.getElementById('nav-' + section.id);
       if (navItem) navItem.classList.add('completed');
     }
@@ -1324,7 +1336,7 @@ function runCell(cellId) {
 }
 
 function updateProgress() {
-  const totalSections = document.querySelectorAll('.section').length;
+  const totalSections = document.querySelectorAll('.section[id]').length;
   const done = completedSections.size;
   const pct = Math.round((done / totalSections) * 100);
   document.getElementById('progress-bar').style.width = pct + '%';
@@ -1396,6 +1408,27 @@ document.addEventListener('DOMContentLoaded', () => {
   
   window.addEventListener('scroll', updateActiveNav, {passive: true});
   updateActiveNav();
-});</script>
-</body>
+
+  restoreProgress();
+});
+
+function restoreProgress() {
+  completedSections.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const navItem = document.getElementById('nav-' + sectionId);
+      if (navItem) navItem.classList.add('completed');
+      section.querySelectorAll('.code-cell').forEach(cell => {
+        const id = cell.id.replace('cell-', '');
+        const btn = cell.querySelector('.run-btn');
+        const output = document.getElementById('out-' + id);
+        cell.classList.add('has-output');
+        if (btn) { btn.classList.add('done-btn'); btn.textContent = '✓ Done'; }
+        if (output) output.classList.add('visible');
+      });
+    }
+  });
+  updateProgress();
+}
+</script>
 </html>
