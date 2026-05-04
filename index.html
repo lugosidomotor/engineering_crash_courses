@@ -64,6 +64,117 @@ header {
 .hero-stat .num { font-size:2rem; font-weight:900; color:var(--cyan); }
 .hero-stat .label { font-size:.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; }
 
+/* ── Prerequisites ── */
+.prereq-section {
+  padding: 32px 32px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.prereq-section h2 {
+  font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;
+  color: var(--text);
+}
+.prereq-section h2 span { color: var(--text-dim); font-weight: 400; font-size: 1rem; }
+.prereq-grid {
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+.prereq-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  font-size: .85rem;
+  color: var(--text);
+}
+.prereq-tag img {
+  width: 18px; height: 18px;
+  filter: brightness(0) invert(1) opacity(.7);
+}
+.prereq-note {
+  margin-top: 12px;
+  font-size: .85rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ── Learning Paths ── */
+.paths-section {
+  padding: 32px 32px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.paths-section h2 {
+  font-size: 1.5rem; font-weight: 700; margin-bottom: 24px;
+  color: var(--text);
+}
+.paths-section h2 span { color: var(--text-dim); font-weight: 400; font-size: 1rem; }
+.paths-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+.path-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.path-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--path-accent);
+}
+.path-card h3 {
+  font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;
+  color: var(--path-accent);
+}
+.path-card .path-subtitle {
+  font-size: .85rem; color: var(--text-dim); margin-bottom: 16px;
+}
+.path-steps {
+  display: flex; flex-direction: column; gap: 0;
+}
+.path-step {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0;
+  position: relative;
+}
+.path-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 15px; top: 36px; bottom: -10px;
+  width: 2px;
+  background: var(--border);
+}
+.path-step-num {
+  width: 30px; height: 30px; min-width: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem; font-weight: 700;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid var(--path-accent);
+  color: var(--path-accent);
+}
+.path-step-info { flex: 1; }
+.path-step-title {
+  font-weight: 600; font-size: .9rem; color: var(--text);
+}
+.path-step-desc {
+  font-size: .78rem; color: var(--text-dim); margin-top: 2px;
+}
+.path-outcome {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: .85rem;
+  color: var(--text-dim);
+}
+.path-outcome strong { color: var(--path-accent); }
+
 /* ── Course grid ── */
 .courses-section { padding: 48px 32px 80px; max-width: 1200px; margin: 0 auto; }
 .courses-section h2 {
@@ -116,7 +227,25 @@ header {
   font-size: .7rem; color: var(--text-dim); margin-bottom: 8px;
 }
 .card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
-.card-desc { color: var(--text-dim); font-size: .9rem; line-height: 1.6; margin-bottom: 20px; flex:1; }
+.card-desc { color: var(--text-dim); font-size: .9rem; line-height: 1.6; margin-bottom: 16px; flex:1; }
+
+/* Card detail rows */
+.card-details {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 16px;
+}
+.card-detail {
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.card-detail-label {
+  font-size: .7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--text-dim); margin-bottom: 4px;
+}
+.card-detail-value {
+  font-size: .85rem; color: var(--text); line-height: 1.5;
+}
 
 .card-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .card-tools img {
@@ -139,6 +268,15 @@ header {
 .diff-intermediate { background: rgba(255,136,0,0.12); color: var(--orange); }
 .diff-advanced { background: rgba(255,68,102,0.12); color: var(--red); }
 
+.card-order {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  padding: 3px 10px; border-radius: 12px;
+  background: rgba(0,212,255,0.08);
+  color: var(--cyan);
+  border: 1px solid rgba(0,212,255,0.2);
+}
+
 .card-arrow {
   font-size: 1.2rem;
   color: var(--accent);
@@ -158,12 +296,12 @@ footer a { color: var(--cyan); text-decoration: none; }
 @media (max-width: 768px) {
   .hero h1 { font-size: 2rem; }
   .hero { padding: 48px 16px 32px; }
-  .courses-section { padding: 32px 16px 60px; }
-  .grid { grid-template-columns: 1fr; }
+  .courses-section, .paths-section, .prereq-section { padding-left: 16px; padding-right: 16px; }
+  .grid, .paths-grid { grid-template-columns: 1fr; }
   header { padding: 12px 16px; }
 }
 @media (min-width: 769px) and (max-width: 1024px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid, .paths-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -176,7 +314,7 @@ footer a { color: var(--cyan); text-decoration: none; }
 
 <section class="hero">
   <h1>Engineering Crash Courses</h1>
-  <p>Interaktív, notebook-alapú kurzusok data és AI szakembereknek. Futtatható kód cellák, eszközlogók, vizuális diagramok és valós példák.</p>
+  <p>Interaktív, notebook-alapú kurzusok data és AI szakembereknek. Futtatható kód cellák, eszközlogók, vizuális diagramok és valós példák — egy fiktív webshop/subscription business esettanulmányon keresztül.</p>
   <div class="hero-stats">
     <div class="hero-stat"><div class="num">5</div><div class="label">Kurzus</div></div>
     <div class="hero-stat"><div class="num">95</div><div class="label">Section</div></div>
@@ -184,16 +322,126 @@ footer a { color: var(--cyan); text-decoration: none; }
   </div>
 </section>
 
+<!-- ═══════════════ Prerequisites ═══════════════ -->
+<section class="prereq-section">
+  <h2>Előfeltételek <span>— amiket érdemes ismerned a kurzusok előtt</span></h2>
+  <div class="prereq-grid">
+    <span class="prereq-tag"><img src="assets/logos/python.svg" alt=""> Python alapok ( változók, függvények, osztályok )</span>
+    <span class="prereq-tag"><img src="assets/logos/pandas.svg" alt=""> pandas alapok ( DataFrame, groupby, merge )</span>
+    <span class="prereq-tag">SQL alapok ( SELECT, JOIN, GROUP BY )</span>
+    <span class="prereq-tag">CLI / terminál alapok ( cd, ls, pipes )</span>
+    <span class="prereq-tag"><img src="assets/logos/docker.svg" alt=""> virtualenv / Docker alapok</span>
+    <span class="prereq-tag"><img src="assets/logos/git.svg" alt=""> Git alapok ( clone, commit, push )</span>
+  </div>
+  <p class="prereq-note">Nem kell expertnek lenned — elég a alapvető jártasság minden területen. A kurzusok innen visznek tovább.</p>
+</section>
+
+<!-- ═══════════════ Learning Paths ═══════════════ -->
+<section class="paths-section">
+  <h2>Tanulási útvonalak <span>— ajánlott sorrend a maximális hatásért</span></h2>
+  <div class="paths-grid">
+
+    <!-- Data Engineering útvonal -->
+    <div class="path-card" style="--path-accent: var(--cyan);">
+      <h3>Data Engineering útvonal</h3>
+      <div class="path-subtitle">Az alapoktól a production adatpipeline-ekig — webshop esettanulmánnyal</div>
+      <div class="path-steps">
+        <div class="path-step">
+          <div class="path-step-num">1</div>
+          <div class="path-step-info">
+            <div class="path-step-title">Delta Table Crash Course</div>
+            <div class="path-step-desc">Megismered a modern lakehouse architektúrát, Bronze/Silver/Gold rétegeket, és felépíted az adatalapot.</div>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="path-step-num">2</div>
+          <div class="path-step-info">
+            <div class="path-step-title">Apache Spark</div>
+            <div class="path-step-desc">Nagy adatmennyiségek elosztott feldolgozása, optimalizált ETL jobok, streaming — mind Sparkkal.</div>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="path-step-num">3</div>
+          <div class="path-step-info">
+            <div class="path-step-title">AI Data Engineer</div>
+            <div class="path-step-desc">AI-ready feature store, streaming ingestion, adatminőség-ellenőrzés és data lineage a webshop adataival.</div>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="path-step-num">4</div>
+          <div class="path-step-info">
+            <div class="path-step-title">AIOps &amp; MLOps</div>
+            <div class="path-step-desc">Az elkészült modellek és pipeline-ek éles üzemeltetése CI/CD-vel, monitoringgal, drift detection-nel.</div>
+          </div>
+        </div>
+      </div>
+      <div class="path-outcome">
+        <strong>Eredmény:</strong> Felépítesz egy teljes, production-ready adatplatformot a webshop subscription adatokból — a nyers adatoktól a feature store-ig és a modellek éles üzemeltetéséig.
+      </div>
+    </div>
+
+    <!-- AI Application útvonal -->
+    <div class="path-card" style="--path-accent: var(--purple);">
+      <h3>AI Alkalmazásfejlesztő útvonal</h3>
+      <div class="path-subtitle">RAG chatbotoktól az éles ML modellekig — webshop ügyfélszolgálat esettanulmánnyal</div>
+      <div class="path-steps">
+        <div class="path-step">
+          <div class="path-step-num">1</div>
+          <div class="path-step-info">
+            <div class="path-step-title">AI Engineering</div>
+            <div class="path-step-desc">RAG chatbotot építesz a webshop termékkatalógusára, vektoradatbázissal, eval pipeline-nal és monitoringgal.</div>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="path-step-num">2</div>
+          <div class="path-step-info">
+            <div class="path-step-title">AI Data Engineer</div>
+            <div class="path-step-desc">Megérted, hogyan épül fel a feature store, hogyan áramlanak az adatok a streaming pipeline-ban a modell felé.</div>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="path-step-num">3</div>
+          <div class="path-step-info">
+            <div class="path-step-title">AIOps &amp; MLOps</div>
+            <div class="path-step-desc">A RAG rendszered és ML modelleid éles üzemeltetése: Docker, K8s, CI/CD, MLflow, canary deployment.</div>
+          </div>
+        </div>
+      </div>
+      <div class="path-outcome">
+        <strong>Eredmény:</strong> Felépítesz egy AI-vezérelt ügyfélszolgálati rendszert a webshopra — RAG chatbottal, valós idejű adatpipeline-lal és production ML infrastruktúrával.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ Course Cards ═══════════════ -->
 <section class="courses-section">
-  <h2>Kurzusok <span>— válassz egy témát és kezdj el tanulni</span></h2>
+  <h2>Kurzusok <span>— részletes áttekintés</span></h2>
   <div class="grid">
 
-    <!-- Delta Table Crash Course -->
+    <!-- ─── Delta Table Crash Course ─── -->
     <a href="delta-table-crash-course/index.html" class="card" style="--accent:var(--cyan); --glow:rgba(0,212,255,0.15);">
       <span class="card-status status-ready">Kész</span>
       <div class="card-number">COURSE 01</div>
       <h3>Delta Table Crash Course</h3>
-      <div class="card-desc">Delta table lokálisan, Bronze/Silver/Gold rétegek, ETL/ELT pipeline, fact/dimension modellezés, batch és streaming feldolgozás — mind Python és deltalake segítségével.</div>
+      <div class="card-desc">Delta table lokálisan, Bronze/Silver/Gold rétegek, ETL/ELT pipeline, fact/dimension modellezés, batch és streaming feldolgozás — mind Python és deltalake segítségével. A kurzus végére elkészítesz egy lokálisan futó Delta Lake architektúrát egy webshop rendelési adatbázisra.</div>
+
+      <div class="card-details">
+        <div class="card-detail">
+          <div class="card-detail-label">Mit építesz?</div>
+          <div class="card-detail-value">Egy teljes Delta Lake lakehouse architektúrát lokálisan: nyers rendelés-adatokból Bronze/Silver/Gold rétegeket, star schema modellt (fact_orders + dim_customer, dim_product, dim_date), és futó ETL/ELT pipeline-t.</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Stack</div>
+          <div class="card-detail-value">Python · deltalake · pandas · Parquet · Delta Lake · dbt · PySpark</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Kinek való?</div>
+          <div class="card-detail-value">Data Engineer pályakezdőknek, analystoknak akik pipeline-t akarnak építeni, és bárkinek aki meg akarja érteni a modern lakehouse architektúrát.</div>
+        </div>
+      </div>
+
       <div class="card-tools">
         <img src="assets/logos/delta-lake.svg" alt="Delta Lake">
         <img src="assets/logos/apachespark.svg" alt="Spark">
@@ -205,16 +453,33 @@ footer a { color: var(--cyan); text-decoration: none; }
       <div class="card-meta">
         <span class="card-diff diff-beginner">Kezdő</span>
         <span>26 section</span>
+        <span class="card-order">DE-1 / AI-</span>
         <span class="card-arrow">→</span>
       </div>
     </a>
 
-    <!-- AI Engineering -->
+    <!-- ─── AI Engineering ─── -->
     <a href="ai-engineering/index.html" class="card" style="--accent:var(--purple); --glow:rgba(179,102,255,0.15);">
       <span class="card-status status-ready">Kész</span>
       <div class="card-number">COURSE 02</div>
       <h3>AI Engineering</h3>
       <div class="card-desc">LLM alkalmazások fejlesztése RAG-pipeline-nal: prompt engineering, vektoradatbázisok, evaluációs keretrendszerek, monitoring és éles üzemeltetés a prototípustól a productionig.</div>
+
+      <div class="card-details">
+        <div class="card-detail">
+          <div class="card-detail-label">Mit építesz?</div>
+          <div class="card-detail-value">Egy lokálisan futó RAG chatbotot, ami a webshop termékkatalógusára és rendelési adatokra válaszol — vektoradatbázissal, eval pipeline-nal (RAGAS), LangFuse monitoringgal és Streamlit UI-val.</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Stack</div>
+          <div class="card-detail-value">Python · OpenAI API · LangChain · ChromaDB · Streamlit · RAGAS · LangFuse</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Kinek való?</div>
+          <div class="card-detail-value">Fejlesztőknek akik LLM alkalmazásokat akarnak építeni, data scientisteknek akik a prototípust production-vé akarják alakítani, és mérnököknek akik RAG rendszert akarnak.</div>
+        </div>
+      </div>
+
       <div class="card-tools">
         <img src="assets/logos/openai.svg" alt="OpenAI">
         <img src="assets/logos/chroma.svg" alt="Chroma">
@@ -226,16 +491,33 @@ footer a { color: var(--cyan); text-decoration: none; }
       <div class="card-meta">
         <span class="card-diff diff-intermediate">Közepes</span>
         <span>17 section</span>
+        <span class="card-order">DE- / AI-1</span>
         <span class="card-arrow">→</span>
       </div>
     </a>
 
-    <!-- AIOps & MLOps -->
+    <!-- ─── AIOps & MLOps ─── -->
     <a href="aiops-mlops/index.html" class="card" style="--accent:var(--green); --glow:rgba(0,255,136,0.15);">
       <span class="card-status status-ready">Kész</span>
       <div class="card-number">COURSE 03</div>
-      <h3>AIOps & MLOps</h3>
+      <h3>AIOps &amp; MLOps</h3>
       <div class="card-desc">ML modellek éles üzemeltetése CI/CD pipeline-nal: MLflow tracking és registry, Docker konténerizáció, Kubernetes deployment, monitoring, drift detection és canary release.</div>
+
+      <div class="card-details">
+        <div class="card-detail">
+          <div class="card-detail-label">Mit építesz?</div>
+          <div class="card-detail-value">Egy teljes ML deployment pipeline-t: a webshop churn prediction modelltől a konténerizált FastAPI szolgáltatásig — MLflow trackinggel, Docker image-dzsel, K8s deploymenttel, Prometheus monitoringgal és canary release-szel.</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Stack</div>
+          <div class="card-detail-value">Python · MLflow · Docker · Kubernetes · FastAPI · Prometheus · GitHub Actions</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Kinek való?</div>
+          <div class="card-detail-value">MLOps engineers-öknek, senior data scientisteknek akik production-t céloznak, és DevOps mérnököknek akik ML workload-okat akarnak menedzselni.</div>
+        </div>
+      </div>
+
       <div class="card-tools">
         <img src="assets/logos/kubernetes.svg" alt="Kubernetes">
         <img src="assets/logos/docker.svg" alt="Docker">
@@ -247,16 +529,33 @@ footer a { color: var(--cyan); text-decoration: none; }
       <div class="card-meta">
         <span class="card-diff diff-advanced">Haladó</span>
         <span>17 section</span>
+        <span class="card-order">DE-4 / AI-3</span>
         <span class="card-arrow">→</span>
       </div>
     </a>
 
-    <!-- AI Data Engineer -->
+    <!-- ─── AI Data Engineer ─── -->
     <a href="ai-data-engineer/index.html" class="card" style="--accent:var(--orange); --glow:rgba(255,136,0,0.15);">
       <span class="card-status status-ready">Kész</span>
       <div class="card-number">COURSE 04</div>
       <h3>AI Data Engineer</h3>
       <div class="card-desc">AI-ready adatpipeline-ek építése: feature store, adatminőség-ellenőrzés, streaming ingestion, data catalog és lineage — az adatforrástól a modellezésig.</div>
+
+      <div class="card-details">
+        <div class="card-detail">
+          <div class="card-detail-label">Mit építesz?</div>
+          <div class="card-detail-value">Egy feature store-t és streaming adatpipeline-t a webshop subscription adatokra: Feast feature store Great Expectations adatminőséggel, Kafka streaming ingestion-nel, Airflow orchestrationnel és teljes data lineage-nel.</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Stack</div>
+          <div class="card-detail-value">Python · Feast · Airflow · dbt · Delta Lake · Great Expectations · Kafka · Spark</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Kinek való?</div>
+          <div class="card-detail-value">Data engineer-eknek akik AI-ready adatinfrastruktúrát akarnak, ML engineer-eknek akik meg akarják érteni az adatoldalt, és architect-eknek akik end-to-end pipeline-t terveznek.</div>
+        </div>
+      </div>
+
       <div class="card-tools">
         <img src="assets/logos/airflow.svg" alt="Airflow">
         <img src="assets/logos/dbt.svg" alt="dbt">
@@ -268,16 +567,33 @@ footer a { color: var(--cyan); text-decoration: none; }
       <div class="card-meta">
         <span class="card-diff diff-intermediate">Közepes</span>
         <span>18 section</span>
+        <span class="card-order">DE-3 / AI-2</span>
         <span class="card-arrow">→</span>
       </div>
     </a>
 
-    <!-- Apache Spark -->
+    <!-- ─── Apache Spark ─── -->
     <a href="spark-crash-course/index.html" class="card" style="--accent:var(--red); --glow:rgba(255,68,102,0.15);">
       <span class="card-status status-ready">Kész</span>
       <div class="card-number">COURSE 05</div>
       <h3>Apache Spark</h3>
       <div class="card-desc">Elosztott adatfeldolgozás Sparkkal: RDD-k, DataFrame API, Spark SQL, Structured Streaming, performance tuning, cluster management és valós ETL feladatok.</div>
+
+      <div class="card-details">
+        <div class="card-detail">
+          <div class="card-detail-label">Mit építesz?</div>
+          <div class="card-detail-value">Egy elosztott ETL rendszert a webshop adatokra: többforrásos join-okat (rendelések + ügyfelek + termékek), aggregációkat, Structured Streaming pipeline-t és MLlib alapú ajánló modellt — mind PySparkkal.</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Stack</div>
+          <div class="card-detail-value">PySpark · Spark SQL · Structured Streaming · MLlib · Hadoop · Hive · Delta Lake</div>
+        </div>
+        <div class="card-detail">
+          <div class="card-detail-label">Kinek való?</div>
+          <div class="card-detail-value">Data engineer-eknek akik nagy adatmennyiségekkel dolgoznak, Sparkot használó csapatokba készülőknek, és bárkinek aki elosztott feldolgozást akar elsajátítani.</div>
+        </div>
+      </div>
+
       <div class="card-tools">
         <img src="assets/logos/apachespark.svg" alt="Spark">
         <img src="assets/logos/scala.svg" alt="Scala">
@@ -289,6 +605,7 @@ footer a { color: var(--cyan); text-decoration: none; }
       <div class="card-meta">
         <span class="card-diff diff-intermediate">Közepes</span>
         <span>17 section</span>
+        <span class="card-order">DE-2 / AI-</span>
         <span class="card-arrow">→</span>
       </div>
     </a>
