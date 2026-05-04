@@ -106,7 +106,8 @@ img{max-width:100%;display:block}
 /* ── Course Grid ── */
 .course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
 .course-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:14px;transition:all .25s;position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;overflow:hidden}
-.course-card:hover{border-color:rgba(88,166,255,.45);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.course-card:hover{text-decoration:none;color:inherit;border-color:rgba(88,166,255,.45);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.course-card:hover,.course-card:hover *{text-decoration:none!important}
 /* Card cover image */
 .card-cover{position:relative;height:160px;overflow:hidden}
 .card-cover img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
