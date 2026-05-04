@@ -371,7 +371,18 @@ tr:hover td { background: rgba(0,212,255,.05); }
   background: var(--accent, var(--cyan));
   color: var(--bg);
   border-color: var(--accent, var(--cyan));
-}</style>
+}
+
+/* ── Colorful log classes ── */
+.log-openai { color: #10a37f; font-weight: 600; }
+.log-chroma { color: #7b68ee; font-weight: 600; }
+.log-info { color: #58a6ff; }
+.log-warn { color: #d29922; }
+.log-ok { color: #3fb950; font-weight: 600; }
+.log-dim { color: #6e7681; }
+.log-cmd { color: #79c0ff; }
+.log-time { color: #8b949e; }
+.log-step { color: #f0883e; font-weight: 600; }</style>
 </head>
 <body>
 <div id="progress-bar"></div>
@@ -474,7 +485,8 @@ client = OpenAI()  <span class="cm"># OPENAI_API_KEY a környezeti változóból
 <span class="fn">print</span>(<span class="str">"OpenAI client initialized"</span>)</pre></div>
     <div class="output-area" id="out-s3">
       <div class="output-label">Output:</div>
-      <pre>OpenAI client initialized</pre>
+      <pre><span class="log-openai">[openai]</span> <span class="log-ok">Client initialized successfully</span>
+<span class="log-dim">API key loaded from environment variable</span></pre>
     </div>
   </div>
 </div>
@@ -503,7 +515,9 @@ client = OpenAI()  <span class="cm"># OPENAI_API_KEY a környezeti változóból
 <span class="fn">print</span>(response.output_text)</pre></div>
     <div class="output-area" id="out-s4">
       <div class="output-label">Output:</div>
-      <pre>A szállítási idő a választott módtól függ:
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">model=gpt-4o</span>
+<span class="log-ok">Response received:</span>
+A szállítási idő a választott módtól függ:
 - Standard: 3-5 munkanap
 - Expressz: 1-2 munkanap
 - Aznapi: rendelés 12:00-ig</pre>
@@ -543,7 +557,9 @@ response = client.responses.create(
 <span class="fn">print</span>(response.output_text)</pre></div>
     <div class="output-area" id="out-s5">
       <div class="output-label">Output:</div>
-      <pre>Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted, feltéve ha eredeti állapotú.</pre>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">with system instructions</span>
+<span class="log-ok">Response received:</span>
+Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted, feltéve ha eredeti állapotú.</pre>
     </div>
   </div>
   <div class="callout">
@@ -592,10 +608,12 @@ result = json.loads(response.output_text)
 <span class="fn">print</span>(json.dumps(result, indent=2, ensure_ascii=<span class="kw">False</span>))</pre></div>
     <div class="output-area" id="out-s6">
       <div class="output-label">Output:</div>
-      <pre>{
-  "answer": "A standard szállítás 990 Ft, expressz 2490 Ft.",
-  "category": "szallitas",
-  "confidence": 0.95
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">structured output (JSON schema)</span>
+<span class="log-ok">Parsed JSON response:</span>
+{
+  <span class="log-info">"answer"</span>: "A standard szállítás 990 Ft, expressz 2490 Ft.",
+  <span class="log-info">"category"</span>: "szallitas",
+  <span class="log-info">"confidence"</span>: 0.95
 }</pre>
     </div>
   </div>
@@ -646,7 +664,11 @@ response = client.responses.create(
 <span class="fn">print</span>(response.output_text)</pre></div>
     <div class="output-area" id="out-s7">
       <div class="output-label">Output:</div>
-      <pre>A WSP-12345 számú rendelés jelenleg szállítás alatt van, várható kézbesítés: 2025. január 15.</pre>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">tool_call: get_order_status(order_id="WSP-12345")</span>
+<span class="log-ok">Tool response received:</span>
+<span class="log-dim">{"status": "szállítás alatt", "eta": "2025-01-15"}</span>
+<span class="log-ok">Final answer:</span>
+A WSP-12345 számú rendelés jelenleg szállítás alatt van, várható kézbesítés: 2025. január 15.</pre>
     </div>
   </div>
   <details>
@@ -685,8 +707,9 @@ vec_vissza    = np.array([<span class="num">0.1</span>, <span class="num">0.2</s
 <span class="fn">print</span>(<span class="str">f"szállítás vs visszaküldés: {cosine_similarity(vec_szallitas, vec_vissza):.2f}"</span>)</pre></div>
     <div class="output-area" id="out-s8">
       <div class="output-label">Output:</div>
-      <pre>szállítás vs csomag:       0.97
-szállítás vs visszaküldés: 0.30</pre>
+      <pre><span class="log-step">[similarity]</span> <span class="log-dim">Computing cosine distances...</span>
+<span class="log-info">szállítás vs csomag:</span>       <span class="log-ok">0.97</span>
+<span class="log-info">szállítás vs visszaküldés:</span> <span class="log-warn">0.30</span></pre>
     </div>
   </div>
   <div class="callout">
@@ -713,9 +736,11 @@ vector = emb_response.data[<span class="num">0</span>].embedding
 <span class="fn">print</span>(<span class="str">f"Token használat: {emb_response.usage.total_tokens}"</span>)</pre></div>
     <div class="output-area" id="out-s9">
       <div class="output-label">Output:</div>
-      <pre>Dimenzió: 1536
-Első 5 érték: [0.0123, -0.0456, 0.0789, -0.0012, 0.0345]
-Token használat: 12</pre>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">embeddings.create()</span> <span class="log-dim">model=text-embedding-3-small</span>
+<span class="log-ok">Embedding generated:</span>
+<span class="log-info">Dimenzió:</span> 1536
+<span class="log-info">Első 5 érték:</span> <span class="log-dim">[0.0123, -0.0456, 0.0789, -0.0012, 0.0345]</span>
+<span class="log-info">Token használat:</span> <span class="log-time">12</span></pre>
     </div>
   </div>
   <div class="callout">
@@ -754,7 +779,9 @@ collection.add(
 <span class="fn">print</span>(<span class="str">f"Dokumentumok száma: {collection.count()}"</span>)</pre></div>
     <div class="output-area" id="out-s10">
       <div class="output-label">Output:</div>
-      <pre>Dokumentumok száma: 3</pre>
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">create_collection()</span> <span class="log-dim">name="webshop_docs"</span>
+<span class="log-chroma">[chroma]</span> <span class="log-step">add()</span> <span class="log-dim">3 documents added</span>
+<span class="log-ok">Dokumentumok száma: 3</span></pre>
     </div>
   </div>
   <div class="code-cell" id="cell-s10b">
@@ -770,9 +797,10 @@ results = collection.query(
     <span class="fn">print</span>(<span class="str">f"  [{dist:.3f}] {doc}"</span>)</pre></div>
     <div class="output-area" id="out-s10b">
       <div class="output-label">Output:</div>
-      <pre>Legjobb találatok:
-  [0.234] A visszaküldési határidő 30 nap a vásárlástól számítva.
-  [0.567] A garancia 2 év, a számla szükséges hozzá.</pre>
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">query()</span> <span class="log-dim">query="meddig tarthatja meg a terméket?" n_results=2</span>
+<span class="log-ok">Legjobb találatok:</span>
+  <span class="log-dim">[0.234]</span> A visszaküldési határidő 30 nap a vásárlástól számítva.
+  <span class="log-dim">[0.567]</span> A garancia 2 év, a számla szükséges hozzá.</pre>
     </div>
   </div>
   <div class="callout">
@@ -819,11 +847,12 @@ chunks = <span class="fn">chunk_text</span>(szabalyzat, chunk_size=<span class="
     <span class="fn">print</span>(chunk[:<span class="num">80</span>] + <span class="str">"..."</span>)</pre></div>
     <div class="output-area" id="out-s11">
       <div class="output-label">Output:</div>
-      <pre>--- Chunk 1 (150 chars) ---
+      <pre><span class="log-step">[chunk]</span> <span class="log-dim">chunk_text(size=150, overlap=30)</span>
+<span class="log-ok">--- Chunk 1 (150 chars) ---</span>
 A WebShop Pro visszaküldési szabályzata: 1. A terméket a vásárlástól számított 30 napon belül vissza lehet küldeni...
---- Chunk 2 (150 chars) ---
+<span class="log-ok">--- Chunk 2 (150 chars) ---</span>
 letben kell lennie. 3. A csomagolásnak érintetlennek kell lennie. 4. A visszaküldés ingyenes, a futár viszi a csomagot...
---- Chunk 3 (79 chars) ---
+<span class="log-ok">--- Chunk 3 (79 chars) ---</span>
 napon belül megtörténik. 6. Elektromos termékekre a garancia 2 év érvényes....</pre>
     </div>
   </div>
@@ -882,7 +911,8 @@ all_chunks = []
 <span class="fn">print</span>(<span class="str">f"Dokumentumok: {len(DOCUMENTS)}, Chunkok: {len(all_chunks)}"</span>)</pre></div>
     <div class="output-area" id="out-s12">
       <div class="output-label">Output:</div>
-      <pre>Dokumentumok: 4, Chunkok: 7</pre>
+      <pre><span class="log-step">[load]</span> <span class="log-dim">Processing 4 documents with chunk_text(size=200, overlap=50)</span>
+<span class="log-ok">Dokumentumok: 4, Chunkok: 7</span></pre>
     </div>
   </div>
 </div>
@@ -905,7 +935,9 @@ rag_collection.add(
 <span class="fn">print</span>(<span class="str">f"Indexed chunks: {rag_collection.count()}"</span>)</pre></div>
     <div class="output-area" id="out-s13">
       <div class="output-label">Output:</div>
-      <pre>Indexed chunks: 7</pre>
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">create_collection()</span> <span class="log-dim">name="webshop_rag"</span>
+<span class="log-chroma">[chroma]</span> <span class="log-step">add()</span> <span class="log-dim">7 chunks with metadata</span>
+<span class="log-ok">Indexed chunks: 7</span></pre>
     </div>
   </div>
 </div>
@@ -934,11 +966,13 @@ results = <span class="fn">retrieve</span>(<span class="str">"Mennyibe kerül a 
     <span class="fn">print</span>(<span class="str">f"  {doc[:80]}..."</span>)</pre></div>
     <div class="output-area" id="out-s14">
       <div class="output-label">Output:</div>
-      <pre>[0.189] (Szállítási tájékoztató)
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">query()</span> <span class="log-dim">query="Mennyibe kerül a szállítás?" n_results=3</span>
+<span class="log-ok">Retrieved 3 results:</span>
+<span class="log-dim">[0.189]</span> (<span class="log-info">Szállítási tájékoztató</span>)
   A WebShop Pro szállítási lehetőségei: - Standard szállítás: 990 Ft, 3-5 munkanap...
-[0.312] (Szállítási tájékoztató)
+<span class="log-dim">[0.312]</span> (<span class="log-info">Szállítási tájékoztató</span>)
   - Nemzetközi szállítás: 5-10 munkanap...
-[0.567] (Gyakori kérdések)
+<span class="log-dim">[0.567]</span> (<span class="log-info">Gyakori kérdések</span>)
   Elfogadtok utalványt? Igen, WebShop Pro utalvány és kupon is...</pre>
     </div>
   </div>
@@ -990,11 +1024,15 @@ Válaszolj a kérdésre a tudásbázis alapján. Ha nincs benne, mondd: "Ezt a k
     <span class="fn">print</span>()</pre></div>
     <div class="output-area" id="out-s15">
       <div class="output-label">Output:</div>
-      <pre>Q: Mennyibe kerül a szállítás?
-A: A standard szállítás 990 Ft (3-5 munkanap), az expressz 2490 Ft (1-2 munkanap), az aznapi 3990 Ft. 15000 Ft felett ingyenes.
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">retrieve()</span> <span class="log-dim">→ context gathered</span>
+<span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">→ generating answer...</span>
+<span class="log-ok">Q:</span> Mennyibe kerül a szállítás?
+<span class="log-ok">A:</span> A standard szállítás 990 Ft (3-5 munkanap), az expressz 2490 Ft (1-2 munkanap), az aznapi 3990 Ft. 15000 Ft felett ingyenes.
 
-Q: Meddig garanciás a telefon?
-A: Elektromos termékekre 2 év garancia érvényes. A számla szükséges hozzá. 14 napon belül csere vagy javítás.</pre>
+<span class="log-chroma">[chroma]</span> <span class="log-step">retrieve()</span> <span class="log-dim">→ context gathered</span>
+<span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">→ generating answer...</span>
+<span class="log-ok">Q:</span> Meddig garanciás a telefon?
+<span class="log-ok">A:</span> Elektromos termékekre 2 év garancia érvényes. A számla szükséges hozzá. 14 napon belül csere vagy javítás.</pre>
     </div>
   </div>
   <div class="callout">
@@ -1054,10 +1092,12 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 <span class="fn">print</span>(json.dumps(result, indent=2, ensure_ascii=<span class="kw">False</span>))</pre></div>
     <div class="output-area" id="out-s16">
       <div class="output-label">Output:</div>
-      <pre>{
-  "faithfulness": 0.95,
-  "relevance": 0.9,
-  "reasoning": "A válasz pontosan a kontextusból származik és közvetlenül megválaszolja a kérdést."
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">evaluate_answer()</span> <span class="log-dim">LLM-as-judge</span>
+<span class="log-ok">Eval result:</span>
+{
+  <span class="log-info">"faithfulness"</span>: <span class="log-ok">0.95</span>,
+  <span class="log-info">"relevance"</span>: <span class="log-ok">0.9</span>,
+  <span class="log-info">"reasoning"</span>: "A válasz pontosan a kontextusból származik és közvetlenül megválaszolja a kérdést."
 }</pre>
     </div>
   </div>
@@ -1099,10 +1139,10 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 <span class="fn">print</span>(<span class="fn">rag_query_tracked</span>(<span class="str">"Mennyi a szállítás?"</span>))</pre></div>
     <div class="output-area" id="out-s17">
       <div class="output-label">Output:</div>
-      <pre>Retrieval: 12ms
-LLM: 834ms
-Total: 846ms
-A standard szállítás 990 Ft (3-5 munkanap), expressz 2490 Ft (1-2 munkanap). 15000 Ft felett ingyenes.</pre>
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">retrieve()</span> <span class="log-time">12ms</span>
+<span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-time">834ms</span>
+<span class="log-ok">Total:</span> <span class="log-time">846ms</span>
+<span class="log-ok">Answer:</span> A standard szállítás 990 Ft (3-5 munkanap), expressz 2490 Ft (1-2 munkanap). 15000 Ft felett ingyenes.</pre>
     </div>
   </div>
   <div class="callout">
@@ -1144,12 +1184,12 @@ st.title(<span class="str">"WebShop Pro Support Bot"</span>)
     st.session_state.messages.append({<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: response})</pre></div>
     <div class="output-area" id="out-s18">
       <div class="output-label">Output:</div>
-      <pre>$ streamlit run app.py
+      <pre><span class="log-cmd">$ streamlit run app.py</span>
 
-  You can now view your Streamlit app in your browser.
+<span class="log-ok">  You can now view your Streamlit app in your browser.</span>
 
-  Local URL: http://localhost:8501
-  Network URL: http://192.168.1.100:8501</pre>
+  <span class="log-info">Local URL:</span>   <span class="log-info">http://localhost:8501</span>
+  <span class="log-info">Network URL:</span> <span class="log-info">http://192.168.1.100:8501</span></pre>
     </div>
   </div>
 </div>

@@ -374,6 +374,19 @@ tr:hover td { background: rgba(0,212,255,.05); }
   border-color: var(--accent, var(--cyan));
 }
 
+.log-airflow { color: #017cee; font-weight: 600; }
+.log-dbt { color: #ff694a; font-weight: 600; }
+.log-delta { color: #48b984; font-weight: 600; }
+.log-spark { color: #f0883e; font-weight: 600; }
+.log-kafka { color: #b0b8c4; font-weight: 600; }
+.log-info { color: #58a6ff; }
+.log-warn { color: #d29922; }
+.log-ok { color: #3fb950; font-weight: 600; }
+.log-dim { color: #6e7681; }
+.log-cmd { color: #79c0ff; }
+.log-time { color: #8b949e; }
+.log-step { color: #f0883e; font-weight: 600; }
+
 </style>
 </head>
 <body>
@@ -410,7 +423,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <div class="section layer-intro" id="s3">
   <div class="section-number">Section 03</div>
   <h2>Környezet</h2>
-  <div class="code-cell" id="cell-s3"><div class="code-header"><span class="cell-number">[s3]</span><button class="run-btn" onclick="runCell('s3')">&#9654; Run</button></div><div class="code-body"><pre>pip install feast kafka-python delta-spark dbt-core great-expectations</pre></div><div class="output-area" id="out-s3"><div class="output-label">Output:</div><pre>feast-0.37 kafka-2.0 delta-3.2 dbt-1.8 gx-0.10</pre></div></div>
+  <div class="code-cell" id="cell-s3"><div class="code-header"><span class="cell-number">[s3]</span><button class="run-btn" onclick="runCell('s3')">&#9654; Run</button></div><div class="code-body"><pre>pip install feast kafka-python delta-spark dbt-core great-expectations</pre></div><div class="output-area" id="out-s3"><div class="output-label">Output:</div><pre><span class="log-step">[env]</span> <span class="log-ok">feast-0.37</span> <span class="log-kafka">kafka-2.0</span> <span class="log-delta">delta-3.2</span> <span class="log-dbt">dbt-1.8</span> <span class="log-dim">gx-0.10</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s4">
   <div class="section-number">Section 04</div>
@@ -442,10 +455,10 @@ user_features = FeatureView(
     ],
     online=<span class="num">True</span>,
     ttl=timedelta(hours=<span class="num">24</span>),
-)</pre></div><div class="output-area" id="out-s6"><div class="output-label">Output:</div><pre>Registered: user_stats
-  Offline: Delta Lake
-  Online: Redis
-  TTL: 24h</pre></div></div>
+)</pre></div><div class="output-area" id="out-s6"><div class="output-label">Output:</div><pre><span class="log-ok">Registered:</span> <span class="log-info">user_stats</span>
+  <span class="log-dim">Offline:</span> <span class="log-delta">Delta Lake</span>
+  <span class="log-dim">Online:</span> <span class="log-info">Redis</span>
+  <span class="log-time">TTL: 24h</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s7">
   <div class="section-number">Section 07</div>
@@ -460,8 +473,8 @@ offline = store.get_historical_features(
 online = store.get_online_features(
     entity_rows=[{<span class="str">"user_id"</span>:42}],
     features=[<span class="str">"user_stats:age"</span>]
-).to_dict()</pre></div><div class="output-area" id="out-s7"><div class="output-label">Output:</div><pre>Offline: (50000, 5)
-Online: {user_id:[42], age:[35.0]}</pre></div></div><table><tr><th></th><th>Offline</th><th>Online</th></tr><tr><td>Cél</td><td>Tanítás (batch)</td><td>Serving (real-time)</td></tr><tr><td>Latencia</td><td>Perc</td><td><10ms</td></tr><tr><td>Méret</td><td>TB</td><td>GB</td></tr><tr><td>Forrás</td><td>Delta/BigQuery</td><td>Redis/DynamoDB</td></tr></table>
+).to_dict()</pre></div><div class="output-area" id="out-s7"><div class="output-label">Output:</div><pre><span class="log-step">Offline:</span> <span class="log-info">(50000, 5)</span>
+<span class="log-step">Online:</span> <span class="log-info">{user_id:[42], age:[35.0]}</span></pre></div></div><table><tr><th></th><th>Offline</th><th>Online</th></tr><tr><td>Cél</td><td>Tanítás (batch)</td><td>Serving (real-time)</td></tr><tr><td>Latencia</td><td>Perc</td><td><10ms</td></tr><tr><td>Méret</td><td>TB</td><td>GB</td></tr><tr><td>Forrás</td><td>Delta/BigQuery</td><td>Redis/DynamoDB</td></tr></table>
 </div>
 <div class="section layer-intro" id="s8">
   <div class="section-number">Section 08</div>
@@ -472,8 +485,8 @@ Online: {user_id:[42], age:[35.0]}</pre></div></div><table><tr><th></th><th>Offl
 producer = KafkaProducer(bootstrap_servers=[<span class="str">"localhost:9092"</span>])
 event = {<span class="str">"user_id"</span>:42, <span class="str">"amount"</span>:1250}
 producer.send(<span class="str">"purchases"</span>, json.dumps(event).encode())
-<span class="fn">print</span>(<span class="str">f"Sent: {event}"</span>)</pre></div><div class="output-area" id="out-s8"><div class="output-label">Output:</div><pre>Sent: {user_id:42, amount:1250}
-Topic: purchases | Offset: 15420</pre></div></div>
+<span class="fn">print</span>(<span class="str">f"Sent: {event}"</span>)</pre></div><div class="output-area" id="out-s8"><div class="output-label">Output:</div><pre><span class="log-kafka">[kafka]</span> <span class="log-ok">Sent:</span> {user_id:42, amount:1250}
+<span class="log-kafka">[kafka]</span> <span class="log-dim">Topic:</span> <span class="log-info">purchases</span> | <span class="log-dim">Offset:</span> <span class="log-time">15420</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s9">
   <div class="section-number">Section 09</div>
@@ -483,9 +496,9 @@ consumer = KafkaConsumer(<span class="str">"purchases"</span>,bootstrap_servers=
 <span class="kw">for</span> msg <span class="kw">in</span> consumer:
     event = json.loads(msg.value)
     update_feature(event[<span class="str">"user_id"</span>],{<span class="str">"last"</span>:event[<span class="str">"amount"</span>]})
-    <span class="fn">print</span>(<span class="str">f"Updated user {event['user_id']}"</span>)</pre></div><div class="output-area" id="out-s9"><div class="output-label">Output:</div><pre>Updated user 42
-Updated user 17
-1.2k events/sec, 8ms avg</pre></div></div>
+    <span class="fn">print</span>(<span class="str">f"Updated user {event['user_id']}"</span>)</pre></div><div class="output-area" id="out-s9"><div class="output-label">Output:</div><pre><span class="log-kafka">[kafka]</span> <span class="log-ok">Updated user 42</span>
+<span class="log-kafka">[kafka]</span> <span class="log-ok">Updated user 17</span>
+<span class="log-kafka">[kafka]</span> <span class="log-time">1.2k events/sec, 8ms avg</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s10">
   <div class="section-number">Section 10</div>
@@ -495,10 +508,10 @@ suite = gx.ExpectationSuite(<span class="str">"user_features"</span>)
 suite.add_expectation(ExpectColumnValuesToBeBetween(column=<span class="str">"age"</span>,min_value=<span class="num">0</span>,max_value=<span class="num">120</span>))
 suite.add_expectation(ExpectColumnValuesToNotBeNull(column=<span class="str">"user_id"</span>))
 suite.add_expectation(ExpectColumnValuesToBeUnique(column=<span class="str">"user_id"</span>))
-<span class="fn">print</span>(<span class="str">f"Suite: {len(suite)} checks"</span>)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><pre>✅ age 0-120: 100%
-✅ user_id not null: 100%
-✅ user_id unique: 100%
-Overall: PASSED ✓</pre></div></div>
+<span class="fn">print</span>(<span class="str">f"Suite: {len(suite)} checks"</span>)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><pre><span class="log-ok">✅ age 0-120:</span> <span class="log-dim">100%</span>
+<span class="log-ok">✅ user_id not null:</span> <span class="log-dim">100%</span>
+<span class="log-ok">✅ user_id unique:</span> <span class="log-dim">100%</span>
+<span class="log-ok">Overall: PASSED ✓</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s11">
   <div class="section-number">Section 11</div>
@@ -512,10 +525,10 @@ Overall: PASSED ✓</pre></div></div>
     <span class="fn">COUNT</span>(*) <span class="kw">AS</span> purchase_count,
     <span class="fn">AVG</span>(amount) <span class="kw">AS</span> avg_order,
     <span class="fn">SUM</span>(amount) <span class="kw">AS</span> total_spend
-<span class="kw">FROM</span> purchases <span class="kw">GROUP BY</span> user_id</pre></div><div class="output-area" id="out-s11"><div class="output-label">Output:</div><pre>$ dbt run
-OK stg_purchases [12k rows in 3.2s]
-OK int_user_features [50k in 5.1s]
-OK fct_user_stats [50k in 2.8s]</pre></div></div>
+<span class="kw">FROM</span> purchases <span class="kw">GROUP BY</span> user_id</pre></div><div class="output-area" id="out-s11"><div class="output-label">Output:</div><pre><span class="log-dbt">[dbt]</span> <span class="log-cmd">$ dbt run</span>
+<span class="log-dbt">[dbt]</span> <span class="log-ok">OK</span> <span class="log-info">stg_purchases</span> <span class="log-time">[12k rows in 3.2s]</span>
+<span class="log-dbt">[dbt]</span> <span class="log-ok">OK</span> <span class="log-info">int_user_features</span> <span class="log-time">[50k in 5.1s]</span>
+<span class="log-dbt">[dbt]</span> <span class="log-ok">OK</span> <span class="log-info">fct_user_stats</span> <span class="log-time">[50k in 2.8s]</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s12">
   <div class="section-number">Section 12</div>
@@ -523,9 +536,9 @@ OK fct_user_stats [50k in 2.8s]</pre></div></div>
   <div class="md-cell"><p>A teljes pipeline forrástól a Feature Store-ig:</p></div><div class="arch-flow"><div class="arch-step"><strong>Extract</strong><div class="detail">API/DB</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Load</strong><div class="detail">Bronze</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Transform</strong><div class="detail">Silver</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Validate</strong><div class="detail">Quality</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Publish</strong><div class="detail">Gold</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Store</strong><div class="detail">Feature Store</div></div></div><div class="code-cell" id="cell-s12"><div class="code-header"><span class="cell-number">[s12]</span><button class="run-btn" onclick="runCell('s12')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Airflow DAG</span>
 <span class="kw">with</span> DAG(<span class="str">"feature_pipeline"</span>,schedule=<span class="str">"@daily"</span>) <span class="kw">as</span> dag:
     extract >> transform >> validate >> publish
-<span class="fn">print</span>(<span class="str">"DAG: feature_pipeline"</span>)</pre></div><div class="output-area" id="out-s12"><div class="output-label">Output:</div><pre>DAG: feature_pipeline @daily
-Last run: SUCCESS 8m32s
-Rows: 1.2M</pre></div></div>
+<span class="fn">print</span>(<span class="str">"DAG: feature_pipeline"</span>)</pre></div><div class="output-area" id="out-s12"><div class="output-label">Output:</div><pre><span class="log-airflow">[airflow]</span> <span class="log-step">DAG:</span> <span class="log-info">feature_pipeline</span> <span class="log-time">@daily</span>
+<span class="log-airflow">[airflow]</span> <span class="log-dim">Last run:</span> <span class="log-ok">SUCCESS</span> <span class="log-time">8m32s</span>
+<span class="log-airflow">[airflow]</span> <span class="log-dim">Rows:</span> <span class="log-info">1.2M</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s13">
   <div class="section-number">Section 13</div>
@@ -538,9 +551,9 @@ df_v5 = spark.read.format(<span class="str">"delta"</span>).option(<span class="
 
 <span class="cm"># Upsert (merge)</span>
 delta_table.alias(<span class="str">"t"</span>).merge(updates.alias(<span class="str">"s"</span>),<span class="str">"t.id=s.id"</span>)
-  .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()</pre></div><div class="output-area" id="out-s13"><div class="output-label">Output:</div><pre>Version: 42 | Rows: 1.2M | Size: 8.3GB
-Time travel to v5: OK
-Merge: 50k updated, 2k inserted</pre></div></div>
+  .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()</pre></div><div class="output-area" id="out-s13"><div class="output-label">Output:</div><pre><span class="log-delta">[delta]</span> <span class="log-dim">Version:</span> <span class="log-time">42</span> | <span class="log-dim">Rows:</span> <span class="log-info">1.2M</span> | <span class="log-dim">Size:</span> <span class="log-info">8.3GB</span>
+<span class="log-delta">[delta]</span> <span class="log-ok">Time travel to v5: OK</span>
+<span class="log-delta">[delta]</span> <span class="log-ok">Merge:</span> <span class="log-info">50k updated, 2k inserted</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s14">
   <div class="section-number">Section 14</div>
@@ -556,9 +569,9 @@ config = {
     <span class="str">"database.dbname"</span>: <span class="str">"shop"</span>,
     <span class="str">"table.include.list"</span>: <span class="str">"users,purchases"</span>,
 }
-<span class="fn">print</span>(<span class="str">"CDC: postgres→kafka"</span>)</pre></div><div class="output-area" id="out-s15"><div class="output-label">Output:</div><pre>CDC: postgres→kafka
-Events: 500/sec, Lag: <1s
-Stream: CDC→Kafka→Spark→Delta→FeatureStore</pre></div></div>
+<span class="fn">print</span>(<span class="str">"CDC: postgres→kafka"</span>)</pre></div><div class="output-area" id="out-s15"><div class="output-label">Output:</div><pre><span class="log-kafka">[kafka]</span> <span class="log-step">CDC:</span> <span class="log-info">postgres→kafka</span>
+<span class="log-kafka">[kafka]</span> <span class="log-dim">Events:</span> <span class="log-time">500/sec</span>, <span class="log-dim">Lag:</span> <span class="log-ok">&lt;1s</span>
+<span class="log-kafka">[kafka]</span> <span class="log-dim">Stream:</span> <span class="log-info">CDC→Kafka→Spark→Delta→FeatureStore</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s16">
   <div class="section-number">Section 16</div>

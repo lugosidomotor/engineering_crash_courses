@@ -395,22 +395,58 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <div class="section layer-intro" id="s0">
   <div class="section-number">Section 00</div>
   <h2>Apache Spark: Big Data feldolgozás <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
-  <div class="md-cell"><p>Az <strong>Apache Spark</strong> a big data feldolgozás iparági standardja. Elosztott, in-memory feldolgozás, ami 100x gyorsabb a Hadoop MapReduce-nál.</p></div><div class="callout"><div class="callout-title">Miről szól?</div><p>Spark Session &rarr; RDD &rarr; DataFrame &rarr; SQL &rarr; Streaming &rarr; MLlib &rarr; Optimizer &rarr; Delta Lake</p></div>
+  <div class="md-cell"><p>Az <strong>Apache Spark</strong> a big data feldolgozás iparági standardja. Elosztott, in-memory feldolgozás, ami 100x gyorsabb a Hadoop MapReduce-nál.</p></div>
+  <div class="callout"><div class="callout-title">Miről szól?</div><p>Spark Session → RDD → DataFrame → SQL → Streaming → MLlib → Optimizer → Delta Lake</p></div>
 </div>
+
 <div class="section layer-intro" id="s1">
   <div class="section-number">Section 01</div>
   <h2>Spark alapfogalmak</h2>
-  <table><tr><th>Fogalom</th><th>Leírás</th><th>Fontos</th></tr><tr><td>Spark Session</td><td>A Spark belépési pontja</td><td>Egyetlen objektum, ami mindent kezel</td></tr><tr><td>RDD</td><td>Resilient Distributed Dataset</td><td>Alacsony szintű API, immutable, partitioned</td></tr><tr><td>DataFrame</td><td>Táblázatos adatstruktúra</td><td>High-level API, optimalizált</td></tr><tr><td>Dataset</td><td>Típusos DataFrame</td><td>Type safety + optimization</td></tr><tr><td>Partition</td><td>Adatpartíció</td><td>Elosztott feldolgozás egysége</td></tr><tr><td>Executor</td><td>Worker node folyamat</td><td>Ahol a tényleges számítás fut</td></tr><tr><td>Driver</td><td>Fő vezérlő folyamat</td><td>Taskok kiosztása, scheduler</td></tr><tr><td>Transform</td><td>Lazy operation</td><td>filter, map, groupBy - nem fut azonnal</td></tr><tr><td>Action</td><td>Triggers execution</td><td>collect, count, show - ez indítja el</td></tr><tr><td>Shuffle</td><td>Adat mozgatás node-ok között</td><td>Drága művelet, minimalizálandó</td></tr></table>
+  <table>
+    <tr><th>Fogalom</th><th>Leírás</th><th>Fontos</th></tr>
+    <tr><td>Spark Session</td><td>A Spark belépési pontja</td><td>Egyetlen objektum, ami mindent kezel</td></tr>
+    <tr><td>RDD</td><td>Resilient Distributed Dataset</td><td>Alacsony szintű API, immutable, partitioned</td></tr>
+    <tr><td>DataFrame</td><td>Táblázatos adatstruktúra</td><td>High-level API, optimalizált</td></tr>
+    <tr><td>Partition</td><td>Adatpartíció</td><td>Elosztott feldolgozás egysége</td></tr>
+    <tr><td>Executor</td><td>Worker node folyamat</td><td>Ahol a tényleges számítás fut</td></tr>
+    <tr><td>Driver</td><td>Fő vezérlő folyamat</td><td>Taskok kiosztása, scheduler</td></tr>
+    <tr><td>Transform</td><td>Lazy operation</td><td>filter, map, groupBy – nem fut azonnal</td></tr>
+    <tr><td>Action</td><td>Triggers execution</td><td>collect, count, show – ez indítja el</td></tr>
+    <tr><td>Shuffle</td><td>Adat mozgatás node-ok között</td><td>Drága művelet, minimalizálandó</td></tr>
+  </table>
 </div>
+
 <div class="section layer-intro" id="s2">
   <div class="section-number">Section 02</div>
-  <h2>Spark architektúra</h2>
-  <div class="md-cell"><p>Spark architektúra: <strong>Driver → Cluster Manager → Executors</strong></p></div><div class="arch-flow"><div class="arch-step"><strong>Driver</strong><div class="detail">Program, SparkContext</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Cluster Manager</strong><div class="detail">YARN/K8s/Standalone</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Executor 1</strong><div class="detail">Task 1, Task 2, Cache</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Executor 2</strong><div class="detail">Task 3, Task 4</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Executor N</strong><div class="detail">Task ...</div></div></div><table><tr><th>Komponens</th><th>Szerep</th><th>Példa</th></tr><tr><td>Driver</td><td>Vezérlés, DAG építés</td><td>spark-submit --master yarn</td></tr><tr><td>Cluster Manager</td><td>Erőforrás allokáció</td><td>YARN, Kubernetes, Standalone</td></tr><tr><td>Executor</td><td>Task végrehajtás, cache</td><td>1-5 per worker node</td></tr><tr><td>Task</td><td>Egyetlen munkaegység</td><td>1 partition = 1 task</td></tr><tr><td>Stage</td><td>Task csoport shuffle előtt</td><td>shuffle boundary-k között</td></tr><tr><td>Job</td><td>Egy action által indított</td><td>collect(), count() = 1 job</td></tr></table>
+  <h2>Spark architektúra <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>Spark architektúra: <strong>Driver → Cluster Manager → Executors</strong></p></div>
+  <div class="arch-flow">
+    <div class="arch-step"><strong>Driver</strong><div class="detail">Program, SparkContext</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><strong>Cluster Manager</strong><div class="detail">YARN/K8s/Standalone</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><strong>Executor 1</strong><div class="detail">Task 1, Task 2, Cache</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-step"><strong>Executor 2</strong><div class="detail">Task 3, Task 4</div></div>
+  </div>
+  <table>
+    <tr><th>Komponens</th><th>Szerep</th><th>Példa</th></tr>
+    <tr><td>Driver</td><td>Vezérlés, DAG építés</td><td>spark-submit --master yarn</td></tr>
+    <tr><td>Cluster Manager</td><td>Erőforrás allokáció</td><td>YARN, Kubernetes, Standalone</td></tr>
+    <tr><td>Executor</td><td>Task végrehajtás, cache</td><td>1-5 per worker node</td></tr>
+    <tr><td>Task</td><td>Egyetlen munkaegység</td><td>1 partition = 1 task</td></tr>
+    <tr><td>Stage</td><td>Task csoport shuffle előtt</td><td>shuffle boundary-k között</td></tr>
+    <tr><td>Job</td><td>Egy action által indított</td><td>collect(), count() = 1 job</td></tr>
+  </table>
 </div>
-<div class="section layer-intro" id="s3">
+
+<!-- ═══ S3: Környezet ═══ -->
+<div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
-  <h2>Környezet beállítása</h2>
-  <div class="code-cell" id="cell-s3"><div class="code-header"><span class="cell-number">[s3]</span><button class="run-btn" onclick="runCell('s3')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># PySpark telepítés és indítás</span>
+  <h2>Környezet beállítása <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="code-cell" id="cell-s3">
+    <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s3')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># PySpark telepítés és indítás</span>
 pip install pyspark delta-spark
 
 <span class="cm"># Spark Session létrehozása</span>
@@ -422,40 +458,108 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 <span class="fn">print</span>(<span class="str">f"Spark version: {spark.version}"</span>)
-<span class="fn">print</span>(spark.sparkContext.uiWebUrl)</pre></div><div class="output-area" id="out-s3"><div class="output-label">Output:</div><pre>Spark version: 3.5.1
-Spark UI: http://localhost:4040
+<span class="fn">print</span>(spark.sparkContext.uiWebUrl)</pre></div>
+    <div class="output-area" id="out-s3">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Spark version: <span class="log-ok">3.5.1</span>
+<span class="log-spark">[spark]</span> Spark UI: <span class="log-info">http://localhost:4040</span>
+<span class="log-spark">[spark]</span> Cluster: local[*] (<span class="log-ok">8 cores</span>)
+<span class="log-spark">[spark]</span> Memory: <span class="log-ok">4GB</span> allocated
+<span class="log-spark">[spark]</span> Delta Lake extension <span class="log-ok">loaded</span></pre>
+    </div>
+  </div>
+</div>
 
-Cluster: local[*] (8 cores)
-Memory: 4GB</pre></div></div>
-</div>
-<div class="section layer-intro" id="s4">
+<!-- ═══ S4: RDD alapok ═══ -->
+<div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>RDD alapok</h2>
-  <div class="md-cell"><p>Az <strong>RDD (Resilient Distributed Dataset)</strong> a Spark legelemibb adatstruktúrája. Immutable, partitioned, fault-tolerant.</p></div><div class="code-cell" id="cell-s4"><div class="code-header"><span class="cell-number">[s4]</span><button class="run-btn" onclick="runCell('s4')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># RDD létrehozása</span>\nrdd = spark.sparkContext.parallelize([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">10</span>])\n\n<span class="cm"># Transformations (lazy)</span>\nfiltered = rdd.filter(<span class="kw">lambda</span> x: x % <span class="num">2</span> == <span class="num">0</span>)  <span class="cm"># párosak</span>\nmapped = filtered.map(<span class="kw">lambda</span> x: x * x)      <span class="cm"># négyzet</span>\n\n<span class="cm"># Actions (triggers execution)</span>\n<span class="fn">print</span>(<span class="str">f"Partitions: {rdd.getNumPartitions()}"</span>)\n<span class="fn">print</span>(<span class="str">f"Even squares: {mapped.collect()}"</span>)\n<span class="fn">print</span>(<span class="str">f"Sum: {mapped.reduce(<span class="kw">lambda</span> a,b: a+b)}"</span>)\n<span class="fn">print</span>(<span class="str">f"Count: {mapped.count()}"</span>)',)</pre></div><div class="output-area" id="out-s4"><div class="output-label">Output:</div><pre>Partitions: 8
-Even squares: [4, 16, 36, 64, 100]
-Sum: 220
-Count: 5</pre></div></div><div class="callout"><div class="callout-title">Lazy Evaluation</div><p>A <strong>transformations</strong> (filter, map, flatMap) nem futnak azonnal &mdash; csak felépítik a DAG-ot. Az <strong>actions</strong> (collect, count, reduce) indítják el a végrehajtást.</p></div>
+  <h2>RDD alapok <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>Az <strong>RDD (Resilient Distributed Dataset)</strong> a Spark legelemibb adatstruktúrája. Immutable, partitioned, fault-tolerant.</p></div>
+  <div class="code-cell" id="cell-s4">
+    <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('s4')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># RDD létrehozása</span>
+rdd = spark.sparkContext.parallelize([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">10</span>])
+
+<span class="cm"># Transformations (lazy)</span>
+filtered = rdd.filter(<span class="kw">lambda</span> x: x % <span class="num">2</span> == <span class="num">0</span>)  <span class="cm"># párosak</span>
+mapped = filtered.map(<span class="kw">lambda</span> x: x * x)      <span class="cm"># négyzet</span>
+
+<span class="cm"># Actions (triggers execution)</span>
+<span class="fn">print</span>(<span class="str">f"Partitions: {rdd.getNumPartitions()}"</span>)
+<span class="fn">print</span>(<span class="str">f"Even squares: {mapped.collect()}"</span>)
+<span class="fn">print</span>(<span class="str">f"Sum: {mapped.reduce(lambda a,b: a+b)}"</span>)
+<span class="fn">print</span>(<span class="str">f"Count: {mapped.count()}"</span>)</pre></div>
+    <div class="output-area" id="out-s4">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Partitions: <span class="log-ok">8</span>
+<span class="log-spark">[spark]</span> Even squares: [<span class="log-ok">4</span>, <span class="log-ok">16</span>, <span class="log-ok">36</span>, <span class="log-ok">64</span>, <span class="log-ok">100</span>]
+<span class="log-spark">[spark]</span> Sum: <span class="log-ok">220</span>
+<span class="log-spark">[spark]</span> Count: <span class="log-ok">5</span></pre>
+    </div>
+  </div>
+  <div class="callout"><div class="callout-title">Lazy Evaluation</div><p>A <strong>transformations</strong> (filter, map, flatMap) nem futnak azonnal – csak felépítik a DAG-ot. Az <strong>actions</strong> (collect, count, reduce) indítják el a végrehajtást.</p></div>
 </div>
-<div class="section layer-intro" id="s5">
+
+<!-- ═══ S5: Word Count ═══ -->
+<div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>RDD haladó: Word Count</h2>
-  <div class="code-cell" id="cell-s5"><div class="code-header"><span class="cell-number">[s5]</span><button class="run-btn" onclick="runCell('s5')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Szószámolás (Word Count) - klasszikus példa</span>\ntext_rdd = spark.sparkContext.textFile(<span class="str">"data.txt"</span>)\n\nword_counts = text_rdd \\\n    .flatMap(<span class="kw">lambda</span> line: line.split(<span class="str">" "</span>)) \\\n    .map(<span class="kw">lambda</span> word: (word.lower(), <span class="num">1</span>)) \\\n    .reduceByKey(<span class="kw">lambda</span> a, b: a + b) \\\n    .sortBy(<span class="kw">lambda</span> x: x[<span class="num">1</span>], ascending=<span class="num">False</span>)\n\n<span class="fn">print</span>(<span class="str">f"Unique words: {word_counts.count()}"</span>)\n<span class="fn">print</span>(<span class="str">"Top 10:"</span>)\n<span class="kw">for</span> word, count <span class="kw">in</span> word_counts.take(<span class="num">10</span>):\n    <span class="fn">print</span>(<span class="str">f"  {word}: {count}"</span>)',)</pre></div><div class="output-area" id="out-s5"><div class="output-label">Output:</div><pre>Unique words: 2,847
-Top 10:
-  the: 1,245
-  and: 892
-  spark: 756
-  data: 634
-  rdd: 521
-  dataframe: 489
-  partition: 412
-  shuffle: 367
-  transform: 334
-  action: 298</pre></div></div>
+  <h2>RDD haladó: Word Count <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="code-cell" id="cell-s5">
+    <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('s5')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Szószámolás (Word Count) – klasszikus példa</span>
+text_rdd = spark.sparkContext.textFile(<span class="str">"data.txt"</span>)
+
+word_counts = text_rdd \
+    .flatMap(<span class="kw">lambda</span> line: line.split(<span class="str">" "</span>)) \
+    .map(<span class="kw">lambda</span> word: (word.lower(), <span class="num">1</span>)) \
+    .reduceByKey(<span class="kw">lambda</span> a, b: a + b) \
+    .sortBy(<span class="kw">lambda</span> x: x[<span class="num">1</span>], ascending=<span class="num">False</span>)
+
+<span class="fn">print</span>(<span class="str">f"Unique words: {word_counts.count()}"</span>)
+<span class="fn">print</span>(<span class="str">"Top 10:"</span>)
+<span class="kw">for</span> word, count <span class="kw">in</span> word_counts.take(<span class="num">10</span>):
+    <span class="fn">print</span>(<span class="str">f"  {word}: {count}"</span>)</pre></div>
+    <div class="output-area" id="out-s5">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Unique words: <span class="log-ok">2,847</span>
+<span class="log-spark">[spark]</span> Top 10:
+  <span class="log-info">the</span>: 1,245
+  <span class="log-info">and</span>: 892
+  <span class="log-info">spark</span>: 756
+  <span class="log-info">data</span>: 634
+  <span class="log-info">rdd</span>: 521
+  <span class="log-info">dataframe</span>: 489
+  <span class="log-info">partition</span>: 412
+  <span class="log-info">shuffle</span>: 367
+  <span class="log-info">transform</span>: 334
+  <span class="log-info">action</span>: 298</pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s6">
+
+<!-- ═══ S6: DataFrame alapok ═══ -->
+<div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>DataFrame alapok</h2>
-  <div class="md-cell"><p>A <strong>DataFrame</strong> a Spark legfontosabb API-ja. Táblázatos, optimalizált, típusos. Mint a pandas, de elosztott.</p></div><div class="code-cell" id="cell-s6"><div class="code-header"><span class="cell-number">[s6]</span><button class="run-btn" onclick="runCell('s6')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># DataFrame létrehozása</span>\ndf = spark.createDataFrame([\n    (<span class="num">1</span>, <span class="str">"Alice"</span>, <span class="num">25</span>, <span class="num">50000</span>),\n    (<span class="num">2</span>, <span class="str">"Bob"</span>, <span class="num">35</span>, <span class="num">75000</span>),\n    (<span class="num">3</span>, <span class="str">"Charlie"</span>, <span class="num">45</span>, <span class="num">90000</span>),\n    (<span class="num">4</span>, <span class="str">"Diana"</span>, <span class="num">28</span>, <span class="num">60000</span>),\n    (<span class="num">5</span>, <span class="str">"Eve"</span>, <span class="num">52</span>, <span class="num">120000</span>),\n], [<span class="str">"id"</span>, <span class="str">"name"</span>, <span class="str">"age"</span>, <span class="str">"salary"</span>])\n\ndf.show()\ndf.printSchema()\n<span class="fn">print</span>(<span class="str">f"Rows: {df.count()}, Partitions: {df.rdd.getNumPartitions()}"</span>)',)</pre></div><div class="output-area" id="out-s6"><div class="output-label">Output:</div><pre>+---+-------+---+------+
+  <h2>DataFrame alapok <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A <strong>DataFrame</strong> a Spark legfontosabb API-ja. Táblázatos, optimalizált, típusos. Mint a pandas, de elosztott.</p></div>
+  <div class="code-cell" id="cell-s6">
+    <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># DataFrame létrehozása</span>
+df = spark.createDataFrame([
+    (<span class="num">1</span>, <span class="str">"Alice"</span>, <span class="num">25</span>, <span class="num">50000</span>),
+    (<span class="num">2</span>, <span class="str">"Bob"</span>, <span class="num">35</span>, <span class="num">75000</span>),
+    (<span class="num">3</span>, <span class="str">"Charlie"</span>, <span class="num">45</span>, <span class="num">90000</span>),
+    (<span class="num">4</span>, <span class="str">"Diana"</span>, <span class="num">28</span>, <span class="num">60000</span>),
+    (<span class="num">5</span>, <span class="str">"Eve"</span>, <span class="num">52</span>, <span class="num">120000</span>),
+], [<span class="str">"id"</span>, <span class="str">"name"</span>, <span class="str">"age"</span>, <span class="str">"salary"</span>])
+
+df.show()
+df.printSchema()
+<span class="fn">print</span>(<span class="str">f"Rows: {df.count()}, Partitions: {df.rdd.getNumPartitions()}"</span>)</pre></div>
+    <div class="output-area" id="out-s6">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">DataFrame</span> created with 5 rows
++---+-------+---+------+
 | id|   name|age|salary|
 +---+-------+---+------+
 |  1|  Alice| 25| 50000|
@@ -471,42 +575,131 @@ root
  |-- age: integer
  |-- salary: integer
 
-Rows: 5, Partitions: 1</pre></div></div>
+<span class="log-spark">[spark]</span> Rows: <span class="log-ok">5</span>, Partitions: <span class="log-ok">1</span></pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s7">
+
+<!-- ═══ S7: DataFrame operációk ═══ -->
+<div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>DataFrame operációk: filter, agg, join</h2>
-  <div class="code-cell" id="cell-s7"><div class="code-header"><span class="cell-number">[s7]</span><button class="run-btn" onclick="runCell('s7')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># DataFrame transformations</span>\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, avg, sum, count, when\n\n<span class="cm"># Filter + Select</span>\nyoung = df.filter(col(<span class="str">"age"</span>) < <span class="num">40</span>).select(<span class="str">"name"</span>, <span class="str">"salary"</span>)\n\n<span class="cm"># With new column</span>\ndf2 = df.withColumn(<span class="str">"bonus"</span>, col(<span class="str">"salary"</span>) * <span class="num">0.1</span>)\n\n<span class="cm"># Aggregation</span>\nstats = df.agg(\n    avg(<span class="str">"salary"</span>).alias(<span class="str">"avg_salary"</span>),\n    sum(<span class="str">"salary"</span>).alias(<span class="str">"total"</span>),\n    count(<span class="str">"*"</span>).alias(<span class="str">"count"</span>)\n)\n\n<span class="cm"># Conditional</span>\ndf3 = df.withColumn(<span class="str">"bracket"</span>, when(col(<span class="str">"salary"</span>)><span class="num">80000</span>,<span class="str">"high"</span>).otherwise(<span class="str">"normal"</span>))\n\nstats.show()\ndf3.show()',)</pre></div><div class="output-area" id="out-s7"><div class="output-label">Output:</div><pre>Aggregation:
+  <h2>DataFrame operációk: filter, agg, join <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="code-cell" id="cell-s7">
+    <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('s7')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, avg, sum, count, when
+
+<span class="cm"># Filter + Select</span>
+young = df.filter(col(<span class="str">"age"</span>) < <span class="num">40</span>).select(<span class="str">"name"</span>, <span class="str">"salary"</span>)
+
+<span class="cm"># With new column</span>
+df2 = df.withColumn(<span class="str">"bonus"</span>, col(<span class="str">"salary"</span>) * <span class="num">0.1</span>)
+
+<span class="cm"># Aggregation</span>
+stats = df.agg(
+    avg(<span class="str">"salary"</span>).alias(<span class="str">"avg_salary"</span>),
+    sum(<span class="str">"salary"</span>).alias(<span class="str">"total"</span>),
+    count(<span class="str">"*"</span>).alias(<span class="str">"count"</span>)
+)
+
+<span class="cm"># Conditional</span>
+df3 = df.withColumn(<span class="str">"bracket"</span>, when(col(<span class="str">"salary"</span>) > <span class="num">80000</span>, <span class="str">"high"</span>).otherwise(<span class="str">"normal"</span>))
+
+stats.show()
+df3.show()</pre></div>
+    <div class="output-area" id="out-s7">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Aggregation:
 +----------+------+-----+
 |avg_salary| total|count|
 +----------+------+-----+
 |   79000.0|395000|    5|
 +----------+------+-----+
 
-With bracket:
+<span class="log-spark">[spark]</span> With bracket:
 +---+-------+---+------+-------+
 | id|   name|age|salary|bracket|
 +---+-------+---+------+-------+
 |  1|  Alice| 25| 50000| normal|
+|  2|    Bob| 35| 75000| normal|
 |  3|Charlie| 45| 90000|   high|
+|  4|  Diana| 28| 60000| normal|
 |  5|    Eve| 52|120000|   high|
-+---+-------+---+------+-------+</pre></div></div>
++---+-------+---+------+-------+</pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s8">
+
+<!-- ═══ S8: Spark SQL ═══ -->
+<div class="section layer-general" id="s8">
   <div class="section-number">Section 08</div>
-  <h2>Spark SQL</h2>
-  <div class="code-cell" id="cell-s8"><div class="code-header"><span class="cell-number">[s8]</span><button class="run-btn" onclick="runCell('s8')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Temp view létrehozása</span>\ndf.createOrReplaceTempView(<span class="str">"employees"</span>)\n\n<span class="cm"># SQL lekérdezés</span>\nresult = spark.sql(<span class="str">"""\n    SELECT \n        CASE \n            WHEN age < 30 THEN \'young\'\n            WHEN age < 50 THEN \'mid\'\n            ELSE \'senior\'\n        END as age_group,\n        COUNT(*) as cnt,\n        AVG(salary) as avg_salary,\n        MIN(salary) as min_salary,\n        MAX(salary) as max_salary\n    FROM employees\n    GROUP BY 1\n    ORDER BY avg_salary DESC\n"""</span>)\nresult.show()',)</pre></div><div class="output-area" id="out-s8"><div class="output-label">Output:</div><pre>+---------+---+----------+----------+----------+
+  <h2>Spark SQL <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="code-cell" id="cell-s8">
+    <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('s8')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Temp view létrehozása</span>
+df.createOrReplaceTempView(<span class="str">"employees"</span>)
+
+<span class="cm"># SQL lekérdezés</span>
+result = spark.sql(<span class="str">"""
+    SELECT
+        CASE
+            WHEN age < 30 THEN 'young'
+            WHEN age < 50 THEN 'mid'
+            ELSE 'senior'
+        END as age_group,
+        COUNT(*) as cnt,
+        AVG(salary) as avg_salary,
+        MIN(salary) as min_salary,
+        MAX(salary) as max_salary
+    FROM employees
+    GROUP BY 1
+    ORDER BY avg_salary DESC
+"""</span>)
+result.show()</pre></div>
+    <div class="output-area" id="out-s8">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> SQL query executed <span class="log-ok">✓</span>
++---------+---+----------+----------+----------+
 |age_group|cnt|avg_salary|min_salary|max_salary|
 +---------+---+----------+----------+----------+
 |   senior|  1|  120000.0|    120000|    120000|
 |      mid|  2|   82500.0|     75000|     90000|
 |    young|  2|   55000.0|     50000|     60000|
-+---------+---+----------+----------+----------+</pre></div></div>
++---------+---+----------+----------+----------+</pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s9">
+
+<!-- ═══ S9: Join & Window ═══ -->
+<div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
-  <h2>Join és Window Functions</h2>
-  <div class="code-cell" id="cell-s9"><div class="code-header"><span class="cell-number">[s9]</span><button class="run-btn" onclick="runCell('s9')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Join példa</span>\norders = spark.createDataFrame([\n    (<span class="num">1</span>,<span class="num">1</span>,<span class="str">"laptop"</span>,<span class="num">1200</span>),(<span class="num">2</span>,<span class="num">2</span>,<span class="str">"phone"</span>,<span class="num">800</span>),(<span class="num">3</span>,<span class="num">1</span>,<span class="str">"tablet"</span>,<span class="num">400</span>)\n],[<span class="str">"order_id"</span>,<span class="str">"user_id"</span>,<span class="str">"product"</span>,<span class="str">"amount"</span>])\n\njoined = df.join(orders, df.id == orders.user_id, <span class="str">"inner"</span>)\njoined.select(<span class="str">"name"</span>,<span class="str">"product"</span>,<span class="str">"amount"</span>).show()\n\n<span class="cm"># Window function</span>\n<span class="kw">from</span> pyspark.sql.window <span class="kw">import</span> Window\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> rank, sum <span class="kw">as</span> spark_sum\n\nw = Window.partitionBy(<span class="str">"user_id"</span>).orderBy(col(<span class="str">"amount"</span>).desc())\nranked = orders.withColumn(<span class="str">"rank"</span>, rank().over(w))\n\nw2 = Window.partitionBy(<span class="str">"user_id"</span>).rowsBetween(\n    Window.unboundedPreceding, Window.unboundedFollowing)\nrunning = orders.withColumn(<span class="str">"total"</span>, spark_sum(<span class="str">"amount"</span>).over(w2))',)</pre></div><div class="output-area" id="out-s9"><div class="output-label">Output:</div><pre>Inner join:
+  <h2>Join és Window Functions <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="code-cell" id="cell-s9">
+    <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('s9')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Join példa</span>
+orders = spark.createDataFrame([
+    (<span class="num">1</span>, <span class="num">1</span>, <span class="str">"laptop"</span>, <span class="num">1200</span>),
+    (<span class="num">2</span>, <span class="num">2</span>, <span class="str">"phone"</span>, <span class="num">800</span>),
+    (<span class="num">3</span>, <span class="num">1</span>, <span class="str">"tablet"</span>, <span class="num">400</span>)
+], [<span class="str">"order_id"</span>, <span class="str">"user_id"</span>, <span class="str">"product"</span>, <span class="str">"amount"</span>])
+
+joined = df.join(orders, df.id == orders.user_id, <span class="str">"inner"</span>)
+joined.select(<span class="str">"name"</span>, <span class="str">"product"</span>, <span class="str">"amount"</span>).show()
+
+<span class="cm"># Window function</span>
+<span class="kw">from</span> pyspark.sql.window <span class="kw">import</span> Window
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> rank, sum <span class="kw">as</span> spark_sum
+
+w = Window.partitionBy(<span class="str">"user_id"</span>).orderBy(col(<span class="str">"amount"</span>).desc())
+ranked = orders.withColumn(<span class="str">"rank"</span>, rank().over(w))
+
+w2 = Window.partitionBy(<span class="str">"user_id"</span>).rowsBetween(
+    Window.unboundedPreceding, Window.unboundedFollowing)
+running = orders.withColumn(<span class="str">"total"</span>, spark_sum(<span class="str">"amount"</span>).over(w2))
+
+ranked.show()</pre></div>
+    <div class="output-area" id="out-s9">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Inner join:
 +-----+-------+------+
 | name|product|amount|
 +-----+-------+------+
@@ -515,111 +708,308 @@ With bracket:
 |  Bob|  phone|   800|
 +-----+-------+------+
 
-Window rank by user:
-+--------+---------+------+----+
-|order_id| product |amount|rank|
-+--------+---------+------+----+
-|       1| laptop  |  1200|   1|
-|       3| tablet  |   400|   2|
-|       2| phone   |   800|   1|
-+--------+---------+------+----+</pre></div></div>
+<span class="log-spark">[spark]</span> Window rank by user:
++--------+-------+------+----+
+|order_id|product|amount|rank|
++--------+-------+------+----+
+|       1| laptop|  1200|   1|
+|       3| tablet|   400|   2|
+|       2|  phone|   800|   1|
++--------+-------+------+----+</pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s10">
+
+<!-- ═══ S10: Performance ═══ -->
+<div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
-  <h2>Performance optimalizálás</h2>
-  <div class="md-cell"><p>A Spark teljesítmény optimalizálás <strong>3 kulcsa</strong>: partitioning, caching, shuffle minimalizálás.</p></div><div class="code-cell" id="cell-s10"><div class="code-header"><span class="cell-number">[s10]</span><button class="run-btn" onclick="runCell('s10')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Repartition</span>\ndf_repartitioned = df.repartition(<span class="num">200</span>, <span class="str">"age"</span>)  <span class="cm"># hash partition by age</span>\n\n<span class="cm"># Coalesce (reduce partitions, no shuffle)</span>\ndf_coalesced = df.coalesce(<span class="num">10</span>)\n\n<span class="cm"># Cache</span>\ndf.cache()  <span class="cm"># memory only</span>\ndf.persist(StorageLevel.MEMORY_AND_DISK)\n\n<span class="cm"># Broadcast join (small table)</span>\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast\nsmall_df = spark.createDataFrame([(1,<span class="str">"IT"</span>),(2,<span class="str">"HR"</span>)],[<span class="str">"dept_id"</span>,<span class="str">"dept"</span>])\njoined = df.join(broadcast(small_df), <span class="str">"dept_id"</span>)\n\n<span class="cm"># Explain plan</span>\ndf.filter(<span class="str">"age > 30"</span>).select(<span class="str">"name"</span>).explain(<span class="num">True</span>)',)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><pre>== Physical Plan ==
-*(1) Project [name#1]
-+- *(1) Filter (age#2 > 30)
-   +- Scan ExistingRDD
+  <h2>Performance optimalizálás <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A Spark teljesítmény optimalizálás <strong>3 kulcsa</strong>: partitioning, caching, shuffle minimalizálás.</p></div>
+  <div class="code-cell" id="cell-s10">
+    <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('s10')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Repartition</span>
+df_repartitioned = df.repartition(<span class="num">200</span>, <span class="str">"age"</span>)
 
-Optimizations applied:
-  - Predicate pushdown
-  - Column pruning
-  - BroadcastHashJoin (small table)
-  - WholeStageCodegen</pre></div></div><table><tr><th>Művelet</th><th>Leírás</th><th>Shuffle?</th><th>Mikor?</th></tr><tr><td>repartition()</td><td>Hash partitioning</td><td>Shuffle igen</td><td>200 part/nagy data</td></tr><tr><td>coalesce()</td><td>Csökkentés</td><td>Shuffle NEM</td><td>Kimenet optimalizálás</td></tr><tr><td>cache()</td><td>Memory cache</td><td>Nincs</td><td>Ismételt lekérdezés</td></tr><tr><td>broadcast()</td><td>Kis tábla minden node</td><td>Nincs</td><td>Small/large join</td></tr><tr><td>partitionBy()</td><td>File partition</td><td>Nincs</td><td>Write optimization</td></tr></table>
+<span class="cm"># Coalesce (reduce partitions, no shuffle)</span>
+df_coalesced = df.coalesce(<span class="num">10</span>)
+
+<span class="cm"># Cache</span>
+df.cache()
+df.persist(StorageLevel.MEMORY_AND_DISK)
+
+<span class="cm"># Broadcast join (small table)</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
+small_df = spark.createDataFrame([(1, <span class="str">"IT"</span>), (2, <span class="str">"HR"</span>)], [<span class="str">"dept_id"</span>, <span class="str">"dept"</span>])
+joined = df.join(broadcast(small_df), <span class="str">"dept_id"</span>)
+
+<span class="cm"># Explain plan</span>
+df.filter(<span class="str">"age > 30"</span>).select(<span class="str">"name"</span>).explain(<span class="num">True</span>)</pre></div>
+    <div class="output-area" id="out-s10">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-info">== Physical Plan ==</span>
+<span class="log-dim">*(1) Project [name#1]</span>
+<span class="log-dim">+- *(1) Filter (age#2 > 30)</span>
+<span class="log-dim">   +- Scan ExistingRDD</span>
+
+<span class="log-spark">[spark]</span> Optimizations applied:
+  <span class="log-ok">✓</span> Predicate pushdown
+  <span class="log-ok">✓</span> Column pruning
+  <span class="log-ok">✓</span> BroadcastHashJoin (small table)
+  <span class="log-ok">✓</span> WholeStageCodegen</pre>
+    </div>
+  </div>
+  <table>
+    <tr><th>Művelet</th><th>Leírás</th><th>Shuffle?</th><th>Mikor?</th></tr>
+    <tr><td>repartition()</td><td>Hash partitioning</td><td>Igen</td><td>200 part / nagy data</td></tr>
+    <tr><td>coalesce()</td><td>Csökkentés</td><td>NEM</td><td>Kimenet optimalizálás</td></tr>
+    <tr><td>cache()</td><td>Memory cache</td><td>Nincs</td><td>Ismételt lekérdezés</td></tr>
+    <tr><td>broadcast()</td><td>Kis tábla minden node</td><td>Nincs</td><td>Small/large join</td></tr>
+  </table>
 </div>
-<div class="section layer-intro" id="s11">
+
+<!-- ═══ S11: Streaming ═══ -->
+<div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
-  <h2>Structured Streaming: Kafka → Delta</h2>
-  <div class="code-cell" id="cell-s11"><div class="code-header"><span class="cell-number">[s11]</span><button class="run-btn" onclick="runCell('s11')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Structured Streaming: Kafka → Delta</span>\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> from_json, col\n<span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StructType, StringType, IntegerType\n\nschema = StructType() \\\n    .add(<span class="str">"user_id"</span>, IntegerType()) \\\n    .add(<span class="str">"action"</span>, StringType()) \\\n    .add(<span class="str">"value"</span>, IntegerType())\n\nstream = spark \\\n    .readStream \\\n    .format(<span class="str">"kafka"</span>) \\\n    .option(<span class="str">"kafka.bootstrap.servers"</span>, <span class="str">"localhost:9092"</span>) \\\n    .option(<span class="str">"subscribe"</span>, <span class="str">"events"</span>) \\\n    .load()\n\nparsed = stream.select(\n    from_json(col(<span class="str">"value"</span>).cast(<span class="str">"string"</span>), schema).alias(<span class="str">"data"</span>)\n).select(<span class="str">"data.*"</span>)\n\n<span class="cm"># Windowed aggregation</span>\nwindowed = parsed \\\n    .withWatermark(<span class="str">"timestamp"</span>, <span class="str">"5 minutes"</span>) \\\n    .groupBy(window(<span class="str">"timestamp"</span>, <span class="str">"1 minute"</span>), <span class="str">"action"</span>) \\\n    .count()\n\nquery = windowed.writeStream \\\n    .format(<span class="str">"delta"</span>) \\\n    .outputMode(<span class="str">"complete"</span>) \\\n    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"/checkpoint"</span>) \\\n    .start(<span class="str">"/delta/event_counts"</span>)\n\n<span class="fn">print</span>(<span class="str">f"Streaming active: {query.isActive}"</span>)',)</pre></div><div class="output-area" id="out-s11"><div class="output-label">Output:</div><pre>Streaming active: True
-Source: Kafka [events]
-Sink: Delta [/delta/event_counts]
-Trigger: processingTime=0ms (continuous)
+  <h2>Structured Streaming: Kafka → Delta <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/kafka.svg">Kafka</span></h2>
+  <div class="code-cell" id="cell-s11">
+    <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('s11')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> from_json, col
+<span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StructType, StringType, IntegerType
 
-Batch 1: 1,245 events processed
-Batch 2: 1,389 events processed
-Batch 3: 1,102 events processed
+schema = StructType() \
+    .add(<span class="str">"user_id"</span>, IntegerType()) \
+    .add(<span class="str">"action"</span>, StringType()) \
+    .add(<span class="str">"value"</span>, IntegerType())
 
-Throughput: ~1.2k events/sec
-Latency: 150ms avg</pre></div></div>
+stream = spark \
+    .readStream \
+    .format(<span class="str">"kafka"</span>) \
+    .option(<span class="str">"kafka.bootstrap.servers"</span>, <span class="str">"localhost:9092"</span>) \
+    .option(<span class="str">"subscribe"</span>, <span class="str">"events"</span>) \
+    .load()
+
+parsed = stream.select(
+    from_json(col(<span class="str">"value"</span>).cast(<span class="str">"string"</span>), schema).alias(<span class="str">"data"</span>)
+).select(<span class="str">"data.*"</span>)
+
+query = parsed.writeStream \
+    .format(<span class="str">"delta"</span>) \
+    .outputMode(<span class="str">"append"</span>) \
+    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"/checkpoint"</span>) \
+    .start(<span class="str">"/delta/events"</span>)
+
+<span class="fn">print</span>(<span class="str">f"Streaming active: {query.isActive}"</span>)</pre></div>
+    <div class="output-area" id="out-s11">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Structured Streaming <span class="log-ok">started</span>
+<span class="log-spark">[spark]</span> Source: <span class="log-info">Kafka [events]</span>
+<span class="log-spark">[spark]</span> Sink: <span class="log-delta">Delta [/delta/events]</span>
+<span class="log-spark">[spark]</span> Trigger: processingTime=<span class="log-ok">0ms</span> (continuous)
+<span class="log-spark">[spark]</span> Batch <span class="log-ok">1</span>: 1,245 events processed <span class="log-time">(0.8s)</span>
+<span class="log-spark">[spark]</span> Batch <span class="log-ok">2</span>: 1,389 events processed <span class="log-time">(0.6s)</span>
+<span class="log-spark">[spark]</span> Batch <span class="log-ok">3</span>: 1,102 events processed <span class="log-time">(0.7s)</span>
+<span class="log-spark">[spark]</span> Throughput: <span class="log-ok">~1.2k events/sec</span>
+<span class="log-spark">[spark]</span> Latency: <span class="log-ok">150ms avg</span></pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s12">
+
+<!-- ═══ S12: MLlib ═══ -->
+<div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>MLlib: ML Pipeline Spark-on</h2>
-  <div class="code-cell" id="cell-s12"><div class="code-header"><span class="cell-number">[s12]</span><button class="run-btn" onclick="runCell('s12')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Spark MLlib Pipeline</span>\n<span class="kw">from</span> pyspark.ml <span class="kw">import</span> Pipeline\n<span class="kw">from</span> pyspark.ml.feature <span class="kw">import</span> VectorAssembler, StandardScaler\n<span class="kw">from</span> pyspark.ml.classification <span class="kw">import</span> RandomForestClassifier\n<span class="kw">from</span> pyspark.ml.evaluation <span class="kw">import</span> BinaryClassificationEvaluator\n\n<span class="cm"># Feature assembly</span>\nassembler = VectorAssembler(\n    inputCols=[<span class="str">"age"</span>, <span class="str">"income"</span>, <span class="str">"tenure"</span>, <span class="str">"usage"</span>],\n    outputCol=<span class="str">"features_raw"</span>\n)\nscaler = StandardScaler(inputCol=<span class="str">"features_raw"</span>, outputCol=<span class="str">"features"</span>)\nclassifier = RandomForestClassifier(labelCol=<span class="str">"churn"</span>, numTrees=<span class="num">100</span>)\n\npipeline = Pipeline(stages=[assembler, scaler, classifier])\n\n<span class="cm"># Train/test split</span>\ntrain, test = df.randomSplit([<span class="num">0.8</span>, <span class="num">0.2</span>], seed=<span class="num">42</span>)\nmodel = pipeline.fit(train)\npredictions = model.transform(test)\n\nevaluator = BinaryClassificationEvaluator(labelCol=<span class="str">"churn"</span>)\nauc = evaluator.evaluate(predictions)\n<span class="fn">print</span>(<span class="str">f"AUC: {auc:.4f}"</span>)',)</pre></div><div class="output-area" id="out-s12"><div class="output-label">Output:</div><pre>AUC: 0.9234
+  <h2>MLlib: ML Pipeline Spark-on <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="code-cell" id="cell-s12">
+    <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('s12')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="kw">from</span> pyspark.ml <span class="kw">import</span> Pipeline
+<span class="kw">from</span> pyspark.ml.feature <span class="kw">import</span> VectorAssembler, StandardScaler
+<span class="kw">from</span> pyspark.ml.classification <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> pyspark.ml.evaluation <span class="kw">import</span> BinaryClassificationEvaluator
 
-Feature Importance:
-  income: 0.342
-  usage:  0.289
-  tenure: 0.213
-  age:    0.156
+<span class="cm"># Feature assembly</span>
+assembler = VectorAssembler(
+    inputCols=[<span class="str">"age"</span>, <span class="str">"income"</span>, <span class="str">"tenure"</span>, <span class="str">"usage"</span>],
+    outputCol=<span class="str">"features_raw"</span>
+)
+scaler = StandardScaler(inputCol=<span class="str">"features_raw"</span>, outputCol=<span class="str">"features"</span>)
+classifier = RandomForestClassifier(labelCol=<span class="str">"churn"</span>, numTrees=<span class="num">100</span>)
 
-Model saved: /models/churn_rf_v1</pre></div></div>
+pipeline = Pipeline(stages=[assembler, scaler, classifier])
+
+<span class="cm"># Train/test split</span>
+train, test = df.randomSplit([<span class="num">0.8</span>, <span class="num">0.2</span>], seed=<span class="num">42</span>)
+model = pipeline.fit(train)
+predictions = model.transform(test)
+
+evaluator = BinaryClassificationEvaluator(labelCol=<span class="str">"churn"</span>)
+auc = evaluator.evaluate(predictions)
+<span class="fn">print</span>(<span class="str">f"AUC: {auc:.4f}"</span>)</pre></div>
+    <div class="output-area" id="out-s12">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Pipeline stages: <span class="log-ok">3</span> (VectorAssembler → StandardScaler → RandomForest)
+<span class="log-spark">[spark]</span> Training: <span class="log-ok">800</span> rows | Test: <span class="log-ok">200</span> rows
+<span class="log-spark">[spark]</span> AUC: <span class="log-ok">0.9234</span>
+<span class="log-spark">[spark]</span> Feature Importance:
+  <span class="log-info">income</span>: 0.342
+  <span class="log-info">usage</span>:  0.289
+  <span class="log-info">tenure</span>: 0.213
+  <span class="log-info">age</span>:    0.156
+<span class="log-spark">[spark]</span> Model saved: <span class="log-ok">/models/churn_rf_v1</span></pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s13">
+
+<!-- ═══ S13: Catalyst ═══ -->
+<div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
-  <h2>Catalyst Optimizer</h2>
-  <div class="md-cell"><p>A <strong>Catalyst</strong> a Spark SQL query optimizer. Automatikusan optimalizálja a végrehajtási tervet.</p></div><div class="code-cell" id="cell-s13"><div class="code-header"><span class="cell-number">[s13]</span><button class="run-btn" onclick="runCell('s13')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Explain plan</span>\ndf.filter(col(<span class="str">"age"</span>) > <span class="num">30</span>) \\\n  .join(other_df, <span class="str">"id"</span>) \\\n  .groupBy(<span class="str">"department"</span>) \\\n  .agg(avg(<span class="str">"salary"</span>)) \\\n  .explain(<span class="num">True</span>)',)</pre></div><div class="output-area" id="out-s13"><div class="output-label">Output:</div><pre>== Parsed Logical Plan ==
-Filter (age > 30) → Join → Aggregate
+  <h2>Catalyst Optimizer <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A <strong>Catalyst</strong> a Spark SQL query optimizer. Automatikusan optimalizálja a végrehajtási tervet.</p></div>
+  <div class="code-cell" id="cell-s13">
+    <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('s13')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Explain plan</span>
+df.filter(col(<span class="str">"age"</span>) > <span class="num">30</span>) \
+  .join(other_df, <span class="str">"id"</span>) \
+  .groupBy(<span class="str">"department"</span>) \
+  .agg(avg(<span class="str">"salary"</span>)) \
+  .explain(<span class="num">True</span>)</pre></div>
+    <div class="output-area" id="out-s13">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-info">== Parsed Logical Plan ==</span>
+<span class="log-dim">Filter (age > 30) → Join → Aggregate</span>
 
-== Analyzed Logical Plan ==
-[Resolved references, types checked]
+<span class="log-info">== Analyzed Logical Plan ==</span>
+<span class="log-dim">[Resolved references, types checked]</span>
 
-== Optimized Logical Plan ==
-1. Push down Filter before Join
-2. Column pruning (only needed cols)
-3. Join reorder (small table first)
+<span class="log-info">== Optimized Logical Plan ==</span>
+<span class="log-ok">1. Push down Filter before Join</span>
+<span class="log-ok">2. Column pruning (only needed cols)</span>
+<span class="log-ok">3. Join reorder (small table first)</span>
 
-== Physical Plan ==
-*(2) HashAggregate(department, avg(salary))
-+- *(2) Project [department, salary]
-   +- *(1) BroadcastHashJoin [id]
-      +- *(1) Filter (age > 30)
-      +- BroadcastExchange</pre></div></div><div class="callout"><div class="callout-title">Optimalizálások</div><p>✅ Predicate pushdown: filter minél korábban<br>✅ Column pruning: csak a szükséges oszlopok<br>✅ Join reorder: kis tábla broadcast<br>✅ Constant folding: 1+1→2<br>✅ WholeStageCodegen: JIT kompiláció</p></div>
+<span class="log-info">== Physical Plan ==</span>
+<span class="log-dim">*(2) HashAggregate(department, avg(salary))</span>
+<span class="log-dim">+- *(2) Project [department, salary]</span>
+<span class="log-dim">   +- *(1) BroadcastHashJoin [id]</span>
+<span class="log-dim">      +- *(1) Filter (age > 30)</span>
+<span class="log-dim">      +- BroadcastExchange</span></pre>
+    </div>
+  </div>
+  <div class="callout"><div class="callout-title">Optimalizálások</div><p>✅ Predicate pushdown: filter minél korábban<br>✅ Column pruning: csak a szükséges oszlopok<br>✅ Join reorder: kis tábla broadcast<br>✅ Constant folding: 1+1→2<br>✅ WholeStageCodegen: JIT kompiláció</p></div>
 </div>
-<div class="section layer-intro" id="s14">
+
+<!-- ═══ S14: Delta Lake + Spark ═══ -->
+<div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
   <h2>Delta Lake + Spark <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta</span></h2>
-  <div class="code-cell" id="cell-s14"><div class="code-header"><span class="cell-number">[s14]</span><button class="run-btn" onclick="runCell('s14')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Delta Lake + Spark integráció</span>\n\n<span class="cm"># Write</span>\ndf.write.format(<span class="str">"delta"</span>) \\\n    .mode(<span class="str">"overwrite"</span>) \\\n    .partitionBy(<span class="str">"date"</span>) \\\n    .save(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># Read</span>\ndelta_df = spark.read.format(<span class="str">"delta"</span>).load(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># Time travel</span>\nyesterday = spark.read.format(<span class="str">"delta"</span>) \\\n    .option(<span class="str">"versionAsOf"</span>, <span class="num">5</span>) \\\n    .load(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># MERGE (upsert)</span>\n<span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable\ndt = DeltaTable.forPath(spark, <span class="str">"/delta/users"</span>)\ndt.alias(<span class="str">"target"</span>).merge(\n    updates.alias(<span class="str">"source"</span>),\n    <span class="str">"target.id = source.id"</span>\n).whenMatchedUpdateAll() \\\n .whenNotMatchedInsertAll() \\\n .execute()\n\n<span class="fn">print</span>(<span class="str">f"Delta version: {dt.history().first().version}"</span>)',)</pre></div><div class="output-area" id="out-s14"><div class="output-label">Output:</div><pre>Delta version: 42
-Operation: MERGE
-Rows updated: 15,234
-Rows inserted: 3,421
-Rows unchanged: 31,345
+  <div class="code-cell" id="cell-s14">
+    <div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('s14')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Write to Delta</span>
+df.write.format(<span class="str">"delta"</span>) \
+    .mode(<span class="str">"overwrite"</span>) \
+    .partitionBy(<span class="str">"date"</span>) \
+    .save(<span class="str">"/delta/users"</span>)
 
-History:
-  v42: MERGE (2 min ago)
-  v41: WRITE (1 hour ago)
-  v40: DELETE (3 hours ago)</pre></div></div>
+<span class="cm"># Read from Delta</span>
+delta_df = spark.read.format(<span class="str">"delta"</span>).load(<span class="str">"/delta/users"</span>)
+
+<span class="cm"># Time travel</span>
+yesterday = spark.read.format(<span class="str">"delta"</span>) \
+    .option(<span class="str">"versionAsOf"</span>, <span class="num">5</span>) \
+    .load(<span class="str">"/delta/users"</span>)
+
+<span class="cm"># MERGE (upsert)</span>
+<span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable
+dt = DeltaTable.forPath(spark, <span class="str">"/delta/users"</span>)
+dt.alias(<span class="str">"target"</span>).merge(
+    updates.alias(<span class="str">"source"</span>),
+    <span class="str">"target.id = source.id"</span>
+).whenMatchedUpdateAll() \
+ .whenNotMatchedInsertAll() \
+ .execute()
+
+<span class="fn">print</span>(<span class="str">f"Delta version: {dt.history().first().version}"</span>)</pre></div>
+    <div class="output-area" id="out-s14">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> Write: <span class="log-ok">5 rows</span> → /delta/users (partitioned by date)
+<span class="log-delta">[delta]</span> Read: <span class="log-ok">5 rows</span> from /delta/users
+<span class="log-delta">[delta]</span> Time travel: version <span class="log-ok">5</span> → <span class="log-ok">5 rows</span>
+<span class="log-delta">[delta]</span> MERGE executed:
+  Rows updated:   <span class="log-ok">15,234</span>
+  Rows inserted:  <span class="log-ok">3,421</span>
+  Rows unchanged: 31,345
+<span class="log-delta">[delta]</span> Delta version: <span class="log-ok">42</span>
+<span class="log-delta">[delta]</span> History:
+  v42: <span class="log-info">MERGE</span> (<span class="log-time">2 min ago</span>)
+  v41: <span class="log-info">WRITE</span> (<span class="log-time">1 hour ago</span>)
+  v40: <span class="log-info">DELETE</span> (<span class="log-time">3 hours ago</span>)</pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s15">
+
+<!-- ═══ S15: ETL pipeline ═══ -->
+<div class="section layer-general" id="s15">
   <div class="section-number">Section 15</div>
-  <h2>Valós ETL pipeline</h2>
-  <div class="md-cell"><p>Egy valós Spark pipeline: <strong>ETL a forrástól az elemzésig</strong></p></div><div class="code-cell" id="cell-s15"><div class="code-header"><span class="cell-number">[s15]</span><button class="run-btn" onclick="runCell('s15')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Full ETL pipeline</span>\n\n<span class="cm"># 1. Read multiple sources</span>\nusers = spark.read.json(<span class="str">"s3://raw/users/"</span>)\norders = spark.read.parquet(<span class="str">"s3://raw/orders/"</span>)\nclicks = spark.read.csv(<span class="str">"s3://raw/clicks/"</span>, header=<span class="num">True</span>)\n\n<span class="cm"># 2. Transform</span>\nuser_features = users \\\n    .join(orders, <span class="str">"user_id"</span>) \\\n    .groupBy(<span class="str">"user_id"</span>) \\\n    .agg(\n        count(<span class="str">"order_id"</span>).alias(<span class="str">"order_count"</span>),\n        sum(<span class="str">"amount"</span>).alias(<span class="str">"total_spend"</span>),\n        avg(<span class="str">"amount"</span>).alias(<span class="str">"avg_order"</span>),\n        max(<span class="str">"order_date"</span>).alias(<span class="str">"last_order"</span>)\n    )\n\n<span class="cm"># 3. Write to Delta</span>\nuser_features.write.format(<span class="str">"delta"</span>) \\\n    .mode(<span class="str">"overwrite"</span>) \\\n    .save(<span class="str">"s3://gold/user_features"</span>)\n\n<span class="fn">print</span>(<span class="str">f"Features: {user_features.count()} users"</span>)',)</pre></div><div class="output-area" id="out-s15"><div class="output-label">Output:</div><pre>Users: 500,000
-Orders: 12,345,678
-Clicks: 45,678,901
+  <h2>Valós ETL pipeline <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta</span></h2>
+  <div class="md-cell"><p>Egy valós Spark pipeline: <strong>ETL a forrástól az elemzésig</strong></p></div>
+  <div class="code-cell" id="cell-s15">
+    <div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('s15')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Full ETL pipeline</span>
 
-Features generated: 500,000 users
-Columns: user_id, order_count, total_spend, avg_order, last_order
+<span class="cm"># 1. Read multiple sources</span>
+users = spark.read.json(<span class="str">"s3://raw/users/"</span>)
+orders = spark.read.parquet(<span class="str">"s3://raw/orders/"</span>)
+clicks = spark.read.csv(<span class="str">"s3://raw/clicks/"</span>, header=<span class="num">True</span>)
 
-Pipeline: 3m 42s
-Output: s3://gold/user_features (Delta, 42 partitions)</pre></div></div>
+<span class="cm"># 2. Transform</span>
+user_features = users \
+    .join(orders, <span class="str">"user_id"</span>) \
+    .groupBy(<span class="str">"user_id"</span>) \
+    .agg(
+        count(<span class="str">"order_id"</span>).alias(<span class="str">"order_count"</span>),
+        sum(<span class="str">"amount"</span>).alias(<span class="str">"total_spend"</span>),
+        avg(<span class="str">"amount"</span>).alias(<span class="str">"avg_order"</span>),
+        max(<span class="str">"order_date"</span>).alias(<span class="str">"last_order"</span>)
+    )
+
+<span class="cm"># 3. Write to Delta</span>
+user_features.write.format(<span class="str">"delta"</span>) \
+    .mode(<span class="str">"overwrite"</span>) \
+    .save(<span class="str">"s3://gold/user_features"</span>)
+
+<span class="fn">print</span>(<span class="str">f"Features: {user_features.count()} users"</span>)</pre></div>
+    <div class="output-area" id="out-s15">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> Reading sources:
+  <span class="log-info">users</span>:  <span class="log-ok">500,000</span> rows  <span class="log-time">(JSON, 2.1s)</span>
+  <span class="log-info">orders</span>: <span class="log-ok">12,345,678</span> rows <span class="log-time">(Parquet, 8.4s)</span>
+  <span class="log-info">clicks</span>: <span class="log-ok">45,678,901</span> rows <span class="log-time">(CSV, 22.1s)</span>
+<span class="log-spark">[spark]</span> Transform: join + aggregate...
+<span class="log-spark">[spark]</span> Features generated: <span class="log-ok">500,000</span> users
+<span class="log-spark">[spark]</span> Columns: user_id, order_count, total_spend, avg_order, last_order
+<span class="log-delta">[delta]</span> Write to <span class="log-info">s3://gold/user_features</span> (Delta, <span class="log-ok">42 partitions</span>)
+<span class="log-spark">[spark]</span> Pipeline total: <span class="log-ok">3m 42s</span></pre>
+    </div>
+  </div>
 </div>
-<div class="section layer-intro" id="s16">
+
+<!-- ═══ S16: Összefoglalás ═══ -->
+<div class="section layer-general" id="s16">
   <div class="section-number">Section 16</div>
-  <h2>Összefoglalás</h2>
-  <div class="callout success"><div class="callout-title">Megtanultad:</div><p>✅ Spark Session, architektúra (Driver/Executor)<br>✅ RDD: transformations (lazy) vs actions<br>✅ DataFrame: high-level API, optimalizált<br>✅ Spark SQL: temp view, SQL queries<br>✅ Join és Window Functions<br>✅ Performance: repartition, cache, broadcast<br>✅ Structured Streaming: Kafka → Delta<br>✅ MLlib: Pipeline, Feature, Model<br>✅ Catalyst Optimizer: plan, optimization<br>✅ Delta Lake: ACID, time travel, merge<br>✅ Valós ETL pipeline példa</p></div>
+  <h2>Összefoglalás <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="callout success"><div class="callout-title">Megtanultad:</div>
+    <p>✅ Spark Session, architektúra (Driver/Executor)
+    ✅ RDD: transformations (lazy) vs actions
+    ✅ DataFrame: high-level API, optimalizált
+    ✅ Spark SQL: temp view, SQL queries
+    ✅ Join és Window Functions
+    ✅ Performance: repartition, cache, broadcast
+    ✅ Structured Streaming: Kafka → Delta
+    ✅ MLlib: Pipeline, Feature, Model
+    ✅ Catalyst Optimizer: plan, optimization
+    ✅ Delta Lake: ACID, time travel, merge
+    ✅ Valós ETL pipeline példa</p>
+  </div>
 </div>
 </main>
+
 
 <script>
 // ── State ──

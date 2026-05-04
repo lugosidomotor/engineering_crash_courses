@@ -374,6 +374,16 @@ tr:hover td { background: rgba(0,212,255,.05); }
   border-color: var(--accent, var(--cyan));
 }
 
+/* ── Log styling ── */
+.log-delta { color: #48b984; font-weight: 600; }
+.log-spark { color: #f0883e; font-weight: 600; }
+.log-info { color: #58a6ff; }
+.log-warn { color: #d29922; }
+.log-ok { color: #3fb950; font-weight: 600; }
+.log-dim { color: #6e7681; }
+.log-cmd { color: #79c0ff; }
+.log-time { color: #8b949e; }
+
 </style>
 </head>
 <body>
@@ -518,9 +528,9 @@ subprocess.check_call(bootstrap_cmd, cwd=project_dir)
 <span class="fn">print</span>(<span class="str">f"Kernel regisztrálva: Python (.venv - Delta demo)"</span>)</pre></div>
     <div class="output-area" id="out-s3">
       <div class="output-label">Output:</div>
-      <pre>Virtuális környezet kész: /home/user/engineering_crash_courses/.venv/bin/python
-Kernel regisztrálva: Python (.venv - Delta demo)
-Aktuális futó Python: /home/user/engineering_crash_courses/.venv/bin/python</pre>
+      <pre><span class="log-ok">[delta]</span> <span class="log-ok">Virtuális környezet kész:</span> <span class="log-info">/home/user/engineering_crash_courses/.venv/bin/python</span>
+<span class="log-ok">[delta]</span> <span class="log-ok">Kernel regisztrálva:</span> <span class="log-info">Python (.venv - Delta demo)</span>
+<span class="log-dim">[delta]</span> <span class="log-dim">Aktuális futó Python:</span> <span class="log-info">/home/user/engineering_crash_courses/.venv/bin/python</span></pre>
     </div>
   </div>
 </div>
@@ -553,10 +563,10 @@ Aktuális futó Python: /home/user/engineering_crash_courses/.venv/bin/python</p
 <span class="fn">print</span>(<span class="str">f"pyarrow: {pa.__version__}"</span>)</pre></div>
     <div class="output-area" id="out-s4">
       <div class="output-label">Output:</div>
-      <pre>Python: /home/user/engineering_crash_courses/.venv/bin/python
-deltalake: 0.25.0
-pandas: 2.2.3
-pyarrow: 18.1.0</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-dim">Python:</span> <span class="log-info">/home/user/engineering_crash_courses/.venv/bin/python</span>
+<span class="log-delta">[delta]</span> deltalake: <span class="log-ok">0.25.0</span>
+<span class="log-delta">[delta]</span> pandas: <span class="log-ok">2.2.3</span>
+<span class="log-delta">[delta]</span> pyarrow: <span class="log-ok">18.1.0</span></pre>
     </div>
   </div>
 </div>
@@ -590,7 +600,7 @@ base_dir.mkdir(parents=<span class="kw">True</span>, exist_ok=<span class="kw">T
 table_path</pre></div>
     <div class="output-area" id="out-s5">
       <div class="output-label">Output:</div>
-      <pre>PosixPath('delta_demo_output/sales_delta')</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Célmappa beállítva:</span> <span class="log-info">PosixPath('delta_demo_output/sales_delta')</span></pre>
     </div>
   </div>
 </div>
@@ -621,6 +631,7 @@ table_path</pre></div>
 sales_df</pre></div>
     <div class="output-area" id="out-s6">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Forrásadat DataFrame betöltve – 4 sor</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>amount</th><th>order_date</th><th>source_system</th></tr>
         <tr><td>0</td><td>1001</td><td>C-001</td><td>12900</td><td>2026-05-01</td><td>webshop</td></tr>
@@ -654,7 +665,7 @@ sales_df</pre></div>
 <span class="fn">print</span>(<span class="str">f"Delta table létrehozva itt: {table_path.resolve()}"</span>)</pre></div>
     <div class="output-area" id="out-s7">
       <div class="output-label">Output:</div>
-      <pre>Delta table létrehozva itt: /home/user/engineering_crash_courses/delta_demo_output/sales_delta</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Delta table létrehozva itt:</span> <span class="log-info">/home/user/engineering_crash_courses/delta_demo_output/sales_delta</span></pre>
     </div>
   </div>
 </div>
@@ -680,9 +691,10 @@ sales_df</pre></div>
     <span class="fn">print</span>(marker, relative)</pre></div>
     <div class="output-area" id="out-s8">
       <div class="output-label">Output:</div>
-      <pre><span style="color:#ff8800">[DIR]</span>  _delta_log
-<span style="color:#00d4ff">[FILE]</span> _delta_log/00000000000000000000.json
-<span style="color:#00d4ff">[FILE]</span> part-00000-a1b2c3d4-e5f6-7890-abcd-ef1234567890-c000.snappy.parquet</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Fájlrendszer tartalom:</span>
+<span style="color:#ff8800">[DIR]</span>  <span class="log-info">_delta_log</span>
+<span style="color:#00d4ff">[FILE]</span> <span class="log-info">_delta_log/00000000000000000000.json</span>
+<span style="color:#00d4ff">[FILE]</span> <span class="log-info">part-00000-a1b2c3d4-e5f6-7890-abcd-ef1234567890-c000.snappy.parquet</span></pre>
     </div>
   </div>
   <div class="md-cell">
@@ -712,7 +724,7 @@ sales_df</pre></div>
 log_files</pre></div>
     <div class="output-area" id="out-s9">
       <div class="output-label">Output:</div>
-      <pre>[PosixPath('delta_demo_output/sales_delta/_delta_log/00000000000000000000.json')]</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Log fájl(ok):</span> <span class="log-info">[PosixPath('delta_demo_output/sales_delta/_delta_log/00000000000000000000.json')]</span></pre>
     </div>
   </div>
   <div class="code-cell" id="cell-s9b">
@@ -730,36 +742,37 @@ log_files</pre></div>
     <span class="fn">print</span>(<span class="str">"-"</span> * <span class="num">80</span>)</pre></div>
     <div class="output-area" id="out-s9b">
       <div class="output-label">Output:</div>
-      <pre>{
-  "<span style="color:#00d4ff">protocol</span>": {
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Delta log tartalom (00000000000000000000.json):</span>
+{
+  "<span class="log-info">protocol</span>": {
     "minReaderVersion": 1,
     "minWriterVersion": 2
   }
 }
-────────────────────────────────────────
+<span class="log-dim">────────────────────────────────────────</span>
 {
-  "<span style="color:#00d4ff">metaData</span>": {
-    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "<span class="log-info">metaData</span>": {
+    "id": "<span class="log-dim">a1b2c3d4-e5f6-7890-abcd-ef1234567890</span>",
     "format": {"provider": "parquet", "options": {}},
     "schemaString": "{"type":"struct","fields":[...]}",
-    "createdTime": 1746297600000
+    "createdTime": <span class="log-time">1746297600000</span>
   }
 }
-────────────────────────────────────────
+<span class="log-dim">────────────────────────────────────────</span>
 {
-  "<span style="color:#00d4ff">add</span>": {
-    "path": "part-00000-a1b2c3d4-c000.snappy.parquet",
+  "<span class="log-info">add</span>": {
+    "path": "<span class="log-info">part-00000-a1b2c3d4-c000.snappy.parquet</span>",
     "partitionValues": {},
     "size": 2456,
-    "modificationTime": 1746297600000,
+    "modificationTime": <span class="log-time">1746297600000</span>,
     "dataChange": true
   }
 }
-────────────────────────────────────────
+<span class="log-dim">────────────────────────────────────────</span>
 {
-  "<span style="color:#00d4ff">commitInfo</span>": {
-    "timestamp": 1746297600000,
-    "operation": "CREATE_TABLE",
+  "<span class="log-info">commitInfo</span>": {
+    "timestamp": <span class="log-time">1746297600000</span>,
+    "operation": "<span class="log-ok">CREATE_TABLE</span>",
     "operationParameters": {"mode": "Overwrite"}
   }
 }</pre>
@@ -794,6 +807,7 @@ log_files</pre></div>
 dt.to_pandas()</pre></div>
     <div class="output-area" id="out-s10">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Delta table beolvasva path alapján – 4 sor</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>amount</th><th>order_date</th><th>source_system</th></tr>
         <tr><td>0</td><td>1001</td><td>C-001</td><td>12900</td><td>2026-05-01</td><td>webshop</td></tr>
@@ -821,13 +835,14 @@ dt.to_pandas()</pre></div>
     <div class="code-body"><pre><span class="fn">print</span>(dt.schema().json())</pre></div>
     <div class="output-area" id="out-s11">
       <div class="output-label">Output:</div>
-      <pre>{"type": "struct", "fields": [
-  {"name": "order_id", "type": "integer", "nullable": false, "metadata": {}},
-  {"name": "customer_id", "type": "string", "nullable": false, "metadata": {}},
-  {"name": "amount", "type": "integer", "nullable": false, "metadata": {}},
-  {"name": "order_date", "type": {"type": "timestamp", "unit": "MICROS", "timezone": "UTC"}, "nullable": false, "metadata": {}},
-  {"name": "source_system", "type": "string", "nullable": false, "metadata": {}}
-]}</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Schema lekérdezve:</span>
+<span class="log-dim">{"type": "struct", "fields": [</span>
+  <span class="log-info">{"name": "order_id"</span>, <span class="log-dim">"type": "integer", "nullable": false, "metadata": {}},</span>
+  <span class="log-info">{"name": "customer_id"</span>, <span class="log-dim">"type": "string", "nullable": false, "metadata": {}},</span>
+  <span class="log-info">{"name": "amount"</span>, <span class="log-dim">"type": "integer", "nullable": false, "metadata": {}},</span>
+  <span class="log-info">{"name": "order_date"</span>, <span class="log-dim">"type": {"type": "timestamp", "unit": "MICROS", "timezone": "UTC"}, "nullable": false, "metadata": {}},</span>
+  <span class="log-info">{"name": "source_system"</span>, <span class="log-dim">"type": "string", "nullable": false, "metadata": {}}</span>
+<span class="log-dim">]}</span></pre>
     </div>
   </div>
   <div class="md-cell">
@@ -868,6 +883,7 @@ dt = DeltaTable(<span class="fn">str</span>(table_path))
 dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <div class="output-area" id="out-s12">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Append sikeres – most már 6 sor</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>amount</th><th>order_date</th><th>source_system</th></tr>
         <tr><td>0</td><td>1001</td><td>C-001</td><td>12900</td><td>2026-05-01</td><td>webshop</td></tr>
@@ -900,8 +916,9 @@ dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <span class="fn">print</span>(log_file.name)</pre></div>
     <div class="output-area" id="out-s13">
       <div class="output-label">Output:</div>
-      <pre>00000000000000000000.json
-00000000000000000001.json</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Delta log verziók:</span>
+<span class="log-info">00000000000000000000.json</span>
+<span class="log-info">00000000000000000001.json</span></pre>
     </div>
   </div>
   <div class="code-cell" id="cell-s13b">
@@ -916,8 +933,8 @@ version_1 = DeltaTable(<span class="fn">str</span>(table_path), version=<span cl
 <span class="fn">print</span>(<span class="str">"1. verzió sorok száma:"</span>, <span class="fn">len</span>(version_1.to_pandas()))</pre></div>
     <div class="output-area" id="out-s13b">
       <div class="output-label">Output:</div>
-      <pre>0. verzió sorok száma: 4
-1. verzió sorok száma: 6</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Time travel:</span> <span class="log-dim">0. verzió sorok száma:</span> <span class="log-ok">4</span>
+<span class="log-delta">[delta]</span> <span class="log-ok">Time travel:</span> <span class="log-dim">1. verzió sorok száma:</span> <span class="log-ok">6</span></pre>
     </div>
   </div>
   <div class="md-cell">
@@ -1008,6 +1025,7 @@ ELT = Extract → Load → Transform</code></pre>
 etl_source_df</pre></div>
     <div class="output-area" id="out-s17a">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">ETL forrásadat betöltve – 4 sor (nyers)</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th></tr>
         <tr><td>0</td><td>"2001"</td><td>C-010</td><td>"12 900"</td><td>"0"</td><td>2026-05-01</td><td>webshop</td></tr>
@@ -1028,6 +1046,7 @@ etl_clean_df[<span class="str">"is_online"</span>] = etl_clean_df[<span class="s
 etl_clean_df</pre></div>
     <div class="output-area" id="out-s17b">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">ETL Transform lépés kész – tisztított + üzleti oszlopok</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th><th>is_online</th></tr>
         <tr><td>0</td><td>2001</td><td>C-010</td><td>12900</td><td>0</td><td>2026-05-01</td><td>webshop</td><td>12900</td><td>True</td></tr>
@@ -1046,7 +1065,7 @@ etl_clean_df</pre></div>
 DeltaTable(<span class="fn">str</span>(etl_table_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <div class="output-area" id="out-s17c">
       <div class="output-label">Output:</div>
-      <pre>ETL output Delta table: /home/user/.../delta_demo_output/sales_etl_curated_delta</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">ETL output Delta table:</span> <span class="log-info">/home/user/.../delta_demo_output/sales_etl_curated_delta</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th><th>is_online</th></tr>
         <tr><td>0</td><td>2001</td><td>C-010</td><td>12900</td><td>0.0</td><td>2026-05-01</td><td>webshop</td><td>12900</td><td>True</td></tr>
@@ -1081,7 +1100,7 @@ elt_raw_table_path = base_dir / <span class="str">"sales_elt_bronze_raw_delta"</
 DeltaTable(<span class="fn">str</span>(elt_raw_table_path)).to_pandas()</pre></div>
     <div class="output-area" id="out-s18a">
       <div class="output-label">Output:</div>
-      <pre>ELT bronze/raw Delta table: .../delta_demo_output/sales_elt_bronze_raw_delta</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">ELT bronze/raw Delta table:</span> <span class="log-info">.../delta_demo_output/sales_elt_bronze_raw_delta</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th></tr>
         <tr><td>0</td><td>"2001"</td><td>C-010</td><td>"12 900"</td><td>"0"</td><td>2026-05-01</td><td>webshop</td></tr>
@@ -1104,6 +1123,7 @@ silver_df[<span class="str">"net_amount_huf"</span>] = (silver_df[<span class="s
 DeltaTable(<span class="fn">str</span>(elt_silver_table_path)).to_pandas()</pre></div>
     <div class="output-area" id="out-s18b">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">ELT Transform: bronze → silver kész</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th></tr>
         <tr><td>0</td><td>2001</td><td>C-010</td><td>12900</td><td>0</td><td>2026-05-01</td><td>webshop</td><td>12900</td></tr>
@@ -1138,18 +1158,19 @@ demo_tables = {
     <span class="fn">print</span>(<span class="str">f"  delta log verziók: {len(log_files)}"</span>)</pre></div>
     <div class="output-area" id="out-s19">
       <div class="output-label">Output:</div>
-      <pre>ETL curated
-  path: delta_demo_output/sales_etl_curated_delta
-  parquet fájlok: 1
-  delta log verziók: 1
-ELT bronze/raw
-  path: delta_demo_output/sales_elt_bronze_raw_delta
-  parquet fájlok: 1
-  delta log verziók: 1
-ELT silver/curated
-  path: delta_demo_output/sales_elt_silver_delta
-  parquet fájlok: 1
-  delta log verziók: 1</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">ETL vs ELT összehasonlítás:</span>
+<span class="log-spark">[spark]</span> <span class="log-ok">ETL curated</span>
+<span class="log-dim">  path:</span> <span class="log-info">delta_demo_output/sales_etl_curated_delta</span>
+<span class="log-dim">  parquet fájlok:</span> <span class="log-ok">1</span>
+<span class="log-dim">  delta log verziók:</span> <span class="log-ok">1</span>
+<span class="log-spark">[spark]</span> <span class="log-ok">ELT bronze/raw</span>
+<span class="log-dim">  path:</span> <span class="log-info">delta_demo_output/sales_elt_bronze_raw_delta</span>
+<span class="log-dim">  parquet fájlok:</span> <span class="log-ok">1</span>
+<span class="log-dim">  delta log verziók:</span> <span class="log-ok">1</span>
+<span class="log-spark">[spark]</span> <span class="log-ok">ELT silver/curated</span>
+<span class="log-dim">  path:</span> <span class="log-info">delta_demo_output/sales_elt_silver_delta</span>
+<span class="log-dim">  parquet fájlok:</span> <span class="log-ok">1</span>
+<span class="log-dim">  delta log verziók:</span> <span class="log-ok">1</span></pre>
     </div>
   </div>
 </div>
@@ -1213,8 +1234,9 @@ landing_batch_1.to_csv(landing_dir / <span class="str">"orders_2026_05_05.csv"</
 landing_batch_2.to_csv(landing_dir / <span class="str">"orders_2026_05_06.csv"</span>, index=<span class="kw">False</span>)</pre></div>
     <div class="output-area" id="out-s21a">
       <div class="output-label">Output:</div>
-      <pre>delta_demo_output/landing/orders/orders_2026_05_05.csv
-delta_demo_output/landing/orders/orders_2026_05_06.csv</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Landing CSV fájlok létrehozva:</span>
+<span class="log-info">delta_demo_output/landing/orders/orders_2026_05_05.csv</span>
+<span class="log-info">delta_demo_output/landing/orders/orders_2026_05_06.csv</span></pre>
     </div>
   </div>
 
@@ -1233,6 +1255,7 @@ bronze_orders_df = pd.concat(bronze_frames, ignore_index=<span class="kw">True</
 DeltaTable(<span class="fn">str</span>(bronze_orders_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <div class="output-area" id="out-s21b">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Landing → Bronze: 5 sor betöltve ingestion metaadatokkal</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>_source_file</th><th>_ingestion_mode</th></tr>
         <tr><td>0</td><td>3001</td><td>C-020</td><td>9900</td><td>0</td><td>2026-05-05</td><td>webshop</td><td>orders_2026_05_05.csv</td><td>batch</td></tr>
@@ -1257,6 +1280,7 @@ silver_orders_df = silver_orders_df.drop_duplicates(subset=[<span class="str">"o
 DeltaTable(<span class="fn">str</span>(silver_orders_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <div class="output-area" id="out-s21c">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Bronze → Silver: tisztított, típusozott, deduplikált – 5 sor</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>net_amount_huf</th><th>is_online</th></tr>
         <tr><td>0</td><td>3001</td><td>C-020</td><td>9900</td><td>0.0</td><td>2026-05-05</td><td>webshop</td><td>9900</td><td>True</td></tr>
@@ -1281,6 +1305,7 @@ gold_daily_sales_df = (
 DeltaTable(<span class="fn">str</span>(gold_daily_sales_path)).to_pandas()</pre></div>
     <div class="output-area" id="out-s21d">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Silver → Gold: napi csatorna KPI – 5 sor</span></pre>
       <table>
         <tr><th></th><th>order_date</th><th>channel</th><th>order_count</th><th>gross_amount_huf</th><th>net_amount_huf</th></tr>
         <tr><td>0</td><td>2026-05-05</td><td>partner</td><td>1</td><td>14900</td><td>12665</td></tr>
@@ -1333,6 +1358,7 @@ dim_customer_df[<span class="str">"customer_name"</span>] = dim_customer_df[<spa
 dim_customer_df</pre></div>
     <div class="output-area" id="out-s23a">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">dim_customer dimension tábla – 4 sor</span></pre>
       <table><tr><th></th><th>customer_id</th><th>customer_name</th></tr>
       <tr><td>0</td><td>C-020</td><td>Kovacs Anna</td></tr>
       <tr><td>1</td><td>C-021</td><td>Nagy Bela</td></tr>
@@ -1349,6 +1375,7 @@ dim_channel_df[<span class="str">"channel_name"</span>] = dim_channel_df[<span c
 dim_channel_df</pre></div>
     <div class="output-area" id="out-s23b">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">dim_channel dimension tábla – 3 sor</span></pre>
       <table><tr><th></th><th>channel</th><th>channel_name</th></tr>
       <tr><td>0</td><td>partner</td><td>Partner sales</td></tr>
       <tr><td>1</td><td>pos</td><td>Physical store</td></tr>
@@ -1366,6 +1393,7 @@ dim_date_df[<span class="str">"day"</span>] = dim_date_df[<span class="str">"ord
 dim_date_df[[<span class="str">"date_id"</span>, <span class="str">"order_date"</span>, <span class="str">"year"</span>, <span class="str">"month"</span>, <span class="str">"day"</span>]]</pre></div>
     <div class="output-area" id="out-s23c">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">dim_date dimension tábla – 3 sor</span></pre>
       <table><tr><th></th><th>date_id</th><th>order_date</th><th>year</th><th>month</th><th>day</th></tr>
       <tr><td>0</td><td>20260505</td><td>2026-05-05</td><td>2026</td><td>5</td><td>5</td></tr>
       <tr><td>1</td><td>20260506</td><td>2026-05-06</td><td>2026</td><td>5</td><td>6</td></tr>
@@ -1384,6 +1412,7 @@ fact_sales_df = fact_sales_df[[<span class="str">"order_id"</span>,<span class="
 fact_sales_df</pre></div>
     <div class="output-area" id="out-s23d">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">fact_sales + dimenziók Delta táblákba írva</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>channel</th><th>date_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>net_amount_huf</th><th>is_online</th></tr>
         <tr><td>0</td><td>3001</td><td>C-020</td><td>webshop</td><td>20260505</td><td>9900</td><td>0.0</td><td>9900</td><td>True</td></tr>
@@ -1404,6 +1433,7 @@ fact_sales_df</pre></div>
 sales_mart_df[[<span class="str">"order_id"</span>, <span class="str">"customer_name"</span>, <span class="str">"channel_name"</span>, <span class="str">"order_date"</span>, <span class="str">"net_amount_huf"</span>]]</pre></div>
     <div class="output-area" id="out-s23e">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">Sales Mart (joined dim + fact) – 5 sor</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_name</th><th>channel_name</th><th>order_date</th><th>net_amount_huf</th></tr>
         <tr><td>0</td><td>3001</td><td>Kovacs Anna</td><td>Online webshop</td><td>2026-05-05</td><td>9900</td></tr>
@@ -1424,6 +1454,7 @@ sales_mart_df[[<span class="str">"order_id"</span>, <span class="str">"customer_
 customer_kpi_df</pre></div>
     <div class="output-area" id="out-s23f">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">Customer KPI aggregátum – 4 sor</span></pre>
       <table>
         <tr><th></th><th>customer_name</th><th>order_count</th><th>total_net_amount_huf</th></tr>
         <tr><td>0</td><td>Toth Csilla</td><td>1</td><td>17991</td></tr>
@@ -1454,6 +1485,7 @@ customer_kpi_df</pre></div>
 batch_summary</pre></div>
     <div class="output-area" id="out-s24">
       <div class="output-label">Output:</div>
+      <pre><span class="log-spark">[spark]</span> <span class="log-ok">Batch feldolgozás lépései</span></pre>
       <table>
         <tr><th></th><th>step</th><th>input</th><th>output</th><th>execution_style</th></tr>
         <tr><td>0</td><td>extract</td><td>landing CSV files</td><td>pandas DataFrame</td><td>batch</td></tr>
@@ -1502,8 +1534,8 @@ stream_batches = [
     <span class="fn">print</span>(<span class="str">f"micro-batch {batch_id} feldolgozva | bronze: {len(all_bronze)} | silver: {len(all_silver)} | gold: {len(all_gold)}"</span>)</pre></div>
     <div class="output-area" id="out-s25a">
       <div class="output-label">Output:</div>
-      <pre>micro-batch 1 feldolgozva | bronze: 2 | silver: 2 | gold: 2
-micro-batch 2 feldolgozva | bronze: 4 | silver: 4 | gold: 3</pre>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">micro-batch 1 feldolgozva</span> <span class="log-dim">| bronze:</span> <span class="log-ok">2</span> <span class="log-dim">| silver:</span> <span class="log-ok">2</span> <span class="log-dim">| gold:</span> <span class="log-ok">2</span>
+<span class="log-delta">[delta]</span> <span class="log-ok">micro-batch 2 feldolgozva</span> <span class="log-dim">| bronze:</span> <span class="log-ok">4</span> <span class="log-dim">| silver:</span> <span class="log-ok">4</span> <span class="log-dim">| gold:</span> <span class="log-ok">3</span></pre>
     </div>
   </div>
 
@@ -1513,6 +1545,7 @@ micro-batch 2 feldolgozva | bronze: 4 | silver: 4 | gold: 3</pre>
 DeltaTable(<span class="fn">str</span>(stream_bronze_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <div class="output-area" id="out-s25b">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Bronze stream tábla – 4 sor</span></pre>
       <table>
         <tr><th></th><th>order_id</th><th>customer_id</th><th>gross_amount_huf</th><th>discount_pct</th><th>order_date</th><th>channel</th><th>_batch_id</th></tr>
         <tr><td>0</td><td>4001</td><td>C-030</td><td>12900</td><td>0</td><td>2026-05-08</td><td>webshop</td><td>1</td></tr>
@@ -1529,6 +1562,7 @@ DeltaTable(<span class="fn">str</span>(stream_bronze_path)).to_pandas().sort_val
 DeltaTable(<span class="fn">str</span>(stream_gold_path)).to_pandas()</pre></div>
     <div class="output-area" id="out-s25c">
       <div class="output-label">Output:</div>
+      <pre><span class="log-delta">[delta]</span> <span class="log-ok">Gold stream KPI tábla – 4 sor</span></pre>
       <table>
         <tr><th></th><th>order_date</th><th>channel</th><th>order_count</th><th>gross_amount_huf</th><th>net_amount_huf</th></tr>
         <tr><td>0</td><td>2026-05-08</td><td>partner</td><td>1</td><td>8490</td><td>8066</td></tr>
