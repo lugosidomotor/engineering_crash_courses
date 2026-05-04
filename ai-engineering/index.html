@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineering &mdash; Crash Course</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --bg-code: #0d1117;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --purple: #b366ff;
+  --yellow: #ffd700;
+  --red: #ff4466;
+  --text: #e0e0e8;
+  --text-dim: #888899;
+  --border: #2a2a3a;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --gold: #ffd700;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+}
+
+/* ── Progress bar ── */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px; z-index:1000;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--yellow));
+  transition: width .4s ease;
+  width: 0%;
+}
+
+/* ── Header ── */
+header {
+  position: fixed; top:0; left:0; right:0; z-index:900;
+  background: rgba(10,10,15,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 30px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+header h1 {
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-actions { display:flex; gap:10px; align-items:center; }
+.btn {
+  padding: 7px 18px; border-radius: 6px; border:none; cursor:pointer;
+  font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600;
+  transition: all .2s;
+}
+.btn-run-all {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000;
+}
+.btn-run-all:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,136,.3); }
+.btn-reset {
+  background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border);
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+#progress-text { color: var(--text-dim); font-size: .8rem; }
+
+/* ── Side nav ── */
+#side-nav {
+  position: fixed; left:0; top:60px; bottom:0; width:260px; z-index:800;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 20px 0;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+#side-nav::-webkit-scrollbar { width:4px; }
+#side-nav::-webkit-scrollbar-thumb { background: var(--border); }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; font-size: .78rem; color: var(--text-dim);
+  text-decoration: none; transition: all .15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.completed { color: var(--green); border-left-color: var(--green); }
+.nav-item.active { color: var(--cyan); background: rgba(0,212,255,.05); border-left-color: var(--cyan); }
+.nav-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height:22px; border-radius: 50%; font-size: .65rem;
+  background: var(--bg3); font-weight: 700;
+}
+.nav-item.completed .nav-num { background: var(--green); color: #000; }
+
+/* ── Main content ── */
+main {
+  margin-left: 260px; padding: 80px 40px 60px 40px;
+  max-width: 960px;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 60px;
+  border-left: 4px solid var(--border);
+  padding-left: 24px;
+  scroll-margin-top: 80px;
+}
+.section.layer-bronze { border-left-color: var(--bronze); }
+.section.layer-silver { border-left-color: var(--silver); }
+.section.layer-gold { border-left-color: var(--gold); }
+.section.layer-general { border-left-color: var(--cyan); }
+.section.layer-intro { border-left-color: var(--purple); }
+
+.section-number {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 4px;
+}
+.layer-bronze .section-number { color: var(--bronze); }
+.layer-silver .section-number { color: var(--silver); }
+.layer-gold .section-number { color: var(--gold); }
+.layer-general .section-number { color: var(--cyan); }
+.layer-intro .section-number { color: var(--purple); }
+
+.section h2 {
+  font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;
+  color: #fff;
+}
+.section h3 {
+  font-size: 1.1rem; font-weight: 600; margin: 20px 0 10px;
+  color: var(--cyan);
+}
+
+/* ── Markdown cells ── */
+.md-cell {
+  margin-bottom: 16px; line-height: 1.8;
+}
+.md-cell p { margin-bottom: 12px; }
+.md-cell strong { color: #fff; }
+.md-cell code {
+  background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  color: var(--cyan);
+}
+.md-cell pre {
+  background: var(--bg-code); padding: 16px; border-radius: 8px;
+  overflow-x: auto; margin: 12px 0; font-size: .85rem;
+  border: 1px solid var(--border);
+}
+.md-cell pre code { background:none; padding:0; color: var(--green); }
+
+/* ── Tables ── */
+table {
+  width:100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem;
+}
+th {
+  background: var(--bg3); padding: 10px 12px; text-align: left;
+  font-weight: 600; color: var(--cyan); border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+tr:hover td { background: rgba(0,212,255,.05); }
+
+/* ── Code cells ── */
+.code-cell {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+.code-cell.running { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,.15); }
+.code-cell.has-output { border-color: rgba(0,255,136,.2); }
+
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-header span { font-size: .75rem; color: var(--text-dim); }
+.cell-number { font-family: 'JetBrains Mono', monospace; color: var(--purple); font-weight:700; }
+
+.run-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 5px; border: 1px solid var(--green);
+  background: transparent; color: var(--green);
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  cursor: pointer; transition: all .2s;
+}
+.run-btn:hover { background: var(--green); color: #000; }
+.run-btn.running-btn {
+  border-color: var(--cyan); color: var(--cyan);
+  animation: pulse 1s infinite;
+}
+.run-btn.done-btn { border-color: var(--text-dim); color: var(--text-dim); cursor:default; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.code-body {
+  padding: 16px; overflow-x: auto;
+}
+.code-body pre {
+  margin:0; font-family: 'JetBrains Mono', monospace;
+  font-size: .84rem; line-height: 1.6; color: #e6e6e6;
+  white-space: pre; overflow-x: auto;
+}
+
+/* Syntax highlighting */
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cm { color: #6272a4; }
+.num { color: #bd93f9; }
+.op { color: #ff79c6; }
+.var { color: #8be9fd; }
+.type { color: #ffb86c; }
+
+/* ── Output area ── */
+.output-area {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  max-height: 0; overflow: hidden;
+  transition: max-height .6s ease, padding .3s;
+}
+.output-area.visible {
+  max-height: 3000px; padding: 16px;
+}
+.output-label {
+  font-size: .7rem; color: var(--text-dim); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+
+.output-area pre {
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+  white-space: pre-wrap; color: var(--green); margin: 0;
+}
+.output-area table { margin: 8px 0; }
+.output-area th { background: rgba(0,212,255,.1); color: var(--cyan); font-size: .8rem; }
+.output-area td { font-size: .82rem; }
+
+/* ── Tool logos inline ── */
+.tool-logo {
+  height: 20px; width: 20px; vertical-align: middle;
+  display: inline-block; margin-right: 4px;
+  filter: brightness(0) invert(1) opacity(.7);
+}
+.tool-logo-bright { filter: none; }
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg3); padding: 3px 10px; border-radius: 20px;
+  font-size: .75rem; color: var(--text-dim); margin: 2px 4px 2px 0;
+  border: 1px solid var(--border);
+}
+.tool-badge img { height:14px; width:14px; filter: brightness(0) invert(1); }
+
+/* ── Architecture diagram ── */
+.arch-flow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 16px 0; justify-content: center;
+}
+.arch-step {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px; text-align: center;
+  min-width: 100px; transition: all .2s;
+}
+.arch-step:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.arch-step .label { font-size: .75rem; color: var(--cyan); font-weight: 600; }
+.arch-step .detail { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
+.arch-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+/* ── Callout boxes ── */
+.callout {
+  background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2);
+  border-radius: 8px; padding: 16px; margin: 16px 0;
+}
+.callout.warning {
+  background: rgba(255,136,0,.05); border-color: rgba(255,136,0,.2);
+}
+.callout.success {
+  background: rgba(0,255,136,.05); border-color: rgba(0,255,136,.2);
+}
+.callout-title { font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+.callout.warning .callout-title { color: var(--orange); }
+.callout.success .callout-title { color: var(--green); }
+
+/* ── Star schema diagram ── */
+.star-schema {
+  display: flex; align-items: center; justify-content: center;
+  gap: 30px; flex-wrap: wrap; margin: 20px 0;
+}
+.star-entity {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 20px; text-align: center;
+  min-width: 120px;
+}
+.star-entity.fact { border-color: var(--yellow); background: rgba(255,215,0,.05); }
+.star-entity.dim { border-color: var(--cyan); background: rgba(0,212,255,.05); }
+.star-entity .entity-name { font-weight: 700; font-size: .9rem; }
+.star-entity.fact .entity-name { color: var(--yellow); }
+.star-entity.dim .entity-name { color: var(--cyan); }
+.star-entity .entity-cols { font-size: .7rem; color: var(--text-dim); margin-top: 4px; }
+.star-arrow { color: var(--text-dim); font-size: 1.5rem; }
+
+/* ── Layer badges ── */
+.layer-badge {
+  display: inline-block; padding: 2px 10px; border-radius: 4px;
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.layer-badge.bronze { background: rgba(205,127,50,.15); color: var(--bronze); border: 1px solid var(--bronze); }
+.layer-badge.silver { background: rgba(192,192,192,.1); color: var(--silver); border: 1px solid var(--silver); }
+.layer-badge.gold { background: rgba(255,215,0,.1); color: var(--gold); border: 1px solid var(--gold); }
+.layer-badge.landing { background: rgba(136,136,153,.1); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+/* ── Hero section ── */
+.hero {
+  text-align: center; padding: 40px 0 60px; margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--green), var(--yellow));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }
+.hero-tools {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+}
+.hero-tool {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.hero-tool img { width:36px; height:36px; filter: brightness(0) invert(1) opacity(.85); }
+.hero-tool span { font-size: .65rem; color: var(--text-dim); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #side-nav { display: none; }
+  main { margin-left:0; padding: 80px 16px 40px; }
+  .hero h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <h1>&lt;/&gt; AI Engineering</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 28 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>LLM alkalmazások fejlesztése RAG-pipeline-nal <span class="tool-badge"><img src="assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell"><p>Ez a kurzus azt mutatja meg, hogyan építs <strong>LLM-re épülő alkalmazásokat</strong> a prototípustól az éles üzemeltetésig.</p><pre><code>RAG = Retrieval-Augmented Generation
+= a modell nem csak a saját tudásából válaszol,
+  hanem egy dokumentumtárból is keres releváns információt</code></pre><p>Nem modelleket tanítunk &mdash; <strong>alkalmazásokat építünk</strong> meglévő LLM-ek (OpenAI GPT, Anthropic Claude) köré.</p><div class="callout"><div class="callout-title">Miről szól?</div><p>LLM API &rarr; Prompt engineering &rarr; Embeddingek &rarr; Vektoradatbázis &rarr; RAG pipeline &rarr; Evaluáció &rarr; Monitoring &rarr; Éles üzem</p></div></div>
+</div>
+<div class="section layer-intro" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Fogalmi térkép: AI Engineering alapfogalmak</h2>
+  <table><tr><th>Fogalom</th><th>Röviden</th><th>Miért fontos?</th></tr><tr><td>Generative AI</td><td>Szöveget, képet, kódot generáló modellek</td><td>Ezek alkotják a technológiai alapot</td></tr><tr><td>LLM</td><td>Large Language Model &mdash; nagy nyelvi modell</td><td>GPT-4, Claude, Gemini &mdash; a fő "motor"</td></tr><tr><td>Token</td><td>A modell legkisebb feldolgozó egysége</td><td>A token szám határozza meg az árat és limitet</td></tr><tr><td>Prompt</td><td>Utasítás a modellnek</td><td>A prompt minősége a válasz minősége</td></tr><tr><td>RAG</td><td>Retrieval-Augmented Generation</td><td>A modell külső tudásbázist használ</td></tr><tr><td>Embedding</td><td>Szöveg &rarr; számsorozat (vektor)</td><td>Hasonlósági keresés alapja</td></tr><tr><td>Vector DB</td><td>Vektorok tárolására optimalizált DB</td><td>Chroma, FAISS, Weaviate, Pinecone</td></tr><tr><td>Chunking</td><td>Dokumentumok darabolása</td><td>Nem lehet egy 200 oldalas PDF-et egyszerre embed</td></tr><tr><td>Hallucination</td><td>A modell hihető de hamis választ ad</td><td>Az eval pipeline ezt hivatott észrevenni</td></tr><tr><td>Fine-tuning</td><td>Modell továbbtanítása saját adaton</td><td>Nem prompt &mdash; a súlyok módosulnak</td></tr><tr><td>Agent</td><td>LLM ami eszközöket használ</td><td>Autonóm feladat-végrehajtás</td></tr></table>
+</div>
+<div class="section layer-intro" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Architektúra-térkép</h2>
+  <div class="md-cell"><p>Egy AI alkalmazás rétegei:</p><div class="arch-flow"><div class="arch-step"><strong>User Query</strong><div class="detail">Felhasználói kérdés</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Embedding</strong><div class="detail">Szöveg &rarr; vektor</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Retrieval</strong><div class="detail">Vector DB keresés</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Context</strong><div class="detail">Kontextus összeállítás</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>LLM API</strong><div class="detail">GPT-4 / Claude hívás</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Response</strong><div class="detail">Válasz</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Eval</strong><div class="detail">Minőség</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Monitor</strong><div class="detail">Éles figyelés</div></div></div><table><tr><th>Réteg</th><th>Tipikus eszköz</th><th>Feladat</th></tr><tr><td>Embedding</td><td>text-embedding-3-small</td><td>Szöveg &rarr; vektor</td></tr><tr><td>Vector Store</td><td>ChromaDB, FAISS</td><td>Hasonlósági keresés</td></tr><tr><td>LLM API</td><td>OpenAI, Anthropic</td><td>Generálás</td></tr><tr><td>Framework</td><td>LangChain, LlamaIndex</td><td>Orchesztráció</td></tr><tr><td>Evaluáció</td><td>Promptfoo, Braintrust</td><td>Minőség</td></tr><tr><td>Monitoring</td><td>Grafana, Streamlit</td><td>Figyelés</td></tr></table></div>
+</div>
+<div class="section layer-intro" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Környezet beállítása</h2>
+  <div class="code-cell" id="cell-s3"><div class="code-header"><span class="cell-number">[s3]</span><button class="run-btn" onclick="runCell('s3')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Szükséges csomagok</span>
+pip install openai langchain chromadb tiktoken python-dotenv</pre></div><div class="output-area" id="out-s3"><div class="output-label">Output:</div><pre>Successfully installed openai-1.30.1 langchain-0.2.1 chromadb-0.5.0 tiktoken-0.7.0</pre></div></div><div class="code-cell" id="cell-s3b"><div class="code-header"><span class="cell-number">[s3b]</span><button class="run-btn" onclick="runCell('s3b')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># API kulcs</span>
+<span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+load_dotenv()
+key = os.getenv(<span class="str">"OPENAI_API_KEY"</span>)
+<span class="fn">print</span>(<span class="str">f"Configured: ...{key[-4:]}"</span>)</pre></div><div class="output-area" id="out-s3b"><div class="output-label">Output:</div><pre>Configured: ...aX3k</pre></div></div>
+</div>
+<div class="section layer-intro" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>OpenAI API alapok <span class="tool-badge"><img src="assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell"><p>A Chat Completions API: <strong>system</strong> (utasítás), <strong>user</strong> (kérdés), <strong>assistant</strong> (válasz).</p></div><div class="code-cell" id="cell-s4"><div class="code-header"><span class="cell-number">[s4]</span><button class="run-btn" onclick="runCell('s4')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+client = OpenAI()
+response = client.chat.completions.create(
+    model=<span class="str">"gpt-4o"</span>,
+    messages=[
+        {<span class="str">"role"</span>:<span class="str">"system"</span>,<span class="str">"content"</span>:<span class="str">"Te egy segítőkész AI asszisztens vagy."</span>},
+        {<span class="str">"role"</span>:<span class="str">"user"</span>,<span class="str">"content"</span>:<span class="str">"Mi az a RAG?"</span>},
+    ],
+    temperature=<span class="num">0.7</span>,
+)
+<span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content[:200])</pre></div><div class="output-area" id="out-s4"><div class="output-label">Output:</div><pre>A RAG (Retrieval-Augmented Generation) egy technika, ahol a nyelvi modell válaszadás előtt külső dokumentumokból keres releváns információt. Ezáltal a válaszok pontosabbak lesznek.</pre></div></div><div class="code-cell" id="cell-s4b"><div class="code-header"><span class="cell-number">[s4b]</span><button class="run-btn" onclick="runCell('s4b')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">import</span> tiktoken
+enc = tiktoken.encoding_for_model(<span class="str">"gpt-4o"</span>)
+tokens = enc.encode(<span class="str">"Mi az a RAG?"</span>)
+<span class="fn">print</span>(<span class="str">f"Tokenek: {len(tokens)}, ID-k: {tokens}"</span>)</pre></div><div class="output-area" id="out-s4b"><div class="output-label">Output:</div><pre>Tokenek: 5, ID-k: [39073, 1311, 505, 389, 1208, 30]</pre></div></div>
+</div>
+<div class="section layer-intro" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>Prompt Engineering stratégiák</h2>
+  <table><tr><th>Stratégia</th><th>Leírás</th><th>Mikor?</th></tr><tr><td>Zero-shot</td><td>Csak utasítás, példa nélkül</td><td>Egyszerű</td></tr><tr><td>Few-shot</td><td>2-3 példa</td><td>Formátum, stílus</td></tr><tr><td>Chain-of-thought</td><td>Lépésről lépésre</td><td>Komplex érvelés</td></tr><tr><td>System prompt</td><td>Rendszer-utasítás</td><td>Személyiség</td></tr><tr><td>Template</td><td>Újrafelhasználható sablon</td><td>Produkció</td></tr></table><div class="code-cell" id="cell-s5"><div class="code-header"><span class="cell-number">[s5]</span><button class="run-btn" onclick="runCell('s5')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Few-shot példa</span>
+response = client.chat.completions.create(
+    model=<span class="str">"gpt-4o"</span>,
+    messages=[
+        {<span class="str">"role"</span>:<span class="str">"system"</span>,<span class="str">"content"</span>:<span class="str">"Osztályozd: pozitív/negatív"</span>},
+        {<span class="str">"role"</span>:<span class="str">"user"</span>,<span class="str">"content"</span>:<span class="str">"Nagyszerű!"</span>},
+        {<span class="str">"role"</span>:<span class="str">"assistant"</span>,<span class="str">"content"</span>:<span class="str">"pozitív"</span>},
+        {<span class="str">"role"</span>:<span class="str">"user"</span>,<span class="str">"content"</span>:<span class="str">"Rossz minőség."</span>},
+        {<span class="str">"role"</span>:<span class="str">"assistant"</span>,<span class="str">"content"</span>:<span class="str">"negatív"</span>},
+        {<span class="str">"role"</span>:<span class="str">"user"</span>,<span class="str">"content"</span>:<span class="str">"Kiváló ár-érték."</span>},
+    ]
+)
+<span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content)</pre></div><div class="output-area" id="out-s5"><div class="output-label">Output:</div><pre>pozitív</pre></div></div>
+</div>
+<div class="section layer-intro" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Embeddingek és vektorok</h2>
+  <div class="md-cell"><p>Az embedding <strong>szöveget vektorrá</strong> alakít. Hasonló szövegek &rarr; hasonló vektorok.</p><pre><code>"kutya" &rarr; [0.12, -0.34, 0.56, ...] # 1536 dimenzió
+"cica"  &rarr; [0.11, -0.33, 0.55, ...] # nagyon hasonló!
+"autó"  &rarr; [0.45, 0.89, -0.12, ...]  # teljesen más</code></pre></div><div class="code-cell" id="cell-s6"><div class="code-header"><span class="cell-number">[s6]</span><button class="run-btn" onclick="runCell('s6')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+texts=[<span class="str">"A kutyák hűségesek"</span>,<span class="str">"A macskák függetlenek"</span>,<span class="str">"A Python nyelv"</span>]
+resp=client.embeddings.create(input=texts,model=<span class="str">"text-embedding-3-small"</span>)
+vecs=[d.embedding <span class="kw">for</span> d <span class="kw">in</span> resp.data]
+<span class="fn">print</span>(<span class="str">f"Dim: {len(vecs[0])}"</span>)
+<span class="kw">def</span> <span class="fn">cs</span>(a,b): <span class="kw">return</span> np.dot(a,b)/(np.linalg.norm(a)*np.linalg.norm(b))
+<span class="fn">print</span>(<span class="str">f"kutya&harr;macska: {cs(vecs[0],vecs[1]):.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"kutya&harr;python: {cs(vecs[0],vecs[2]):.4f}"</span>)</pre></div><div class="output-area" id="out-s6"><div class="output-label">Output:</div><pre>Dim: 1536
+kutya&harr;macska: 0.7823
+kutya&harr;python: 0.3214</pre></div></div>
+</div>
+<div class="section layer-intro" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Vektoradatbázis: ChromaDB <span class="tool-badge"><img src="assets/logos/chroma.svg">Chroma</span></h2>
+  <div class="code-cell" id="cell-s7"><div class="code-header"><span class="cell-number">[s7]</span><button class="run-btn" onclick="runCell('s7')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">import</span> chromadb
+cl=chromadb.Client()
+col=cl.create_collection(<span class="str">"docs"</span>)
+col.add(
+    documents=[<span class="str">"A Delta table nyílt formátum"</span>,<span class="str">"A RAG pipeline dokumentumokból keres"</span>,<span class="str">"Az MLflow modelleket követi"</span>],
+    ids=[<span class="str">"d1"</span>,<span class="str">"d2"</span>,<span class="str">"d3"</span>]
+)
+res=col.query(query_texts=[<span class="str">"Mi az a RAG?"</span>],n_results=<span class="num">2</span>)
+<span class="kw">for</span> doc,d <span class="kw">in</span> <span class="fn">zip</span>(res[<span class="str">"documents"</span>][<span class="num">0</span>],res[<span class="str">"distances"</span>][<span class="num">0</span>]):
+    <span class="fn">print</span>(<span class="str">f"  [{d:.4f}] {doc}"</span>)</pre></div><div class="output-area" id="out-s7"><div class="output-label">Output:</div><pre>[0.2134] A RAG pipeline dokumentumokból keres
+[0.4521] A Delta table nyílt formátum</pre></div></div>
+</div>
+<div class="section layer-intro" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>RAG Pipeline: dokumentum &rarr; válasz</h2>
+  <div class="md-cell"><p>A RAG pipeline <strong>5 lépése</strong>:</p><div class="arch-flow"><div class="arch-step"><strong>Load</strong><div class="detail">Betöltés</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Chunk</strong><div class="detail">Darabolás</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Embed</strong><div class="detail">Vektorizálás</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Retrieve</strong><div class="detail">Keresés</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Generate</strong><div class="detail">LLM válasz</div></div></div></div><div class="code-cell" id="cell-s8"><div class="code-header"><span class="cell-number">[s8]</span><button class="run-btn" onclick="runCell('s8')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Egyszerű RAG</span>
+docs=[<span class="str">"A cég 2025-ös bevétele 150M Ft, 12% növekedés."</span>,
+      <span class="str">"A DataSync Pro a legnépszerűbb, 45% részesedés."</span>,
+      <span class="str">"120 alkalmazott, ebből 40 mérnök."</span>]
+col2=cl.create_collection(<span class="str">"co"</span>)
+col2.add(documents=docs,ids=[<span class="str">f"d{i}"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>)])
+q=<span class="str">"Mennyi a bevétel?"</span>
+res=col2.query(query_texts=[q],n_results=<span class="num">2</span>)
+ctx=<span class="str">"\n"</span>.join(res[<span class="str">"documents"</span>][<span class="num">0</span>])
+<span class="fn">print</span>(<span class="str">f"Retrieved: {ctx[:80]}..."</span>)
+<span class="fn">print</span>(<span class="str">f"Answer: A cég 150M Ft bevételt ért el 2025-ben."</span>)</pre></div><div class="output-area" id="out-s8"><div class="output-label">Output:</div><pre>Retrieved: A cég 2025-ös bevétele 150M Ft, 12% növekedés....
+Answer: A cég 150M Ft bevételt ért el 2025-ben.</pre></div></div>
+</div>
+<div class="section layer-intro" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Retrieval stratégiák</h2>
+  <table><tr><th>Stratégia</th><th>Leírás</th><th>Előny</th></tr><tr><td>Top-K</td><td>Legközelebbi K vektor</td><td>Egyszerű, gyors</td></tr><tr><td>MMR</td><td>Max Marginal Relevance</td><td>Diverzitás</td></tr><tr><td>Hybrid</td><td>Szöveg + vektor</td><td>Jobb recall</td></tr><tr><td>Reranking</td><td>Cross-encoder</td><td>Pontosabb</td></tr><tr><td>Overlap</td><td>Chunking átfedéssel</td><td>Nem vész kontextus</td></tr></table><div class="code-cell" id="cell-s9"><div class="code-header"><span class="cell-number">[s9]</span><button class="run-btn" onclick="runCell('s9')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">def</span> <span class="fn">chunk</span>(text,sz=<span class="num">200</span>,ov=<span class="num">50</span>):
+    c=[];s=<span class="num">0</span>
+    <span class="kw">while</span> s&lt;<span class="fn">len</span>(text): c.append(text[s:s+sz]);s+=sz-ov
+    <span class="kw">return</span> c
+chunks=chunk(<span class="str">"Delta Lake..."</span>*<span class="num">10</span>)
+<span class="fn">print</span>(<span class="str">f"Chunks: {len(chunks)}, Size: {len(chunks[0])}"</span>)</pre></div><div class="output-area" id="out-s9"><div class="output-label">Output:</div><pre>Chunks: 8, Size: 200</pre></div></div>
+</div>
+<div class="section layer-intro" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>RAG Evaluáció: RAGAS metrikák</h2>
+  <table><tr><th>Metrika</th><th>Mit mér?</th><th>Jó érték</th></tr><tr><td>Faithfulness</td><td>Válasz hű-e a kontextushoz</td><td>&gt; 0.9</td></tr><tr><td>Answer Relevancy</td><td>Válasz releváns-e</td><td>&gt; 0.8</td></tr><tr><td>Context Precision</td><td>Kontextus releváns-e</td><td>&gt; 0.8</td></tr><tr><td>Context Recall</td><td>Minden infó megvan-e</td><td>&gt; 0.7</td></tr></table><div class="code-cell" id="cell-s10"><div class="code-header"><span class="cell-number">[s10]</span><button class="run-btn" onclick="runCell('s10')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Eval eredmények</span>
+<span class="fn">print</span>(<span class="str">"RAGAS scores:"</span>)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><table><tr><th>question</th><th>faith</th><th>rel</th><th>prec</th><th>recall</th></tr><tr><td>Bevétel?</td><td>0.95</td><td>0.91</td><td>0.87</td><td>0.80</td></tr><tr><td>Alkalmazott?</td><td>0.92</td><td>0.85</td><td>0.90</td><td>0.78</td></tr><tr><td>Fő termék?</td><td>0.88</td><td>0.93</td><td>0.82</td><td>0.85</td></tr></table></div></div>
+</div>
+<div class="section layer-intro" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>LLM Evaluáció: Promptfoo és Braintrust</h2>
+  <table><tr><th>Eszköz</th><th>Típus</th><th>Mire jó?</th></tr><tr><td>Promptfoo</td><td>CLI</td><td>Prompt verziók</td></tr><tr><td>Braintrust</td><td>Cloud</td><td>Eval CI/CD-be</td></tr><tr><td>Arize Phoenix</td><td>Observability</td><td>Tracing</td></tr></table><div class="code-cell" id="cell-s11"><div class="code-header"><span class="cell-number">[s11]</span><button class="run-btn" onclick="runCell('s11')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Promptfoo test</span>
+<span class="fn">print</span>(<span class="str">"Prompt A vs B:"</span>)</pre></div><div class="output-area" id="out-s11"><div class="output-label">Output:</div><pre>Prompt A vs B:
+Test           | A     | B
+Mi az a RAG?   | PASS  | PASS
+Mennyi 2+2?    | PASS  | FAIL
+Petőfi?        | PASS  | PASS
+Pass rate: A=100% B=67%</pre></div></div>
+</div>
+<div class="section layer-intro" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>LangChain alapok <span class="tool-badge"><img src="assets/logos/langchain.svg">LangChain</span></h2>
+  <div class="md-cell"><p>A <strong>LangChain</strong> a legnépszerűbb LLM framework: chains, prompts, output parsers, LCEL.</p></div><div class="code-cell" id="cell-s12"><div class="code-header"><span class="cell-number">[s12]</span><button class="run-btn" onclick="runCell('s12')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+<span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
+<span class="kw">from</span> langchain_core.output_parsers <span class="kw">import</span> StrOutputParser
+
+llm=ChatOpenAI(model=<span class="str">"gpt-4o"</span>)
+prompt=ChatPromptTemplate.from_messages([
+    (<span class="str">"system"</span>,<span class="str">"Válaszolj röviden."</span>),(<span class="str">"user"</span>,<span class="str">"{q}"</span>),
+])
+chain=prompt|llm|StrOutputParser()
+resp=chain.invoke({<span class="str">"q"</span>:<span class="str">"Mi a vektoradatbázis?"</span>})
+<span class="fn">print</span>(resp[:<span class="num">200</span>])</pre></div><div class="output-area" id="out-s12"><div class="output-label">Output:</div><pre>Egy vektoradatbázis nagy dimenziós vektorok tárolására optimalizált adatbázis. AI alkalmazásokban használják tartalom-alapú keresésre.</pre></div></div>
+</div>
+<div class="section layer-intro" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>LangChain: agents, tools, memory</h2>
+  <div class="code-cell" id="cell-s13"><div class="code-header"><span class="cell-number">[s13]</span><button class="run-btn" onclick="runCell('s13')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Tools</span>
+<span class="kw">from</span> langchain_core.tools <span class="kw">import</span> tool
+
+@tool
+<span class="kw">def</span> <span class="fn">search_docs</span>(q:<span class="fn">str</span>)-><span class="fn">str</span>:
+    <span class="str">"""Keresés céges dokumentumtárban."""</span>
+    <span class="kw">return</span> <span class="str">"Eredmény..."</span>
+
+@tool
+<span class="kw">def</span> <span class="fn">calc</span>(expr:<span class="fn">str</span>)-><span class="fn">str</span>:
+    <span class="str">"""Matematikai kifejezés."""</span>
+    <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">eval</span>(expr))
+
+<span class="fn">print</span>(<span class="str">"Tools: search_docs, calc"</span>)</pre></div><div class="output-area" id="out-s13"><div class="output-label">Output:</div><pre>Tools: search_docs, calc</pre></div></div><div class="code-cell" id="cell-s13b"><div class="code-header"><span class="cell-number">[s13b]</span><button class="run-btn" onclick="runCell('s13b')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Agent</span>
+tools=[search_docs,calc]
+agent=create_tool_calling_agent(llm,tools,prompt)
+<span class="fn">print</span>(<span class="str">f"Agent kész ({len(tools)} tool)"</span>)</pre></div><div class="output-area" id="out-s13b"><div class="output-label">Output:</div><pre>Agent kész (2 tool)</pre></div></div>
+</div>
+<div class="section layer-intro" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Monitoring és cost tracking <span class="tool-badge"><img src="assets/logos/grafana.svg">Grafana</span></h2>
+  <div class="md-cell"><p>Éles üzemben: token usage, latency, quality score.</p></div><div class="code-cell" id="cell-s14"><div class="code-header"><span class="cell-number">[s14]</span><button class="run-btn" onclick="runCell('s14')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># LLM metrikák</span>
+<span class="fn">print</span>(<span class="str">f"Összköltség: $0.0543"</span>)
+<span class="fn">print</span>(<span class="str">f"Átl latency: 1054ms"</span>)</pre></div><div class="output-area" id="out-s14"><div class="output-label">Output:</div><table><tr><th></th><th>time</th><th>model</th><th>tok_in</th><th>tok_out</th><th>lat_ms</th><th>cost</th></tr><tr><td>0</td><td>10:01</td><td>gpt-4o</td><td>245</td><td>156</td><td>890</td><td>$0.009</td></tr><tr><td>1</td><td>10:02</td><td>gpt-4o</td><td>312</td><td>203</td><td>1230</td><td>$0.012</td></tr><tr><td>2</td><td>10:03</td><td>gpt-4o</td><td>189</td><td>98</td><td>670</td><td>$0.006</td></tr><tr><td>3</td><td>10:04</td><td>gpt-4o</td><td>456</td><td>312</td><td>1560</td><td>$0.018</td></tr><tr><td>4</td><td>10:05</td><td>gpt-4o</td><td>278</td><td>167</td><td>920</td><td>$0.009</td></tr></table></div></div>
+</div>
+<div class="section layer-intro" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Streamlit chat interface <span class="tool-badge"><img src="assets/logos/streamlit.svg">Streamlit</span></h2>
+  <div class="code-cell" id="cell-s15"><div class="code-header"><span class="cell-number">[s15]</span><button class="run-btn" onclick="runCell('s15')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># app.py</span>
+<span class="kw">import</span> streamlit <span class="kw">as</span> st
+st.title(<span class="str">"RAG Chatbot"</span>)
+<span class="kw">if</span> prompt := st.chat_input(<span class="str">"Kérdezz..."</span>):
+    resp=rag.query(prompt)
+    st.session_state.msgs.append({<span class="str">"role"</span>:<span class="str">"assistant"</span>,<span class="str">"content"</span>:resp})</pre></div><div class="output-area" id="out-s15"><div class="output-label">Output:</div><pre>$ streamlit run app.py
+Local URL: http://localhost:8501</pre></div></div>
+</div>
+<div class="section layer-intro" id="s16">
+  <div class="section-number">Section 16</div>
+  <h2>Összefoglalás</h2>
+  <div class="callout success"><div class="callout-title">Megtanultad:</div><p>✅ OpenAI API, tokenek, temperature<br>✅ Prompt engineering: zero-shot, few-shot, CoT<br>✅ Embeddingek: text→vector, cosine similarity<br>✅ ChromaDB: similarity search<br>✅ RAG pipeline: load→chunk→embed→retrieve→generate<br>✅ RAGAS metrikák, Promptfoo<br>✅ LangChain: chains, agents, tools<br>✅ Monitoring: token, latency, cost<br>✅ Streamlit: chat UI</p></div>
+</div>
+</main>
+
+<script>
+// ── State ──
+const completedSections = new Set();
+const allCellIds = [];
+let runAllRunning = false;
+
+// ── Navigation ──
+function buildNav() {
+  const nav = document.getElementById('side-nav');
+  const sections = document.querySelectorAll('.section');
+  const tocData = [
+    {id:'s0',num:'00',label:'Intro: LLM és RAG'},
+    {id:'s1',num:'01',label:'Fogalmi térkép'},
+    {id:'s2',num:'02',label:'Architektúra-térkép'},
+    {id:'s3',num:'03',label:'Környezet'},
+    {id:'s4',num:'04',label:'OpenAI API'},
+    {id:'s5',num:'05',label:'Prompt Engineering'},
+    {id:'s6',num:'06',label:'Embeddingek'},
+    {id:'s7',num:'07',label:'Vektoradatbázis'},
+    {id:'s8',num:'08',label:'RAG Pipeline'},
+    {id:'s9',num:'09',label:'Retrieval stratégiák'},
+    {id:'s10',num:'10',label:'RAG Evaluáció'},
+    {id:'s11',num:'11',label:'LLM Evaluáció'},
+    {id:'s12',num:'12',label:'LangChain alapok'},
+    {id:'s13',num:'13',label:'LangChain haladó'},
+    {id:'s14',num:'14',label:'Monitoring'},
+    {id:'s15',num:'15',label:'Streamlit UI'},
+    {id:'s16',num:'16',label:'Összefoglalás'}
+  ];
+  
+  nav.innerHTML = tocData.map(item => 
+    `<a href="#${item.id}" class="nav-item" data-section="${item.id}" id="nav-${item.id}">
+      <span class="nav-num">${item.num}</span> ${item.label}
+    </a>`
+  ).join('');
+}
+
+// ── Cell execution ──
+function runCell(cellId) {
+  const cell = document.getElementById('cell-' + cellId);
+  if (!cell) return;
+  const output = document.getElementById('out-' + cellId);
+  if (!output) return;
+  const btn = cell.querySelector('.run-btn');
+  
+  // Already running or done
+  if (cell.classList.contains('running') || btn.classList.contains('done-btn')) return;
+  
+  // Start running
+  cell.classList.add('running');
+  btn.classList.add('running-btn');
+  btn.textContent = '⏳ Running...';
+  
+  // Simulate execution time
+  const delay = 400 + Math.random() * 800;
+  setTimeout(() => {
+    cell.classList.remove('running');
+    cell.classList.add('has-output');
+    btn.classList.remove('running-btn');
+    btn.classList.add('done-btn');
+    btn.textContent = '✓ Done';
+    output.classList.add('visible');
+    
+    // Mark section as completed
+    const section = cell.closest('.section');
+    if (section) {
+      completedSections.add(section.id);
+      const navItem = document.getElementById('nav-' + section.id);
+      if (navItem) navItem.classList.add('completed');
+    }
+    updateProgress();
+  }, delay);
+}
+
+function updateProgress() {
+  const totalSections = document.querySelectorAll('.section').length;
+  const done = completedSections.size;
+  const pct = Math.round((done / totalSections) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} / ${totalSections} section completed`;
+}
+
+// ── Run All ──
+async function runAll() {
+  if (runAllRunning) return;
+  runAllRunning = true;
+  
+  const cells = document.querySelectorAll('.code-cell');
+  for (const cell of cells) {
+    const id = cell.id.replace('cell-', '');
+    const btn = cell.querySelector('.run-btn');
+    if (!btn.classList.contains('done-btn')) {
+      runCell(id);
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+    }
+  }
+  runAllRunning = false;
+}
+
+// ── Reset ──
+function resetAll() {
+  completedSections.clear();
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    cell.classList.remove('running', 'has-output');
+    const id = cell.id.replace('cell-', '');
+    const output = document.getElementById('out-' + id);
+    if (output) output.classList.remove('visible');
+    const btn = cell.querySelector('.run-btn');
+    if (btn) {
+      btn.classList.remove('running-btn', 'done-btn');
+      btn.textContent = '▶ Run';
+    }
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
+  updateProgress();
+}
+
+// ── Scroll spy ──
+function updateActiveNav() {
+  const sections = document.querySelectorAll('.section');
+  let activeId = null;
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 120) activeId = s.id;
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (activeId) {
+    const navItem = document.getElementById('nav-' + activeId);
+    if (navItem) {
+      navItem.classList.add('active');
+      navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+  }
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildNav();
+  updateProgress();
+  
+  // Collect all cell IDs
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    allCellIds.push(cell.id.replace('cell-', ''));
+  });
+  
+  window.addEventListener('scroll', updateActiveNav, {passive: true});
+  updateActiveNav();
+});
+</script>
+</body>
+</html>

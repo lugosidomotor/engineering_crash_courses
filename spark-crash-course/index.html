@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apache Spark &mdash; Crash Course</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --bg-code: #0d1117;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --purple: #b366ff;
+  --yellow: #ffd700;
+  --red: #ff4466;
+  --text: #e0e0e8;
+  --text-dim: #888899;
+  --border: #2a2a3a;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --gold: #ffd700;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+}
+
+/* ── Progress bar ── */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px; z-index:1000;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--yellow));
+  transition: width .4s ease;
+  width: 0%;
+}
+
+/* ── Header ── */
+header {
+  position: fixed; top:0; left:0; right:0; z-index:900;
+  background: rgba(10,10,15,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 30px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+header h1 {
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-actions { display:flex; gap:10px; align-items:center; }
+.btn {
+  padding: 7px 18px; border-radius: 6px; border:none; cursor:pointer;
+  font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600;
+  transition: all .2s;
+}
+.btn-run-all {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000;
+}
+.btn-run-all:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,136,.3); }
+.btn-reset {
+  background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border);
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+#progress-text { color: var(--text-dim); font-size: .8rem; }
+
+/* ── Side nav ── */
+#side-nav {
+  position: fixed; left:0; top:60px; bottom:0; width:260px; z-index:800;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 20px 0;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+#side-nav::-webkit-scrollbar { width:4px; }
+#side-nav::-webkit-scrollbar-thumb { background: var(--border); }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; font-size: .78rem; color: var(--text-dim);
+  text-decoration: none; transition: all .15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.completed { color: var(--green); border-left-color: var(--green); }
+.nav-item.active { color: var(--cyan); background: rgba(0,212,255,.05); border-left-color: var(--cyan); }
+.nav-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height:22px; border-radius: 50%; font-size: .65rem;
+  background: var(--bg3); font-weight: 700;
+}
+.nav-item.completed .nav-num { background: var(--green); color: #000; }
+
+/* ── Main content ── */
+main {
+  margin-left: 260px; padding: 80px 40px 60px 40px;
+  max-width: 960px;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 60px;
+  border-left: 4px solid var(--border);
+  padding-left: 24px;
+  scroll-margin-top: 80px;
+}
+.section.layer-bronze { border-left-color: var(--bronze); }
+.section.layer-silver { border-left-color: var(--silver); }
+.section.layer-gold { border-left-color: var(--gold); }
+.section.layer-general { border-left-color: var(--cyan); }
+.section.layer-intro { border-left-color: var(--purple); }
+
+.section-number {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 4px;
+}
+.layer-bronze .section-number { color: var(--bronze); }
+.layer-silver .section-number { color: var(--silver); }
+.layer-gold .section-number { color: var(--gold); }
+.layer-general .section-number { color: var(--cyan); }
+.layer-intro .section-number { color: var(--purple); }
+
+.section h2 {
+  font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;
+  color: #fff;
+}
+.section h3 {
+  font-size: 1.1rem; font-weight: 600; margin: 20px 0 10px;
+  color: var(--cyan);
+}
+
+/* ── Markdown cells ── */
+.md-cell {
+  margin-bottom: 16px; line-height: 1.8;
+}
+.md-cell p { margin-bottom: 12px; }
+.md-cell strong { color: #fff; }
+.md-cell code {
+  background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  color: var(--cyan);
+}
+.md-cell pre {
+  background: var(--bg-code); padding: 16px; border-radius: 8px;
+  overflow-x: auto; margin: 12px 0; font-size: .85rem;
+  border: 1px solid var(--border);
+}
+.md-cell pre code { background:none; padding:0; color: var(--green); }
+
+/* ── Tables ── */
+table {
+  width:100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem;
+}
+th {
+  background: var(--bg3); padding: 10px 12px; text-align: left;
+  font-weight: 600; color: var(--cyan); border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+tr:hover td { background: rgba(0,212,255,.05); }
+
+/* ── Code cells ── */
+.code-cell {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+.code-cell.running { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,.15); }
+.code-cell.has-output { border-color: rgba(0,255,136,.2); }
+
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-header span { font-size: .75rem; color: var(--text-dim); }
+.cell-number { font-family: 'JetBrains Mono', monospace; color: var(--purple); font-weight:700; }
+
+.run-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 5px; border: 1px solid var(--green);
+  background: transparent; color: var(--green);
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  cursor: pointer; transition: all .2s;
+}
+.run-btn:hover { background: var(--green); color: #000; }
+.run-btn.running-btn {
+  border-color: var(--cyan); color: var(--cyan);
+  animation: pulse 1s infinite;
+}
+.run-btn.done-btn { border-color: var(--text-dim); color: var(--text-dim); cursor:default; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.code-body {
+  padding: 16px; overflow-x: auto;
+}
+.code-body pre {
+  margin:0; font-family: 'JetBrains Mono', monospace;
+  font-size: .84rem; line-height: 1.6; color: #e6e6e6;
+  white-space: pre; overflow-x: auto;
+}
+
+/* Syntax highlighting */
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cm { color: #6272a4; }
+.num { color: #bd93f9; }
+.op { color: #ff79c6; }
+.var { color: #8be9fd; }
+.type { color: #ffb86c; }
+
+/* ── Output area ── */
+.output-area {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  max-height: 0; overflow: hidden;
+  transition: max-height .6s ease, padding .3s;
+}
+.output-area.visible {
+  max-height: 3000px; padding: 16px;
+}
+.output-label {
+  font-size: .7rem; color: var(--text-dim); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+
+.output-area pre {
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+  white-space: pre-wrap; color: var(--green); margin: 0;
+}
+.output-area table { margin: 8px 0; }
+.output-area th { background: rgba(0,212,255,.1); color: var(--cyan); font-size: .8rem; }
+.output-area td { font-size: .82rem; }
+
+/* ── Tool logos inline ── */
+.tool-logo {
+  height: 20px; width: 20px; vertical-align: middle;
+  display: inline-block; margin-right: 4px;
+  filter: brightness(0) invert(1) opacity(.7);
+}
+.tool-logo-bright { filter: none; }
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg3); padding: 3px 10px; border-radius: 20px;
+  font-size: .75rem; color: var(--text-dim); margin: 2px 4px 2px 0;
+  border: 1px solid var(--border);
+}
+.tool-badge img { height:14px; width:14px; filter: brightness(0) invert(1); }
+
+/* ── Architecture diagram ── */
+.arch-flow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 16px 0; justify-content: center;
+}
+.arch-step {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px; text-align: center;
+  min-width: 100px; transition: all .2s;
+}
+.arch-step:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.arch-step .label { font-size: .75rem; color: var(--cyan); font-weight: 600; }
+.arch-step .detail { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
+.arch-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+/* ── Callout boxes ── */
+.callout {
+  background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2);
+  border-radius: 8px; padding: 16px; margin: 16px 0;
+}
+.callout.warning {
+  background: rgba(255,136,0,.05); border-color: rgba(255,136,0,.2);
+}
+.callout.success {
+  background: rgba(0,255,136,.05); border-color: rgba(0,255,136,.2);
+}
+.callout-title { font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+.callout.warning .callout-title { color: var(--orange); }
+.callout.success .callout-title { color: var(--green); }
+
+/* ── Star schema diagram ── */
+.star-schema {
+  display: flex; align-items: center; justify-content: center;
+  gap: 30px; flex-wrap: wrap; margin: 20px 0;
+}
+.star-entity {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 20px; text-align: center;
+  min-width: 120px;
+}
+.star-entity.fact { border-color: var(--yellow); background: rgba(255,215,0,.05); }
+.star-entity.dim { border-color: var(--cyan); background: rgba(0,212,255,.05); }
+.star-entity .entity-name { font-weight: 700; font-size: .9rem; }
+.star-entity.fact .entity-name { color: var(--yellow); }
+.star-entity.dim .entity-name { color: var(--cyan); }
+.star-entity .entity-cols { font-size: .7rem; color: var(--text-dim); margin-top: 4px; }
+.star-arrow { color: var(--text-dim); font-size: 1.5rem; }
+
+/* ── Layer badges ── */
+.layer-badge {
+  display: inline-block; padding: 2px 10px; border-radius: 4px;
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.layer-badge.bronze { background: rgba(205,127,50,.15); color: var(--bronze); border: 1px solid var(--bronze); }
+.layer-badge.silver { background: rgba(192,192,192,.1); color: var(--silver); border: 1px solid var(--silver); }
+.layer-badge.gold { background: rgba(255,215,0,.1); color: var(--gold); border: 1px solid var(--gold); }
+.layer-badge.landing { background: rgba(136,136,153,.1); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+/* ── Hero section ── */
+.hero {
+  text-align: center; padding: 40px 0 60px; margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--green), var(--yellow));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }
+.hero-tools {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+}
+.hero-tool {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.hero-tool img { width:36px; height:36px; filter: brightness(0) invert(1) opacity(.85); }
+.hero-tool span { font-size: .65rem; color: var(--text-dim); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #side-nav { display: none; }
+  main { margin-left:0; padding: 80px 16px 40px; }
+  .hero h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <h1>&lt;/&gt; Apache Spark</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 28 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>Apache Spark: Big Data feldolgozás <span class="tool-badge"><img src="assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>Az <strong>Apache Spark</strong> a big data feldolgozás iparági standardja. Elosztott, in-memory feldolgozás, ami 100x gyorsabb a Hadoop MapReduce-nál.</p></div><div class="callout"><div class="callout-title">Miről szól?</div><p>Spark Session &rarr; RDD &rarr; DataFrame &rarr; SQL &rarr; Streaming &rarr; MLlib &rarr; Optimizer &rarr; Delta Lake</p></div>
+</div>
+<div class="section layer-intro" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Spark alapfogalmak</h2>
+  <table><tr><th>Fogalom</th><th>Leírás</th><th>Fontos</th></tr><tr><td>Spark Session</td><td>A Spark belépési pontja</td><td>Egyetlen objektum, ami mindent kezel</td></tr><tr><td>RDD</td><td>Resilient Distributed Dataset</td><td>Alacsony szintű API, immutable, partitioned</td></tr><tr><td>DataFrame</td><td>Táblázatos adatstruktúra</td><td>High-level API, optimalizált</td></tr><tr><td>Dataset</td><td>Típusos DataFrame</td><td>Type safety + optimization</td></tr><tr><td>Partition</td><td>Adatpartíció</td><td>Elosztott feldolgozás egysége</td></tr><tr><td>Executor</td><td>Worker node folyamat</td><td>Ahol a tényleges számítás fut</td></tr><tr><td>Driver</td><td>Fő vezérlő folyamat</td><td>Taskok kiosztása, scheduler</td></tr><tr><td>Transform</td><td>Lazy operation</td><td>filter, map, groupBy - nem fut azonnal</td></tr><tr><td>Action</td><td>Triggers execution</td><td>collect, count, show - ez indítja el</td></tr><tr><td>Shuffle</td><td>Adat mozgatás node-ok között</td><td>Drága művelet, minimalizálandó</td></tr></table>
+</div>
+<div class="section layer-intro" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Spark architektúra</h2>
+  <div class="md-cell"><p>Spark architektúra: <strong>Driver → Cluster Manager → Executors</strong></p></div><div class="arch-flow"><div class="arch-step"><strong>Driver</strong><div class="detail">Program, SparkContext</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Cluster Manager</strong><div class="detail">YARN/K8s/Standalone</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Executor 1</strong><div class="detail">Task 1, Task 2, Cache</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Executor 2</strong><div class="detail">Task 3, Task 4</div></div><div class="arch-arrow">&#8594;</div><div class="arch-step"><strong>Executor N</strong><div class="detail">Task ...</div></div></div><table><tr><th>Komponens</th><th>Szerep</th><th>Példa</th></tr><tr><td>Driver</td><td>Vezérlés, DAG építés</td><td>spark-submit --master yarn</td></tr><tr><td>Cluster Manager</td><td>Erőforrás allokáció</td><td>YARN, Kubernetes, Standalone</td></tr><tr><td>Executor</td><td>Task végrehajtás, cache</td><td>1-5 per worker node</td></tr><tr><td>Task</td><td>Egyetlen munkaegység</td><td>1 partition = 1 task</td></tr><tr><td>Stage</td><td>Task csoport shuffle előtt</td><td>shuffle boundary-k között</td></tr><tr><td>Job</td><td>Egy action által indított</td><td>collect(), count() = 1 job</td></tr></table>
+</div>
+<div class="section layer-intro" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Környezet beállítása</h2>
+  <div class="code-cell" id="cell-s3"><div class="code-header"><span class="cell-number">[s3]</span><button class="run-btn" onclick="runCell('s3')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># PySpark telepítés és indítás</span>
+pip install pyspark delta-spark
+
+<span class="cm"># Spark Session létrehozása</span>
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+
+spark = SparkSession.builder \
+    .appName(<span class="str">"crash-course"</span>) \
+    .config(<span class="str">"spark.sql.extensions"</span>, <span class="str">"io.delta.sql.DeltaSparkSessionExtension"</span>) \
+    .getOrCreate()
+
+<span class="fn">print</span>(<span class="str">f"Spark version: {spark.version}"</span>)
+<span class="fn">print</span>(spark.sparkContext.uiWebUrl)</pre></div><div class="output-area" id="out-s3"><div class="output-label">Output:</div><pre>Spark version: 3.5.1
+Spark UI: http://localhost:4040
+
+Cluster: local[*] (8 cores)
+Memory: 4GB</pre></div></div>
+</div>
+<div class="section layer-intro" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>RDD alapok</h2>
+  <div class="md-cell"><p>Az <strong>RDD (Resilient Distributed Dataset)</strong> a Spark legelemibb adatstruktúrája. Immutable, partitioned, fault-tolerant.</p></div><div class="code-cell" id="cell-s4"><div class="code-header"><span class="cell-number">[s4]</span><button class="run-btn" onclick="runCell('s4')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># RDD létrehozása</span>\nrdd = spark.sparkContext.parallelize([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">10</span>])\n\n<span class="cm"># Transformations (lazy)</span>\nfiltered = rdd.filter(<span class="kw">lambda</span> x: x % <span class="num">2</span> == <span class="num">0</span>)  <span class="cm"># párosak</span>\nmapped = filtered.map(<span class="kw">lambda</span> x: x * x)      <span class="cm"># négyzet</span>\n\n<span class="cm"># Actions (triggers execution)</span>\n<span class="fn">print</span>(<span class="str">f"Partitions: {rdd.getNumPartitions()}"</span>)\n<span class="fn">print</span>(<span class="str">f"Even squares: {mapped.collect()}"</span>)\n<span class="fn">print</span>(<span class="str">f"Sum: {mapped.reduce(<span class="kw">lambda</span> a,b: a+b)}"</span>)\n<span class="fn">print</span>(<span class="str">f"Count: {mapped.count()}"</span>)',)</pre></div><div class="output-area" id="out-s4"><div class="output-label">Output:</div><pre>Partitions: 8
+Even squares: [4, 16, 36, 64, 100]
+Sum: 220
+Count: 5</pre></div></div><div class="callout"><div class="callout-title">Lazy Evaluation</div><p>A <strong>transformations</strong> (filter, map, flatMap) nem futnak azonnal &mdash; csak felépítik a DAG-ot. Az <strong>actions</strong> (collect, count, reduce) indítják el a végrehajtást.</p></div>
+</div>
+<div class="section layer-intro" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>RDD haladó: Word Count</h2>
+  <div class="code-cell" id="cell-s5"><div class="code-header"><span class="cell-number">[s5]</span><button class="run-btn" onclick="runCell('s5')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Szószámolás (Word Count) - klasszikus példa</span>\ntext_rdd = spark.sparkContext.textFile(<span class="str">"data.txt"</span>)\n\nword_counts = text_rdd \\\n    .flatMap(<span class="kw">lambda</span> line: line.split(<span class="str">" "</span>)) \\\n    .map(<span class="kw">lambda</span> word: (word.lower(), <span class="num">1</span>)) \\\n    .reduceByKey(<span class="kw">lambda</span> a, b: a + b) \\\n    .sortBy(<span class="kw">lambda</span> x: x[<span class="num">1</span>], ascending=<span class="num">False</span>)\n\n<span class="fn">print</span>(<span class="str">f"Unique words: {word_counts.count()}"</span>)\n<span class="fn">print</span>(<span class="str">"Top 10:"</span>)\n<span class="kw">for</span> word, count <span class="kw">in</span> word_counts.take(<span class="num">10</span>):\n    <span class="fn">print</span>(<span class="str">f"  {word}: {count}"</span>)',)</pre></div><div class="output-area" id="out-s5"><div class="output-label">Output:</div><pre>Unique words: 2,847
+Top 10:
+  the: 1,245
+  and: 892
+  spark: 756
+  data: 634
+  rdd: 521
+  dataframe: 489
+  partition: 412
+  shuffle: 367
+  transform: 334
+  action: 298</pre></div></div>
+</div>
+<div class="section layer-intro" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>DataFrame alapok</h2>
+  <div class="md-cell"><p>A <strong>DataFrame</strong> a Spark legfontosabb API-ja. Táblázatos, optimalizált, típusos. Mint a pandas, de elosztott.</p></div><div class="code-cell" id="cell-s6"><div class="code-header"><span class="cell-number">[s6]</span><button class="run-btn" onclick="runCell('s6')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># DataFrame létrehozása</span>\ndf = spark.createDataFrame([\n    (<span class="num">1</span>, <span class="str">"Alice"</span>, <span class="num">25</span>, <span class="num">50000</span>),\n    (<span class="num">2</span>, <span class="str">"Bob"</span>, <span class="num">35</span>, <span class="num">75000</span>),\n    (<span class="num">3</span>, <span class="str">"Charlie"</span>, <span class="num">45</span>, <span class="num">90000</span>),\n    (<span class="num">4</span>, <span class="str">"Diana"</span>, <span class="num">28</span>, <span class="num">60000</span>),\n    (<span class="num">5</span>, <span class="str">"Eve"</span>, <span class="num">52</span>, <span class="num">120000</span>),\n], [<span class="str">"id"</span>, <span class="str">"name"</span>, <span class="str">"age"</span>, <span class="str">"salary"</span>])\n\ndf.show()\ndf.printSchema()\n<span class="fn">print</span>(<span class="str">f"Rows: {df.count()}, Partitions: {df.rdd.getNumPartitions()}"</span>)',)</pre></div><div class="output-area" id="out-s6"><div class="output-label">Output:</div><pre>+---+-------+---+------+
+| id|   name|age|salary|
++---+-------+---+------+
+|  1|  Alice| 25| 50000|
+|  2|    Bob| 35| 75000|
+|  3|Charlie| 45| 90000|
+|  4|  Diana| 28| 60000|
+|  5|    Eve| 52|120000|
++---+-------+---+------+
+
+root
+ |-- id: integer
+ |-- name: string
+ |-- age: integer
+ |-- salary: integer
+
+Rows: 5, Partitions: 1</pre></div></div>
+</div>
+<div class="section layer-intro" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>DataFrame operációk: filter, agg, join</h2>
+  <div class="code-cell" id="cell-s7"><div class="code-header"><span class="cell-number">[s7]</span><button class="run-btn" onclick="runCell('s7')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># DataFrame transformations</span>\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, avg, sum, count, when\n\n<span class="cm"># Filter + Select</span>\nyoung = df.filter(col(<span class="str">"age"</span>) < <span class="num">40</span>).select(<span class="str">"name"</span>, <span class="str">"salary"</span>)\n\n<span class="cm"># With new column</span>\ndf2 = df.withColumn(<span class="str">"bonus"</span>, col(<span class="str">"salary"</span>) * <span class="num">0.1</span>)\n\n<span class="cm"># Aggregation</span>\nstats = df.agg(\n    avg(<span class="str">"salary"</span>).alias(<span class="str">"avg_salary"</span>),\n    sum(<span class="str">"salary"</span>).alias(<span class="str">"total"</span>),\n    count(<span class="str">"*"</span>).alias(<span class="str">"count"</span>)\n)\n\n<span class="cm"># Conditional</span>\ndf3 = df.withColumn(<span class="str">"bracket"</span>, when(col(<span class="str">"salary"</span>)><span class="num">80000</span>,<span class="str">"high"</span>).otherwise(<span class="str">"normal"</span>))\n\nstats.show()\ndf3.show()',)</pre></div><div class="output-area" id="out-s7"><div class="output-label">Output:</div><pre>Aggregation:
++----------+------+-----+
+|avg_salary| total|count|
++----------+------+-----+
+|   79000.0|395000|    5|
++----------+------+-----+
+
+With bracket:
++---+-------+---+------+-------+
+| id|   name|age|salary|bracket|
++---+-------+---+------+-------+
+|  1|  Alice| 25| 50000| normal|
+|  3|Charlie| 45| 90000|   high|
+|  5|    Eve| 52|120000|   high|
++---+-------+---+------+-------+</pre></div></div>
+</div>
+<div class="section layer-intro" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Spark SQL</h2>
+  <div class="code-cell" id="cell-s8"><div class="code-header"><span class="cell-number">[s8]</span><button class="run-btn" onclick="runCell('s8')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Temp view létrehozása</span>\ndf.createOrReplaceTempView(<span class="str">"employees"</span>)\n\n<span class="cm"># SQL lekérdezés</span>\nresult = spark.sql(<span class="str">"""\n    SELECT \n        CASE \n            WHEN age < 30 THEN \'young\'\n            WHEN age < 50 THEN \'mid\'\n            ELSE \'senior\'\n        END as age_group,\n        COUNT(*) as cnt,\n        AVG(salary) as avg_salary,\n        MIN(salary) as min_salary,\n        MAX(salary) as max_salary\n    FROM employees\n    GROUP BY 1\n    ORDER BY avg_salary DESC\n"""</span>)\nresult.show()',)</pre></div><div class="output-area" id="out-s8"><div class="output-label">Output:</div><pre>+---------+---+----------+----------+----------+
+|age_group|cnt|avg_salary|min_salary|max_salary|
++---------+---+----------+----------+----------+
+|   senior|  1|  120000.0|    120000|    120000|
+|      mid|  2|   82500.0|     75000|     90000|
+|    young|  2|   55000.0|     50000|     60000|
++---------+---+----------+----------+----------+</pre></div></div>
+</div>
+<div class="section layer-intro" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Join és Window Functions</h2>
+  <div class="code-cell" id="cell-s9"><div class="code-header"><span class="cell-number">[s9]</span><button class="run-btn" onclick="runCell('s9')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Join példa</span>\norders = spark.createDataFrame([\n    (<span class="num">1</span>,<span class="num">1</span>,<span class="str">"laptop"</span>,<span class="num">1200</span>),(<span class="num">2</span>,<span class="num">2</span>,<span class="str">"phone"</span>,<span class="num">800</span>),(<span class="num">3</span>,<span class="num">1</span>,<span class="str">"tablet"</span>,<span class="num">400</span>)\n],[<span class="str">"order_id"</span>,<span class="str">"user_id"</span>,<span class="str">"product"</span>,<span class="str">"amount"</span>])\n\njoined = df.join(orders, df.id == orders.user_id, <span class="str">"inner"</span>)\njoined.select(<span class="str">"name"</span>,<span class="str">"product"</span>,<span class="str">"amount"</span>).show()\n\n<span class="cm"># Window function</span>\n<span class="kw">from</span> pyspark.sql.window <span class="kw">import</span> Window\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> rank, sum <span class="kw">as</span> spark_sum\n\nw = Window.partitionBy(<span class="str">"user_id"</span>).orderBy(col(<span class="str">"amount"</span>).desc())\nranked = orders.withColumn(<span class="str">"rank"</span>, rank().over(w))\n\nw2 = Window.partitionBy(<span class="str">"user_id"</span>).rowsBetween(\n    Window.unboundedPreceding, Window.unboundedFollowing)\nrunning = orders.withColumn(<span class="str">"total"</span>, spark_sum(<span class="str">"amount"</span>).over(w2))',)</pre></div><div class="output-area" id="out-s9"><div class="output-label">Output:</div><pre>Inner join:
++-----+-------+------+
+| name|product|amount|
++-----+-------+------+
+|Alice| laptop|  1200|
+|Alice| tablet|   400|
+|  Bob|  phone|   800|
++-----+-------+------+
+
+Window rank by user:
++--------+---------+------+----+
+|order_id| product |amount|rank|
++--------+---------+------+----+
+|       1| laptop  |  1200|   1|
+|       3| tablet  |   400|   2|
+|       2| phone   |   800|   1|
++--------+---------+------+----+</pre></div></div>
+</div>
+<div class="section layer-intro" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Performance optimalizálás</h2>
+  <div class="md-cell"><p>A Spark teljesítmény optimalizálás <strong>3 kulcsa</strong>: partitioning, caching, shuffle minimalizálás.</p></div><div class="code-cell" id="cell-s10"><div class="code-header"><span class="cell-number">[s10]</span><button class="run-btn" onclick="runCell('s10')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Repartition</span>\ndf_repartitioned = df.repartition(<span class="num">200</span>, <span class="str">"age"</span>)  <span class="cm"># hash partition by age</span>\n\n<span class="cm"># Coalesce (reduce partitions, no shuffle)</span>\ndf_coalesced = df.coalesce(<span class="num">10</span>)\n\n<span class="cm"># Cache</span>\ndf.cache()  <span class="cm"># memory only</span>\ndf.persist(StorageLevel.MEMORY_AND_DISK)\n\n<span class="cm"># Broadcast join (small table)</span>\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast\nsmall_df = spark.createDataFrame([(1,<span class="str">"IT"</span>),(2,<span class="str">"HR"</span>)],[<span class="str">"dept_id"</span>,<span class="str">"dept"</span>])\njoined = df.join(broadcast(small_df), <span class="str">"dept_id"</span>)\n\n<span class="cm"># Explain plan</span>\ndf.filter(<span class="str">"age > 30"</span>).select(<span class="str">"name"</span>).explain(<span class="num">True</span>)',)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><pre>== Physical Plan ==
+*(1) Project [name#1]
++- *(1) Filter (age#2 > 30)
+   +- Scan ExistingRDD
+
+Optimizations applied:
+  - Predicate pushdown
+  - Column pruning
+  - BroadcastHashJoin (small table)
+  - WholeStageCodegen</pre></div></div><table><tr><th>Művelet</th><th>Leírás</th><th>Shuffle?</th><th>Mikor?</th></tr><tr><td>repartition()</td><td>Hash partitioning</td><td>Shuffle igen</td><td>200 part/nagy data</td></tr><tr><td>coalesce()</td><td>Csökkentés</td><td>Shuffle NEM</td><td>Kimenet optimalizálás</td></tr><tr><td>cache()</td><td>Memory cache</td><td>Nincs</td><td>Ismételt lekérdezés</td></tr><tr><td>broadcast()</td><td>Kis tábla minden node</td><td>Nincs</td><td>Small/large join</td></tr><tr><td>partitionBy()</td><td>File partition</td><td>Nincs</td><td>Write optimization</td></tr></table>
+</div>
+<div class="section layer-intro" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Structured Streaming: Kafka → Delta</h2>
+  <div class="code-cell" id="cell-s11"><div class="code-header"><span class="cell-number">[s11]</span><button class="run-btn" onclick="runCell('s11')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Structured Streaming: Kafka → Delta</span>\n<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> from_json, col\n<span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StructType, StringType, IntegerType\n\nschema = StructType() \\\n    .add(<span class="str">"user_id"</span>, IntegerType()) \\\n    .add(<span class="str">"action"</span>, StringType()) \\\n    .add(<span class="str">"value"</span>, IntegerType())\n\nstream = spark \\\n    .readStream \\\n    .format(<span class="str">"kafka"</span>) \\\n    .option(<span class="str">"kafka.bootstrap.servers"</span>, <span class="str">"localhost:9092"</span>) \\\n    .option(<span class="str">"subscribe"</span>, <span class="str">"events"</span>) \\\n    .load()\n\nparsed = stream.select(\n    from_json(col(<span class="str">"value"</span>).cast(<span class="str">"string"</span>), schema).alias(<span class="str">"data"</span>)\n).select(<span class="str">"data.*"</span>)\n\n<span class="cm"># Windowed aggregation</span>\nwindowed = parsed \\\n    .withWatermark(<span class="str">"timestamp"</span>, <span class="str">"5 minutes"</span>) \\\n    .groupBy(window(<span class="str">"timestamp"</span>, <span class="str">"1 minute"</span>), <span class="str">"action"</span>) \\\n    .count()\n\nquery = windowed.writeStream \\\n    .format(<span class="str">"delta"</span>) \\\n    .outputMode(<span class="str">"complete"</span>) \\\n    .option(<span class="str">"checkpointLocation"</span>, <span class="str">"/checkpoint"</span>) \\\n    .start(<span class="str">"/delta/event_counts"</span>)\n\n<span class="fn">print</span>(<span class="str">f"Streaming active: {query.isActive}"</span>)',)</pre></div><div class="output-area" id="out-s11"><div class="output-label">Output:</div><pre>Streaming active: True
+Source: Kafka [events]
+Sink: Delta [/delta/event_counts]
+Trigger: processingTime=0ms (continuous)
+
+Batch 1: 1,245 events processed
+Batch 2: 1,389 events processed
+Batch 3: 1,102 events processed
+
+Throughput: ~1.2k events/sec
+Latency: 150ms avg</pre></div></div>
+</div>
+<div class="section layer-intro" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>MLlib: ML Pipeline Spark-on</h2>
+  <div class="code-cell" id="cell-s12"><div class="code-header"><span class="cell-number">[s12]</span><button class="run-btn" onclick="runCell('s12')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Spark MLlib Pipeline</span>\n<span class="kw">from</span> pyspark.ml <span class="kw">import</span> Pipeline\n<span class="kw">from</span> pyspark.ml.feature <span class="kw">import</span> VectorAssembler, StandardScaler\n<span class="kw">from</span> pyspark.ml.classification <span class="kw">import</span> RandomForestClassifier\n<span class="kw">from</span> pyspark.ml.evaluation <span class="kw">import</span> BinaryClassificationEvaluator\n\n<span class="cm"># Feature assembly</span>\nassembler = VectorAssembler(\n    inputCols=[<span class="str">"age"</span>, <span class="str">"income"</span>, <span class="str">"tenure"</span>, <span class="str">"usage"</span>],\n    outputCol=<span class="str">"features_raw"</span>\n)\nscaler = StandardScaler(inputCol=<span class="str">"features_raw"</span>, outputCol=<span class="str">"features"</span>)\nclassifier = RandomForestClassifier(labelCol=<span class="str">"churn"</span>, numTrees=<span class="num">100</span>)\n\npipeline = Pipeline(stages=[assembler, scaler, classifier])\n\n<span class="cm"># Train/test split</span>\ntrain, test = df.randomSplit([<span class="num">0.8</span>, <span class="num">0.2</span>], seed=<span class="num">42</span>)\nmodel = pipeline.fit(train)\npredictions = model.transform(test)\n\nevaluator = BinaryClassificationEvaluator(labelCol=<span class="str">"churn"</span>)\nauc = evaluator.evaluate(predictions)\n<span class="fn">print</span>(<span class="str">f"AUC: {auc:.4f}"</span>)',)</pre></div><div class="output-area" id="out-s12"><div class="output-label">Output:</div><pre>AUC: 0.9234
+
+Feature Importance:
+  income: 0.342
+  usage:  0.289
+  tenure: 0.213
+  age:    0.156
+
+Model saved: /models/churn_rf_v1</pre></div></div>
+</div>
+<div class="section layer-intro" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Catalyst Optimizer</h2>
+  <div class="md-cell"><p>A <strong>Catalyst</strong> a Spark SQL query optimizer. Automatikusan optimalizálja a végrehajtási tervet.</p></div><div class="code-cell" id="cell-s13"><div class="code-header"><span class="cell-number">[s13]</span><button class="run-btn" onclick="runCell('s13')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Explain plan</span>\ndf.filter(col(<span class="str">"age"</span>) > <span class="num">30</span>) \\\n  .join(other_df, <span class="str">"id"</span>) \\\n  .groupBy(<span class="str">"department"</span>) \\\n  .agg(avg(<span class="str">"salary"</span>)) \\\n  .explain(<span class="num">True</span>)',)</pre></div><div class="output-area" id="out-s13"><div class="output-label">Output:</div><pre>== Parsed Logical Plan ==
+Filter (age > 30) → Join → Aggregate
+
+== Analyzed Logical Plan ==
+[Resolved references, types checked]
+
+== Optimized Logical Plan ==
+1. Push down Filter before Join
+2. Column pruning (only needed cols)
+3. Join reorder (small table first)
+
+== Physical Plan ==
+*(2) HashAggregate(department, avg(salary))
++- *(2) Project [department, salary]
+   +- *(1) BroadcastHashJoin [id]
+      +- *(1) Filter (age > 30)
+      +- BroadcastExchange</pre></div></div><div class="callout"><div class="callout-title">Optimalizálások</div><p>✅ Predicate pushdown: filter minél korábban<br>✅ Column pruning: csak a szükséges oszlopok<br>✅ Join reorder: kis tábla broadcast<br>✅ Constant folding: 1+1→2<br>✅ WholeStageCodegen: JIT kompiláció</p></div>
+</div>
+<div class="section layer-intro" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Delta Lake + Spark <span class="tool-badge"><img src="assets/logos/delta-lake.svg">Delta</span></h2>
+  <div class="code-cell" id="cell-s14"><div class="code-header"><span class="cell-number">[s14]</span><button class="run-btn" onclick="runCell('s14')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Delta Lake + Spark integráció</span>\n\n<span class="cm"># Write</span>\ndf.write.format(<span class="str">"delta"</span>) \\\n    .mode(<span class="str">"overwrite"</span>) \\\n    .partitionBy(<span class="str">"date"</span>) \\\n    .save(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># Read</span>\ndelta_df = spark.read.format(<span class="str">"delta"</span>).load(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># Time travel</span>\nyesterday = spark.read.format(<span class="str">"delta"</span>) \\\n    .option(<span class="str">"versionAsOf"</span>, <span class="num">5</span>) \\\n    .load(<span class="str">"/delta/users"</span>)\n\n<span class="cm"># MERGE (upsert)</span>\n<span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable\ndt = DeltaTable.forPath(spark, <span class="str">"/delta/users"</span>)\ndt.alias(<span class="str">"target"</span>).merge(\n    updates.alias(<span class="str">"source"</span>),\n    <span class="str">"target.id = source.id"</span>\n).whenMatchedUpdateAll() \\\n .whenNotMatchedInsertAll() \\\n .execute()\n\n<span class="fn">print</span>(<span class="str">f"Delta version: {dt.history().first().version}"</span>)',)</pre></div><div class="output-area" id="out-s14"><div class="output-label">Output:</div><pre>Delta version: 42
+Operation: MERGE
+Rows updated: 15,234
+Rows inserted: 3,421
+Rows unchanged: 31,345
+
+History:
+  v42: MERGE (2 min ago)
+  v41: WRITE (1 hour ago)
+  v40: DELETE (3 hours ago)</pre></div></div>
+</div>
+<div class="section layer-intro" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Valós ETL pipeline</h2>
+  <div class="md-cell"><p>Egy valós Spark pipeline: <strong>ETL a forrástól az elemzésig</strong></p></div><div class="code-cell" id="cell-s15"><div class="code-header"><span class="cell-number">[s15]</span><button class="run-btn" onclick="runCell('s15')">&#9654; Run</button></div><div class="code-body"><pre>('<span class="cm"># Full ETL pipeline</span>\n\n<span class="cm"># 1. Read multiple sources</span>\nusers = spark.read.json(<span class="str">"s3://raw/users/"</span>)\norders = spark.read.parquet(<span class="str">"s3://raw/orders/"</span>)\nclicks = spark.read.csv(<span class="str">"s3://raw/clicks/"</span>, header=<span class="num">True</span>)\n\n<span class="cm"># 2. Transform</span>\nuser_features = users \\\n    .join(orders, <span class="str">"user_id"</span>) \\\n    .groupBy(<span class="str">"user_id"</span>) \\\n    .agg(\n        count(<span class="str">"order_id"</span>).alias(<span class="str">"order_count"</span>),\n        sum(<span class="str">"amount"</span>).alias(<span class="str">"total_spend"</span>),\n        avg(<span class="str">"amount"</span>).alias(<span class="str">"avg_order"</span>),\n        max(<span class="str">"order_date"</span>).alias(<span class="str">"last_order"</span>)\n    )\n\n<span class="cm"># 3. Write to Delta</span>\nuser_features.write.format(<span class="str">"delta"</span>) \\\n    .mode(<span class="str">"overwrite"</span>) \\\n    .save(<span class="str">"s3://gold/user_features"</span>)\n\n<span class="fn">print</span>(<span class="str">f"Features: {user_features.count()} users"</span>)',)</pre></div><div class="output-area" id="out-s15"><div class="output-label">Output:</div><pre>Users: 500,000
+Orders: 12,345,678
+Clicks: 45,678,901
+
+Features generated: 500,000 users
+Columns: user_id, order_count, total_spend, avg_order, last_order
+
+Pipeline: 3m 42s
+Output: s3://gold/user_features (Delta, 42 partitions)</pre></div></div>
+</div>
+<div class="section layer-intro" id="s16">
+  <div class="section-number">Section 16</div>
+  <h2>Összefoglalás</h2>
+  <div class="callout success"><div class="callout-title">Megtanultad:</div><p>✅ Spark Session, architektúra (Driver/Executor)<br>✅ RDD: transformations (lazy) vs actions<br>✅ DataFrame: high-level API, optimalizált<br>✅ Spark SQL: temp view, SQL queries<br>✅ Join és Window Functions<br>✅ Performance: repartition, cache, broadcast<br>✅ Structured Streaming: Kafka → Delta<br>✅ MLlib: Pipeline, Feature, Model<br>✅ Catalyst Optimizer: plan, optimization<br>✅ Delta Lake: ACID, time travel, merge<br>✅ Valós ETL pipeline példa</p></div>
+</div>
+</main>
+
+<script>
+// ── State ──
+const completedSections = new Set();
+const allCellIds = [];
+let runAllRunning = false;
+
+// ── Navigation ──
+function buildNav() {
+  const nav = document.getElementById('side-nav');
+  const sections = document.querySelectorAll('.section');
+  const tocData = [
+    {id:'s0',num:'00',label:'Intro'},
+    {id:'s1',num:'01',label:'Fogalmak'},
+    {id:'s2',num:'02',label:'Architektúra'},
+    {id:'s3',num:'03',label:'Környezet'},
+    {id:'s4',num:'04',label:'RDD alapok'},
+    {id:'s5',num:'05',label:'RDD haladó'},
+    {id:'s6',num:'06',label:'DataFrame'},
+    {id:'s7',num:'07',label:'DataFrame operációk'},
+    {id:'s8',num:'08',label:'Spark SQL'},
+    {id:'s9',num:'09',label:'Join és Window'},
+    {id:'s10',num:'10',label:'Performance'},
+    {id:'s11',num:'11',label:'Structured Streaming'},
+    {id:'s12',num:'12',label:'MLlib'},
+    {id:'s13',num:'13',label:'Catalyst Optimizer'},
+    {id:'s14',num:'14',label:'Delta Lake + Spark'},
+    {id:'s15',num:'15',label:'Valós alkalmazás'},
+    {id:'s16',num:'16',label:'Összefoglalás'}
+  ];
+  
+  nav.innerHTML = tocData.map(item => 
+    `<a href="#${item.id}" class="nav-item" data-section="${item.id}" id="nav-${item.id}">
+      <span class="nav-num">${item.num}</span> ${item.label}
+    </a>`
+  ).join('');
+}
+
+// ── Cell execution ──
+function runCell(cellId) {
+  const cell = document.getElementById('cell-' + cellId);
+  if (!cell) return;
+  const output = document.getElementById('out-' + cellId);
+  if (!output) return;
+  const btn = cell.querySelector('.run-btn');
+  
+  // Already running or done
+  if (cell.classList.contains('running') || btn.classList.contains('done-btn')) return;
+  
+  // Start running
+  cell.classList.add('running');
+  btn.classList.add('running-btn');
+  btn.textContent = '⏳ Running...';
+  
+  // Simulate execution time
+  const delay = 400 + Math.random() * 800;
+  setTimeout(() => {
+    cell.classList.remove('running');
+    cell.classList.add('has-output');
+    btn.classList.remove('running-btn');
+    btn.classList.add('done-btn');
+    btn.textContent = '✓ Done';
+    output.classList.add('visible');
+    
+    // Mark section as completed
+    const section = cell.closest('.section');
+    if (section) {
+      completedSections.add(section.id);
+      const navItem = document.getElementById('nav-' + section.id);
+      if (navItem) navItem.classList.add('completed');
+    }
+    updateProgress();
+  }, delay);
+}
+
+function updateProgress() {
+  const totalSections = document.querySelectorAll('.section').length;
+  const done = completedSections.size;
+  const pct = Math.round((done / totalSections) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} / ${totalSections} section completed`;
+}
+
+// ── Run All ──
+async function runAll() {
+  if (runAllRunning) return;
+  runAllRunning = true;
+  
+  const cells = document.querySelectorAll('.code-cell');
+  for (const cell of cells) {
+    const id = cell.id.replace('cell-', '');
+    const btn = cell.querySelector('.run-btn');
+    if (!btn.classList.contains('done-btn')) {
+      runCell(id);
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+    }
+  }
+  runAllRunning = false;
+}
+
+// ── Reset ──
+function resetAll() {
+  completedSections.clear();
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    cell.classList.remove('running', 'has-output');
+    const id = cell.id.replace('cell-', '');
+    const output = document.getElementById('out-' + id);
+    if (output) output.classList.remove('visible');
+    const btn = cell.querySelector('.run-btn');
+    if (btn) {
+      btn.classList.remove('running-btn', 'done-btn');
+      btn.textContent = '▶ Run';
+    }
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
+  updateProgress();
+}
+
+// ── Scroll spy ──
+function updateActiveNav() {
+  const sections = document.querySelectorAll('.section');
+  let activeId = null;
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 120) activeId = s.id;
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (activeId) {
+    const navItem = document.getElementById('nav-' + activeId);
+    if (navItem) {
+      navItem.classList.add('active');
+      navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+  }
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildNav();
+  updateProgress();
+  
+  // Collect all cell IDs
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    allCellIds.push(cell.id.replace('cell-', ''));
+  });
+  
+  window.addEventListener('scroll', updateActiveNav, {passive: true});
+  updateActiveNav();
+});
+</script>
+</body>
+</html>
