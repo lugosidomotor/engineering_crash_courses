@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Streaming Engineering Crash Course</title>
+<link rel="stylesheet" href="../shared/course.css">
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn">&#8592;</a>
+  <h1>&lt;/&gt; Streaming Engineering</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 16 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>Streaming Engineering Crash Course <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A batch feldolgozás nem elég, ha valós idejű adatokkal dolgozol. A <strong>streaming engineering</strong> lehetővé teszi, hogy adatokat milliszekundumok alatt dolgozz fel, ahogy érkeznek.</p>
+<p><strong>WebShop Pro kontextus:</strong> Képzeljük el, hogy a webshopunk minden kattintását, kosár-eseményét, rendelését és készlet-frissítését valós időben akarjuk feldolgozni. Nem várhatunk éjfélig a batch ETL-re!</p>
+<p><span class="glossary-term" data-def="Adatok folyamatos, valós idejű furtherfeldolgozása ahogy keletkeznek">Event streaming</span> · <span class="glossary-term" data-def="Distributed event streaming platform, ami eseményeket tárol és továbbít">Kafka</span> · <span class="glossary-term" data-def="Spark API streaming adatfeldolgozásra, micro-batch alapú">Structured Streaming</span></p>
+<p><a href="https://kafka.apache.org/documentation/" target="_blank" rel="noopener">Kafka dokumentáció 📖</a> · <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="noopener">Spark Streaming 📖</a> · <a href="https://www.youtube.com/watch?v=06iRM1Ghr1k" target="_blank" rel="noopener">Kafka in 6 minutes 🎬</a></p></div><div class="callout "><div class="callout-title">Tartalom</div><p>Kafka · Topic/partition · Event schema · Producer/Consumer · Exactly-once · Dead letter queue · Spark Streaming · Watermarking · Stream-to-Delta · WebShop Pro pipeline</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>WebShop Pro real-time clickstream + rendelés feldolgozó pipeline</p></div>
+</div>
+
+<div class="section layer-general" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Event-driven architektúra </h2>
+  <div class="md-cell"><p>A hagyományos batch architektúrában az adatforrás → ETL → adattárház lánc fut napi/heti rendszerességgel. Az <strong>event-driven architektúrában</strong> minden művelet eseményt generál, amit azonnal fel lehet dolgozni.</p>
+<p><strong>WebShop Pro események:</strong></p>
+<ul>
+<li><strong>Page view</strong> — felhasználó megnyitott egy terméoldalt</li>
+<li><strong>Add to cart</strong> — terméket tett a kosárba</li>
+<li><strong>Purchase</strong> — sikeres vásárlás</li>
+<li><strong>Inventory update</strong> — készlet változás</li>
+<li><strong>Return</strong> — visszaküldés</li>
+</ul></div><table><tr><th>Batch vs Streaming</th><th>Batch</th><th>Streaming</th></tr><tr><td>Késleltetés</td><td>Órák / napok</td><td>Milliszekundumok / másodpercek</td></tr><tr><td>Adat</td><td>Teljes adathalmaz</td><td>Eseményenként / micro-batch</td></tr><tr><td>Komplexitás</td><td>Alacsonyabb</td><td>Magasabb (state, ordering, late data)</td></tr><tr><td>Use case</td><td>Reporting, BI</td><td>Real-time dashboard, alert, personalization</td></tr></table>
+</div>
+
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Kafka alapok <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
+  <div class="md-cell"><p>Az <strong>Apache Kafka</strong> egy distributed event streaming platform. Három szerepe van:</p>
+<ol>
+<li><strong>Publish</strong> — producerek eseményeket küldenek</li>
+<li><strong>Store</strong> — Kafka tárolja az eseményeket (retention alapján)</li>
+<li><strong>Subscribe</strong> — consumerek feliratkoznak és feldolgozzák</li>
+</ol>
+<p><span class="glossary-term" data-def="Kafka szerver node, ami az eseményeket tárolja és kiszolgálja">Broker</span> · <span class="glossary-term" data-def="Kafka metaadat-kezelő (KRaft az új, Zookeeper a régi)">Zookeeper/KRaft</span></p>
+<p><a href="https://developer.confluent.io/quickstart/kafka-docker/" target="_blank" rel="noopener">Kafka Docker quickstart 🚀</a></p></div><div class="code-cell" id="cell-s2">
+    <div class="code-header">
+      <span class="cell-number">[2]</span>
+      <button class="run-btn" onclick="runCell('s2')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Kafka indítása Docker-rel (WebShop Pro dev környezet)
+version: '3'
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,HOST://localhost:9092
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,HOST://0.0.0.0:9092
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+print("Kafka elindíthatő: docker-compose up -d")</pre></div>
+    <div class="output-area" id="out-s2">
+      <div class="output-label">Output:</div>
+      <pre>Kafka elindíthatő: docker-compose up -d</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Topic, Partition, Consumer Group <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
+  <div class="md-cell"><p>A Kafka három alapfogalma:</p>
+<ul>
+<li><strong>Topic</strong> — kategória, amire a producerek küldenek és a consumerek olvasnak (pl. <code>webshop.orders</code>)</li>
+<li><strong>Partition</strong> — a topic vízszintes skálázási egysége. Minden partition rendezett, append-only log</li>
+<li><strong>Consumer Group</strong> — consumerek csoportja, ahol minden partitiont pontosan egy consumer olvas</li>
+</ul></div><div class="code-cell" id="cell-s3">
+    <div class="code-header">
+      <span class="cell-number">[3]</span>
+      <button class="run-btn" onclick="runCell('s3')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from kafka import KafkaAdminClient
+from kafka.admin import NewTopic
+
+admin = KafkaAdminClient(bootstrap_servers="localhost:9092")
+
+# WebShop Pro topic-ok létrehozása
+topics = [
+    NewTopic(name="webshop.page_views",  num_partitions=3, replication_factor=1),
+    NewTopic(name="webshop.cart_events",  num_partitions=3, replication_factor=1),
+    NewTopic(name="webshop.purchases",    num_partitions=6, replication_factor=1),
+    NewTopic(name="webshop.inventory",    num_partitions=3, replication_factor=1),
+]
+admin.create_topics(topics)
+print(f"Topics created: {[t.name for t in topics]}")</pre></div>
+    <div class="output-area" id="out-s3">
+      <div class="output-label">Output:</div>
+      <pre>Topics created: ['webshop.page_views', 'webshop.cart_events', 'webshop.purchases', 'webshop.inventory']</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Event schema <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
+  <div class="md-cell"><p>A Kafka maga nem kényszerít sémát — bármilyen byte-sorozat lehet az üzenet. De production-ben <strong>séma validáció</strong> kell. Két megközelítés:</p>
+<ul>
+<li><strong>JSON Schema</strong> — egyszerű, jó debugra</li>
+<li><strong>Avro / Protobuf</strong> — kompakt bináris, sémaváltozás támogatással</li>
+</ul>
+<p><span class="glossary-term" data-def="Központi sémátároló, ami biztosítja a kompatibilitást producer és consumer között">Schema Registry</span> · <a href="https://docs.confluent.io/platform/current/schema-registry/" target="_blank" rel="noopener">Schema Registry 📖</a></p></div><div class="code-cell" id="cell-s4">
+    <div class="code-header">
+      <span class="cell-number">[4]</span>
+      <button class="run-btn" onclick="runCell('s4')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>import json
+from datetime import datetime
+
+# WebShop Pro event schema (JSON)
+purchase_event = {
+    "event_type": "purchase",
+    "event_id": "evt-abc123",
+    "timestamp": datetime.now().isoformat(),
+    "user_id": "usr-456",
+    "session_id": "ses-789",
+    "data": {
+        "order_id": "ORD-2024-001",
+        "items": [
+            {"product_id": "P-100", "name": "Mechanikus billentyűzet", "qty": 1, "price": 25000},
+            {"product_id": "P-200", "name": "USB-C hub", "qty": 2, "price": 8500},
+        ],
+        "total_amount": 42000,
+        "currency": "HUF",
+        "payment_method": "card"
+    }
+}
+print(json.dumps(purchase_event, indent=2, ensure_ascii=False))</pre></div>
+    <div class="output-area" id="out-s4">
+      <div class="output-label">Output:</div>
+      <pre>{
+  "event_type": "purchase",
+  "event_id": "evt-abc123",
+  "timestamp": "2024-01-15T14:30:00.123456",
+  "user_id": "usr-456",
+  "data": {
+    "order_id": "ORD-2024-001",
+    "items": [
+      {"product_id": "P-100", "name": "Mechanikus billentyűzet", "qty": 1, "price": 25000},
+      {"product_id": "P-200", "name": "USB-C hub", "qty": 2, "price": 8500}
+    ],
+    "total_amount": 42000
+  }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>Kafka Producer <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell"><p>A producer felel az események Kafka-ba küldéséért. Kulcsfontosságú beállítások:</p>
+<ul>
+<li><strong>acks=all</strong> — minden broker visszaigazolja a írást (max durability)</li>
+<li><strong>key</strong> — azonos key = azonos partition (rendezettség garantált)</li>
+<li><strong>compression</strong> — gzip/snappy/lz4 csökkenti a hálózati forgalmat</li>
+</ul></div><div class="code-cell" id="cell-s5">
+    <div class="code-header">
+      <span class="cell-number">[5]</span>
+      <button class="run-btn" onclick="runCell('s5')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from kafka import KafkaProducer
+import json
+from datetime import datetime
+
+producer = KafkaProducer(
+    bootstrap_servers="localhost:9092",
+    value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+    key_serializer=lambda k: k.encode("utf-8") if k else None,
+    acks="all",
+    compression_type="gzip",
+)
+
+# WebShop Pro: kosár esemény küldése
+events = [
+    ("usr-456", {"event_type": "add_to_cart", "product_id": "P-100", "qty": 1}),
+    ("usr-456", {"event_type": "add_to_cart", "product_id": "P-200", "qty": 2}),
+    ("usr-789", {"event_type": "add_to_cart", "product_id": "P-300", "qty": 1}),
+]
+
+for key, event in events:
+    event["timestamp"] = datetime.now().isoformat()
+    future = producer.send("webshop.cart_events", key=key, value=event)
+    record = future.get(timeout=10)
+    print(f"Sent to partition {record.partition} at offset {record.offset}")</pre></div>
+    <div class="output-area" id="out-s5">
+      <div class="output-label">Output:</div>
+      <pre>Sent to partition 1 at offset 0
+Sent to partition 1 at offset 1
+Sent to partition 0 at offset 0</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Kafka Consumer <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell"><p>A consumer olvassa a topic üzeneteket. Fontos fogalmak:</p>
+<ul>
+<li><strong>Consumer Group</strong> — azonos group.id-val rendelkező consumerek megosztják a partition-okat</li>
+<li><strong>Offset</strong> — hol tart a consumer az olvasásban</li>
+<li><strong>auto.offset.reset</strong> — új consumer hol kezdjen: <code>earliest</code> vagy <code>latest</code></li>
+</ul></div><div class="code-cell" id="cell-s6">
+    <div class="code-header">
+      <span class="cell-number">[6]</span>
+      <button class="run-btn" onclick="runCell('s6')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from kafka import KafkaConsumer
+
+consumer = KafkaConsumer(
+    "webshop.cart_events",
+    bootstrap_servers="localhost:9092",
+    group_id="webshop-analytics",
+    auto_offset_reset="earliest",
+    value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+    key_deserializer=lambda m: m.decode("utf-8") if m else None,
+    enable_auto_commit=False,  # manual offset commit!
+)
+
+# Process a few messages
+for msg in consumer:
+    print(f"[{msg.partition}:{msg.offset}] key={msg.key} value={msg.value}")
+    # Manual commit after successful processing
+    consumer.commit()
+    break  # demo: just one message</pre></div>
+    <div class="output-area" id="out-s6">
+      <div class="output-label">Output:</div>
+      <pre>[1:1] key=usr-456 value={'event_type': 'add_to_cart', 'product_id': 'P-200', 'qty': 2, 'timestamp': '2024-01-15T14:30:01'}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Exactly-once vs at-least-once <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
+  <div class="md-cell"><p>A <strong>delivery guarantee</strong> az egyik legfontosabb kérdés streaming-ben:</p>
+<ul>
+<li><strong>At-most-once</strong> — üzenet elveszhet (fire and forget)</li>
+<li><strong>At-least-once</strong> — üzenet biztos megérkezik, de lehet duplikált</li>
+<li><strong>Exactly-once</strong> — üzenet pontosan egyszer érkezik (legdrágább)</li>
+</ul></div><table><tr><th>Garancia</th><th>Elveszhet?</th><th>Duplikálódhat?</th><th>Teljesítmény</th><th>Használat</th></tr><tr><td>At-most-once</td><td>Igen</td><td>Nem</td><td>Legjobb</td><td>Metrikák, logok</td></tr><tr><td>At-least-once</td><td>Nem</td><td>Igen</td><td>Jó</td><td>Idempotens feldolgozás</td></tr><tr><td>Exactly-once</td><td>Nem</td><td>Nem</td><td>Lassabb</td><td>Pénzügyi tranzakciók</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: exactly-once (pénzügyi). Page views: at-least-once (idempotens aggregálás).</p></div>
+</div>
+
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Dead Letter Queue (DLQ) <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
+  <div class="md-cell"><p>Mi van, ha egy üzenetet nem sikerül feldolgozni? Nem dobhatjuk el, de nem is akadhatunk rajta végtelenül. A <strong>DLQ</strong> a megoldás:</p>
+<ol>
+<li>Próbálkozz N alkalommal (retry)</li>
+<li>Ha továbbra is hibás → küld DLQ topicra</li>
+<li>DLQ-t monitorozzuk és manuálisan/vagy automatikusan újra feldolgozzuk</li>
+</ol></div><div class="code-cell" id="cell-s8">
+    <div class="code-header">
+      <span class="cell-number">[8]</span>
+      <button class="run-btn" onclick="runCell('s8')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from kafka import KafkaProducer, KafkaConsumer
+import json
+
+DLQ_TOPIC = "webshop.cart_events.dlq"
+MAX_RETRIES = 3
+
+dlq_producer = KafkaProducer(
+    bootstrap_servers="localhost:9092",
+    value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+)
+
+def process_with_retry(msg, attempt=1):
+    try:
+        event = msg.value
+        # Simulate processing that might fail
+        if event.get("product_id") is None:
+            raise ValueError("Missing product_id")
+        print(f"Processed: {event['event_type']} product={event['product_id']}")
+    except Exception as e:
+        if attempt < MAX_RETRIES:
+            print(f"Retry {attempt}/{MAX_RETRIES}: {e}")
+            process_with_retry(msg, attempt + 1)
+        else:
+            # Send to DLQ after max retries
+            dlq_event = {
+                "original": msg.value,
+                "error": str(e),
+                "topic": msg.topic,
+                "partition": msg.partition,
+                "offset": msg.offset,
+                "retry_count": attempt
+            }
+            dlq_producer.send(DLQ_TOPIC, value=dlq_event)
+            print(f"Sent to DLQ: {e}")</pre></div>
+    <div class="output-area" id="out-s8">
+      <div class="output-label">Output:</div>
+      <pre>Processed: add_to_cart product=P-100
+Sent to DLQ: Missing product_id</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Spark Structured Streaming <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A <strong>Spark Structured Streaming</strong> a Spark batch API-ját kiterjeszti streaming-re. A lényeg: <em>micro-batch</em> módban kis batch-ekként dolgozza fel az adatot, de a API ugyanaz, mint a batch DataFrame-eknél.</p>
+<p><span class="glossary-term" data-def="A streaming feldolgozás kis batch-ekben történik, pl. 500ms vagy 1s időablakokban">Micro-batch</span> · <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="noopener">Spark Streaming docs 📖</a></p></div><div class="code-cell" id="cell-s9">
+    <div class="code-header">
+      <span class="cell-number">[9]</span>
+      <button class="run-btn" onclick="runCell('s9')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from pyspark.sql import SparkSession
+from pyspark.sql.functions import from_json, col
+from pyspark.sql.types import StructType, StringType, IntegerType
+
+spark = SparkSession.builder \
+    .appName("WebShop-Streaming") \
+    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0") \
+    .getOrCreate()
+
+# Schema definiálása a Kafka üzenethez
+cart_schema = StructType() \
+    .add("event_type", StringType()) \
+    .add("product_id", StringType()) \
+    .add("qty", IntegerType()) \
+    .add("timestamp", StringType())
+
+# Kafka stream olvasása
+cart_stream = spark \
+    .readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("subscribe", "webshop.cart_events") \
+    .option("startingOffsets", "latest") \
+    .load()
+
+# JSON parse
+parsed = cart_stream.select(
+    from_json(col("value").cast("string"), cart_schema).alias("data")
+).select("data.*")
+
+print("Streaming query definiálva (micro-batch, 5s trigger)")</pre></div>
+    <div class="output-area" id="out-s9">
+      <div class="output-label">Output:</div>
+      <pre>Streaming query definiálva (micro-batch, 5s trigger)</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Watermarking <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A <strong>watermark</strong> megmondja a Sparknak, hogy mennyi ideig várjon a későn érkező adatokra. Ha egy esemény <code>maxDelay</code>-en túl érkezik, a Spark eldobja vagy külön kezeli.</p>
+<p><strong>WebShop Pro:</strong> Ha egy felhasználó kosárba tesz valamit mobilon, de a hálózat miatt 2 perc múlva érkezik meg a Kafka-hoz — a watermark kezeli ezt.</p></div><div class="code-cell" id="cell-s10">
+    <div class="code-header">
+      <span class="cell-number">[10]</span>
+      <button class="run-btn" onclick="runCell('s10')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from pyspark.sql.functions import window, to_timestamp, current_timestamp
+
+# Watermark alkalmazása: 2 perc max delay
+windowed = parsed \
+    .withColumn("event_time", to_timestamp("timestamp")) \
+    .withWatermark("event_time", "2 minutes") \
+    .groupBy(
+        window("event_time", "5 minutes"),  # 5 perces ablakok
+        "product_id"
+    ).count()
+
+# Output: 5 percenként aggregált kosár-események per termék
+query = windowed.writeStream \
+    .outputMode("complete") \
+    .format("console") \
+    .trigger(processingTime="10 seconds") \
+    .start()
+
+print("Windowed aggregation: 5 min windows, 2 min watermark")</pre></div>
+    <div class="output-area" id="out-s10">
+      <div class="output-label">Output:</div>
+      <pre>Windowed aggregation: 5 min windows, 2 min watermark</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Late arriving data <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A <strong>late data</strong> olyan esemény, ami a watermark után érkezik. Három stratégia:</p>
+<ol>
+<li><strong>Drop</strong> — figyelmen kívül hagyjuk (alapértelmezett)</li>
+<li><strong>Update</strong> — frissítjük a korábbi ablak eredményt</li>
+<li><strong>Append</strong> — új sorként hozzáadjuk</li>
+</ol></div><table><tr><th>Stratégia</th><th>Output mode</th><th>Használat</th><th>Költség</th></tr><tr><td>Drop late</td><td>Append</td><td>Metrikák ahol nem kritikus</td><td>Ingyenes</td></tr><tr><td>Update result</td><td>Update</td><td>Real-time dashboard</td><td>Közepes (state storage)</td></tr><tr><td>Reprocess</td><td>Complete</td><td>Pontos aggregáció</td><td>Magas (teljes state)</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: Update mode (pontos kell). Page views: Drop late (nem kritikus ha egy view elveszik).</p></div>
+</div>
+
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Stream-to-Delta <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
+  <div class="md-cell"><p>A streaming adatok Delta táblába írása a leggyakoribb lakehouse minta. A Spark Structured Streaming natívan támogatja a Delta sink-et.</p></div><div class="code-cell" id="cell-s12">
+    <div class="code-header">
+      <span class="cell-number">[12]</span>
+      <button class="run-btn" onclick="runCell('s12')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Kosár események stream → Delta tábla
+delta_query = parsed \
+    .withColumn("event_time", to_timestamp("timestamp")) \
+    .withWatermark("event_time", "2 minutes") \
+    .writeStream \
+    .format("delta") \
+    .outputMode("append") \
+    .option("checkpointLocation", "./checkpoint/cart_events") \
+    .partitionBy("product_id") \
+    .trigger(processingTime="30 seconds") \
+    .start("./data/delta/cart_events")
+
+# Készlet-frissítések stream → Delta tábla
+inventory_stream = spark.readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("subscribe", "webshop.inventory") \
+    .load()
+
+inventory_query = inventory_stream \
+    .select(from_json(col("value").cast("string"), inv_schema).alias("d")) \
+    .select("d.*") \
+    .writeStream \
+    .format("delta") \
+    .outputMode("update") \
+    .option("checkpointLocation", "./checkpoint/inventory") \
+    .start("./data/delta/inventory")
+
+print("2 streaming query fut: cart_events → Delta, inventory → Delta")</pre></div>
+    <div class="output-area" id="out-s12">
+      <div class="output-label">Output:</div>
+      <pre>2 streaming query fut: cart_events → Delta, inventory → Delta</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Real-time feature update <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
+  <div class="md-cell"><p>Az ML modellek frissítéséhez real-time feature-k kellenek. Például: <em>"a felhasználó az elmúlt 10 percben hány terméket nézett meg"</em>. Ezt a streaming pipeline számolja és egy feature store-ba írja.</p></div><div class="code-cell" id="cell-s13">
+    <div class="code-header">
+      <span class="cell-number">[13]</span>
+      <button class="run-btn" onclick="runCell('s13')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from pyspark.sql.functions import count, sum as _sum, avg
+
+# Real-time feature kalkuláció: user activity az elmúlt 10 percben
+user_features = parsed \
+    .withColumn("event_time", to_timestamp("timestamp")) \
+    .withWatermark("event_time", "1 minute") \
+    .groupBy(
+        window("event_time", "10 minutes", "1 minute"),  # sliding window
+        col("product_id")
+    ).agg(
+        count("*").alias("event_count"),
+        _sum("qty").alias("total_qty"),
+    )
+
+# Feature store-ba írás Delta-ként
+feature_query = user_features.writeStream \
+    .format("delta") \
+    .outputMode("complete") \
+    .option("checkpointLocation", "./checkpoint/features") \
+    .trigger(processingTime="1 minute") \
+    .start("./data/delta/features/user_activity")
+
+print("Real-time feature update: 10 min sliding window, 1 min slide, 1 min trigger")</pre></div>
+    <div class="output-area" id="out-s13">
+      <div class="output-label">Output:</div>
+      <pre>Real-time feature update: 10 min sliding window, 1 min slide, 1 min trigger</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>WebShop Pro streaming pipeline <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
+  <div class="md-cell"><p>A teljes WebShop Pro streaming architektúra összerakva:</p></div><div class="code-cell" id="cell-s14">
+    <div class="code-header">
+      <span class="cell-number">[14]</span>
+      <button class="run-btn" onclick="runCell('s14')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># WebShop Pro Streaming Pipeline Architecture
+#
+# [Web/Frontend] → Kafka Topics → Spark Structured Streaming → Delta Lake
+#
+# Topics:
+#   webshop.page_views    → parsed → Delta: delta/page_views
+#   webshop.cart_events   → parsed → Delta: delta/cart_events
+#   webshop.purchases     → parsed → Delta: delta/purchases
+#   webshop.inventory     → parsed → Delta: delta/inventory
+#
+# + Dead Letter Queue: webshop.*.dlq (hibás üzenetek)
+# + Real-time features: 10 min sliding window → Delta: delta/features
+# + Alerting: purchase amount > 500000 HUF → Slack notification
+
+pipeline_topics = {
+    "webshop.page_views":  {"partitions": 6,  "retention_ms": 86400000},
+    "webshop.cart_events": {"partitions": 6,  "retention_ms": 604800000},
+    "webshop.purchases":   {"partitions": 12, "retention_ms": -1},  # forever
+    "webshop.inventory":   {"partitions": 3,  "retention_ms": 604800000},
+}
+
+for topic, cfg in pipeline_topics.items():
+    print(f"  {topic}: {cfg['partitions']} partitions, retention={cfg['retention_ms']}ms")</pre></div>
+    <div class="output-area" id="out-s14">
+      <div class="output-label">Output:</div>
+      <pre>  webshop.page_views: 6 partitions, retention=86400000ms
+  webshop.cart_events: 6 partitions, retention=604800000ms
+  webshop.purchases: 12 partitions, retention=-1ms
+  webshop.inventory: 3 partitions, retention=604800000ms</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Összefoglalás </h2>
+  <div class="md-cell"><p>Gratulálunk! Megtanultad a streaming engineering alapokat!</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>Event-driven architektúra</td><td>RAG Evaluation & AI Safety</td></tr><tr><td>Kafka producer/consumer</td><td>LLM eval pipeline</td></tr><tr><td>Exactly-once, DLQ</td><td>Hallucination detection</td></tr><tr><td>Spark Structured Streaming</td><td>Guardrails & safety</td></tr><tr><td>Watermarking, late data</td><td>Production eval pipeline</td></tr><tr><td>Stream-to-Delta</td><td>Real-time AI features</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>RAG Evaluation & AI Safety — ahol megtanuljuk, honnan tudjuk, hogy az AI jól válaszol!</p></div><div class="quiz-box" data-answer="1">
+<h3>Quiz: Mi a Kafka consumer group lényege?</h3>
+<button class="quiz-option">Az összes consumer ugyanazt az üzenetet kapja</button><button class="quiz-option">A partition-ok megosztódnak a consumerek között</button><button class="quiz-option">A producerek csoportosítása</button><button class="quiz-option">A topic replikáció</button>
+<div class="quiz-feedback"></div>
+</div><div class="quiz-box" data-answer="2">
+<h3>Quiz: Mit csinál a watermark?</h3>
+<button class="quiz-option">Gyorsítja a feldolgozást</button><button class="quiz-option">Tömöríti az adatokat</button><button class="quiz-option">Megmondja mennyit várjon a későn érkező adatra</button><button class="quiz-option">Partitionálja a topicot</button>
+<div class="quiz-feedback"></div>
+</div><div class="quiz-box" data-answer="0">
+<h3>Quiz: Melyik delivery guarantee a legmegbízhatóbb?</h3>
+<button class="quiz-option">Exactly-once</button><button class="quiz-option">At-least-once</button><button class="quiz-option">At-most-once</button><button class="quiz-option">Best-effort</button>
+<div class="quiz-feedback"></div>
+</div>
+</div>
+
+</main>
+<script>
+window.COURSE_CONFIG = {
+  slug: 'streaming-engineering',
+  toc: [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Event-driven architektúra"}, {"id": "s2", "num": "02", "label": "Kafka alapok"}, {"id": "s3", "num": "03", "label": "Topic, partition, consumer group"}, {"id": "s4", "num": "04", "label": "Event schema"}, {"id": "s5", "num": "05", "label": "Producer"}, {"id": "s6", "num": "06", "label": "Consumer"}, {"id": "s7", "num": "07", "label": "Exactly-once vs at-least-once"}, {"id": "s8", "num": "08", "label": "Dead letter queue"}, {"id": "s9", "num": "09", "label": "Spark Structured Streaming"}, {"id": "s10", "num": "10", "label": "Watermarking"}, {"id": "s11", "num": "11", "label": "Late arriving data"}, {"id": "s12", "num": "12", "label": "Stream-to-Delta"}, {"id": "s13", "num": "13", "label": "Real-time feature update"}, {"id": "s14", "num": "14", "label": "WebShop Pro streaming pipeline"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}]
+};
+</script>
+<script src="../shared/course.js"></script>
+</body>
+</html>

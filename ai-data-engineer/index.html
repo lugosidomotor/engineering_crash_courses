@@ -47,11 +47,11 @@
   <div class="section-number">Section 04</div>
   <h2>Feature Engineering</h2>
   <div class="md-cell"><p>A nyers adatot modell-bemenetté alakítjuk. Ez a legfontosabb lépés.</p></div><div class="code-cell" id="cell-s4"><div class="code-header"><span class="cell-number">[s4]</span><button class="run-btn" onclick="runCell('s4')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
-df = pd.DataFrame({"age":[25,35,45],"income":[50k,75k,90k],"purchases":[5,12,3]})
+df = pd.DataFrame({"age":[25,35,45],"income":[50000,75000,90000],"purchases":[5,12,3],"last_days":[5,45,2]})
 df["income_per_purchase"] = df.income / df.purchases
 df["is_active"] = (df.last_days < 30).astype(int)
-df["age_bucket"] = pd.cut(df.age, bins=[0,30,40,50,100])
-<span class="fn">print</span>(df)</pre></div><div class="output-area" id="out-s4"><div class="output-label">Output:</div><table><tr><th>age</th><th>income_per_purchase</th><th>is_active</th><th>age_bucket</th></tr><tr><td>25</td><td>10k</td><td>1</td><td>young</td></tr><tr><td>35</td><td>6.25k</td><td>1</td><td>mid</td></tr><tr><td>45</td><td>30k</td><td>0</td><td>senior</td></tr></table></div></div>
+df["age_bucket"] = pd.cut(df.age, bins=[0,30,40,100], labels=["young","mid","senior"])
+<span class="fn">print</span>(df)</pre></div><div class="output-area" id="out-s4"><div class="output-label">Output:</div><table><tr><th>age</th><th>income</th><th>purchases</th><th>last_days</th><th>income_per_purchase</th><th>is_active</th><th>age_bucket</th></tr><tr><td>25</td><td>50000</td><td>5</td><td>5</td><td>10000.0</td><td>1</td><td>young</td></tr><tr><td>35</td><td>75000</td><td>12</td><td>45</td><td>6250.0</td><td>0</td><td>mid</td></tr><tr><td>45</td><td>90000</td><td>3</td><td>2</td><td>30000.0</td><td>1</td><td>senior</td></tr></table></div></div>
 </div>
 <div class="section layer-intro" id="s5">
   <div class="section-number">Section 05</div>

@@ -276,15 +276,17 @@ img{max-width:100%;display:block}
     <!-- Data Engineering Path -->
     <div class="path-card path-de">
       <h3>⚡ Data Engineering</h3>
-      <p class="path-meta">Teljes pipeline · 8 kurzus · Kezdőtől haladóig</p>
+      <p class="path-meta">Teljes pipeline · 10 kurzus · Kezdőtől haladóig</p>
       <ol class="path-steps">
         <li><a href="./sql-data-modeling/">SQL & Data Modeling</a></li>
         <li><a href="./python-data-engineering/">Python for Data Engineering</a></li>
         <li><a href="./delta-table-crash-course/">Delta Table Crash Course</a></li>
+        <li><a href="./open-table-formats/">Open Table Formats</a></li>
         <li><a href="./spark-crash-course/">Apache Spark Crash Course</a></li>
         <li><a href="./airflow-orchestration/">Airflow & Orchestration</a></li>
         <li><a href="./dbt-analytics-engineering/">dbt Analytics Engineering</a></li>
         <li><a href="./databricks-lakehouse/">Databricks Lakehouse</a></li>
+        <li><a href="./streaming-engineering/">Streaming Engineering</a></li>
         <li><a href="./ai-data-engineer/">AI Data Engineer</a></li>
       </ol>
     </div>
@@ -292,11 +294,12 @@ img{max-width:100%;display:block}
     <!-- AI Engineering Path -->
     <div class="path-card path-ai">
       <h3>🤖 AI Engineering</h3>
-      <p class="path-meta">LLM → RAG → Production · 6 kurzus · Középhaladó</p>
+      <p class="path-meta">LLM → RAG → Eval → Production · 7 kurzus · Középhaladó</p>
       <ol class="path-steps">
         <li><a href="./python-data-engineering/">Python for Data Engineering</a></li>
         <li><a href="./docker-local-data-platform/">Docker & Local Data Platform</a></li>
         <li><a href="./ai-engineering/">AI Engineering</a></li>
+        <li><a href="./rag-evaluation-ai-safety/">RAG Evaluation & AI Safety</a></li>
         <li><a href="./llmops-genai-production/">LLMOps / GenAI Production</a></li>
         <li><a href="./databricks-lakehouse/">Databricks Lakehouse</a></li>
         <li><a href="./aiops-mlops/">AIOps & MLOps</a></li>
@@ -312,7 +315,7 @@ img{max-width:100%;display:block}
     Kurzusok
   </div>
   <h2>Összes kurzus egy helyen</h2>
-  <p class="section-desc">12 interaktív, projektalapú és magyar nyelvű kurzus. Minden kurzus kész és azonnal elkezdhető.</p>
+  <p class="section-desc">15 interaktív, projektalapú és magyar nyelvű kurzus. Minden kurzus kész és azonnal elkezdhető.</p>
 
   <div class="controls">
     <div class="search-box">
@@ -359,6 +362,16 @@ img{max-width:100%;display:block}
       <p>Nagy volumenű ETL, joinok, streaming</p>
     </div>
     <div class="platform-item">
+      <div class="pi-icon">📊</div>
+      <h4>Open Table Formats</h4>
+      <p>Delta vs Iceberg vs Hudi összehasonlítás</p>
+    </div>
+    <div class="platform-item">
+      <div class="pi-icon">🌊</div>
+      <h4>Streaming</h4>
+      <p>Real-time Kafka clickstream pipeline</p>
+    </div>
+    <div class="platform-item">
       <div class="pi-icon">🧠</div>
       <h4>AI Data Engineer</h4>
       <p>Feature store, data quality, lineage</p>
@@ -367,6 +380,11 @@ img{max-width:100%;display:block}
       <div class="pi-icon">💬</div>
       <h4>AI Engineering</h4>
       <p>RAG ügyfélszolgálati chatbot</p>
+    </div>
+    <div class="platform-item">
+      <div class="pi-icon">🔍</div>
+      <h4>RAG Evaluation</h4>
+      <p>Hallucination detection, eval pipeline</p>
     </div>
     <div class="platform-item">
       <div class="pi-icon">🚀</div>
@@ -591,6 +609,51 @@ const COURSES = [
     "icon": "openai",
     "url": "./llmops-genai-production/",
     "whatYouBuild": "Production-ready RAG/LLM alkalmazás monitoringgal és eval datasetekkel"
+  },
+  {
+    "slug": "open-table-formats",
+    "image": "./assets/images/open-table-formats.jpg",
+    "title": "Open Table Formats",
+    "description": "Delta Lake vs Apache Iceberg vs Apache Hudi összehasonlítás: table format vs file format, schema evolution, partition evolution, ACID tranzakciók, catalog szerepe, vendor lock-in és teljesítmény.",
+    "path": ["Data Engineering"],
+    "difficulty": "Középhaladó",
+    "estimatedTime": "2–3 óra",
+    "sectionCount": 16,
+    "stack": ["delta-lake", "apacheiceberg", "parquet", "apachespark"],
+    "status": "Kész",
+    "icon": "delta-lake",
+    "url": "./open-table-formats/",
+    "whatYouBuild": "WebShop Pro táblaformátum-összehasonlítás és döntési útmutató"
+  },
+  {
+    "slug": "streaming-engineering",
+    "image": "./assets/images/streaming-engineering.jpg",
+    "title": "Streaming Engineering",
+    "description": "Valós idejű adatfeldolgozás Kafka és Spark Structured Streaming segítségével: topic/partition, event schema, producer/consumer, exactly-once, DLQ, watermarking, stream-to-Delta pipeline.",
+    "path": ["Data Engineering", "AI Engineering"],
+    "difficulty": "Középhaladó–Haladó",
+    "estimatedTime": "3–5 óra",
+    "sectionCount": 16,
+    "stack": ["apachekafka", "apachespark", "delta-lake", "python"],
+    "status": "Kész",
+    "icon": "apachekafka",
+    "url": "./streaming-engineering/",
+    "whatYouBuild": "WebShop Pro real-time clickstream és rendelés feldolgozó pipeline"
+  },
+  {
+    "slug": "rag-evaluation-ai-safety",
+    "image": "./assets/images/rag-evaluation-ai-safety.jpg",
+    "title": "RAG Evaluation & AI Safety",
+    "description": "Honnan tudod, hogy az AI jól válaszol? Golden dataset, retrieval precision/recall, faithfulness, hallucination detection, prompt regression, guardrails, fallback model és red teaming alapok.",
+    "path": ["AI Engineering"],
+    "difficulty": "Középhaladó–Haladó",
+    "estimatedTime": "3–4 óra",
+    "sectionCount": 16,
+    "stack": ["python", "openai", "chroma", "mlflow"],
+    "status": "Kész",
+    "icon": "openai",
+    "url": "./rag-evaluation-ai-safety/",
+    "whatYouBuild": "WebShop Pro AI asszisztens evaluációs pipeline"
   }
 ];
 
@@ -615,7 +678,10 @@ const LOGO_NAMES = {
   'unity-catalog': 'Unity Catalog',
   'pandas': 'pandas',
   'prometheus': 'Prometheus',
-  'sql': 'SQL'
+  'sql': 'SQL',
+  'apacheiceberg': 'Iceberg',
+  'streamlit': 'Streamlit',
+  'langchain': 'LangChain'
 };
 
 // State

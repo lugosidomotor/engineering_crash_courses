@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Table Formats Crash Course</title>
+<link rel="stylesheet" href="../shared/course.css">
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn">&#8592;</a>
+  <h1>&lt;/&gt; Open Table Formats</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 16 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>Open Table Formats Crash Course <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span> <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
+  <div class="md-cell"><p>A modern lakehouse architektúra alapja nem csak a fájlformátum — hanem a <strong>táblaformátum</strong>. Ebben a kurzusban megnézzük a három legfontosabb nyílt forráskódú táblaformátumot: <span class="glossary-term" data-def="A Databricks által készített nyílt táblaformátum, Parquet alapú ACID tranzakciókkal">Delta Lake</span>, <span class="glossary-term" data-def="A Netflix által eredetileg fejlesztett, most Apache projekt, kiváló multi-engine támogatással">Apache Iceberg</span> és <span class="glossary-term" data-def="Az Uber által fejlesztett Apache projekt, streaming upsert optimalizált">Apache Hudi</span>.</p>
+<p><strong>WebShop Pro kontextus:</strong> A webshopunk rendelési adatait tároljuk data lake-ben. Parquet fájlokként elég bajos megoldani az ACID tranzakciókat, a séma változásokat és a time travel-t. A táblaformátumok pontosan ezeket a problémákat oldják meg.</p>
+<p><a href="https://www.databricks.com/glossary/table-format" target="_blank" rel="noopener">Table format fogalom 📖</a> · <a href="https://www.youtube.com/watch?v=O1qQ3kblXEk" target="_blank" rel="noopener">Ryan Murray - Table Formats Explained 🎬</a></p></div><div class="callout "><div class="callout-title">Tartalom</div><p>Table vs file format · Delta Lake vs Iceberg vs Hudi · Schema & partition evolution · ACID · Catalog · Vendor lock-in · Teljesítmény · Döntési útmutató</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>WebShop Pro rendelési adatok táblaformátum-összehasonlítása</p></div>
+</div>
+
+<div class="section layer-general" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Table format vs file format <span class="tool-badge"><img src="../assets/logos/parquet.svg">Parquet</span></h2>
+  <div class="md-cell"><p>A <strong>fájlformátum</strong> (Parquet, ORC, Avro) meghatározza, hogyan tárolódnak az adatok egyetlen fájlban. A <strong>táblaformátum</strong> (Delta, Iceberg, Hudi) ezen felül biztosít:</p>
+<ul>
+<li>ACID tranzakciókat több fájl felett</li>
+<li>Séma verziózást és evolúciót</li>
+<li>Time travel-t (korábbi állapotok lekérdezése)</li>
+<li>Concurrent write kezelést</li>
+</ul></div><table><tr><th>Réteg</th><th>Példa</th><th>Funkció</th></tr><tr><td>Nyers tároló</td><td>S3, ADLS, GCS, MinIO</td><td>Object storage</td></tr><tr><td>Fájlformátum</td><td>Parquet, ORC, Avro, JSON</td><td>Oszlopos/soros tárolás egy fájlon belül</td></tr><tr><td>Táblaformátum</td><td>Delta Lake, Iceberg, Hudi</td><td>ACID, séma, time travel, több fájl felett</td></tr><tr><td>Catalog</td><td>Unity Catalog, Nessie, Glue</td><td>Névtér, jogosultság, felderítés</td></tr></table><div class="code-cell" id="cell-s1">
+    <div class="code-header">
+      <span class="cell-number">[1]</span>
+      <button class="run-btn" onclick="runCell('s1')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Pure Parquet: no ACID, no schema enforcement
+# Ha két processz egyszerre ír, adatvesztés lehet
+df.write.parquet("s3://webshop/orders/")
+
+# Delta Lake: transaction log garantálja a konzisztenciát
+df.write.format("delta").save("s3://webshop/orders-delta/")</pre></div>
+    <div class="output-area" id="out-s1">
+      <div class="output-label">Output:</div>
+      <pre>Parquet → azonnali írás, nincs tranzakció
+Delta → _delta_log/ mappa létrejön, ACID garantált</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Delta Lake alapok <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span> <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A Delta Lake a Databricks nyílt forráskódú projektje. Parquet fájlokra épít, és egy <code>_delta_log/</code> mappában tartja a tranzakciós naplót JSON formátumban.</p>
+<p><strong>WebShop Pro:</strong> Rendelési adatokat Delta táblába töltünk, így ACID tranzakcióval garantálható, hogy egyETL futás sem marad félkész.</p>
+<p><a href="https://docs.delta.io/latest/quick-start.html" target="_blank" rel="noopener">Delta Lake dokumentáció 📖</a></p></div><div class="code-cell" id="cell-s2">
+    <div class="code-header">
+      <span class="cell-number">[2]</span>
+      <button class="run-btn" onclick="runCell('s2')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from delta import DeltaTable
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("WebShop-Delta") \
+    .config("spark.jars.packages", "io.delta:delta-core_2.12:3.1.0") \
+    .getOrCreate()
+
+# WebShop rendelések DataFrame
+orders = spark.createDataFrame([
+    (1, "keyboard", 15000, "2024-01-15"),
+    (2, "monitor", 89000, "2024-01-15"),
+    (3, "mouse", 5500, "2024-01-16"),
+], ["order_id", "product", "amount_ft", "date"])
+
+# Mentés Delta formátumba
+orders.write.format("delta").mode("overwrite").save("./data/webshop_orders")
+
+# Time travel: előző verzió lekérdezése
+dt = DeltaTable.forPath(spark, "./data/webshop_orders")
+spark.read.format("delta").option("versionAsOf", 0).load("./data/webshop_orders").show()</pre></div>
+    <div class="output-area" id="out-s2">
+      <div class="output-label">Output:</div>
+      <pre>+--------+--------+----------+----+
+|order_id| product|amount_ft|date|
++--------+--------+----------+----+
+|       1|keyboard|     15000|2024|
+|       2| monitor|     89000|2024|
+|       3|   mouse|      5500|2024|
++--------+--------+----------+----+</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Apache Iceberg alapok <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
+  <div class="md-cell"><p>Az Apache Iceberg a Netflix belső projektjeként indult, ma az egyik legdinamikusabban fejlődő táblaformátum. Fő erőssége a <strong>multi-engine támogatás</strong>: Spark, Flink, Trino, Presto, Dremio mind natívan olvassák.</p>
+<p><strong>Kulcskülönbség:</strong> Az Iceberg <strong>rejtett particionálást</strong> (hidden partitioning) használ — nem kell manuálisan particionáló oszlopot létrehozni.</p>
+<p><a href="https://iceberg.apache.org/docs/latest/" target="_blank" rel="noopener">Iceberg dokumentáció 📖</a></p></div><div class="code-cell" id="cell-s3">
+    <div class="code-header">
+      <span class="cell-number">[3]</span>
+      <button class="run-btn" onclick="runCell('s3')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
+    .config("spark.sql.catalog.webshop", "org.apache.iceberg.spark.SparkCatalog") \
+    .config("spark.sql.catalog.webshop.type", "hadoop") \
+    .config("spark.sql.catalog.webshop.warehouse", "./warehouse") \
+    .getOrCreate()
+
+# Iceberg tábla létrehozása
+spark.sql("""
+CREATE TABLE webshop.orders (
+    order_id BIGINT,
+    product STRING,
+    amount_ft INT,
+    order_date DATE
+) USING iceberg
+PARTITIONED BY (months(order_date))
+""")
+
+print("Iceberg tábla létrehozva rejtett havi particionálással")</pre></div>
+    <div class="output-area" id="out-s3">
+      <div class="output-label">Output:</div>
+      <pre>Iceberg tábla létrehozva rejtett havi particionálással</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Iceberg metadata fa <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
+  <div class="md-cell"><p>Az Iceberg egyik legnagyobb innovációja a <strong>fat-alapú metadata struktúra</strong>. Nem egy monolitikus tranzakciós naplót használ, hanem egy hierarchiát:</p></div><div class="code-cell" id="cell-s4">
+    <div class="code-header">
+      <span class="cell-number">[4]</span>
+      <button class="run-btn" onclick="runCell('s4')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Iceberg metadata fa struktúra
+#
+#  metadata/
+#    ├── v1.metadata.json       ← tábla metaadat (séma, partition spec, sort order)
+#    ├── v2.metadata.json
+#    └── snap-12345.avro        ← manifest list (snapshot)
+#         │
+#         ├── manifest-A.avro   ← manifest file (data file-ok listája + stats)
+#         │    ├── data/file1.parquet  (row_count=1000, min_id=1, max_id=1000)
+#         │    └── data/file2.parquet  (row_count=800, min_id=1001, max_id=1800)
+#         │
+#         └── manifest-B.avro
+#              └── data/file3.parquet  (row_count=500)
+#
+# Előny: egy query csak a releváns manifesteket + data fileokat olvassa
+# A manifest file-ok statisztikákat tartalmaznak (min/max/value_count/null_count)
+
+print("Iceberg metadata fa: metadata.json → manifest list → manifest → data files")</pre></div>
+    <div class="output-area" id="out-s4">
+      <div class="output-label">Output:</div>
+      <pre>Iceberg metadata fa: metadata.json → manifest list → manifest → data files</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>Apache Hudi alapok <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Hudi</span></h2>
+  <div class="md-cell"><p>Az Apache Hudi (Hadoop Upserts Deletes and Incrementals) az Uber belső projektje. Fő erőssége a <strong>streaming upsert</strong> és az <strong>inkrementális lekérdezés</strong>.</p>
+<p><strong>WebShop Pro:</strong> Ha valós időben érkeznek rendelés-frissítések (pl. státusz változás: "new" → "shipped" → "delivered"), a Hudi natívan támogatja az upsert-eket.</p>
+<p><a href="https://hudi.apache.org/docs/overview/" target="_blank" rel="noopener">Hudi dokumentáció 📖</a></p></div><div class="code-cell" id="cell-s5">
+    <div class="code-header">
+      <span class="cell-number">[5]</span>
+      <button class="run-btn" onclick="runCell('s5')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .config("spark.jars.packages", "org.apache.hudi:hudi-spark3-bundle_2.12:0.14.0") \
+    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
+    .getOrCreate()
+
+# Hudi tábla írása upsert-tel
+hudi_options = {
+    "hoodie.table.name": "webshop_orders",
+    "hoodie.datasource.write.operation": "upsert",
+    "hoodie.datasource.write.recordkey.field": "order_id",
+    "hoodie.datasource.write.precombine.field": "updated_at",
+    "hoodie.datasource.write.table.type": "COPY_ON_WRITE",
+}
+
+orders.write.format("hudi").options(**hudi_options).mode("append").save("./data/webshop_hudi")</pre></div>
+    <div class="output-area" id="out-s5">
+      <div class="output-label">Output:</div>
+      <pre>Hudi tábla létrehozva COPY_ON_WRITE módban, upsert támogatással</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Hudi táblatípusok: CoW vs MoR <span class="tool-badge"><img src="../assets/logos/apachehadoop.svg">Hudi</span></h2>
+  <div class="md-cell"><p>A Hudi kétféle táblatípust támogat. A választás befolyásolja az írási/olvasási teljesítményt:</p></div><table><tr><th>Táblatípus</th><th>Írás</th><th>Olvasás</th><th>Használat</th></tr><tr><td>Copy-on-Write (CoW)</td><td>Lassabb (mindig új Parquet)</td><td>Gyors (direkt Parquet)</td><td>Batch ETL, ritka frissítés</td></tr><tr><td>Merge-on-Read (MoR)</td><td>Gyors (Avro log + Parquet base)</td><td>Lassabb (merge kell)</td><td>Streaming, gyakori upsert</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Ha óránként jönnek rendelés-frissítések → MoR. Ha napi batch-et dolgozunk fel → CoW.</p></div>
+</div>
+
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Schema evolution <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span> <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
+  <div class="md-cell"><p>A séma evolúció kritikus egy növekvő webshopnál. Például hozzáadunk egy <code>shipping_address</code> mezőt. Mindhárom formátum támogatja, de eltérő módon:</p></div><div class="code-cell" id="cell-s7">
+    <div class="code-header">
+      <span class="cell-number">[7]</span>
+      <button class="run-btn" onclick="runCell('s7')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Delta Lake: automatikus séma evolúció
+spark.sql("ALTER TABLE delta.`./data/webshop_orders` ADD COLUMN shipping_address STRING")
+
+# Iceberg: teljes séma evolúció (add, rename, reorder, change type)
+spark.sql("ALTER TABLE webshop.orders ADD COLUMN shipping_address STRING")
+spark.sql("ALTER TABLE webshop.orders RENAME COLUMN amount_ft TO amount_huf")
+
+# Hudi: séma evolúció upsert-kor automatikusan
+# Ha az új DataFrame tartalmaz extra oszlopot, Hudi auto-addolja
+
+print("Mindhárom formátum támogatja az oszlop hozzáadását")</pre></div>
+    <div class="output-area" id="out-s7">
+      <div class="output-label">Output:</div>
+      <pre>Mindhárom formátum támogatja az oszlop hozzáadását
+Iceberg: legteljesebb séma evolúció (rename, reorder, típus változás)</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Partition evolution <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
+  <div class="md-cell"><p>A particionálás evolúciója az egyik legfájdalmasabb művelet hagyományos data lake-ben. Az Iceberg <strong>rejtett particionálása</strong> ezt oldja meg: az alkalmazás nem látja a particionáló oszlopot.</p></div><table><tr><th>Formátum</th><th>Partition evolution</th><th>Rejtett particionálás</th></tr><tr><td>Delta Lake</td><td>Manuális REORGANIZE</td><td>Nem</td></tr><tr><td>Iceberg</td><td>Automatikus partition spec váltás</td><td>Igen (year/month/day/hour transforms)</td></tr><tr><td>Hudi</td><td>Korlátozott</td><td>Nem (record key + precombine key)</td></tr></table>
+</div>
+
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Time travel összehasonlítás <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span> <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
+  <div class="md-cell"><p>A time travel lehetővé teszi a tábla korábbi állapotának lekérdezését. Audit, rollback, reprodukálható kísérletek — mindhez kell.</p></div><div class="code-cell" id="cell-s9">
+    <div class="code-header">
+      <span class="cell-number">[9]</span>
+      <button class="run-btn" onclick="runCell('s9')">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Delta Lake time travel
+spark.read.format("delta") \
+    .option("versionAsOf", 0) \
+    .load("./data/webshop_orders").show()
+
+# Iceberg time travel (snapshot ID alapján)
+spark.read.format("iceberg") \
+    .option("snapshot-id", 123456789) \
+    .load("webshop.orders").show()
+
+# Hudi time travel (timestamp alapján)
+spark.read.format("hudi") \
+    .option("as.of.instant", "20240115120000") \
+    .load("./data/webshop_hudi").show()</pre></div>
+    <div class="output-area" id="out-s9">
+      <div class="output-label">Output:</div>
+      <pre>Delta: versionAsOf (0, 1, 2...)
+Iceberg: snapshot-id
+Hudi: as.of.instant (timestamp)</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>ACID tranzakciók <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span> <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
+  <div class="md-cell"><p>ACID = Atomicity, Consistency, Isolation, Durability. Data lake-ben ezek kritikusak, ha több process ír egyszerre.</p></div><table><tr><th>ACID tulajdonság</th><th>Delta</th><th>Iceberg</th><th>Hudi</th></tr><tr><td>Atomicity</td><td>JSON log + CRC</td><td>Atomic snapshot swap</td><td>Timeline commit</td></tr><tr><td>Consistency</td><td>Séma enforce</td><td>Séma + partition spec</td><td>Séma enforce</td></tr><tr><td>Isolation</td><td>Optimistic concurrency</td><td>Optimistic (OCC)</td><td>MVCC</td></tr><tr><td>Durability</td><td>Parquet + log</td><td>Parquet + manifest</td><td>Parquet + Avro log</td></tr></table>
+</div>
+
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Catalog szerepe <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Catalog</span></h2>
+  <div class="md-cell"><p>A catalog a táblák felderítését, névterek kezelését és a jogosultságokat biztosítja. Nélküle csak fájlútvonalakkal hivatkozhatunk táblákra.</p></div><table><tr><th>Catalog</th><th>Formátum támogatás</th><th>Hálózat</th><th>Karbantartó</th></tr><tr><td>Unity Catalog</td><td>Delta (elsődlegesen)</td><td>Databricks</td><td>Databricks</td></tr><tr><td>Project Nessie</td><td>Iceberg (Git-like branching)</td><td>Nyílt forráskódú</td><td>Dremio / Community</td></tr><tr><td>AWS Glue Catalog</td><td>Iceberg, Hudi</td><td>AWS</td><td>Amazon</td></tr><tr><td>Polaris Catalog</td><td>Iceberg</td><td>Nyílt forráskódú</td><td>Snowflake (donated)</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Lokálisan: Nessie Docker konténer. Felhőben: Unity Catalog (Databricks) vagy Glue (AWS).</p></div>
+</div>
+
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Vendor lock-in </h2>
+  <div class="md-cell"><p>A vendor lock-in az egyik legfontosabb stratégiai kérdés:</p></div><table><tr><th>Formátum</th><th>Nyílt forráskód?</th><th>Fő sponsor</th><th>Lock-in kockázat</th></tr><tr><td>Delta Lake</td><td>Igen (Linux Foundation)</td><td>Databricks</td><td>Alacsony (de Databricks optimalizált)</td></tr><tr><td>Iceberg</td><td>Igen (Apache)</td><td>Apple, Netflix, AWS</td><td>Nagyon alacsony (multi-engine)</td></tr><tr><td>Hudi</td><td>Igen (Apache)</td><td>Uber, Amazon, Onehouse</td><td>Alacsony</td></tr></table><div class="callout warning"><div class="callout-title">Figyelem</div><p>A formátum nyílt forráskódú, de a CLOUD SZOLGÁLTATÓ vendor lock-in marad. Delta + Databricks, Iceberg + AWS/Snowflake, stb.</p></div>
+</div>
+
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Teljesítmény összehasonlítás <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A teljesítmény függ a query mintától, adatmérettől és a compaction stratégiától:</p></div><table><tr><th>Metrika</th><th>Delta Lake</th><th>Iceberg</th><th>Hudi</th></tr><tr><td>Query tervezés</td><td>Catalyst (Spark)</td><td>Manifest stats (multi-engine)</td><td>Index + bloom filter</td></tr><tr><td>File skipping</td><td>Z-ORDER, data skipping</td><td>Min/max per file, partition pruning</td><td>Index alapú</td></tr><tr><td>Compaction</td><td>OPTIMIZE parancs</td><td>Rewrite Data Files</td><td>Auto compaction (MoR)</td></tr><tr><td>Streaming write</td><td>Közepes</td><td>Jó (Flink integration)</td><td>Kiváló (built-in upsert)</td></tr><tr><td>Concurrent writes</td><td>Optimistic locking</td><td>OCC</td><td>MVCC</td></tr></table>
+</div>
+
+<div class="section layer-general" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Döntési útmutató </h2>
+  <div class="md-cell"><p>Melyik formátumot válaszd? A válasz attól függ, mi a primary use case:</p></div><table><tr><th>Ha...</th><th>Akkor válaszd...</th><th>Indok</th></tr><tr><td>Databricks-öt használsz</td><td>Delta Lake</td><td>Legjobb Spark integráció, Unity Catalog</td></tr><tr><td>Multi-engine kell (Spark + Trino + Flink)</td><td>Iceberg</td><td>Legjobb cross-engine kompatibilitás</td></tr><tr><td>Streaming upsert dominál</td><td>Hudi</td><td>Natív upsert, inkrementális query</td></tr><tr><td>Séma gyakran változik</td><td>Iceberg</td><td>Legteljesebb schema evolution</td></tr><tr><td>Maximális teljesítmény kell Spark-on</td><td>Delta Lake</td><td>Z-ORDER, OPTIMIZE tight integráció</td></tr><tr><td>Felhő-független akarsz lenni</td><td>Iceberg</td><td>Legjobb hordozhatóság</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro döntés</div><p>Lokális fejlesztésre Delta Lake (mert a többi kurzus is azt használja). Felhőben Iceberg (mert multi-engine). Streaming upsert-re Hudi.</p></div>
+</div>
+
+<div class="section layer-general" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Összefoglalás </h2>
+  <div class="md-cell"><p>Gratulálunk! Megismerted a három legfontosabb nyílt táblaformátumot!</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>Table vs file format</td><td>Streaming Engineering (Kafka + Spark)</td></tr><tr><td>Delta / Iceberg / Hudi alapok</td><td>Real-time adatfeldolgozás</td></tr><tr><td>Schema & partition evolution</td><td>Stream-to-Delta pipeline</td></tr><tr><td>ACID, catalog, performance</td><td>Production streaming architektúra</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Streaming Engineering — ahol Kafka + Spark Structured Streaming pipeline-t építünk a WebShop Pro-hoz!</p></div><div class="quiz-box" data-answer="1">
+<h3>Quiz: Melyik formátum a legjobb multi-engine környezetben?</h3>
+<button class="quiz-option">Delta Lake</button><button class="quiz-option">Apache Iceberg</button><button class="quiz-option">Apache Hudi</button><button class="quiz-option">CSV</button>
+<div class="quiz-feedback"></div>
+</div><div class="quiz-box" data-answer="0">
+<h3>Quiz: Mi a Delta Lake tranzakciós naplójának helye?</h3>
+<button class="quiz-option">_delta_log/ mappa</button><button class="quiz-option">manifest/ mappa</button><button class="quiz-option">.hoodie/ mappa</button><button class="quiz-option">catalog.json</button>
+<div class="quiz-feedback"></div>
+</div><div class="quiz-box" data-answer="2">
+<h3>Quiz: Melyik formátum a legjobb streaming upsert-hez?</h3>
+<button class="quiz-option">Parquet</button><button class="quiz-option">Delta Lake</button><button class="quiz-option">Apache Hudi</button><button class="quiz-option">ORC</button>
+<div class="quiz-feedback"></div>
+</div>
+</div>
+
+</main>
+<script>
+window.COURSE_CONFIG = {
+  slug: 'open-table-formats',
+  toc: [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Table vs file format"}, {"id": "s2", "num": "02", "label": "Delta Lake alapok"}, {"id": "s3", "num": "03", "label": "Iceberg alapok"}, {"id": "s4", "num": "04", "label": "Iceberg metadata"}, {"id": "s5", "num": "05", "label": "Hudi alapok"}, {"id": "s6", "num": "06", "label": "Hudi táblatípusok"}, {"id": "s7", "num": "07", "label": "Schema evolution"}, {"id": "s8", "num": "08", "label": "Partition evolution"}, {"id": "s9", "num": "09", "label": "Time travel"}, {"id": "s10", "num": "10", "label": "ACID tranzakciók"}, {"id": "s11", "num": "11", "label": "Catalog szerepe"}, {"id": "s12", "num": "12", "label": "Vendor lock-in"}, {"id": "s13", "num": "13", "label": "Teljesítmény"}, {"id": "s14", "num": "14", "label": "Döntési útmutató"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}]
+};
+</script>
+<script src="../shared/course.js"></script>
+</body>
+</html>

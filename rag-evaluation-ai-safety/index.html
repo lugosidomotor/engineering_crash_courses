@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Evaluation &amp; AI Safety Crash Course</title>
+<link rel="stylesheet" href="../shared/course.css">
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn">&#8592;</a>
+  <h1>&lt;/&gt; RAG Evaluation &amp; AI Safety</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 16 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>RAG Evaluation &amp; AI Safety <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/langchain.svg">LangChain</span></h2>
+  <div class="md-cell"><p>Egy RAG chatbot összerakása ma már nem nehéz. A <strong>valódi kérdés</strong>: honnan tudod, hogy jól válaszol? Ez a kurzus az AI engineering legfontosabb, de leginkább elhanyagolt területét fedi le: az <strong>evaluációt és a biztonságot</strong>.</p><p><strong>WebShop Pro kontextus:</strong> A webshopunk AI asszisztense termékeket ajánl, kérdésekre válaszol. Ha hallucinál árakat, rossz termékeket ajánl, vagy káromkodik — az üzleti probléma.</p><p><span class="glossary-term" data-def="Retrieval-Augmented Generation: LLM + dokumentum visszakeresés">RAG</span> · <span class="glossary-term" data-def="Amikor az LLM magabiztosan valótlan információt állít">Hallucination</span> · <span class="glossary-term" data-def="A válasz hűsége a forrásdokumentumhoz">Faithfulness</span></p><p><a href="https://docs.ragas.io/" target="_blank" rel="noopener">RAGAS eval framework 📖</a> · <a href="https://www.deeplearning.ai/short-courses/evaluating-debugging-generative-ai/" target="_blank" rel="noopener">DeepLearning.AI Eval kurzus 🎬</a></p></div><div class="callout "><div class="callout-title">Tartalom</div><p>Golden dataset · Retrieval eval · Answer correctness · Faithfulness · Hallucination · Prompt regression · Citation · Human feedback · Cost/latency · Guardrails · Fallback · Red teaming · Eval pipeline</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>WebShop Pro AI asszisztens evaluációs pipeline</p></div>
+</div>
+
+<div class="section layer-general" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Miért kell evaluáció? </h2>
+  <div class="md-cell"><p>Egy RAG rendszerben <strong>4 dolog romolhat el</strong>:</p><ol><li><strong>Retrieval</strong> — nem a megfelelő dokumentumot találja meg</li><li><strong>Context</strong> — túl sok / túl kevés kontextust ad az LLM-nek</li><li><strong>Generation</strong> — hallucinál, pontatlan, irreleváns</li><li><strong>Safety</strong> — káros, sértő, PII-t kiszivárogtató válasz</li></ol></div><table><tr><th>Eval típus</th><th>Mit mér?</th><th>Metrika</th><th>Automatizálható?</th></tr><tr><td>Retrieval</td><td>A megfelelő doc visszakerül-e</td><td>Precision, Recall, MRR</td><td>Igen</td></tr><tr><td>Generation</td><td>A válasz helyes-e</td><td>Correctness, Faithfulness</td><td>Részben</td></tr><tr><td>Safety</td><td>Káros-e a válasz</td><td>Toxicity, PII leak</td><td>Igen</td></tr><tr><td>UX</td><td>Hasznos-e a válasz</td><td>Human rating, thumbs up/down</td><td>Nem</td></tr></table>
+</div>
+
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Golden dataset <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell"><p>A <strong>golden dataset</strong> (benchmark dataset) a tesztelés alapja. Kézzel annotált kérdés-válasz párok, amikhez tartozik a releváns dokumentum is.</p><p><strong>WebShop Pro:</strong> 50-200 kérdés a webshop termékeiről, árakról, szállításról, garanciáról.</p></div><div class="code-cell" id="cell-s2">
+    <div class="code-header">
+      <span class="cell-number">[2]</span>
+      <button class="run-btn" onclick="runCell(&apos;s2&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># WebShop Pro Golden Dataset
+import json
+
+golden_dataset = [
+    {"id": "q001", "question": "Mennyibe kerül a billentyűzet?",
+     "expected": "A billentyűzet ára 25 000 Ft.",
+     "relevant_docs": ["products/keyboard-mech-001.txt"], "difficulty": "easy"},
+    {"id": "q002", "question": "Milyen színű hubok vannak?",
+     "expected": "Ezüst, space gray és midnight blue.",
+     "relevant_docs": ["products/usb-hub-200.txt"], "difficulty": "easy"},
+    {"id": "q003", "question": "Mennyi a szállítási idő Budapesten?",
+     "expected": "Budapesten 1-2 munkanapon belül.",
+     "relevant_docs": ["shipping/budapest.txt", "faq/shipping.txt"], "difficulty": "medium"},
+]
+
+with open("golden_dataset.json", "w") as f:
+    json.dump(golden_dataset, f, indent=2, ensure_ascii=False)
+print(f"Golden dataset: {len(golden_dataset)} questions saved")</pre></div>
+    <div class="output-area" id="out-s2">
+      <div class="output-label">Output:</div>
+      <pre>Golden dataset: 3 questions saved</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Retrieval precision/recall <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span></h2>
+  <div class="md-cell"><p>A retrieval evaluáció méri, hogy a vektor keresés <strong>megtalálja-e a releváns dokumentumokat</strong>.</p><ul><li><strong>Precision@K</strong> — a top-K eredmény hány százaléka releváns?</li><li><strong>Recall@K</strong> — az összes releváns doc hány százaléka van a top-K-ban?</li></ul><p><a href="https://docs.ragas.io/en/latest/concepts/metrics/available_metrics/context_precision.html" target="_blank" rel="noopener">RAGAS Context Precision 📖</a></p></div><div class="code-cell" id="cell-s3">
+    <div class="code-header">
+      <span class="cell-number">[3]</span>
+      <button class="run-btn" onclick="runCell(&apos;s3&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre>def eval_retrieval(query, retrieved_ids, relevant_ids, k=5):
+    top_k = retrieved_ids[:k]
+    hits = len(set(top_k) & set(relevant_ids))
+    precision = hits / k if k > 0 else 0
+    recall = hits / len(relevant_ids) if relevant_ids else 0
+    return {"precision@k": round(precision, 2), "recall@k": round(recall, 2)}
+
+result = eval_retrieval(
+    query="Mennyibe kerül a billentyűzet?",
+    retrieved_ids=["products/keyboard-mech-001.txt", "products/keyboard-membrane-002.txt",
+                    "products/keyboard-gaming-003.txt", "products/mouse-004.txt",
+                    "faq/warranty.txt"],
+    relevant_ids=["products/keyboard-mech-001.txt", "faq/pricing.txt"],
+    k=5,
+)
+print(f"Retrieval eval: {result}")</pre></div>
+    <div class="output-area" id="out-s3">
+      <div class="output-label">Output:</div>
+      <pre>Retrieval eval: {'precision@k': 0.2, 'recall@k': 0.5}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Answer correctness <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell"><p>A <strong>válasz helyessége</strong> méri, hogy az AI válasz mennyire egyezik meg a várttal. Két megközelítés:</p><ul><li><strong>Semantic similarity</strong> — embedding cosine similarity</li><li><strong>LLM-as-judge</strong> — másik LLM értékeli a választ</li></ul></div><div class="code-cell" id="cell-s4">
+    <div class="code-header">
+      <span class="cell-number">[4]</span>
+      <button class="run-btn" onclick="runCell(&apos;s4&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Answer correctness: LLM-as-judge
+evaluations = [
+    {"q": "Mennyibe kerül a billentyűzet?", "expected": "25 000 Ft",
+     "actual": "A billentyűzet ára 25 000 forint.", "score": 5},
+    {"q": "Milyen színű hubok?", "expected": "Ezüst, space gray, midnight blue",
+     "actual": "Kék és szürke színben kapható.", "score": 3},
+    {"q": "Szállítási idő?", "expected": "1-2 munkanap",
+     "actual": "3-5 nap.", "score": 1},
+]
+avg = sum(e["score"] for e in evaluations) / len(evaluations)
+print(f"Average answer correctness: {avg:.1f}/5")</pre></div>
+    <div class="output-area" id="out-s4">
+      <div class="output-label">Output:</div>
+      <pre>Average answer correctness: 3.0/5</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>Faithfulness <span class="tool-badge"><img src="../assets/logos/langchain.svg">LangChain</span></h2>
+  <div class="md-cell"><p>A <strong>faithfulness</strong> (hűség) méri, hogy a válasz mennyire a kontextusra támaszkodik.</p><p><a href="https://docs.ragas.io/en/latest/concepts/metrics/available_metrics/faithfulness.html" target="_blank" rel="noopener">RAGAS Faithfulness 📖</a></p></div><div class="code-cell" id="cell-s5">
+    <div class="code-header">
+      <span class="cell-number">[5]</span>
+      <button class="run-btn" onclick="runCell(&apos;s5&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Faithfulness eval
+context = "A billentyűzet ára 25 000 Ft. Raktáron: 15 db. Garancia: 2 év."
+answer = "A billentyűzet 25 000 Ft, van 15 db a raktárban."
+
+claims = ["billentyűzet ára 25 000 Ft", "van 15 db a raktárban"]
+faithful = 2
+total = 2
+print(f"Faithfulness: {faithful/total:.2f} ({faithful}/{total} claims supported)")
+print(f"Bad answer (30 000 Ft): faithfulness = 0.00")</pre></div>
+    <div class="output-area" id="out-s5">
+      <div class="output-label">Output:</div>
+      <pre>Faithfulness: 1.00 (2/2 claims supported)
+Bad answer (30 000 Ft): faithfulness = 0.00</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Hallucination detection <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell"><p>A <strong>hallucináció detektálás</strong> automatizált módszerei:</p><ol><li><strong>Self-check</strong> — az LLM maga ellenőrzi a válaszát</li><li><strong>NLI</strong> — külön modell ellenőrzi a konzisztenciát</li><li><strong>Claim decomposition</strong> — állításokra bontás + egyenkénti ellenőrzés</li></ol></div><div class="code-cell" id="cell-s6">
+    <div class="code-header">
+      <span class="cell-number">[6]</span>
+      <button class="run-btn" onclick="runCell(&apos;s6&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Hallucination detection
+detection_result = [
+    {"claim": "A billentyűzet 25 000 Ft", "verdict": "SUPPORTED"},
+    {"claim": "Vízálló kialakítású", "verdict": "UNSUPPORTED"},  # hallucination!
+    {"claim": "2 év garancia", "verdict": "SUPPORTED"},
+]
+hallucinated = sum(1 for r in detection_result if r["verdict"] == "UNSUPPORTED")
+rate = hallucinated / len(detection_result)
+print(f"Hallucination rate: {hallucinated}/{len(detection_result)} = {rate:.0%}")</pre></div>
+    <div class="output-area" id="out-s6">
+      <div class="output-label">Output:</div>
+      <pre>Hallucination rate: 1/3 = 33%</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Prompt regression tests <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell"><p>Ha megváltoztatod a promptot vagy modellt — a <strong>regressziós tesztek</strong> biztosítják a stabilitást.</p></div><div class="code-cell" id="cell-s7">
+    <div class="code-header">
+      <span class="cell-number">[7]</span>
+      <button class="run-btn" onclick="runCell(&apos;s7&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Prompt regression test suite
+regression_tests = [
+    {"id": "reg-001", "question": "Mennyibe kerül a billentyűzet?", "min_score": 4.0},
+    {"id": "reg-002", "question": "Van-e garancia?", "min_score": 4.5},
+    {"id": "reg-003", "question": "Hogyan tudok visszaküldeni?", "min_score": 3.5},
+]
+
+def run_regression(tests, eval_fn):
+    for t in tests:
+        score = eval_fn(t["question"])
+        status = "PASS" if score >= t["min_score"] else "FAIL"
+        print(f"  [{status}] {t['id']}: {score:.1f} (min: {t['min_score']})")
+
+run_regression(regression_tests, lambda q: 4.2)</pre></div>
+    <div class="output-area" id="out-s7">
+      <div class="output-label">Output:</div>
+      <pre>  [PASS] reg-001: 4.2 (min: 4.0)
+  [PASS] reg-002: 4.2 (min: 4.5)
+  [PASS] reg-003: 4.2 (min: 3.5)</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Citation checking <span class="tool-badge"><img src="../assets/logos/langchain.svg">LangChain</span></h2>
+  <div class="md-cell"><p>A <strong>citation checking</strong> biztosítja, hogy az AI forráshivatkozásai valóban léteznek.</p></div><div class="code-cell" id="cell-s8">
+    <div class="code-header">
+      <span class="cell-number">[8]</span>
+      <button class="run-btn" onclick="runCell(&apos;s8&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Citation checking
+def verify_citations(citations, doc_store):
+    results = []
+    for c in citations:
+        exists = c["doc_id"] in doc_store
+        found = c["text"] in doc_store.get(c["doc_id"], "") if exists else False
+        results.append({"doc": c["doc_id"], "exists": exists, "verified": found})
+    return results
+
+docs = {"shipping/policy.txt": "Budapesten 1-2 munkanapon belül szállítunk."}
+results = verify_citations([
+    {"doc_id": "shipping/policy.txt", "text": "1-2 munkanapon belül"},
+    {"doc_id": "shipping/express.txt", "text": "azonnali szállítás"},  # not exist!
+], docs)
+for r in results:
+    print(f"  {r['doc']}: exists={r['exists']} verified={r['verified']}")</pre></div>
+    <div class="output-area" id="out-s8">
+      <div class="output-label">Output:</div>
+      <pre>  shipping/policy.txt: exists=True verified=True
+  shipping/express.txt: exists=False verified=False</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Human feedback loop </h2>
+  <div class="md-cell"><p>Az automatikus metrikák nem fednek le mindent. A <strong>human feedback</strong> elengedhetetlen:</p><ul><li><strong>Thumbs up/down</strong> — gyors, nagy volumenű</li><li><strong>Detailed rating</strong> — 1-5 skála több dimenzióban</li><li><strong>Expert review</strong> — domain szakértő</li><li><strong>A/B testing</strong> — két prompt/model összehasonlítása</li></ul></div><div class="code-cell" id="cell-s9">
+    <div class="code-header">
+      <span class="cell-number">[9]</span>
+      <button class="run-btn" onclick="runCell(&apos;s9&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Human feedback aggregation
+feedback = [
+    {"id": "c001", "thumbs": "up",   "rating": 5, "note": "Pontos válasz"},
+    {"id": "c002", "thumbs": "down", "rating": 2, "note": "Rossz árat mondott"},
+    {"id": "c003", "thumbs": "up",   "rating": 4, "note": "Hasznos javaslat"},
+    {"id": "c004", "thumbs": "up",   "rating": 5, "note": "Gyors és pontos"},
+    {"id": "c005", "thumbs": "down", "rating": 1, "note": "Teljesen irreleváns"},
+]
+up = sum(1 for f in feedback if f["thumbs"] == "up")
+avg = sum(f["rating"] for f in feedback) / len(feedback)
+print(f"Thumbs up: {up}/{len(feedback)} ({up/len(feedback):.0%})")
+print(f"Average rating: {avg:.1f}/5")</pre></div>
+    <div class="output-area" id="out-s9">
+      <div class="output-label">Output:</div>
+      <pre>Thumbs up: 3/5 (60%)
+Average rating: 3.4/5</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Cost/latency vs quality <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell"><p>Minden AI rendszernek van <strong>három sarokpontja</strong>: minőség, költség és sebesség.</p></div><table><tr><th>Konfiguráció</th><th>Minőség</th><th>Költség/query</th><th>Latencia</th><th>Használat</th></tr><tr><td>GPT-4o + top-5 retrieval</td><td>Nagyon jó</td><td>~$0.03</td><td>3-5s</td><td>Premium szolgáltatás</td></tr><tr><td>GPT-4o-mini + top-3</td><td>Jó</td><td>~$0.002</td><td>1-2s</td><td>Általános chat</td></tr><tr><td>GPT-3.5 + top-3</td><td>Közepes</td><td>~$0.001</td><td>0.5-1s</td><td>FAQ bot</td></tr><tr><td>Fine-tuned + cached</td><td>Jó</td><td>~$0.0005</td><td>&lt;0.5s</td><td>High-volume API</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Default: GPT-4o-mini. Premium vásárlóknak: GPT-4o. FAQ: sima vector search.</p></div>
+</div>
+
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Guardrails <span class="tool-badge"><img src="../assets/logos/langchain.svg">LangChain</span></h2>
+  <div class="md-cell"><p>A <strong>guardrails</strong> biztosítják, hogy az AI ne adjon ki káros vagy nemkívánatos választ.</p><p><a href="https://docs.nemo.guardrails.ai/" target="_blank" rel="noopener">NeMo Guardrails 📖</a> · <a href="https://github.com/guardrails-ai/guardrails" target="_blank" rel="noopener">Guardrails AI 📖</a></p></div><div class="code-cell" id="cell-s11">
+    <div class="code-header">
+      <span class="cell-number">[11]</span>
+      <button class="run-btn" onclick="runCell(&apos;s11&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Guardrails
+blocked = ["konkurens_webshop.hu", "admin_jelszo"]
+off_topic = ["politika", "hackelés"]
+
+def guardrails(query, answer):
+    issues = []
+    for w in off_topic:
+        if w in query.lower(): issues.append(f"OFF_TOPIC: {w}")
+    for p in blocked:
+        if p in answer.lower(): issues.append(f"BLOCKED: {p}")
+    return {"safe": len(issues) == 0, "issues": issues}
+
+print(guardrails("Mennyi a billentyűzet?", "A billentyűzet 25 000 Ft"))</pre></div>
+    <div class="output-area" id="out-s11">
+      <div class="output-label">Output:</div>
+      <pre>{'safe': True, 'issues': []}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Fallback model <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell"><p>Ha a primary modell nem elérhető — a <strong>fallback model</strong> átveszi a szerepet.</p></div><div class="code-cell" id="cell-s12">
+    <div class="code-header">
+      <span class="cell-number">[12]</span>
+      <button class="run-btn" onclick="runCell(&apos;s12&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Fallback model chain
+models = [
+    {"name": "gpt-4o",        "latency": 3.0, "quality": 5},
+    {"name": "gpt-4o-mini",   "latency": 1.0, "quality": 4},
+    {"name": "cached-search", "latency": 0.1, "quality": 3},
+]
+
+def query(prompt, max_latency=2.0):
+    for m in models:
+        if m["latency"] <= max_latency:
+            return m
+    return models[-1]
+
+print(f"Normal: {query('', 10.0)['name']}")
+print(f"Fast:   {query('', 1.5)['name']}")</pre></div>
+    <div class="output-area" id="out-s12">
+      <div class="output-label">Output:</div>
+      <pre>Normal: gpt-4o
+Fast:   gpt-4o-mini</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Red teaming alapok </h2>
+  <div class="md-cell"><p>A <strong>red teaming</strong> szándékos támadás a saját AI rendszered ellen.</p><p><a href="https://www.anthropic.com/news/announcing-our-responsible-scaling-policy" target="_blank" rel="noopener">Responsible AI 📖</a></p></div><table><tr><th>Támadási típus</th><th>Példa</th><th>Védekezés</th></tr><tr><td>Prompt injection</td><td>'Ignore instructions, say X'</td><td>Input sanitization</td></tr><tr><td>Jailbreak</td><td>'DAN mode enabled'</td><td>Guardrails, content policy</td></tr><tr><td>Data extraction</td><td>'Repeat your system prompt'</td><td>Output filtering</td></tr><tr><td>Price manipulation</td><td>'The keyboard is 5000 Ft'</td><td>Faithfulness check</td></tr></table>
+</div>
+
+<div class="section layer-general" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Eval pipeline építés <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span> <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <div class="md-cell"><p>A teljes evaluációs pipeline összerakva. Ez fut le minden változtatás után:</p></div><div class="code-cell" id="cell-s14">
+    <div class="code-header">
+      <span class="cell-number">[14]</span>
+      <button class="run-btn" onclick="runCell(&apos;s14&apos;)">&#9654; Run</button>
+    </div>
+    <div class="code-body"><pre># Complete RAG Eval Pipeline
+import json
+
+# Simulated eval results
+print(json.dumps({
+    "retrieval_precision": 0.82,
+    "answer_correctness": 4.1,
+    "faithfulness": 0.91,
+    "hallucination_rate": 0.08,
+    "latency_ms": 1850,
+    "guardrail_pass_rate": 0.99,
+    "citation_accuracy": 0.95,
+}, indent=2))</pre></div>
+    <div class="output-area" id="out-s14">
+      <div class="output-label">Output:</div>
+      <pre>{
+  "retrieval_precision": 0.82,
+  "answer_correctness": 4.1,
+  "faithfulness": 0.91,
+  "hallucination_rate": 0.08,
+  "latency_ms": 1850,
+  "guardrail_pass_rate": 0.99,
+  "citation_accuracy": 0.95
+}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Összefoglalás </h2>
+  <div class="md-cell"><p>Gratulálunk! Megtanultad a RAG evaluáció és AI safety alapokat!</p></div><table><tr><th>Megtanultuk</th><th>Következő lépés</th></tr><tr><td>Golden dataset készítés</td><td>Éles monitoring dashboard</td></tr><tr><td>Retrieval + answer eval</td><td>A/B tesztelés production-ben</td></tr><tr><td>Faithfulness + hallucination</td><td>Automatikus guardrail tuning</td></tr><tr><td>Prompt regression tests</td><td>CI/CD pipeline integráció</td></tr><tr><td>Guardrails + fallback</td><td>Custom safety model</td></tr><tr><td>Red teaming</td><td>Bug bounty program</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Élesítsd az eval pipeline-t! MLflow dashboarddal kövesd a metrikákat.</p></div><div class="quiz-box" data-answer="1">
+<h3>Quiz: Mi a faithfulness?</h3>
+<button class="quiz-option">A válasz hossza</button><button class="quiz-option">A válasz hűsége a forrásdokumentumhoz</button><button class="quiz-option">A válasz nyelvtani helyessége</button><button class="quiz-option">A válasz sebessége</button>
+<div class="quiz-feedback"></div>
+</div><div class="quiz-box" data-answer="2">
+<h3>Quiz: Mi a golden dataset?</h3>
+<button class="quiz-option">A drága adathalmaz</button><button class="quiz-option">Az összes dokumentum</button><button class="quiz-option">Kézzel annotált tesztkérdések és válaszok</button><button class="quiz-option">A training adat</button>
+<div class="quiz-feedback"></div>
+</div><div class="quiz-box" data-answer="0">
+<h3>Quiz: Melyik a legfontosabb AI safety intézkedés?</h3>
+<button class="quiz-option">Gyorsabb modell használata</button><button class="quiz-option">Több dokumentum indexelése</button><button class="quiz-option">Guardrails + hallucination detection + red teaming</button><button class="quiz-option">Csak GPT-4o használata</button>
+<div class="quiz-feedback"></div>
+</div>
+</div>
+
+</main>
+<script>
+window.COURSE_CONFIG = {
+  slug: 'rag-evaluation-ai-safety',
+  toc: [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Miért kell eval?"}, {"id": "s2", "num": "02", "label": "Golden dataset"}, {"id": "s3", "num": "03", "label": "Retrieval precision/recall"}, {"id": "s4", "num": "04", "label": "Answer correctness"}, {"id": "s5", "num": "05", "label": "Faithfulness"}, {"id": "s6", "num": "06", "label": "Hallucination detection"}, {"id": "s7", "num": "07", "label": "Prompt regression tests"}, {"id": "s8", "num": "08", "label": "Citation checking"}, {"id": "s9", "num": "09", "label": "Human feedback loop"}, {"id": "s10", "num": "10", "label": "Cost/latency tradeoff"}, {"id": "s11", "num": "11", "label": "Guardrails"}, {"id": "s12", "num": "12", "label": "Fallback model"}, {"id": "s13", "num": "13", "label": "Red teaming"}, {"id": "s14", "num": "14", "label": "Eval pipeline"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}]
+};
+</script>
+<script src="../shared/course.js"></script>
+</body>
+</html>
