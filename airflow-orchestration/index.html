@@ -23,6 +23,7 @@
   <div class="section-number">Section 00</div>
   <h2>Airflow & Orchestration <span class="tool-badge"><img src="../assets/logos/airflow.svg">Airflow</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
   <div class="md-cell"><p>Adatpipeline-ok ütemezése, monitorozása és hibakezelése Apache Airflow-val. Napi ETL DAG-ot építünk a WebShop Pro projekthez.</p></div><div class="callout "><div class="callout-title">Tartalom</div><p>DAG, operator, sensor, schedule, retry, backfill, XCom, connections</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>Napi webshop ETL DAG bronze/silver/gold rétegekkel</p></div>
+<div class="callout success"><div class="callout-title">Szójegyzék</div><p><span class="glossary-term" data-def="Directed Acyclic Graph - irányított körmentes gráf, task-ok függőségei">DAG</span> · <span class="glossary-term" data-def="Speciális Airflow operátor ami vár egy feltételre">Sensor</span> · <span class="glossary-term" data-def="Múltbeli időpontokra történő pipeline futtatás">Backfill</span></p></div>
 </div>
 <div class="section layer-intro" id="s1">
   <div class="section-number">Section 01</div>
@@ -319,6 +320,23 @@ Slack integration: #data-alerts channel</pre></div></div>
   <div class="section-number">Section 15</div>
   <h2>Összefoglalás</h2>
   <div class="md-cell"><p>Gratulálunk! Megtanultad az Airflow alapokat!</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>DAG, operátorok, schedule</td><td>dbt Analytics Engineering</td></tr><tr><td>XCom, sensor, retry</td><td>SQL transzformációk</td></tr><tr><td>Bronze/Silver/Gold DAG</td><td>Databricks Lakehouse</td></tr><tr><td>TaskFlow API</td><td>Modern pipeline-ok</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>dbt Analytics Engineering - ahol SQL transzformációkat építünk!</p></div>
+</div>
+
+<div class="quiz-box" data-answer="1">
+<h3>Quiz: Mi az XCom?</h3>
+<button class="quiz-option">Exterior Communication</button>
+<button class="quiz-option">Taskok közötti adatcsere</button>
+<button class="quiz-option">XML Communication</button>
+<button class="quiz-option">Extra Command</button>
+<div class="quiz-feedback"></div>
+</div>
+<div class="quiz-box" data-answer="1">
+<h3>Quiz: Melyik dekorátorral definiálunk DAG-ot a TaskFlow API-ban?</h3>
+<button class="quiz-option">@task</button>
+<button class="quiz-option">@dag</button>
+<button class="quiz-option">@pipeline</button>
+<button class="quiz-option">@schedule</button>
+<div class="quiz-feedback"></div>
 </div>
 </main>
 <script>

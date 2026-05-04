@@ -23,6 +23,7 @@
   <div class="section-number">Section 00</div>
   <h2>Docker alapok <span class="tool-badge"><img src="../assets/logos/docker.svg">Docker</span> <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span> <span class="tool-badge"><img src="../assets/logos/prometheus.svg">Prometheus</span></h2>
   <div class="md-cell"><p>A Docker konténerizáció a modern data engineering alapja. Lokális data platformot építünk egyetlen docker-compose.yml fájlból.</p></div><div class="callout "><div class="callout-title">Tartalom</div><p>Dockerfile, Compose, Postgres, MinIO, Spark, Airflow, MLflow, Prometheus, Grafana</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>Teljes lokális data stack: 7 szolgáltatás egy paranccsal!</p></div>
+<div class="callout success"><div class="callout-title">Szójegyzék</div><p><span class="glossary-term" data-def="Multi-container Docker alkalmazások definíciója egyetlen YAML fájlban">Docker Compose</span> · <span class="glossary-term" data-def="S3-compatible objektumtároló, lokális fejlesztésre">MinIO</span> · <span class="glossary-term" data-def="Monitoring és alerting rendszer, metrikák gyűjtésére">Prometheus</span></p></div>
 </div>
 <div class="section layer-intro" id="s1">
   <div class="section-number">Section 01</div>
@@ -310,6 +311,23 @@ Resource usage:
   <div class="section-number">Section 15</div>
   <h2>Összefoglalás</h2>
   <div class="md-cell"><p>Gratulálunk! Felépítetted a teljes lokális data platformot!</p></div><table><tr><th>Felépítettük</th><th>Következő</th></tr><tr><td>Postgres, MinIO, Spark</td><td>Delta Table Crash Course</td></tr><tr><td>Airflow, MLflow</td><td>Bronze/Silver/Gold pipeline</td></tr><tr><td>Prometheus, Grafana</td><td>Monitoring dashboardek</td></tr><tr><td>Docker networking, volumes</td><td>Production best practices</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Delta Table Crash Course - ahol a platformon építkezünk!</p></div>
+</div>
+
+<div class="quiz-box" data-answer="1">
+<h3>Quiz: Mi a Docker volume célja?</h3>
+<button class="quiz-option">Hálózat konfiguráció</button>
+<button class="quiz-option">Perzisztens adattárolás</button>
+<button class="quiz-option">CPU limitálás</button>
+<button class="quiz-option">Log kezelés</button>
+<div class="quiz-feedback"></div>
+</div>
+<div class="quiz-box" data-answer="3">
+<h3>Quiz: Melyik nem Docker Compose kulcsszó?</h3>
+<button class="quiz-option">services</button>
+<button class="quiz-option">volumes</button>
+<button class="quiz-option">networks</button>
+<button class="quiz-option">functions</button>
+<div class="quiz-feedback"></div>
 </div>
 </main>
 <script>

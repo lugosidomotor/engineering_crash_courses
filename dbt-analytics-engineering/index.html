@@ -23,6 +23,7 @@
   <div class="section-number">Section 00</div>
   <h2>dbt Analytics Engineering <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
   <div class="md-cell"><p>Az analytics engineering a data engineering és a business intelligence találkozása. A dbt (data build tool) segítségével SQL-ben írunk transzformációkat, teszteket és dokumentációt.</p></div><div class="callout "><div class="callout-title">Tartalom</div><p>staging, intermediate, mart modellek, schema tests, incremental models, snapshots, macros</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>WebShop Pro analytics layer: staging -> intermediate -> mart modellek</p></div>
+<div class="callout success"><div class="callout-title">Szójegyzék</div><p><span class="glossary-term" data-def="data build tool - SQL transzformációk és tesztek framework-je">dbt</span> · <span class="glossary-term" data-def="Hogyan tárolódik a dbt modell: view, table, incremental">Materialization</span> · <span class="glossary-term" data-def="Adatok származási láncolata, modellfüggőségek vizualizációja">Lineage</span></p></div>
 </div>
 <div class="section layer-intro" id="s1">
   <div class="section-number">Section 01</div>
@@ -326,6 +327,23 @@ Docs available at http://localhost:8080</pre></div></div>
   <div class="section-number">Section 15</div>
   <h2>Összefoglalás</h2>
   <div class="md-cell"><p>Gratulálunk! Felépítetted a WebShop Pro analytics layert!</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>Staging/Intermediate/Mart</td><td>Databricks Lakehouse</td></tr><tr><td>Schema tesztek, incremental</td><td>Production deployment</td></tr><tr><td>Snapshots, macros</td><td>Delta Live Tables</td></tr><tr><td>Dokumentáció, lineage</td><td>Unity Catalog</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Databricks Lakehouse - ahol managed környezetben dolgozunk!</p></div>
+</div>
+
+<div class="quiz-box" data-answer="1">
+<h3>Quiz: Mi a staging réteg célja?</h3>
+<button class="quiz-option">Adatok aggregálása</button>
+<button class="quiz-option">Nyers adatok tisztítása és átnevezése</button>
+<button class="quiz-option">Business metrikák</button>
+<button class="quiz-option">Dashboard készítés</button>
+<div class="quiz-feedback"></div>
+</div>
+<div class="quiz-box" data-answer="2">
+<h3>Quiz: Melyik dbt materialization épít újra minden futáskor?</h3>
+<button class="quiz-option">table</button>
+<button class="quiz-option">incremental</button>
+<button class="quiz-option">view</button>
+<button class="quiz-option">ephemeral</button>
+<div class="quiz-feedback"></div>
 </div>
 </main>
 <script>

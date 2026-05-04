@@ -23,6 +23,7 @@
   <div class="section-number">Section 00</div>
   <h2>SQL alapok <span class="tool-badge"><img src="../assets/logos/parquet.svg">Parquet</span></h2>
   <div class="md-cell"><p>Az SQL a data engineering alapnyelve. Ebben a kurzusban a WebShop Pro projekten keresztül tanulod meg az SQL alapokat és az adatmodellezést.</p></div><div class="callout "><div class="callout-title">Tartalom</div><p>SELECT, JOIN, Aggregáció, Window Functions, CTE, DML/DDL, Tranzakciók, Star Schema, SCD, Normalizálás, Parquet, Teljes analitikai modell</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>Felépítjük a WebShop Pro teljes analitikai adatmodelljét.</p></div>
+<div class="callout success"><div class="callout-title">Szójegyzék</div><p><span class="glossary-term" data-def="Common Table Expression - névesített allekérdezés a WITH kulcsszóval">CTE</span> · <span class="glossary-term" data-def="Slowly Changing Dimension - lassan változó dimenzió a data warehouse-ban">SCD</span> · <span class="glossary-term" data-def="Központi fact tábla + dimenzió táblák, analitikai lekérdezésekre optimalizálva">Star Schema</span></p></div>
 </div>
 <div class="section layer-intro" id="s1">
   <div class="section-number">Section 01</div>
@@ -288,6 +289,23 @@ Regular    |     67 | 23499.65</pre></div></div>
   <div class="section-number">Section 19</div>
   <h2>Összefoglalás</h2>
   <div class="md-cell"><p>Gratulálunk! Végigcsináltad az SQL & Data Modeling kurzust.</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>SELECT, JOIN, GROUP BY</td><td>Python for DE</td></tr><tr><td>Window functions, CTE</td><td>Pandas DataFrame</td></tr><tr><td>Star schema, SCD</td><td>Delta Lake</td></tr><tr><td>DuckDB + Parquet</td><td>PyArrow</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Python for Data Engineering!</p></div>
+</div>
+
+<div class="quiz-box" data-answer="2">
+<h3>Quiz: Melyik JOIN adja vissza az összes sort mindkét táblából?</h3>
+<button class="quiz-option">INNER JOIN</button>
+<button class="quiz-option">LEFT JOIN</button>
+<button class="quiz-option">FULL JOIN</button>
+<button class="quiz-option">CROSS JOIN</button>
+<div class="quiz-feedback"></div>
+</div>
+<div class="quiz-box" data-answer="1">
+<h3>Quiz: Mi az SCD Type 2 stratégia?</h3>
+<button class="quiz-option">Felülírjuk a régi értéket</button>
+<button class="quiz-option">Új sort szúrunk be időintervallummal</button>
+<button class="quiz-option">Új oszlopot adunk hozzá</button>
+<button class="quiz-option">Nem változtatunk semmit</button>
+<div class="quiz-feedback"></div>
 </div>
 </main>
 <script>
