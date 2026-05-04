@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
 <title>Data & AI Engineering Crash Course-ok magyarul</title>
 <meta name="description" content="Projektalapú Data & AI Engineering kurzusok magyarul: Delta Lake, Spark, Databricks, Airflow, dbt, RAG, MLflow és MLOps gyakorlati példákkal.">
 <link rel="canonical" href="https://lugosidomotor.github.io/engineering_crash_courses/">
@@ -104,10 +105,12 @@ img{max-width:100%;display:block}
 
 /* ── Course Grid ── */
 .course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
-.course-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:14px;padding:24px;transition:all .25s;position:relative;display:flex;flex-direction:column}
+.course-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:14px;padding:24px;transition:all .25s;position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit}
 .course-card:hover{border-color:rgba(88,166,255,.45);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
-.course-card.planned{opacity:.65}
-.course-card.planned:hover{opacity:.85}
+/* Card icon */
+.card-title-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.card-icon{width:36px;height:36px;flex-shrink:0;filter:brightness(0) invert(1) opacity(.85)}
+.card-icon-fallback{width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#58a6ff;background:rgba(88,166,255,.1);border-radius:8px}
 .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
 .card-badges{display:flex;gap:6px;flex-wrap:wrap}
 .badge{padding:3px 10px;border-radius:10px;font-size:.7rem;font-weight:600;letter-spacing:.3px}
@@ -254,9 +257,9 @@ img{max-width:100%;display:block}
       <h3>🏗️ Foundation</h3>
       <p class="path-meta">Alapozás · 3 kurzus · Kezdő</p>
       <ol class="path-steps">
-        <li><a href="./sql-data-modeling/">SQL & Data Modeling</a> <span class="step-tag">Tervezett</span></li>
-        <li><a href="./python-data-engineering/">Python for Data Engineering</a> <span class="step-tag">Tervezett</span></li>
-        <li><a href="./docker-local-data-platform/">Docker & Local Data Platform</a> <span class="step-tag">Tervezett</span></li>
+        <li><a href="./sql-data-modeling/">SQL & Data Modeling</a> <span class="step-tag">Kész</span></li>
+        <li><a href="./python-data-engineering/">Python for Data Engineering</a> <span class="step-tag">Kész</span></li>
+        <li><a href="./docker-local-data-platform/">Docker & Local Data Platform</a> <span class="step-tag">Kész</span></li>
       </ol>
     </div>
 
@@ -265,14 +268,14 @@ img{max-width:100%;display:block}
       <h3>⚡ Data Engineering</h3>
       <p class="path-meta">Teljes pipeline · 8 kurzus · Kezdőtől haladóig</p>
       <ol class="path-steps">
-        <li class="planned">SQL & Data Modeling</li>
-        <li class="planned">Python for Data Engineering</li>
-        <li><a href="./delta-table-crash-course/">Delta Table Crash Course</a> <span class="step-tag">Kész</span></li>
-        <li><a href="./spark-crash-course/">Apache Spark Crash Course</a> <span class="step-tag">Kész</span></li>
-        <li class="planned">Airflow & Orchestration</li>
-        <li class="planned">dbt Analytics Engineering</li>
-        <li class="planned">Databricks Lakehouse</li>
-        <li><a href="./ai-data-engineer/">AI Data Engineer</a> <span class="step-tag">Kész</span></li>
+        <li><a href="./sql-data-modeling/">SQL & Data Modeling</a></li>
+        <li><a href="./python-data-engineering/">Python for Data Engineering</a></li>
+        <li><a href="./delta-table-crash-course/">Delta Table Crash Course</a></li>
+        <li><a href="./spark-crash-course/">Apache Spark Crash Course</a></li>
+        <li><a href="./airflow-orchestration/">Airflow & Orchestration</a></li>
+        <li><a href="./dbt-analytics-engineering/">dbt Analytics Engineering</a></li>
+        <li><a href="./databricks-lakehouse/">Databricks Lakehouse</a></li>
+        <li><a href="./ai-data-engineer/">AI Data Engineer</a></li>
       </ol>
     </div>
 
@@ -281,12 +284,12 @@ img{max-width:100%;display:block}
       <h3>🤖 AI Engineering</h3>
       <p class="path-meta">LLM → RAG → Production · 6 kurzus · Középhaladó</p>
       <ol class="path-steps">
-        <li class="planned">Python for Data Engineering</li>
-        <li class="planned">Docker & Local Data Platform</li>
-        <li><a href="./ai-engineering/">AI Engineering</a> <span class="step-tag">Kész</span></li>
-        <li class="planned">LLMOps / GenAI Production</li>
-        <li class="planned">Databricks Lakehouse</li>
-        <li><a href="./aiops-mlops/">AIOps & MLOps</a> <span class="step-tag">Kész</span></li>
+        <li><a href="./python-data-engineering/">Python for Data Engineering</a></li>
+        <li><a href="./docker-local-data-platform/">Docker & Local Data Platform</a></li>
+        <li><a href="./ai-engineering/">AI Engineering</a></li>
+        <li><a href="./llmops-genai-production/">LLMOps / GenAI Production</a></li>
+        <li><a href="./databricks-lakehouse/">Databricks Lakehouse</a></li>
+        <li><a href="./aiops-mlops/">AIOps & MLOps</a></li>
       </ol>
     </div>
   </div>
@@ -299,7 +302,7 @@ img{max-width:100%;display:block}
     Kurzusok
   </div>
   <h2>Összes kurzus egy helyen</h2>
-  <p class="section-desc">5 kész kurzus és 7 tervezett. Minden kurzus interaktív, projektalapú és magyar nyelvű.</p>
+  <p class="section-desc">12 interaktív, projektalapú és magyar nyelvű kurzus. Minden kurzus kész és azonnal elkezdhető.</p>
 
   <div class="controls">
     <div class="search-box">
@@ -308,11 +311,10 @@ img{max-width:100%;display:block}
     </div>
     <div class="filter-chips" id="filters">
       <button class="chip active" data-filter="all">Összes</button>
-      <button class="chip" data-filter="Kész">✅ Kész</button>
-      <button class="chip" data-filter="Tervezett">📋 Tervezett</button>
       <button class="chip" data-filter="Foundation">🏗️ Foundation</button>
       <button class="chip" data-filter="Data Engineering">⚡ Data Engineering</button>
       <button class="chip" data-filter="AI Engineering">🤖 AI Engineering</button>
+      <button class="chip" data-filter="Analytics Engineering">📐 Analytics Engineering</button>
     </div>
   </div>
 
@@ -410,6 +412,7 @@ const COURSES = [
     "sectionCount": 26,
     "stack": ["python", "delta-lake", "parquet"],
     "status": "Kész",
+    "icon": "delta-lake",
     "url": "./delta-table-crash-course/",
     "whatYouBuild": "Bronze/Silver/Gold lakehouse adatmodell"
   },
@@ -423,6 +426,7 @@ const COURSES = [
     "sectionCount": 17,
     "stack": ["python", "apachespark", "delta-lake"],
     "status": "Kész",
+    "icon": "apachespark",
     "url": "./spark-crash-course/",
     "whatYouBuild": "Nagy volumenű ETL pipeline"
   },
@@ -436,6 +440,7 @@ const COURSES = [
     "sectionCount": 20,
     "stack": ["python", "openai", "chroma", "streamlit"],
     "status": "Kész",
+    "icon": "openai",
     "url": "./ai-engineering/",
     "whatYouBuild": "RAG ügyfélszolgálati chatbot"
   },
@@ -449,6 +454,7 @@ const COURSES = [
     "sectionCount": 15,
     "stack": ["python", "mlflow", "fastapi", "docker", "grafana"],
     "status": "Kész",
+    "icon": "mlflow",
     "url": "./aiops-mlops/",
     "whatYouBuild": "Churn modell deployment pipeline"
   },
@@ -462,6 +468,7 @@ const COURSES = [
     "sectionCount": 18,
     "stack": ["python", "apachespark", "delta-lake", "apachekafka", "feast", "dbt"],
     "status": "Kész",
+    "icon": "feast",
     "url": "./ai-data-engineer/",
     "whatYouBuild": "Feature store és data quality pipeline"
   },
@@ -474,7 +481,8 @@ const COURSES = [
     "estimatedTime": "3–4 óra",
     "sectionCount": 20,
     "stack": ["sql", "parquet"],
-    "status": "Tervezett",
+    "status": "Kész",
+    "icon": "sql",
     "url": "./sql-data-modeling/",
     "whatYouBuild": "WebShop Pro analitikai adatmodell"
   },
@@ -487,7 +495,8 @@ const COURSES = [
     "estimatedTime": "3–4 óra",
     "sectionCount": 18,
     "stack": ["python", "pandas", "parquet"],
-    "status": "Tervezett",
+    "status": "Kész",
+    "icon": "python",
     "url": "./python-data-engineering/",
     "whatYouBuild": "Lokális Python ETL mini-framework"
   },
@@ -500,7 +509,8 @@ const COURSES = [
     "estimatedTime": "3–4 óra",
     "sectionCount": 16,
     "stack": ["docker", "prometheus", "grafana"],
-    "status": "Tervezett",
+    "status": "Kész",
+    "icon": "docker",
     "url": "./docker-local-data-platform/",
     "whatYouBuild": "Lokális data stack Docker Compose-szal"
   },
@@ -513,7 +523,8 @@ const COURSES = [
     "estimatedTime": "3–4 óra",
     "sectionCount": 16,
     "stack": ["python", "airflow", "delta-lake"],
-    "status": "Tervezett",
+    "status": "Kész",
+    "icon": "airflow",
     "url": "./airflow-orchestration/",
     "whatYouBuild": "Napi webshop ETL DAG bronze/silver/gold rétegekkel"
   },
@@ -526,7 +537,8 @@ const COURSES = [
     "estimatedTime": "3–4 óra",
     "sectionCount": 16,
     "stack": ["sql", "dbt", "delta-lake"],
-    "status": "Tervezett",
+    "status": "Kész",
+    "icon": "dbt",
     "url": "./dbt-analytics-engineering/",
     "whatYouBuild": "Webshop analytics layer staging, intermediate és mart modellekkel"
   },
@@ -539,7 +551,8 @@ const COURSES = [
     "estimatedTime": "4–6 óra",
     "sectionCount": 18,
     "stack": ["databricks", "delta-lake", "apachespark", "mlflow", "unity-catalog"],
-    "status": "Tervezett",
+    "status": "Kész",
+    "icon": "databricks",
     "url": "./databricks-lakehouse/",
     "whatYouBuild": "Databricks-alapú lakehouse pipeline bronze/silver/gold rétegekkel"
   },
@@ -552,7 +565,8 @@ const COURSES = [
     "estimatedTime": "3–5 óra",
     "sectionCount": 16,
     "stack": ["python", "openai", "mlflow", "grafana"],
-    "status": "Tervezett",
+    "status": "Kész",
+    "icon": "openai",
     "url": "./llmops-genai-production/",
     "whatYouBuild": "Production-ready RAG/LLM alkalmazás monitoringgal és eval datasetekkel"
   }
@@ -594,11 +608,7 @@ function renderCourses() {
   let filtered = COURSES.filter(c => {
     // Filter
     if (activeFilter !== 'all') {
-      if (activeFilter === 'Kész' || activeFilter === 'Tervezett') {
-        if (c.status !== activeFilter) return false;
-      } else {
         if (!c.path.includes(activeFilter)) return false;
-      }
     }
     // Search
     if (searchQuery) {
@@ -618,10 +628,6 @@ function renderCourses() {
   empty.style.display = 'none';
 
   grid.innerHTML = filtered.map((c, i) => {
-    const isReady = c.status === 'Kész';
-    const statusBadge = isReady
-      ? '<span class="badge badge-status-ready">Kész</span>'
-      : '<span class="badge badge-status-planned">Tervezett</span>';
     const diffBadge = `<span class="badge badge-difficulty">${c.difficulty}</span>`;
     const pathBadges = c.path.map(p => `<span class="badge badge-path">${p}</span>`).join('');
     const stackChips = c.stack.map(s => {
@@ -630,17 +636,21 @@ function renderCourses() {
       return `<span class="stack-chip">${img}${name}</span>`;
     }).join('');
 
-    const btnClass = isReady ? 'card-btn card-btn-ready' : 'card-btn card-btn-planned';
-    const btnText = isReady ? '→ Kurzus megnyitása' : 'Hamarosan';
-    const linkOpen = isReady ? `<a href="${c.url}" class="${btnClass}">${btnText}</a>` : `<span class="${btnClass}">${btnText}</span>`;
+    // Course icon image
+    const iconSvg = c.icon && c.icon !== 'sql'
+      ? `<img class="card-icon" src="./assets/logos/${c.icon}.svg" alt="${c.title}" onerror="this.style.display='none'">`
+      : `<div class="card-icon-fallback">SQL</div>`;
 
     return `
-      <div class="course-card ${isReady ? '' : 'planned'}">
+      <a href="${c.url}" class="course-card">
         <div class="card-top">
-          <div class="card-badges">${statusBadge}${diffBadge}${pathBadges}</div>
+          <div class="card-badges">${diffBadge}${pathBadges}</div>
           <span class="card-number">#${String(i+1).padStart(2,'0')}</span>
         </div>
-        <h3>${c.title}</h3>
+        <div class="card-title-row">
+          ${iconSvg}
+          <h3>${c.title}</h3>
+        </div>
         <p class="card-desc">${c.description}</p>
         <div class="card-build"><strong>Mit építesz:</strong> ${c.whatYouBuild}</div>
         <div class="card-meta">
@@ -648,8 +658,8 @@ function renderCourses() {
           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>${c.sectionCount} szekció</span>
         </div>
         <div class="card-stack">${stackChips}</div>
-        <div class="card-footer">${linkOpen}</div>
-      </div>`;
+        <div class="card-footer"><span class="card-btn card-btn-ready">→ Kurzus megnyitása</span></div>
+      </a>`;
   }).join('');
 }
 
