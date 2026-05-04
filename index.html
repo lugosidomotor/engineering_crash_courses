@@ -111,12 +111,10 @@ img{max-width:100%;display:block}
 .card-cover{position:relative;height:160px;overflow:hidden}
 .card-cover img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
 .course-card:hover .card-cover img{transform:scale(1.05)}
-.card-cover-overlay{position:absolute;bottom:0;left:0;right:0;padding:10px 16px;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.card-cover-overlay{position:absolute;inset:0;padding:10px 16px;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(transparent 20%,rgba(0,0,0,.75))}
 .card-body{padding:16px 24px 0;display:flex;flex-direction:column;flex:1}
-/* Card icon */
-.card-title-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
-.card-icon{width:36px;height:36px;flex-shrink:0;filter:brightness(0) invert(1) opacity(.85)}
-.card-icon-fallback{width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#58a6ff;background:rgba(88,166,255,.1);border-radius:8px}
+/* Card title */
+.course-card h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;line-height:1.3}
 .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
 .card-badges{display:flex;gap:6px;flex-wrap:wrap}
 .badge{padding:3px 10px;border-radius:10px;font-size:.7rem;font-weight:600;letter-spacing:.3px}
@@ -138,7 +136,10 @@ img{max-width:100%;display:block}
 .card-footer{margin-top:auto;padding-top:14px;padding-bottom:24px;border-top:1px solid rgba(48,54,61,.4)}
 .card-btn{display:block;text-align:center;padding:10px;border-radius:8px;font-size:.88rem;font-weight:600;transition:all .15s}
 .card-btn-ready{background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.25)}
-.card-btn-ready:hover{background:rgba(63,185,80,.2);text-decoration:none}
+.card-btn-ready:hover{background:rgba(63,185,80,.2)}
+.course-card:hover h3{text-decoration:none}
+.card-cover-overlay .card-badges{position:relative;z-index:2}
+.card-cover-overlay .card-number{color:rgba(255,255,255,.7);position:relative;z-index:2}
 .card-btn-planned{background:rgba(139,148,158,.08);color:#6e7681;border:1px solid rgba(48,54,61,.4);cursor:default}
 
 /* ── Empty state ── */
@@ -402,7 +403,7 @@ img{max-width:100%;display:block}
 <!-- Footer -->
 <footer class="site-footer">
   <p>Engineering Crash Courses · Projektalapú Data & AI Engineering kurzusok magyarul</p>
-  <p style="margin-top:6px"><a href="https://github.com/lugosidomotor/engineering_crash_courses" target="_blank" rel="noopener">GitHub</a> · Nyílt forráskódú · <a href="https://github.com/lugosidomotor/engineering_crash_courses/blob/main/LICENSE">MIT License</a></p>
+  <p style="margin-top:6px"><a href="https://lugosidomotor.hu" target="_blank" rel="noopener">lugosidomotor.hu</a> · <a href="https://github.com/lugosidomotor/engineering_crash_courses" target="_blank" rel="noopener">GitHub</a> · <a href="https://github.com/lugosidomotor/engineering_crash_courses/blob/main/LICENSE">MIT License</a></p>
 </footer>
 
 <script>
@@ -654,11 +655,6 @@ function renderCourses() {
       return `<span class="stack-chip">${img}${name}</span>`;
     }).join('');
 
-    // Course icon image
-    const iconSvg = c.icon && c.icon !== 'sql'
-      ? `<img class="card-icon" src="./assets/logos/${c.icon}.svg" alt="${c.title}" onerror="this.style.display='none'">`
-      : `<div class="card-icon-fallback">SQL</div>`;
-
     return `
       <a href="${c.url}" class="course-card">
         <div class="card-cover">
@@ -669,10 +665,7 @@ function renderCourses() {
           </div>
         </div>
         <div class="card-body">
-          <div class="card-title-row">
-            ${iconSvg}
-            <h3>${c.title}</h3>
-          </div>
+          <h3>${c.title}</h3>
           <p class="card-desc">${c.description}</p>
           <div class="card-build"><strong>Mit építesz:</strong> ${c.whatYouBuild}</div>
           <div class="card-meta">
