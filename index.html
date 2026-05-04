@@ -1,305 +1,304 @@
-     1|<!DOCTYPE html>
-     2|<html lang="hu">
-     3|<head>
-     4|<meta charset="UTF-8">
-     5|<meta name="viewport" content="width=device-width, initial-scale=1.0">
-     6|<title>Engineering Crash Courses</title>
-     7|<style>
-     8|@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
-     9|
-    10|:root {
-    11|  --bg: #0a0a0f;
-    12|  --bg2: #111118;
-    13|  --bg3: #1a1a25;
-    14|  --cyan: #00d4ff;
-    15|  --green: #00ff88;
-    16|  --orange: #ff8800;
-    17|  --purple: #b366ff;
-    18|  --yellow: #ffd700;
-    19|  --red: #ff4466;
-    20|  --text: #e0e0e8;
-    21|  --text-dim: #888899;
-    22|  --border: #2a2a3a;
-    23|}
-    24|
-    25|* { margin:0; padding:0; box-sizing:border-box; }
-    26|html { scroll-behavior: smooth; }
-    27|body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.7; }
-    28|
-    29|/* ── Header ── */
-    30|header {
-    31|  background: linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.85) 100%);
-    32|  backdrop-filter: blur(12px);
-    33|  border-bottom: 1px solid var(--border);
-    34|  padding: 16px 32px;
-    35|  display: flex; align-items: center; justify-content: space-between;
-    36|  position: sticky; top: 0; z-index: 100;
-    37|}
-    38|.logo {
-    39|  font-family: 'JetBrains Mono', monospace;
-    40|  font-weight: 700; font-size: 1.2rem;
-    41|  background: linear-gradient(135deg, var(--cyan), var(--purple));
-    42|  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    43|  text-decoration: none;
-    44|}
-    45|.header-sub { color: var(--text-dim); font-size: .85rem; }
-    46|
-    47|/* ── Hero ── */
-    48|.hero {
-    49|  text-align: center;
-    50|  padding: 80px 32px 48px;
-    51|  background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 60%),
-    52|              radial-gradient(ellipse at 30% 0%, rgba(179,102,255,0.06) 0%, transparent 50%);
-    53|}
-    54|.hero h1 {
-    55|  font-size: 3rem; font-weight: 900;
-    56|  background: linear-gradient(135deg, var(--cyan), var(--purple), var(--green));
-    57|  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    58|  margin-bottom: 16px;
-    59|}
-    60|.hero p { color: var(--text-dim); font-size: 1.15rem; max-width: 640px; margin: 0 auto 24px; }
-    61|.hero-stats { display:flex; gap:32px; justify-content:center; margin-top:24px; }
-    62|.hero-stat { text-align:center; }
-    63|.hero-stat .num { font-size:2rem; font-weight:900; color:var(--cyan); }
-    64|.hero-stat .label { font-size:.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; }
-    65|
-    66|/* ── Course grid ── */
-    67|.courses-section { padding: 48px 32px 80px; max-width: 1200px; margin: 0 auto; }
-    68|.courses-section h2 {
-    69|  font-size: 1.5rem; font-weight: 700; margin-bottom: 32px;
-    70|  color: var(--text);
-    71|}
-    72|.courses-section h2 span { color: var(--text-dim); font-weight: 400; font-size: 1rem; }
-    73|
-    74|.grid {
-    75|  display: grid;
-    76|  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    77|  gap: 24px;
-    78|}
-    79|
-    80|/* ── Course card ── */
-    81|.card {
-    82|  background: var(--bg2);
-    83|  border: 1px solid var(--border);
-    84|  border-radius: 16px;
-    85|  padding: 28px;
-    86|  position: relative;
-    87|  overflow: hidden;
-    88|  transition: transform .25s, box-shadow .25s, border-color .25s;
-    89|  text-decoration: none;
-    90|  color: var(--text);
-    91|  display: flex; flex-direction: column;
-    92|}
-    93|.card::before {
-    94|  content: '';
-    95|  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    96|  background: var(--accent);
-    97|  opacity: 0; transition: opacity .25s;
-    98|}
-    99|.card:hover {
-   100|  transform: translateY(-4px);
-   101|  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 24px var(--glow);
-   102|  border-color: var(--accent);
-   103|}
-   104|.card:hover::before { opacity: 1; }
-   105|
-   106|.card-status {
-   107|  position: absolute; top: 16px; right: 16px;
-   108|  font-size: .7rem; font-weight: 600; text-transform: uppercase;
-   109|  letter-spacing: .05em; padding: 4px 10px; border-radius: 20px;
-   110|}
-   111|.status-ready { background: rgba(0,255,136,0.15); color: var(--green); }
-   112|.status-soon { background: rgba(255,136,0,0.15); color: var(--orange); }
-   113|
-   114|.card-number {
-   115|  font-family: 'JetBrains Mono', monospace;
-   116|  font-size: .7rem; color: var(--text-dim); margin-bottom: 8px;
-   117|}
-   118|.card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
-   119|.card-desc { color: var(--text-dim); font-size: .9rem; line-height: 1.6; margin-bottom: 20px; flex:1; }
-   120|
-   121|.card-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-   122|.card-tools img {
-   123|  width: 24px; height: 24px;
-   124|  filter: brightness(0) invert(1) opacity(.7);
-   125|  transition: opacity .2s;
-   126|}
-   127|.card:hover .card-tools img { opacity: 1; }
-   128|
-   129|.card-meta {
-   130|  display: flex; justify-content: space-between; align-items: center;
-   131|  margin-top: 16px; padding-top: 16px;
-   132|  border-top: 1px solid var(--border);
-   133|  font-size: .8rem; color: var(--text-dim);
-   134|}
-   135|.card-diff {
-   136|  padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: .7rem;
-   137|}
-   138|.diff-beginner { background: rgba(0,255,136,0.12); color: var(--green); }
-   139|.diff-intermediate { background: rgba(255,136,0,0.12); color: var(--orange); }
-   140|.diff-advanced { background: rgba(255,68,102,0.12); color: var(--red); }
-   141|
-   142|.card-arrow {
-   143|  font-size: 1.2rem;
-   144|  color: var(--accent);
-   145|  transition: transform .2s;
-   146|}
-   147|.card:hover .card-arrow { transform: translateX(4px); }
-   148|
-   149|/* ── Footer ── */
-   150|footer {
-   151|  text-align: center; padding: 32px;
-   152|  border-top: 1px solid var(--border);
-   153|  color: var(--text-dim); font-size: .8rem;
-   154|}
-   155|footer a { color: var(--cyan); text-decoration: none; }
-   156|
-   157|/* ── Responsive ── */
-   158|@media (max-width: 768px) {
-   159|  .hero h1 { font-size: 2rem; }
-   160|  .hero { padding: 48px 16px 32px; }
-   161|  .courses-section { padding: 32px 16px 60px; }
-   162|  .grid { grid-template-columns: 1fr; }
-   163|  header { padding: 12px 16px; }
-   164|}
-   165|@media (min-width: 769px) and (max-width: 1024px) {
-   166|  .grid { grid-template-columns: repeat(2, 1fr); }
-   167|}
-   168|</style>
-   169|</head>
-   170|<body>
-   171|
-   172|<header>
-   173|  <a href="index.html" class="logo">&lt;/&gt; Engineering Crash Courses</a>
-   174|  <span class="header-sub">Interaktív notebook-alapú kurzusok</span>
-   175|</header>
-   176|
-   177|<section class="hero">
-   178|  <h1>Engineering Crash Courses</h1>
-   179|  <p>Interaktív, notebook-alapú kurzusok data és AI szakembereknek. Futtatható kód cellák, eszközlogók, vizuális diagramok és valós példák.</p>
-   180|  <div class="hero-stats">
-   181|    <div class="hero-stat"><div class="num">5</div><div class="label">Kurzus</div></div>
-   182|    <div class="hero-stat"><div class="num">95</div><div class="label">Section</div></div>
-   183|    <div class="hero-stat"><div class="num">50+</div><div class="label">Tool</div></div>
-   184|  </div>
-   185|</section>
-   186|
-   187|<section class="courses-section">
-   188|  <h2>Kurzusok <span>— válassz egy témát és kezdj el tanulni</span></h2>
-   189|  <div class="grid">
-   190|
-   191|    <!-- Data Engineering -->
-   192|    <a href="de-crash-course/index.html" class="card" style="--accent:var(--cyan); --glow:rgba(0,212,255,0.15);">
-   193|      <span class="card-status status-ready">Kész</span>
-   194|      <div class="card-number">COURSE 01</div>
-   195|      <h3>Data Engineering</h3>
-   196|      <div class="card-desc">Delta table lokálisan, Bronze/Silver/Gold rétegek, ETL/ELT pipeline, fact/dimension modellezés, batch és streaming feldolgozás — mind Python és deltalake segítségével.</div>
-   197|      <div class="card-tools">
-   198|        <img src="de-crash-course/assets/logos/delta-lake.svg" alt="Delta Lake">
-   199|        <img src="de-crash-course/assets/logos/apachespark.svg" alt="Spark">
-   200|        <img src="de-crash-course/assets/logos/python.svg" alt="Python">
-   201|        <img src="de-crash-course/assets/logos/parquet.svg" alt="Parquet">
-   202|        <img src="de-crash-course/assets/logos/dbt.svg" alt="dbt">
-   203|        <img src="de-crash-course/assets/logos/pandas.svg" alt="pandas">
-   204|      </div>
-   205|      <div class="card-meta">
-   206|        <span class="card-diff diff-beginner">Kezdő</span>
-   207|        <span>26 section</span>
-   208|        <span class="card-arrow">→</span>
-   209|      </div>
-   210|    </a>
-   211|
-   212|    <!-- AI Engineering -->
-   213|    <a href="ai-engineering/index.html" class="card" style="--accent:var(--purple); --glow:rgba(179,102,255,0.15);">
-   214|      <span class="card-status status-soon">Hamarosan</span>
-   215|      <div class="card-number">COURSE 02</div>
-   216|      <h3>AI Engineering</h3>
-   217|      <div class="card-desc">LLM alkalmazások fejlesztése RAG-pipeline-nal: prompt engineering, vektoradatbázisok, evaluációs keretrendszerek, monitoring és éles üzemeltetés a prototípustól a productionig.</div>
-   218|      <div class="card-tools">
-   219|        <img src="ai-engineering/assets/logos/openai.svg" alt="OpenAI">
-   220|        <img src="ai-engineering/assets/logos/chroma.svg" alt="Chroma">
-   221|        <img src="ai-engineering/assets/logos/streamlit.svg" alt="Streamlit">
-   222|        <img src="ai-engineering/assets/logos/grafana.svg" alt="Grafana">
-   223|        <img src="ai-engineering/assets/logos/anthropic.svg" alt="Anthropic">
-   224|        <img src="ai-engineering/assets/logos/python.svg" alt="Python">
-   225|      </div>
-   226|      <div class="card-meta">
-   227|        <span class="card-diff diff-intermediate">Közepes</span>
-   228|        <span>16 section</span>
-   229|        <span class="card-arrow">→</span>
-   230|      </div>
-   231|    </a>
-   232|
-   233|    <!-- AIOps & MLOps -->
-   234|    <a href="aiops-mlops/index.html" class="card" style="--accent:var(--green); --glow:rgba(0,255,136,0.15);">
-   235|      <span class="card-status status-soon">Hamarosan</span>
-   236|      <div class="card-number">COURSE 03</div>
-   237|      <h3>AIOps & MLOps</h3>
-   238|      <div class="card-desc">ML modellek éles üzemeltetése CI/CD pipeline-nal: MLflow tracking és registry, Docker konténerizáció, Kubernetes deployment, monitoring, drift detection és canary release.</div>
-   239|      <div class="card-tools">
-   240|        <img src="aiops-mlops/assets/logos/kubernetes.svg" alt="Kubernetes">
-   241|        <img src="aiops-mlops/assets/logos/docker.svg" alt="Docker">
-   242|        <img src="aiops-mlops/assets/logos/mlflow.svg" alt="MLflow">
-   243|        <img src="aiops-mlops/assets/logos/prometheus.svg" alt="Prometheus">
-   244|        <img src="aiops-mlops/assets/logos/fastapi.svg" alt="FastAPI">
-   245|        <img src="aiops-mlops/assets/logos/git.svg" alt="Git">
-   246|      </div>
-   247|      <div class="card-meta">
-   248|        <span class="card-diff diff-advanced">Haladó</span>
-   249|        <span>16 section</span>
-   250|        <span class="card-arrow">→</span>
-   251|      </div>
-   252|    </a>
-   253|
-   254|    <!-- AI Data Engineer -->
-   255|    <a href="ai-data-engineer/index.html" class="card" style="--accent:var(--orange); --glow:rgba(255,136,0,0.15);">
-   256|      <span class="card-status status-soon">Hamarosan</span>
-   257|      <div class="card-number">COURSE 04</div>
-   258|      <h3>AI Data Engineer</h3>
-   259|      <div class="card-desc">AI-ready adatpipeline-ek építése: feature store, adatminőség-ellenőrzés, streaming ingestion, data catalog és lineage — az adatforrástól a modellezésig.</div>
-   260|      <div class="card-tools">
-   261|        <img src="ai-data-engineer/assets/logos/airflow.svg" alt="Airflow">
-   262|        <img src="ai-data-engineer/assets/logos/dbt.svg" alt="dbt">
-   263|        <img src="ai-data-engineer/assets/logos/apacheiceberg.svg" alt="Iceberg">
-   264|        <img src="ai-data-engineer/assets/logos/delta-lake.svg" alt="Delta Lake">
-   265|        <img src="ai-data-engineer/assets/logos/python.svg" alt="Python">
-   266|        <img src="ai-data-engineer/assets/logos/apachekafka.svg" alt="Kafka">
-   267|      </div>
-   268|      <div class="card-meta">
-   269|        <span class="card-diff diff-intermediate">Közepes</span>
-   270|        <span>16 section</span>
-   271|        <span class="card-arrow">→</span>
-   272|      </div>
-   273|    </a>
-   274|
-   275|    <!-- Apache Spark -->
-   276|    <a href="spark-crash-course/index.html" class="card" style="--accent:var(--red); --glow:rgba(255,68,102,0.15);">
-   277|      <span class="card-status status-soon">Hamarosan</span>
-   278|      <div class="card-number">COURSE 05</div>
-   279|      <h3>Apache Spark</h3>
-   280|      <div class="card-desc">Distributed data processing Sparkkal: RDD-k, DataFrame API, Spark SQL,Structured Streaming, performance tuning, cluster management és valós ETL feladatok.</div>
-   281|      <div class="card-tools">
-   282|        <img src="spark-crash-course/assets/logos/apachespark.svg" alt="Spark">
-   283|        <img src="spark-crash-course/assets/logos/scala.svg" alt="Scala">
-   284|        <img src="spark-crash-course/assets/logos/python.svg" alt="Python">
-   285|        <img src="spark-crash-course/assets/logos/apachehadoop.svg" alt="Hadoop">
-   286|        <img src="spark-crash-course/assets/logos/hive.svg" alt="Hive">
-   287|        <img src="spark-crash-course/assets/logos/apachekafka.svg" alt="Kafka">
-   288|      </div>
-   289|      <div class="card-meta">
-   290|        <span class="card-diff diff-intermediate">Közepes</span>
-   291|        <span>16 section</span>
-   292|        <span class="card-arrow">→</span>
-   293|      </div>
-   294|    </a>
-   295|
-   296|  </div>
-   297|</section>
-   298|
-   299|<footer>
-   300|  <p>Built with AI · Engineering Crash Courses · 2026</p>
-   301|</footer>
-   302|
-   303|</body>
-   304|</html>
-   305|
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Crash Courses</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --purple: #b366ff;
+  --yellow: #ffd700;
+  --red: #ff4466;
+  --teal: #00bcd4;
+  --text: #e0e0e8;
+  --text-dim: #888899;
+  --border: #2a2a3a;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.7; }
+
+/* ── Header ── */
+header {
+  background: linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.85) 100%);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 1.2rem;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  text-decoration: none;
+}
+.header-sub { color: var(--text-dim); font-size: .85rem; }
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  padding: 80px 32px 48px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 30% 0%, rgba(179,102,255,0.06) 0%, transparent 50%);
+}
+.hero h1 {
+  font-size: 3rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--purple), var(--green));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero p { color: var(--text-dim); font-size: 1.15rem; max-width: 640px; margin: 0 auto 24px; }
+.hero-stats { display:flex; gap:32px; justify-content:center; margin-top:24px; }
+.hero-stat { text-align:center; }
+.hero-stat .num { font-size:2rem; font-weight:900; color:var(--cyan); }
+.hero-stat .label { font-size:.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; }
+
+/* ── Course grid ── */
+.courses-section { padding: 48px 32px 80px; max-width: 1200px; margin: 0 auto; }
+.courses-section h2 {
+  font-size: 1.5rem; font-weight: 700; margin-bottom: 32px;
+  color: var(--text);
+}
+.courses-section h2 span { color: var(--text-dim); font-weight: 400; font-size: 1rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+/* ── Course card ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+  text-decoration: none;
+  color: var(--text);
+  display: flex; flex-direction: column;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent);
+  opacity: 0; transition: opacity .25s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 24px var(--glow);
+  border-color: var(--accent);
+}
+.card:hover::before { opacity: 1; }
+
+.card-status {
+  position: absolute; top: 16px; right: 16px;
+  font-size: .7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .05em; padding: 4px 10px; border-radius: 20px;
+}
+.status-ready { background: rgba(0,255,136,0.15); color: var(--green); }
+
+.card-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem; color: var(--text-dim); margin-bottom: 8px;
+}
+.card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.card-desc { color: var(--text-dim); font-size: .9rem; line-height: 1.6; margin-bottom: 20px; flex:1; }
+
+.card-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.card-tools img {
+  width: 24px; height: 24px;
+  filter: brightness(0) invert(1) opacity(.7);
+  transition: opacity .2s;
+}
+.card:hover .card-tools img { opacity: 1; }
+
+.card-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: .8rem; color: var(--text-dim);
+}
+.card-diff {
+  padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: .7rem;
+}
+.diff-beginner { background: rgba(0,255,136,0.12); color: var(--green); }
+.diff-intermediate { background: rgba(255,136,0,0.12); color: var(--orange); }
+.diff-advanced { background: rgba(255,68,102,0.12); color: var(--red); }
+
+.card-arrow {
+  font-size: 1.2rem;
+  color: var(--accent);
+  transition: transform .2s;
+}
+.card:hover .card-arrow { transform: translateX(4px); }
+
+/* ── Footer ── */
+footer {
+  text-align: center; padding: 32px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim); font-size: .8rem;
+}
+footer a { color: var(--cyan); text-decoration: none; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .hero { padding: 48px 16px 32px; }
+  .courses-section { padding: 32px 16px 60px; }
+  .grid { grid-template-columns: 1fr; }
+  header { padding: 12px 16px; }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">&lt;/&gt; Engineering Crash Courses</a>
+  <span class="header-sub">Interaktív notebook-alapú kurzusok</span>
+</header>
+
+<section class="hero">
+  <h1>Engineering Crash Courses</h1>
+  <p>Interaktív, notebook-alapú kurzusok data és AI szakembereknek. Futtatható kód cellák, eszközlogók, vizuális diagramok és valós példák.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">5</div><div class="label">Kurzus</div></div>
+    <div class="hero-stat"><div class="num">95</div><div class="label">Section</div></div>
+    <div class="hero-stat"><div class="num">50+</div><div class="label">Tool</div></div>
+  </div>
+</section>
+
+<section class="courses-section">
+  <h2>Kurzusok <span>— válassz egy témát és kezdj el tanulni</span></h2>
+  <div class="grid">
+
+    <!-- Delta Table Crash Course -->
+    <a href="delta-table-crash-course/index.html" class="card" style="--accent:var(--cyan); --glow:rgba(0,212,255,0.15);">
+      <span class="card-status status-ready">Kész</span>
+      <div class="card-number">COURSE 01</div>
+      <h3>Delta Table Crash Course</h3>
+      <div class="card-desc">Delta table lokálisan, Bronze/Silver/Gold rétegek, ETL/ELT pipeline, fact/dimension modellezés, batch és streaming feldolgozás — mind Python és deltalake segítségével.</div>
+      <div class="card-tools">
+        <img src="delta-table-crash-course/assets/logos/delta-lake.svg" alt="Delta Lake">
+        <img src="delta-table-crash-course/assets/logos/apachespark.svg" alt="Spark">
+        <img src="delta-table-crash-course/assets/logos/python.svg" alt="Python">
+        <img src="delta-table-crash-course/assets/logos/parquet.svg" alt="Parquet">
+        <img src="delta-table-crash-course/assets/logos/dbt.svg" alt="dbt">
+        <img src="delta-table-crash-course/assets/logos/pandas.svg" alt="pandas">
+      </div>
+      <div class="card-meta">
+        <span class="card-diff diff-beginner">Kezdő</span>
+        <span>26 section</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- AI Engineering -->
+    <a href="ai-engineering/index.html" class="card" style="--accent:var(--purple); --glow:rgba(179,102,255,0.15);">
+      <span class="card-status status-ready">Kész</span>
+      <div class="card-number">COURSE 02</div>
+      <h3>AI Engineering</h3>
+      <div class="card-desc">LLM alkalmazások fejlesztése RAG-pipeline-nal: prompt engineering, vektoradatbázisok, evaluációs keretrendszerek, monitoring és éles üzemeltetés a prototípustól a productionig.</div>
+      <div class="card-tools">
+        <img src="ai-engineering/assets/logos/openai.svg" alt="OpenAI">
+        <img src="ai-engineering/assets/logos/chroma.svg" alt="Chroma">
+        <img src="ai-engineering/assets/logos/langchain.svg" alt="LangChain">
+        <img src="ai-engineering/assets/logos/grafana.svg" alt="Grafana">
+        <img src="ai-engineering/assets/logos/streamlit.svg" alt="Streamlit">
+        <img src="ai-engineering/assets/logos/python.svg" alt="Python">
+      </div>
+      <div class="card-meta">
+        <span class="card-diff diff-intermediate">Közepes</span>
+        <span>17 section</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- AIOps & MLOps -->
+    <a href="aiops-mlops/index.html" class="card" style="--accent:var(--green); --glow:rgba(0,255,136,0.15);">
+      <span class="card-status status-ready">Kész</span>
+      <div class="card-number">COURSE 03</div>
+      <h3>AIOps & MLOps</h3>
+      <div class="card-desc">ML modellek éles üzemeltetése CI/CD pipeline-nal: MLflow tracking és registry, Docker konténerizáció, Kubernetes deployment, monitoring, drift detection és canary release.</div>
+      <div class="card-tools">
+        <img src="aiops-mlops/assets/logos/kubernetes.svg" alt="Kubernetes">
+        <img src="aiops-mlops/assets/logos/docker.svg" alt="Docker">
+        <img src="aiops-mlops/assets/logos/mlflow.svg" alt="MLflow">
+        <img src="aiops-mlops/assets/logos/prometheus.svg" alt="Prometheus">
+        <img src="aiops-mlops/assets/logos/fastapi.svg" alt="FastAPI">
+        <img src="aiops-mlops/assets/logos/github.svg" alt="GitHub">
+      </div>
+      <div class="card-meta">
+        <span class="card-diff diff-advanced">Haladó</span>
+        <span>17 section</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- AI Data Engineer -->
+    <a href="ai-data-engineer/index.html" class="card" style="--accent:var(--orange); --glow:rgba(255,136,0,0.15);">
+      <span class="card-status status-ready">Kész</span>
+      <div class="card-number">COURSE 04</div>
+      <h3>AI Data Engineer</h3>
+      <div class="card-desc">AI-ready adatpipeline-ek építése: feature store, adatminőség-ellenőrzés, streaming ingestion, data catalog és lineage — az adatforrástól a modellezésig.</div>
+      <div class="card-tools">
+        <img src="ai-data-engineer/assets/logos/airflow.svg" alt="Airflow">
+        <img src="ai-data-engineer/assets/logos/dbt.svg" alt="dbt">
+        <img src="ai-data-engineer/assets/logos/feast.svg" alt="Feast">
+        <img src="ai-data-engineer/assets/logos/delta-lake.svg" alt="Delta Lake">
+        <img src="ai-data-engineer/assets/logos/greatexpectations.svg" alt="Great Expectations">
+        <img src="ai-data-engineer/assets/logos/apachekafka.svg" alt="Kafka">
+      </div>
+      <div class="card-meta">
+        <span class="card-diff diff-intermediate">Közepes</span>
+        <span>18 section</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- Apache Spark -->
+    <a href="spark-crash-course/index.html" class="card" style="--accent:var(--red); --glow:rgba(255,68,102,0.15);">
+      <span class="card-status status-ready">Kész</span>
+      <div class="card-number">COURSE 05</div>
+      <h3>Apache Spark</h3>
+      <div class="card-desc">Elosztott adatfeldolgozás Sparkkal: RDD-k, DataFrame API, Spark SQL, Structured Streaming, performance tuning, cluster management és valós ETL feladatok.</div>
+      <div class="card-tools">
+        <img src="spark-crash-course/assets/logos/apachespark.svg" alt="Spark">
+        <img src="spark-crash-course/assets/logos/scala.svg" alt="Scala">
+        <img src="spark-crash-course/assets/logos/python.svg" alt="Python">
+        <img src="spark-crash-course/assets/logos/apachehadoop.svg" alt="Hadoop">
+        <img src="spark-crash-course/assets/logos/hive.svg" alt="Hive">
+        <img src="spark-crash-course/assets/logos/delta-lake.svg" alt="Delta Lake">
+      </div>
+      <div class="card-meta">
+        <span class="card-diff diff-intermediate">Közepes</span>
+        <span>17 section</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<footer>
+  <p>Built with AI · Engineering Crash Courses · 2026</p>
+</footer>
+
+</body>
+</html>
