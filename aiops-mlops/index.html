@@ -352,6 +352,28 @@ tr:hover td { background: rgba(0,212,255,.05); }
   main { margin-left:0; padding: 80px 16px 40px; }
   .hero h1 { font-size: 1.8rem; }
 }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all .2s;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.back-btn:hover {
+  background: var(--accent, var(--cyan));
+  color: var(--bg);
+  border-color: var(--accent, var(--cyan));
+}
+
 </style>
 </head>
 <body>
@@ -359,6 +381,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
 <div id="progress-bar"></div>
 
 <header>
+  <a href="../index.html" class="back-btn" title="Vissza a kurzusokhoz">&#8592;</a>
   <h1>&lt;/&gt; AIOps & MLOps</h1>
   <div class="header-actions">
     <span id="progress-text">0 / 28 section completed</span>
