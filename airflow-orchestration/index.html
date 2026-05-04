@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airflow & Orchestration &mdash; Crash Course</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --bg-code: #0d1117;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --purple: #b366ff;
+  --yellow: #ffd700;
+  --red: #ff4466;
+  --text: #e0e0e8;
+  --text-dim: #888899;
+  --border: #2a2a3a;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --gold: #ffd700;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+}
+
+/* ── Progress bar ── */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px; z-index:1000;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--yellow));
+  transition: width .4s ease;
+  width: 0%;
+}
+
+/* ── Header ── */
+header {
+  position: fixed; top:0; left:0; right:0; z-index:900;
+  background: rgba(10,10,15,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 30px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+header h1 {
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-actions { display:flex; gap:10px; align-items:center; }
+.btn {
+  padding: 7px 18px; border-radius: 6px; border:none; cursor:pointer;
+  font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600;
+  transition: all .2s;
+}
+.btn-run-all {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000;
+}
+.btn-run-all:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,136,.3); }
+.btn-reset {
+  background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border);
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+#progress-text { color: var(--text-dim); font-size: .8rem; }
+
+/* ── Side nav ── */
+#side-nav {
+  position: fixed; left:0; top:60px; bottom:0; width:260px; z-index:800;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 20px 0;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+#side-nav::-webkit-scrollbar { width:4px; }
+#side-nav::-webkit-scrollbar-thumb { background: var(--border); }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; font-size: .78rem; color: var(--text-dim);
+  text-decoration: none; transition: all .15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.completed { color: var(--green); border-left-color: var(--green); }
+.nav-item.active { color: var(--cyan); background: rgba(0,212,255,.05); border-left-color: var(--cyan); }
+.nav-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height:22px; border-radius: 50%; font-size: .65rem;
+  background: var(--bg3); font-weight: 700;
+}
+.nav-item.completed .nav-num { background: var(--green); color: #000; }
+
+/* ── Main content ── */
+main {
+  margin-left: 260px; padding: 80px 40px 60px 40px;
+  max-width: 960px;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 60px;
+  border-left: 4px solid var(--border);
+  padding-left: 24px;
+  scroll-margin-top: 80px;
+}
+.section.layer-bronze { border-left-color: var(--bronze); }
+.section.layer-silver { border-left-color: var(--silver); }
+.section.layer-gold { border-left-color: var(--gold); }
+.section.layer-general { border-left-color: var(--cyan); }
+.section.layer-intro { border-left-color: var(--purple); }
+
+.section-number {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 4px;
+}
+.layer-bronze .section-number { color: var(--bronze); }
+.layer-silver .section-number { color: var(--silver); }
+.layer-gold .section-number { color: var(--gold); }
+.layer-general .section-number { color: var(--cyan); }
+.layer-intro .section-number { color: var(--purple); }
+
+.section h2 {
+  font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;
+  color: #fff;
+}
+.section h3 {
+  font-size: 1.1rem; font-weight: 600; margin: 20px 0 10px;
+  color: var(--cyan);
+}
+
+/* ── Markdown cells ── */
+.md-cell {
+  margin-bottom: 16px; line-height: 1.8;
+}
+.md-cell p { margin-bottom: 12px; }
+.md-cell strong { color: #fff; }
+.md-cell code {
+  background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  color: var(--cyan);
+}
+.md-cell pre {
+  background: var(--bg-code); padding: 16px; border-radius: 8px;
+  overflow-x: auto; margin: 12px 0; font-size: .85rem;
+  border: 1px solid var(--border);
+}
+.md-cell pre code { background:none; padding:0; color: var(--green); }
+
+/* ── Tables ── */
+table {
+  width:100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem;
+}
+th {
+  background: var(--bg3); padding: 10px 12px; text-align: left;
+  font-weight: 600; color: var(--cyan); border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+tr:hover td { background: rgba(0,212,255,.05); }
+
+/* ── Code cells ── */
+.code-cell {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+.code-cell.running { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,.15); }
+.code-cell.has-output { border-color: rgba(0,255,136,.2); }
+
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-header span { font-size: .75rem; color: var(--text-dim); }
+.cell-number { font-family: 'JetBrains Mono', monospace; color: var(--purple); font-weight:700; }
+
+.run-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 5px; border: 1px solid var(--green);
+  background: transparent; color: var(--green);
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  cursor: pointer; transition: all .2s;
+}
+.run-btn:hover { background: var(--green); color: #000; }
+.run-btn.running-btn {
+  border-color: var(--cyan); color: var(--cyan);
+  animation: pulse 1s infinite;
+}
+.run-btn.done-btn { border-color: var(--text-dim); color: var(--text-dim); cursor:default; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.code-body {
+  padding: 16px; overflow-x: auto;
+}
+.code-body pre {
+  margin:0; font-family: 'JetBrains Mono', monospace;
+  font-size: .84rem; line-height: 1.6; color: #e6e6e6;
+  white-space: pre; overflow-x: auto;
+}
+
+/* Syntax highlighting */
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cm { color: #6272a4; }
+.num { color: #bd93f9; }
+.op { color: #ff79c6; }
+.var { color: #8be9fd; }
+.type { color: #ffb86c; }
+
+/* ── Output area ── */
+.output-area {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  max-height: 0; overflow: hidden;
+  transition: max-height .6s ease, padding .3s;
+}
+.output-area.visible {
+  max-height: 3000px; padding: 16px;
+}
+.output-label {
+  font-size: .7rem; color: var(--text-dim); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+
+.output-area pre {
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+  white-space: pre-wrap; color: var(--green); margin: 0;
+}
+.output-area table { margin: 8px 0; }
+.output-area th { background: rgba(0,212,255,.1); color: var(--cyan); font-size: .8rem; }
+.output-area td { font-size: .82rem; }
+
+/* ── Tool logos inline ── */
+.tool-logo {
+  height: 20px; width: 20px; vertical-align: middle;
+  display: inline-block; margin-right: 4px;
+  filter: brightness(0) invert(1) opacity(.7);
+}
+.tool-logo-bright { filter: none; }
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg3); padding: 3px 10px; border-radius: 20px;
+  font-size: .75rem; color: var(--text-dim); margin: 2px 4px 2px 0;
+  border: 1px solid var(--border);
+}
+.tool-badge img { height:14px; width:14px; filter: brightness(0) invert(1); }
+
+/* ── Architecture diagram ── */
+.arch-flow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 16px 0; justify-content: center;
+}
+.arch-step {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px; text-align: center;
+  min-width: 100px; transition: all .2s;
+}
+.arch-step:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.arch-step .label { font-size: .75rem; color: var(--cyan); font-weight: 600; }
+.arch-step .detail { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
+.arch-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+/* ── Callout boxes ── */
+.callout {
+  background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2);
+  border-radius: 8px; padding: 16px; margin: 16px 0;
+}
+.callout.warning {
+  background: rgba(255,136,0,.05); border-color: rgba(255,136,0,.2);
+}
+.callout.success {
+  background: rgba(0,255,136,.05); border-color: rgba(0,255,136,.2);
+}
+.callout-title { font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+.callout.warning .callout-title { color: var(--orange); }
+.callout.success .callout-title { color: var(--green); }
+
+/* ── Star schema diagram ── */
+.star-schema {
+  display: flex; align-items: center; justify-content: center;
+  gap: 30px; flex-wrap: wrap; margin: 20px 0;
+}
+.star-entity {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 20px; text-align: center;
+  min-width: 120px;
+}
+.star-entity.fact { border-color: var(--yellow); background: rgba(255,215,0,.05); }
+.star-entity.dim { border-color: var(--cyan); background: rgba(0,212,255,.05); }
+.star-entity .entity-name { font-weight: 700; font-size: .9rem; }
+.star-entity.fact .entity-name { color: var(--yellow); }
+.star-entity.dim .entity-name { color: var(--cyan); }
+.star-entity .entity-cols { font-size: .7rem; color: var(--text-dim); margin-top: 4px; }
+.star-arrow { color: var(--text-dim); font-size: 1.5rem; }
+
+/* ── Layer badges ── */
+.layer-badge {
+  display: inline-block; padding: 2px 10px; border-radius: 4px;
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.layer-badge.bronze { background: rgba(205,127,50,.15); color: var(--bronze); border: 1px solid var(--bronze); }
+.layer-badge.silver { background: rgba(192,192,192,.1); color: var(--silver); border: 1px solid var(--silver); }
+.layer-badge.gold { background: rgba(255,215,0,.1); color: var(--gold); border: 1px solid var(--gold); }
+.layer-badge.landing { background: rgba(136,136,153,.1); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+/* ── Hero section ── */
+.hero {
+  text-align: center; padding: 40px 0 60px; margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--green), var(--yellow));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }
+.hero-tools {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+}
+.hero-tool {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.hero-tool img { width:36px; height:36px; filter: brightness(0) invert(1) opacity(.85); }
+.hero-tool span { font-size: .65rem; color: var(--text-dim); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #side-nav { display: none; }
+  main { margin-left:0; padding: 80px 16px 40px; }
+  .hero h1 { font-size: 1.8rem; }
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all .2s;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.back-btn:hover {
+  background: var(--accent, var(--cyan));
+  color: var(--bg);
+  border-color: var(--accent, var(--cyan));
+}
+
+.log-airflow { color: #017cee; font-weight: 600; }
+.log-dbt { color: #ff694a; font-weight: 600; }
+.log-delta { color: #48b984; font-weight: 600; }
+.log-spark { color: #f0883e; font-weight: 600; }
+.log-kafka { color: #b0b8c4; font-weight: 600; }
+.log-info { color: #58a6ff; }
+.log-warn { color: #d29922; }
+.log-ok { color: #3fb950; font-weight: 600; }
+.log-dim { color: #6e7681; }
+.log-cmd { color: #79c0ff; }
+.log-time { color: #8b949e; }
+.log-step { color: #f0883e; font-weight: 600; }
+
+
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn">&#8592;</a>
+  <h1>&lt;/&gt; Airflow & Orchestration</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 16 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>Airflow & Orchestration <span class="tool-badge"><img src="../assets/logos/airflow.svg">Airflow</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
+  <div class="md-cell"><p>Adatpipeline-ok ütemezése, monitorozása és hibakezelése Apache Airflow-val. Napi ETL DAG-ot építünk a WebShop Pro projekthez.</p></div><div class="callout "><div class="callout-title">Tartalom</div><p>DAG, operator, sensor, schedule, retry, backfill, XCom, connections</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>Napi webshop ETL DAG bronze/silver/gold rétegekkel</p></div>
+</div>
+<div class="section layer-intro" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Airflow architektúra</h2>
+  <div class="md-cell"><p>Scheduler + Webserver + Executor + Metadata DB. A DAG-ok Python fájlok, amiket a scheduler értelmez.</p></div><table><tr><th>Komponens</th><th>Feladat</th></tr><tr><td>Scheduler</td><td>DAG-ok elemzése, taskok ütemezése</td></tr><tr><td>Webserver</td><td>Web UI a monitorozáshoz</td></tr><tr><td>Executor</td><td>Taskok futtatása</td></tr><tr><td>Metadata DB</td><td>Állapot tárolás (Postgres)</td></tr><tr><td>Worker</td><td>A tényleges futtatás</td></tr></table><div class="code-cell" id="cell-1"><div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('1')">&#9654; Run</button></div><div class="code-body"><pre># Start Airflow standalone
+airflow standalone
+
+# Access Web UI
+# http://localhost:8081
+# Default: admin / admin</pre></div><div class="output-area" id="out-1"><div class="output-label">Output:</div><pre>Airflow webserver running at 0.0.0.0:8080
+Airflow scheduler started</pre></div></div>
+</div>
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Első DAG</h2>
+  <div class="md-cell"><p>DAG = Directed Acyclic Graph. Task-ok irányított, körmentes gráfja.</p></div><div class="code-cell" id="cell-2"><div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('2')">&#9654; Run</button></div><div class="code-body"><pre>from datetime import datetime, timedelta
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+
+default_args = {
+    'owner': 'data-engineer',
+    'retries': 2,
+    'retry_delay': timedelta(minutes=5),
+}
+
+with DAG(
+    dag_id='webshop_daily_etl',
+    default_args=default_args,
+    start_date=datetime(2024, 1, 1),
+    schedule='@daily',
+    catchup=False,
+) as dag:
+    
+    extract = PythonOperator(
+        task_id='extract',
+        python_callable=lambda: print('Extracting data...')
+    )
+    
+    transform = PythonOperator(
+        task_id='transform',
+        python_callable=lambda: print('Transforming data...')
+    )
+    
+    load = PythonOperator(
+        task_id='load',
+        python_callable=lambda: print('Loading data...')
+    )
+    
+    extract &gt;&gt; transform &gt;&gt; load</pre></div><div class="output-area" id="out-2"><div class="output-label">Output:</div><pre>DAG: webshop_daily_etl
+Tasks: extract -&gt; transform -&gt; load
+Schedule: @daily</pre></div></div>
+</div>
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Operátorok: PythonOperator, BashOperator</h2>
+  <div class="md-cell"><p>Az operátorok határozzák meg, mi történik egy task-ban.</p></div><table><tr><th>Operátor</th><th>Feladat</th></tr><tr><td>PythonOperator</td><td>Python függvény futtatása</td></tr><tr><td>BashOperator</td><td>Shell parancs</td></tr><tr><td>SparkSubmitOperator</td><td>Spark job indítás</td></tr><tr><td>EmailOperator</td><td>Email küldés</td></tr><tr><td>Sensor</td><td>Valamire várakozás</td></tr></table><div class="code-cell" id="cell-3"><div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('3')">&#9654; Run</button></div><div class="code-body"><pre>from airflow.operators.bash import BashOperator
+
+clean = BashOperator(
+    task_id='clean_temp_files',
+    bash_command='rm -rf /tmp/webshop/*'
+)
+
+validate = PythonOperator(
+    task_id='validate_data',
+    python_callable=validate_schema
+)</pre></div><div class="output-area" id="out-3"><div class="output-label">Output:</div><pre>Task: clean_temp_files (BashOperator)
+Task: validate_data (PythonOperator)</pre></div></div>
+</div>
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Task dependencies</h2>
+  <div class="md-cell"><p>Task-ok közötti függőségek: >>, <<, láncolás.</p></div><div class="code-cell" id="cell-4"><div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('4')">&#9654; Run</button></div><div class="code-body"><pre># Linear chain
+extract &gt;&gt; transform &gt;&gt; load
+
+# Parallel branches
+[extract_orders, extract_products] &gt;&gt; transform &gt;&gt; [load_bronze, load_silver]
+
+# Complex
+extract &gt;&gt; [validate, profile] &gt;&gt; transform &gt;&gt; load &gt;&gt; notify</pre></div><div class="output-area" id="out-4"><div class="output-label">Output:</div><pre>extract_orders (parallel) ──┐
+                            ├─&gt; transform -&gt; load
+extract_products (parallel) ─┘</pre></div></div>
+</div>
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>XCom: Taskok közötti kommunikáció</h2>
+  <div class="md-cell"><p>XCom = Cross-Communication. Task-ok közötti adatcsere.</p></div><div class="code-cell" id="cell-5"><div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('5')">&#9654; Run</button></div><div class="code-body"><pre>def extract(**context):
+    import pandas as pd
+    df = pd.read_csv('data/orders.csv')
+    context['ti'].xcom_push(key='row_count', value=len(df))
+    context['ti'].xcom_push(key='columns', value=list(df.columns))
+    return len(df)  # Also pushed as 'return_value'
+
+def validate(**context):
+    row_count = context['ti'].xcom_pull(task_ids='extract', key='row_count')
+    print(f'Validating {row_count} rows...')
+    assert row_count &gt; 0, 'No data extracted!'</pre></div><div class="output-area" id="out-5"><div class="output-label">Output:</div><pre>XCom pushed: row_count=1500, columns=['id','customer_id',...]
+XCom pulled: row_count=1500
+Validating 1500 rows...</pre></div></div>
+</div>
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Sensor: várakozás feltételre</h2>
+  <div class="md-cell"><p>Sensor = speciális operátor, ami vár valamilyen feltételre.</p></div><div class="code-cell" id="cell-6"><div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('6')">&#9654; Run</button></div><div class="code-body"><pre>from airflow.sensors.filesystem import FileSensor
+from airflow.sensors.python import PythonSensor
+
+# Wait for file to exist
+wait_for_file = FileSensor(
+    task_id='wait_for_orders',
+    filepath='/data/orders_{{ ds }}.csv',
+    poke_interval=300,  # check every 5 min
+    timeout=3600,       # max 1 hour
+    mode='poke'
+)</pre></div><div class="output-area" id="out-6"><div class="output-label">Output:</div><pre>Sensor: wait_for_orders
+Poking for /data/orders_2024-05-04.csv
+File found after 2 attempts</pre></div></div>
+</div>
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Schedule és cron</h2>
+  <div class="md-cell"><p>DAG ütemezés: cron kifejezések, interval-ok.</p></div><table><tr><th>Kifejezés</th><th>Jelentés</th></tr><tr><td>@daily</td><td>Naponta éjfélkor</td></tr><tr><td>@hourly</td><td>Óránként</td></tr><tr><td>0 6 * * 1-5</td><td>Hétköznap reggel 6-kor</td></tr><tr><td>0 0 1 * *</td><td>Hónap első napján</td></tr><tr><td>*/15 * * * *</td><td>15 percenként</td></tr></table><div class="code-cell" id="cell-7"><div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('7')">&#9654; Run</button></div><div class="code-body"><pre>with DAG(
+    dag_id='webshop_daily_etl',
+    schedule='0 6 * * *',  # Daily at 6 AM
+    start_date=datetime(2024, 1, 1),
+    catchup=False,  # Don't run past dates
+    max_active_runs=1,
+    tags=['webshop', 'etl'],
+) as dag:
+    ...</pre></div><div class="output-area" id="out-7"><div class="output-label">Output:</div><pre>DAG scheduled: 0 6 * * * (daily at 06:00 UTC)
+Next run: 2024-05-05T06:00:00</pre></div></div>
+</div>
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Retry és hibakezelés</h2>
+  <div class="md-cell"><p>Robusztus pipeline: retry, timeout, on_failure_callback.</p></div><div class="code-cell" id="cell-8"><div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('8')">&#9654; Run</button></div><div class="code-body"><pre>from airflow.operators.python import PythonOperator
+from datetime import timedelta
+
+def on_failure_callback(context):
+    dag_id = context['dag'].dag_id
+    task_id = context['task_instance'].task_id
+    print(f'ALERT: {dag_id}.{task_id} failed!')
+
+risky_task = PythonOperator(
+    task_id='process_large_file',
+    python_callable=process_file,
+    retries=3,
+    retry_delay=timedelta(minutes=10),
+    execution_timeout=timedelta(hours=2),
+    on_failure_callback=on_failure_callback,
+)</pre></div><div class="output-area" id="out-8"><div class="output-label">Output:</div><pre>Task failed on attempt 1, retrying in 10min...
+Task succeeded on attempt 2!</pre></div></div>
+</div>
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Connections és Hooks</h2>
+  <div class="md-cell"><p>Airflow connection-ök: adatbázis, API, cloud kapcsolatok.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre># Define connection via UI or CLI
+airflow connections add 'webshop_postgres' \
+    --conn-type 'postgres' \
+    --conn-host 'postgres' \
+    --conn-port 5432 \
+    --conn-login 'admin' \
+    --conn-password 'secret' \
+    --conn-schema 'webshop_pro'
+
+# Use in task
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+
+def load_to_postgres(**context):
+    hook = PostgresHook(postgres_conn_id='webshop_postgres')
+    df = context['ti'].xcom_pull(task_ids='transform')
+    hook.insert_rows('orders', df.values.tolist())</pre></div><div class="output-area" id="out-9"><div class="output-label">Output:</div><pre>Connection: webshop_postgres (postgres://admin@postgres:5432/webshop_pro)
+Loaded 1420 rows to orders table</pre></div></div>
+</div>
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Bronze/Silver/Gold DAG</h2>
+  <div class="md-cell"><p>A teljes WebShop Pro ETL pipeline egy DAG-ban: bronze (nyers) -> silver (tisztított) -> gold (analytics).</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre># WebShop Pro Medallion DAG
+with DAG('webshop_medallion', schedule='@daily') as dag:
+    
+    # Bronze layer
+    ingest_orders = PythonOperator(task_id='bronze_orders', python_callable=ingest_orders)
+    ingest_products = PythonOperator(task_id='bronze_products', python_callable=ingest_products)
+    
+    # Silver layer
+    clean_orders = PythonOperator(task_id='silver_orders', python_callable=clean_orders)
+    clean_products = PythonOperator(task_id='silver_products', python_callable=clean_products)
+    
+    # Gold layer
+    build_marts = PythonOperator(task_id='gold_marts', python_callable=build_marts)
+    
+    # Quality check
+    quality_check = PythonOperator(task_id='quality_check', python_callable=run_quality_checks)
+    
+    # Dependencies
+    [ingest_orders, ingest_products] &gt;&gt; [clean_orders, clean_products] &gt;&gt; build_marts &gt;&gt; quality_check</pre></div><div class="output-area" id="out-10"><div class="output-label">Output:</div><pre>bronze_orders ──┐              ┌──&gt; silver_orders ──┐
+                 ├─&gt; clean ──&gt; │                    ├─&gt; gold_marts -&gt; quality_check
+bronze_products ─┘              └──&gt; silver_products ─┘</pre></div></div>
+</div>
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Backfill és catchup</h2>
+  <div class="md-cell"><p>Múltbeli futtatások pótlása: catchup, backfill CLI.</p></div><div class="code-cell" id="cell-11"><div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('11')">&#9654; Run</button></div><div class="code-body"><pre># Backfill specific date range
+airflow dags backfill webshop_medallion \
+    --start-date 2024-01-01 \
+    --end-date 2024-01-31 \
+    --reset-dagruns
+
+# Or enable catchup in DAG definition
+with DAG(
+    dag_id='webshop_medallion',
+    catchup=True,  # Run all missed schedules
+    start_date=datetime(2024, 1, 1),
+) as dag:
+    ...</pre></div><div class="output-area" id="out-11"><div class="output-label">Output:</div><pre>Backfilling 31 days:
+2024-01-01: SUCCESS
+2024-01-02: SUCCESS
+...
+2024-01-31: SUCCESS
+31/31 completed</pre></div></div>
+</div>
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Dynamic task mapping</h2>
+  <div class="md-cell"><p>Airflow 2.3+: task-ok dinamikus generálása futásidőben.</p></div><div class="code-cell" id="cell-12"><div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('12')">&#9654; Run</button></div><div class="code-body"><pre>from airflow.operators.python import PythonOperator
+
+def get_files(**context):
+    from pathlib import Path
+    return [str(f) for f in Path('/data/incoming').glob('*.csv')]
+
+def process_file(filepath, **context):
+    import pandas as pd
+    df = pd.read_csv(filepath)
+    df.to_parquet(filepath.replace('.csv', '.parquet'))
+    return len(df)
+
+list_files = PythonOperator(task_id='list_files', python_callable=get_files)
+
+process = PythonOperator.partial(task_id='process').expand(
+    filepath=list_files.output.map(lambda x: x)
+)
+
+list_files &gt;&gt; process</pre></div><div class="output-area" id="out-12"><div class="output-label">Output:</div><pre>Dynamic mapping: processing 5 files
+file_1.csv: 500 rows -&gt; file_1.parquet
+file_2.csv: 300 rows -&gt; file_2.parquet
+...</pre></div></div>
+</div>
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>TaskFlow API</h2>
+  <div class="md-cell"><p>Modern Airflow: @task dekorátor, tiszta Python kód.</p></div><div class="code-cell" id="cell-13"><div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('13')">&#9654; Run</button></div><div class="code-body"><pre>from airflow.decorators import dag, task
+from datetime import datetime
+
+@dag(schedule='@daily', start_date=datetime(2024, 1, 1), catchup=False)
+def webshop_etl_modern():
+    
+    @task
+    def extract():
+        import pandas as pd
+        return pd.read_csv('data/orders.csv')
+    
+    @task
+    def transform(df):
+        return df.dropna().drop_duplicates()
+    
+    @task
+    def load(df):
+        df.to_parquet('gold/orders.parquet')
+        return len(df)
+    
+    df = extract()
+    clean = transform(df)
+    load(clean)
+
+webshop_etl_modern()</pre></div><div class="output-area" id="out-13"><div class="output-label">Output:</div><pre>DAG: webshop_etl_modern
+extract -&gt; transform -&gt; load
+Clean TaskFlow API with automatic XCom</pre></div></div>
+</div>
+<div class="section layer-general" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Monitoring és alerting</h2>
+  <div class="md-cell"><p>SLA, timeout, email/Slack alert, log kezelés.</p></div><div class="code-cell" id="cell-14"><div class="code-header"><span class="cell-number">[14]</span><button class="run-btn" onclick="runCell('14')">&#9654; Run</button></div><div class="code-body"><pre># SLA miss callback
+def sla_miss_callback(dag, task_list, blocking_tis, *args):
+    print(f'SLA MISSED for {dag.dag_id}!')
+
+with DAG(
+    dag_id='webshop_sla',
+    sla_miss_callback=sla_miss_callback,
+    default_args={'email': ['data-team@webshop.hu'], 'email_on_failure': True}
+) as dag:
+    ...</pre></div><div class="output-area" id="out-14"><div class="output-label">Output:</div><pre>SLA monitoring enabled
+Email alerts: data-team@webshop.hu
+Slack integration: #data-alerts channel</pre></div></div>
+</div>
+<div class="section layer-general" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Összefoglalás</h2>
+  <div class="md-cell"><p>Gratulálunk! Megtanultad az Airflow alapokat!</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>DAG, operátorok, schedule</td><td>dbt Analytics Engineering</td></tr><tr><td>XCom, sensor, retry</td><td>SQL transzformációk</td></tr><tr><td>Bronze/Silver/Gold DAG</td><td>Databricks Lakehouse</td></tr><tr><td>TaskFlow API</td><td>Modern pipeline-ok</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>dbt Analytics Engineering - ahol SQL transzformációkat építünk!</p></div>
+</div>
+</main>
+<script>
+// ── State ──
+const completedSections = new Set();
+const allCellIds = [];
+const COURSE_SLUG = 'airflow-orchestration';
+
+// Restore from localStorage
+try {
+  const saved = JSON.parse(localStorage.getItem('ecc:' + COURSE_SLUG + ':completed') || '[]');
+  saved.forEach(id => completedSections.add(id));
+} catch(e) {}
+
+let runAllRunning = false;
+
+// ── Navigation ──
+function buildNav() {
+  const nav = document.getElementById('side-nav');
+  const sections = document.querySelectorAll('.section');
+  const tocData = [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Architektúra"}, {"id": "s2", "num": "02", "label": "Első DAG"}, {"id": "s3", "num": "03", "label": "Operátorok"}, {"id": "s4", "num": "04", "label": "Dependencies"}, {"id": "s5", "num": "05", "label": "XCom"}, {"id": "s6", "num": "06", "label": "Sensor"}, {"id": "s7", "num": "07", "label": "Schedule"}, {"id": "s8", "num": "08", "label": "Retry, hibakezelés"}, {"id": "s9", "num": "09", "label": "Connections"}, {"id": "s10", "num": "10", "label": "Medallion DAG"}, {"id": "s11", "num": "11", "label": "Backfill"}, {"id": "s12", "num": "12", "label": "Dynamic tasks"}, {"id": "s13", "num": "13", "label": "TaskFlow API"}, {"id": "s14", "num": "14", "label": "Monitoring"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}];
+  
+  nav.innerHTML = tocData.map(item => 
+    `<a href="#${item.id}" class="nav-item" data-section="${item.id}" id="nav-${item.id}">
+      <span class="nav-num">${item.num}</span> ${item.label}
+    </a>`
+  ).join('');
+}
+
+// ── Cell execution ──
+function runCell(cellId) {
+  const cell = document.getElementById('cell-' + cellId);
+  if (!cell) return;
+  const output = document.getElementById('out-' + cellId);
+  if (!output) return;
+  const btn = cell.querySelector('.run-btn');
+  
+  // Already running or done
+  if (cell.classList.contains('running') || btn.classList.contains('done-btn')) return;
+  
+  // Start running
+  cell.classList.add('running');
+  btn.classList.add('running-btn');
+  btn.textContent = '⏳ Running...';
+  
+  // Simulate execution time
+  const delay = 400 + Math.random() * 800;
+  setTimeout(() => {
+    cell.classList.remove('running');
+    cell.classList.add('has-output');
+    btn.classList.remove('running-btn');
+    btn.classList.add('done-btn');
+    btn.textContent = '✓ Done';
+    output.classList.add('visible');
+    
+    // Mark section as completed
+    const section = cell.closest('.section');
+    if (section) {
+      completedSections.add(section.id);
+      // Persist to localStorage
+      try {
+        localStorage.setItem('ecc:' + COURSE_SLUG + ':completed', JSON.stringify([...completedSections]));
+      } catch(e) {}
+      const navItem = document.getElementById('nav-' + section.id);
+      if (navItem) navItem.classList.add('completed');
+    }
+    updateProgress();
+  }, delay);
+}
+
+function updateProgress() {
+  const totalSections = document.querySelectorAll('.section[id]').length;
+  const done = completedSections.size;
+  const pct = Math.round((done / totalSections) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} / ${totalSections} section completed`;
+}
+
+// ── Run All ──
+async function runAll() {
+  if (runAllRunning) return;
+  runAllRunning = true;
+  
+  const cells = document.querySelectorAll('.code-cell');
+  for (const cell of cells) {
+    const id = cell.id.replace('cell-', '');
+    const btn = cell.querySelector('.run-btn');
+    if (!btn.classList.contains('done-btn')) {
+      runCell(id);
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+    }
+  }
+  runAllRunning = false;
+}
+
+// ── Reset ──
+function resetAll() {
+  completedSections.clear();
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    cell.classList.remove('running', 'has-output');
+    const id = cell.id.replace('cell-', '');
+    const output = document.getElementById('out-' + id);
+    if (output) output.classList.remove('visible');
+    const btn = cell.querySelector('.run-btn');
+    if (btn) {
+      btn.classList.remove('running-btn', 'done-btn');
+      btn.textContent = '▶ Run';
+    }
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
+  updateProgress();
+}
+
+// ── Scroll spy ──
+function updateActiveNav() {
+  const sections = document.querySelectorAll('.section');
+  let activeId = null;
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 120) activeId = s.id;
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (activeId) {
+    const navItem = document.getElementById('nav-' + activeId);
+    if (navItem) {
+      navItem.classList.add('active');
+      navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+  }
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildNav();
+  updateProgress();
+  
+  // Collect all cell IDs
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    allCellIds.push(cell.id.replace('cell-', ''));
+  });
+  
+  window.addEventListener('scroll', updateActiveNav, {passive: true});
+  updateActiveNav();
+
+  restoreProgress();
+});
+
+function restoreProgress() {
+  completedSections.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const navItem = document.getElementById('nav-' + sectionId);
+      if (navItem) navItem.classList.add('completed');
+      section.querySelectorAll('.code-cell').forEach(cell => {
+        const id = cell.id.replace('cell-', '');
+        const btn = cell.querySelector('.run-btn');
+        const output = document.getElementById('out-' + id);
+        cell.classList.add('has-output');
+        if (btn) { btn.classList.add('done-btn'); btn.textContent = '✓ Done'; }
+        if (output) output.classList.add('visible');
+      });
+    }
+  });
+  updateProgress();
+}
+
+</script>
+</body>
+</html>

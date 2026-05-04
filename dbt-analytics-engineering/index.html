@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dbt Analytics Engineering &mdash; Crash Course</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --bg-code: #0d1117;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --purple: #b366ff;
+  --yellow: #ffd700;
+  --red: #ff4466;
+  --text: #e0e0e8;
+  --text-dim: #888899;
+  --border: #2a2a3a;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --gold: #ffd700;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+}
+
+/* ── Progress bar ── */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px; z-index:1000;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--yellow));
+  transition: width .4s ease;
+  width: 0%;
+}
+
+/* ── Header ── */
+header {
+  position: fixed; top:0; left:0; right:0; z-index:900;
+  background: rgba(10,10,15,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 30px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+header h1 {
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-actions { display:flex; gap:10px; align-items:center; }
+.btn {
+  padding: 7px 18px; border-radius: 6px; border:none; cursor:pointer;
+  font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600;
+  transition: all .2s;
+}
+.btn-run-all {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000;
+}
+.btn-run-all:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,136,.3); }
+.btn-reset {
+  background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border);
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+#progress-text { color: var(--text-dim); font-size: .8rem; }
+
+/* ── Side nav ── */
+#side-nav {
+  position: fixed; left:0; top:60px; bottom:0; width:260px; z-index:800;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 20px 0;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+#side-nav::-webkit-scrollbar { width:4px; }
+#side-nav::-webkit-scrollbar-thumb { background: var(--border); }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; font-size: .78rem; color: var(--text-dim);
+  text-decoration: none; transition: all .15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.completed { color: var(--green); border-left-color: var(--green); }
+.nav-item.active { color: var(--cyan); background: rgba(0,212,255,.05); border-left-color: var(--cyan); }
+.nav-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height:22px; border-radius: 50%; font-size: .65rem;
+  background: var(--bg3); font-weight: 700;
+}
+.nav-item.completed .nav-num { background: var(--green); color: #000; }
+
+/* ── Main content ── */
+main {
+  margin-left: 260px; padding: 80px 40px 60px 40px;
+  max-width: 960px;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 60px;
+  border-left: 4px solid var(--border);
+  padding-left: 24px;
+  scroll-margin-top: 80px;
+}
+.section.layer-bronze { border-left-color: var(--bronze); }
+.section.layer-silver { border-left-color: var(--silver); }
+.section.layer-gold { border-left-color: var(--gold); }
+.section.layer-general { border-left-color: var(--cyan); }
+.section.layer-intro { border-left-color: var(--purple); }
+
+.section-number {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 4px;
+}
+.layer-bronze .section-number { color: var(--bronze); }
+.layer-silver .section-number { color: var(--silver); }
+.layer-gold .section-number { color: var(--gold); }
+.layer-general .section-number { color: var(--cyan); }
+.layer-intro .section-number { color: var(--purple); }
+
+.section h2 {
+  font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;
+  color: #fff;
+}
+.section h3 {
+  font-size: 1.1rem; font-weight: 600; margin: 20px 0 10px;
+  color: var(--cyan);
+}
+
+/* ── Markdown cells ── */
+.md-cell {
+  margin-bottom: 16px; line-height: 1.8;
+}
+.md-cell p { margin-bottom: 12px; }
+.md-cell strong { color: #fff; }
+.md-cell code {
+  background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  color: var(--cyan);
+}
+.md-cell pre {
+  background: var(--bg-code); padding: 16px; border-radius: 8px;
+  overflow-x: auto; margin: 12px 0; font-size: .85rem;
+  border: 1px solid var(--border);
+}
+.md-cell pre code { background:none; padding:0; color: var(--green); }
+
+/* ── Tables ── */
+table {
+  width:100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem;
+}
+th {
+  background: var(--bg3); padding: 10px 12px; text-align: left;
+  font-weight: 600; color: var(--cyan); border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+tr:hover td { background: rgba(0,212,255,.05); }
+
+/* ── Code cells ── */
+.code-cell {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+.code-cell.running { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,.15); }
+.code-cell.has-output { border-color: rgba(0,255,136,.2); }
+
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-header span { font-size: .75rem; color: var(--text-dim); }
+.cell-number { font-family: 'JetBrains Mono', monospace; color: var(--purple); font-weight:700; }
+
+.run-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 5px; border: 1px solid var(--green);
+  background: transparent; color: var(--green);
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  cursor: pointer; transition: all .2s;
+}
+.run-btn:hover { background: var(--green); color: #000; }
+.run-btn.running-btn {
+  border-color: var(--cyan); color: var(--cyan);
+  animation: pulse 1s infinite;
+}
+.run-btn.done-btn { border-color: var(--text-dim); color: var(--text-dim); cursor:default; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.code-body {
+  padding: 16px; overflow-x: auto;
+}
+.code-body pre {
+  margin:0; font-family: 'JetBrains Mono', monospace;
+  font-size: .84rem; line-height: 1.6; color: #e6e6e6;
+  white-space: pre; overflow-x: auto;
+}
+
+/* Syntax highlighting */
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cm { color: #6272a4; }
+.num { color: #bd93f9; }
+.op { color: #ff79c6; }
+.var { color: #8be9fd; }
+.type { color: #ffb86c; }
+
+/* ── Output area ── */
+.output-area {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  max-height: 0; overflow: hidden;
+  transition: max-height .6s ease, padding .3s;
+}
+.output-area.visible {
+  max-height: 3000px; padding: 16px;
+}
+.output-label {
+  font-size: .7rem; color: var(--text-dim); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+
+.output-area pre {
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+  white-space: pre-wrap; color: var(--green); margin: 0;
+}
+.output-area table { margin: 8px 0; }
+.output-area th { background: rgba(0,212,255,.1); color: var(--cyan); font-size: .8rem; }
+.output-area td { font-size: .82rem; }
+
+/* ── Tool logos inline ── */
+.tool-logo {
+  height: 20px; width: 20px; vertical-align: middle;
+  display: inline-block; margin-right: 4px;
+  filter: brightness(0) invert(1) opacity(.7);
+}
+.tool-logo-bright { filter: none; }
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg3); padding: 3px 10px; border-radius: 20px;
+  font-size: .75rem; color: var(--text-dim); margin: 2px 4px 2px 0;
+  border: 1px solid var(--border);
+}
+.tool-badge img { height:14px; width:14px; filter: brightness(0) invert(1); }
+
+/* ── Architecture diagram ── */
+.arch-flow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 16px 0; justify-content: center;
+}
+.arch-step {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px; text-align: center;
+  min-width: 100px; transition: all .2s;
+}
+.arch-step:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.arch-step .label { font-size: .75rem; color: var(--cyan); font-weight: 600; }
+.arch-step .detail { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
+.arch-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+/* ── Callout boxes ── */
+.callout {
+  background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2);
+  border-radius: 8px; padding: 16px; margin: 16px 0;
+}
+.callout.warning {
+  background: rgba(255,136,0,.05); border-color: rgba(255,136,0,.2);
+}
+.callout.success {
+  background: rgba(0,255,136,.05); border-color: rgba(0,255,136,.2);
+}
+.callout-title { font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+.callout.warning .callout-title { color: var(--orange); }
+.callout.success .callout-title { color: var(--green); }
+
+/* ── Star schema diagram ── */
+.star-schema {
+  display: flex; align-items: center; justify-content: center;
+  gap: 30px; flex-wrap: wrap; margin: 20px 0;
+}
+.star-entity {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 20px; text-align: center;
+  min-width: 120px;
+}
+.star-entity.fact { border-color: var(--yellow); background: rgba(255,215,0,.05); }
+.star-entity.dim { border-color: var(--cyan); background: rgba(0,212,255,.05); }
+.star-entity .entity-name { font-weight: 700; font-size: .9rem; }
+.star-entity.fact .entity-name { color: var(--yellow); }
+.star-entity.dim .entity-name { color: var(--cyan); }
+.star-entity .entity-cols { font-size: .7rem; color: var(--text-dim); margin-top: 4px; }
+.star-arrow { color: var(--text-dim); font-size: 1.5rem; }
+
+/* ── Layer badges ── */
+.layer-badge {
+  display: inline-block; padding: 2px 10px; border-radius: 4px;
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.layer-badge.bronze { background: rgba(205,127,50,.15); color: var(--bronze); border: 1px solid var(--bronze); }
+.layer-badge.silver { background: rgba(192,192,192,.1); color: var(--silver); border: 1px solid var(--silver); }
+.layer-badge.gold { background: rgba(255,215,0,.1); color: var(--gold); border: 1px solid var(--gold); }
+.layer-badge.landing { background: rgba(136,136,153,.1); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+/* ── Hero section ── */
+.hero {
+  text-align: center; padding: 40px 0 60px; margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--green), var(--yellow));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }
+.hero-tools {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+}
+.hero-tool {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.hero-tool img { width:36px; height:36px; filter: brightness(0) invert(1) opacity(.85); }
+.hero-tool span { font-size: .65rem; color: var(--text-dim); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #side-nav { display: none; }
+  main { margin-left:0; padding: 80px 16px 40px; }
+  .hero h1 { font-size: 1.8rem; }
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all .2s;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.back-btn:hover {
+  background: var(--accent, var(--cyan));
+  color: var(--bg);
+  border-color: var(--accent, var(--cyan));
+}
+
+.log-airflow { color: #017cee; font-weight: 600; }
+.log-dbt { color: #ff694a; font-weight: 600; }
+.log-delta { color: #48b984; font-weight: 600; }
+.log-spark { color: #f0883e; font-weight: 600; }
+.log-kafka { color: #b0b8c4; font-weight: 600; }
+.log-info { color: #58a6ff; }
+.log-warn { color: #d29922; }
+.log-ok { color: #3fb950; font-weight: 600; }
+.log-dim { color: #6e7681; }
+.log-cmd { color: #79c0ff; }
+.log-time { color: #8b949e; }
+.log-step { color: #f0883e; font-weight: 600; }
+
+
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn">&#8592;</a>
+  <h1>&lt;/&gt; dbt Analytics Engineering</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 16 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>dbt Analytics Engineering <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
+  <div class="md-cell"><p>Az analytics engineering a data engineering és a business intelligence találkozása. A dbt (data build tool) segítségével SQL-ben írunk transzformációkat, teszteket és dokumentációt.</p></div><div class="callout "><div class="callout-title">Tartalom</div><p>staging, intermediate, mart modellek, schema tests, incremental models, snapshots, macros</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>WebShop Pro analytics layer: staging -> intermediate -> mart modellek</p></div>
+</div>
+<div class="section layer-intro" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>dbt beállítása</h2>
+  <div class="md-cell"><p>dbt-core telepítés, profiles.yml, projekt struktúra.</p></div><div class="code-cell" id="cell-1"><div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('1')">&#9654; Run</button></div><div class="code-body"><pre># Install dbt
+pip install dbt-core dbt-postgres
+
+# Initialize project
+dbt init webshop_analytics
+
+# profiles.yml
+webshop_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: admin
+      password: secret
+      dbname: webshop_pro
+      schema: analytics
+      threads: 4</pre></div><div class="output-area" id="out-1"><div class="output-label">Output:</div><pre>dbt project initialized at /home/user/webshop_analytics
+Profile configured for dev environment</pre></div></div>
+</div>
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Projekt struktúra</h2>
+  <div class="md-cell"><p>models/, tests/, macros/, snapshots/, seeds/, dbt_project.yml.</p></div><table><tr><th>Könyvtár</th><th>Tartalom</th></tr><tr><td>models/</td><td>SQL modellek (staging, intermediate, marts)</td></tr><tr><td>tests/</td><td>Egyedi tesztek</td></tr><tr><td>macros/</td><td>Újrahasználható SQL kód</td></tr><tr><td>snapshots/</td><td>SCD Type 2 automatikus</td></tr><tr><td>seeds/</td><td>CSV seed adatok</td></tr><tr><td>dbt_project.yml</td><td>Projekt konfiguráció</td></tr></table><div class="code-cell" id="cell-2"><div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('2')">&#9654; Run</button></div><div class="code-body"><pre># dbt_project.yml
+name: webshop_analytics
+version: '1.0.0'
+profile: webshop_analytics
+
+model-paths: ['models']
+test-paths: ['tests']
+macro-paths: ['macros']
+seed-paths: ['seeds']
+
+models:
+  webshop_analytics:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table</pre></div><div class="output-area" id="out-2"><div class="output-label">Output:</div><pre>Project structure:
+models/
+  staging/
+  intermediate/
+  marts/
+tests/
+macros/
+seeds/</pre></div></div>
+</div>
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Staging modellek</h2>
+  <div class="md-cell"><p>Nyers adatok tisztítása és átnevezése. A staging a Bronze réteg.</p></div><div class="code-cell" id="cell-3"><div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('3')">&#9654; Run</button></div><div class="code-body"><pre>-- models/staging/stg_orders.sql
+with source as (
+    select * from {{ source('webshop', 'raw_orders') }}
+),
+renamed as (
+    select
+        order_id,
+        customer_id,
+        order_date::timestamp as ordered_at,
+        total_amount as amount,
+        status,
+        case when status = 'cancelled' then true else false end as is_cancelled
+    from source
+    where status is not null
+)
+select * from renamed</pre></div><div class="output-area" id="out-3"><div class="output-label">Output:</div><pre>$ dbt run --select stg_orders
+OK created view model analytics.stg_orders [SELECT 1420]</pre></div></div>
+</div>
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Source és ref</h2>
+  <div class="md-cell"><p>source() és ref() függvények: DAG lineage automatikus.</p></div><div class="code-cell" id="cell-4"><div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('4')">&#9654; Run</button></div><div class="code-body"><pre>-- models/sources.yml
+version: 2
+sources:
+  - name: webshop
+    schema: raw
+    tables:
+      - name: raw_orders
+        loaded_at_field: loaded_at
+        freshness:
+          warn_after: {count: 12, period: hour}
+          error_after: {count: 24, period: hour}
+      - name: raw_products
+      - name: raw_customers
+
+-- Use in models:
+select * from {{ source('webshop', 'raw_orders') }}
+select * from {{ ref('stg_orders') }}</pre></div><div class="output-area" id="out-4"><div class="output-label">Output:</div><pre>$ dbt source freshness
+raw_orders: 2 hours ago (WARN)
+raw_products: 30 min ago (PASS)</pre></div></div>
+</div>
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>Intermediate modellek</h2>
+  <div class="md-cell"><p>Staging adatok dúsítása, join-ok. Az intermediate a Silver réteg.</p></div><div class="code-cell" id="cell-5"><div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('5')">&#9654; Run</button></div><div class="code-body"><pre>-- models/intermediate/int_orders_enriched.sql
+with orders as (
+    select * from {{ ref('stg_orders') }}
+),
+customers as (
+    select * from {{ ref('stg_customers') }}
+),
+products as (
+    select * from {{ ref('stg_products') }}
+)
+select
+    o.order_id,
+    c.name as customer_name,
+    c.city,
+    c.segment,
+    p.name as product_name,
+    p.category,
+    o.amount,
+    o.ordered_at
+from orders o
+join customers c on o.customer_id = c.customer_id
+join products p on o.product_id = p.product_id
+where not o.is_cancelled</pre></div><div class="output-area" id="out-5"><div class="output-label">Output:</div><pre>$ dbt run --select int_orders_enriched
+OK created view model analytics.int_orders_enriched [SELECT 1380]</pre></div></div>
+</div>
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Mart modellek</h2>
+  <div class="md-cell"><p>Business-ready aggregációk. A mart a Gold réteg - ezeket használják az elemzők.</p></div><div class="code-cell" id="cell-6"><div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('6')">&#9654; Run</button></div><div class="code-body"><pre>-- models/marts/fct_monthly_revenue.sql
+with enriched as (
+    select * from {{ ref('int_orders_enriched') }}
+)
+select
+    date_trunc('month', ordered_at) as month,
+    category,
+    segment,
+    count(distinct order_id) as order_count,
+    count(distinct customer_name) as unique_customers,
+    sum(amount) as revenue,
+    avg(amount) as avg_order_value
+from enriched
+group by 1, 2, 3
+order by 1, 2</pre></div><div class="output-area" id="out-6"><div class="output-label">Output:</div><pre>$ dbt run --select fct_monthly_revenue
+OK created TABLE analytics.fct_monthly_revenue [SELECT 48]</pre></div></div>
+</div>
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Schema tesztek</h2>
+  <div class="md-cell"><p>Adatminőségi tesztek: unique, not_null, accepted_values, relationships.</p></div><div class="code-cell" id="cell-7"><div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('7')">&#9654; Run</button></div><div class="code-body"><pre># models/staging/_stg_models__yml.yml
+version: 2
+models:
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['pending', 'shipped', 'delivered', 'cancelled']</pre></div><div class="output-area" id="out-7"><div class="output-label">Output:</div><pre>$ dbt test --select stg_orders
+PASS: unique_stg_orders_order_id
+PASS: not_null_stg_orders_customer_id
+PASS: relationships_stg_orders_customer_id
+4 of 4 tests passed</pre></div></div>
+</div>
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Custom tesztek</h2>
+  <div class="md-cell"><p>Saját SQL tesztek üzleti logikához.</p></div><div class="code-cell" id="cell-8"><div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('8')">&#9654; Run</button></div><div class="code-body"><pre>-- tests/assert_positive_revenue.sql
+select order_id
+from {{ ref('stg_orders') }}
+where amount &lt; 0
+
+-- tests/assert_recent_orders.sql  
+select count(*) as cnt
+from {{ ref('stg_orders') }}
+where ordered_at &gt;= dateadd('day', -7, current_timestamp)
+having count(*) &lt; 1</pre></div><div class="output-area" id="out-8"><div class="output-label">Output:</div><pre>$ dbt test
+PASS: assert_positive_revenue (0 failures)
+PASS: assert_recent_orders (0 failures)</pre></div></div>
+</div>
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Incremental modellek</h2>
+  <div class="md-cell"><p>Nem minden futásnál dolgozzuk fel az összes adatot - csak az újakat.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre>-- models/marts/fct_orders_incremental.sql
+{{ config(materialized='incremental', unique_key='order_id') }}
+
+with orders as (
+    select * from {{ ref('stg_orders') }}
+)
+select * from orders
+{% if is_incremental() %}
+where ordered_at &gt; (select max(ordered_at) from {{ this }})
+{% endif %}</pre></div><div class="output-area" id="out-9"><div class="output-label">Output:</div><pre>$ dbt run --select fct_orders_incremental
+Incremental: inserted 45 new rows (total: 1420)</pre></div></div>
+</div>
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Snapshots: SCD Type 2</h2>
+  <div class="md-cell"><p>Automatikus SCD Type 2 dbt snapshot-okkal.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre># snapshots/orders_snapshot.sql
+{% snapshot orders_snapshot %}
+
+{{ config(
+    target_schema='snapshots',
+    unique_key='order_id',
+    strategy='timestamp',
+    updated_at='updated_at',
+) }}
+
+select * from {{ ref('stg_orders') }}
+
+{% endsnapshot %}</pre></div><div class="output-area" id="out-10"><div class="output-label">Output:</div><pre>$ dbt snapshot
+OK snapshot snapshots.orders_snapshot [INSERT 45, UPDATE 12]</pre></div></div>
+</div>
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Macros: újrahasználható kód</h2>
+  <div class="md-cell"><p>Macros = SQL függvények, amiket több modellben is használhatsz.</p></div><div class="code-cell" id="cell-11"><div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('11')">&#9654; Run</button></div><div class="code-body"><pre>-- macros/cast_timestamp.sql
+{% macro cast_timestamp(column_name) %}
+    {{ column_name }}::timestamp
+{% endmacro %}
+
+-- macros/generate_surrogate_key.sql
+{% macro generate_surrogate_key(columns) %}
+    md5(concat({{ columns | join("||'|'||") }}))
+{% endmacro %}
+
+-- Usage in model:
+select {{ generate_surrogate_key(['customer_id', 'product_id']) }} as order_sk</pre></div><div class="output-area" id="out-11"><div class="output-label">Output:</div><pre>Macro defined: cast_timestamp, generate_surrogate_key
+Used in 5 models</pre></div></div>
+</div>
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Dokumentáció</h2>
+  <div class="md-cell"><p>Automatikus dokumentáció és lineage.</p></div><div class="code-cell" id="cell-12"><div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('12')">&#9654; Run</button></div><div class="code-body"><pre># models/marts/_marts__yml.yml
+models:
+  - name: fct_monthly_revenue
+    description: 'Monthly revenue by category and segment'
+    columns:
+      - name: month
+        description: 'Truncated to first day of month'
+      - name: revenue
+        description: 'Sum of order amounts, excluding cancelled'
+
+# Generate docs
+dbt docs generate
+dbt docs serve</pre></div><div class="output-area" id="out-12"><div class="output-label">Output:</div><pre>$ dbt docs generate
+Built documentation with 12 models, 34 columns
+$ dbt docs serve
+Serving at http://localhost:8080</pre></div></div>
+</div>
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Tags és meta</h2>
+  <div class="md-cell"><p>Modellek címkézése és metaadatok.</p></div><div class="code-cell" id="cell-13"><div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('13')">&#9654; Run</button></div><div class="code-body"><pre>models:
+  - name: fct_monthly_revenue
+    meta:
+      owner: 'analytics-team'
+      sla: '4 hours'
+      refresh_frequency: 'daily'
+    tags: ['mart', 'revenue']
+
+# Run by tag
+dbt run --select tag:mart
+
+# Run by meta
+dbt run --select 'config.meta.owner:analytics-team'</pre></div><div class="output-area" id="out-13"><div class="output-label">Output:</div><pre>$ dbt run --select tag:mart
+Running 3 models with tag 'mart'</pre></div></div>
+</div>
+<div class="section layer-general" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Teljes WebShop Pro analytics layer</h2>
+  <div class="md-cell"><p>Staging (3) -> Intermediate (2) -> Mart (3) = 8 modell, 15 teszt.</p></div><div class="code-cell" id="cell-14"><div class="code-header"><span class="cell-number">[14]</span><button class="run-btn" onclick="runCell('14')">&#9654; Run</button></div><div class="code-body"><pre># Run the full project
+dbt run
+
+# Run all tests
+dbt test
+
+# Generate docs
+dbt docs generate
+
+# Summary
+echo 'Models: 8 (3 staging, 2 intermediate, 3 mart)'
+echo 'Tests: 15 (schema + custom)'
+echo 'Sources: 3 tables with freshness checks'</pre></div><div class="output-area" id="out-14"><div class="output-label">Output:</div><pre>$ dbt run
+OK: stg_orders, stg_products, stg_customers
+OK: int_orders_enriched, int_customer_segments
+OK: fct_monthly_revenue, dim_customers, dim_products
+
+$ dbt test
+15 of 15 tests passed
+
+Docs available at http://localhost:8080</pre></div></div>
+</div>
+<div class="section layer-general" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Összefoglalás</h2>
+  <div class="md-cell"><p>Gratulálunk! Felépítetted a WebShop Pro analytics layert!</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>Staging/Intermediate/Mart</td><td>Databricks Lakehouse</td></tr><tr><td>Schema tesztek, incremental</td><td>Production deployment</td></tr><tr><td>Snapshots, macros</td><td>Delta Live Tables</td></tr><tr><td>Dokumentáció, lineage</td><td>Unity Catalog</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Databricks Lakehouse - ahol managed környezetben dolgozunk!</p></div>
+</div>
+</main>
+<script>
+// ── State ──
+const completedSections = new Set();
+const allCellIds = [];
+const COURSE_SLUG = 'dbt-analytics-engineering';
+
+// Restore from localStorage
+try {
+  const saved = JSON.parse(localStorage.getItem('ecc:' + COURSE_SLUG + ':completed') || '[]');
+  saved.forEach(id => completedSections.add(id));
+} catch(e) {}
+
+let runAllRunning = false;
+
+// ── Navigation ──
+function buildNav() {
+  const nav = document.getElementById('side-nav');
+  const sections = document.querySelectorAll('.section');
+  const tocData = [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Beállítás"}, {"id": "s2", "num": "02", "label": "Struktúra"}, {"id": "s3", "num": "03", "label": "Staging"}, {"id": "s4", "num": "04", "label": "Source, ref"}, {"id": "s5", "num": "05", "label": "Intermediate"}, {"id": "s6", "num": "06", "label": "Mart modellek"}, {"id": "s7", "num": "07", "label": "Schema tesztek"}, {"id": "s8", "num": "08", "label": "Custom tesztek"}, {"id": "s9", "num": "09", "label": "Incremental"}, {"id": "s10", "num": "10", "label": "Snapshots"}, {"id": "s11", "num": "11", "label": "Macros"}, {"id": "s12", "num": "12", "label": "Dokumentáció"}, {"id": "s13", "num": "13", "label": "Tags, meta"}, {"id": "s14", "num": "14", "label": "Teljes analytics"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}];
+  
+  nav.innerHTML = tocData.map(item => 
+    `<a href="#${item.id}" class="nav-item" data-section="${item.id}" id="nav-${item.id}">
+      <span class="nav-num">${item.num}</span> ${item.label}
+    </a>`
+  ).join('');
+}
+
+// ── Cell execution ──
+function runCell(cellId) {
+  const cell = document.getElementById('cell-' + cellId);
+  if (!cell) return;
+  const output = document.getElementById('out-' + cellId);
+  if (!output) return;
+  const btn = cell.querySelector('.run-btn');
+  
+  // Already running or done
+  if (cell.classList.contains('running') || btn.classList.contains('done-btn')) return;
+  
+  // Start running
+  cell.classList.add('running');
+  btn.classList.add('running-btn');
+  btn.textContent = '⏳ Running...';
+  
+  // Simulate execution time
+  const delay = 400 + Math.random() * 800;
+  setTimeout(() => {
+    cell.classList.remove('running');
+    cell.classList.add('has-output');
+    btn.classList.remove('running-btn');
+    btn.classList.add('done-btn');
+    btn.textContent = '✓ Done';
+    output.classList.add('visible');
+    
+    // Mark section as completed
+    const section = cell.closest('.section');
+    if (section) {
+      completedSections.add(section.id);
+      // Persist to localStorage
+      try {
+        localStorage.setItem('ecc:' + COURSE_SLUG + ':completed', JSON.stringify([...completedSections]));
+      } catch(e) {}
+      const navItem = document.getElementById('nav-' + section.id);
+      if (navItem) navItem.classList.add('completed');
+    }
+    updateProgress();
+  }, delay);
+}
+
+function updateProgress() {
+  const totalSections = document.querySelectorAll('.section[id]').length;
+  const done = completedSections.size;
+  const pct = Math.round((done / totalSections) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} / ${totalSections} section completed`;
+}
+
+// ── Run All ──
+async function runAll() {
+  if (runAllRunning) return;
+  runAllRunning = true;
+  
+  const cells = document.querySelectorAll('.code-cell');
+  for (const cell of cells) {
+    const id = cell.id.replace('cell-', '');
+    const btn = cell.querySelector('.run-btn');
+    if (!btn.classList.contains('done-btn')) {
+      runCell(id);
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+    }
+  }
+  runAllRunning = false;
+}
+
+// ── Reset ──
+function resetAll() {
+  completedSections.clear();
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    cell.classList.remove('running', 'has-output');
+    const id = cell.id.replace('cell-', '');
+    const output = document.getElementById('out-' + id);
+    if (output) output.classList.remove('visible');
+    const btn = cell.querySelector('.run-btn');
+    if (btn) {
+      btn.classList.remove('running-btn', 'done-btn');
+      btn.textContent = '▶ Run';
+    }
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
+  updateProgress();
+}
+
+// ── Scroll spy ──
+function updateActiveNav() {
+  const sections = document.querySelectorAll('.section');
+  let activeId = null;
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 120) activeId = s.id;
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (activeId) {
+    const navItem = document.getElementById('nav-' + activeId);
+    if (navItem) {
+      navItem.classList.add('active');
+      navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+  }
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildNav();
+  updateProgress();
+  
+  // Collect all cell IDs
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    allCellIds.push(cell.id.replace('cell-', ''));
+  });
+  
+  window.addEventListener('scroll', updateActiveNav, {passive: true});
+  updateActiveNav();
+
+  restoreProgress();
+});
+
+function restoreProgress() {
+  completedSections.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const navItem = document.getElementById('nav-' + sectionId);
+      if (navItem) navItem.classList.add('completed');
+      section.querySelectorAll('.code-cell').forEach(cell => {
+        const id = cell.id.replace('cell-', '');
+        const btn = cell.querySelector('.run-btn');
+        const output = document.getElementById('out-' + id);
+        cell.classList.add('has-output');
+        if (btn) { btn.classList.add('done-btn'); btn.textContent = '✓ Done'; }
+        if (output) output.classList.add('visible');
+      });
+    }
+  });
+  updateProgress();
+}
+
+</script>
+</body>
+</html>

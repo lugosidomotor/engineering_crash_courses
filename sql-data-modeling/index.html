@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL & Data Modeling &mdash; Crash Course</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700;900&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --bg-code: #0d1117;
+  --cyan: #00d4ff;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --purple: #b366ff;
+  --yellow: #ffd700;
+  --red: #ff4466;
+  --text: #e0e0e8;
+  --text-dim: #888899;
+  --border: #2a2a3a;
+  --bronze: #cd7f32;
+  --silver: #c0c0c0;
+  --gold: #ffd700;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.7;
+}
+
+/* ── Progress bar ── */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px; z-index:1000;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--yellow));
+  transition: width .4s ease;
+  width: 0%;
+}
+
+/* ── Header ── */
+header {
+  position: fixed; top:0; left:0; right:0; z-index:900;
+  background: rgba(10,10,15,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 30px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+header h1 {
+  font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-actions { display:flex; gap:10px; align-items:center; }
+.btn {
+  padding: 7px 18px; border-radius: 6px; border:none; cursor:pointer;
+  font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600;
+  transition: all .2s;
+}
+.btn-run-all {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000;
+}
+.btn-run-all:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,136,.3); }
+.btn-reset {
+  background: var(--bg3); color: var(--text-dim); border: 1px solid var(--border);
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+#progress-text { color: var(--text-dim); font-size: .8rem; }
+
+/* ── Side nav ── */
+#side-nav {
+  position: fixed; left:0; top:60px; bottom:0; width:260px; z-index:800;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 20px 0;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+#side-nav::-webkit-scrollbar { width:4px; }
+#side-nav::-webkit-scrollbar-thumb { background: var(--border); }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; font-size: .78rem; color: var(--text-dim);
+  text-decoration: none; transition: all .15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.completed { color: var(--green); border-left-color: var(--green); }
+.nav-item.active { color: var(--cyan); background: rgba(0,212,255,.05); border-left-color: var(--cyan); }
+.nav-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height:22px; border-radius: 50%; font-size: .65rem;
+  background: var(--bg3); font-weight: 700;
+}
+.nav-item.completed .nav-num { background: var(--green); color: #000; }
+
+/* ── Main content ── */
+main {
+  margin-left: 260px; padding: 80px 40px 60px 40px;
+  max-width: 960px;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 60px;
+  border-left: 4px solid var(--border);
+  padding-left: 24px;
+  scroll-margin-top: 80px;
+}
+.section.layer-bronze { border-left-color: var(--bronze); }
+.section.layer-silver { border-left-color: var(--silver); }
+.section.layer-gold { border-left-color: var(--gold); }
+.section.layer-general { border-left-color: var(--cyan); }
+.section.layer-intro { border-left-color: var(--purple); }
+
+.section-number {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 4px;
+}
+.layer-bronze .section-number { color: var(--bronze); }
+.layer-silver .section-number { color: var(--silver); }
+.layer-gold .section-number { color: var(--gold); }
+.layer-general .section-number { color: var(--cyan); }
+.layer-intro .section-number { color: var(--purple); }
+
+.section h2 {
+  font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;
+  color: #fff;
+}
+.section h3 {
+  font-size: 1.1rem; font-weight: 600; margin: 20px 0 10px;
+  color: var(--cyan);
+}
+
+/* ── Markdown cells ── */
+.md-cell {
+  margin-bottom: 16px; line-height: 1.8;
+}
+.md-cell p { margin-bottom: 12px; }
+.md-cell strong { color: #fff; }
+.md-cell code {
+  background: var(--bg-code); padding: 2px 6px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  color: var(--cyan);
+}
+.md-cell pre {
+  background: var(--bg-code); padding: 16px; border-radius: 8px;
+  overflow-x: auto; margin: 12px 0; font-size: .85rem;
+  border: 1px solid var(--border);
+}
+.md-cell pre code { background:none; padding:0; color: var(--green); }
+
+/* ── Tables ── */
+table {
+  width:100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem;
+}
+th {
+  background: var(--bg3); padding: 10px 12px; text-align: left;
+  font-weight: 600; color: var(--cyan); border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+tr:hover td { background: rgba(0,212,255,.05); }
+
+/* ── Code cells ── */
+.code-cell {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+.code-cell.running { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,.15); }
+.code-cell.has-output { border-color: rgba(0,255,136,.2); }
+
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-header span { font-size: .75rem; color: var(--text-dim); }
+.cell-number { font-family: 'JetBrains Mono', monospace; color: var(--purple); font-weight:700; }
+
+.run-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 5px; border: 1px solid var(--green);
+  background: transparent; color: var(--green);
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  cursor: pointer; transition: all .2s;
+}
+.run-btn:hover { background: var(--green); color: #000; }
+.run-btn.running-btn {
+  border-color: var(--cyan); color: var(--cyan);
+  animation: pulse 1s infinite;
+}
+.run-btn.done-btn { border-color: var(--text-dim); color: var(--text-dim); cursor:default; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.code-body {
+  padding: 16px; overflow-x: auto;
+}
+.code-body pre {
+  margin:0; font-family: 'JetBrains Mono', monospace;
+  font-size: .84rem; line-height: 1.6; color: #e6e6e6;
+  white-space: pre; overflow-x: auto;
+}
+
+/* Syntax highlighting */
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cm { color: #6272a4; }
+.num { color: #bd93f9; }
+.op { color: #ff79c6; }
+.var { color: #8be9fd; }
+.type { color: #ffb86c; }
+
+/* ── Output area ── */
+.output-area {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  max-height: 0; overflow: hidden;
+  transition: max-height .6s ease, padding .3s;
+}
+.output-area.visible {
+  max-height: 3000px; padding: 16px;
+}
+.output-label {
+  font-size: .7rem; color: var(--text-dim); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+
+.output-area pre {
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+  white-space: pre-wrap; color: var(--green); margin: 0;
+}
+.output-area table { margin: 8px 0; }
+.output-area th { background: rgba(0,212,255,.1); color: var(--cyan); font-size: .8rem; }
+.output-area td { font-size: .82rem; }
+
+/* ── Tool logos inline ── */
+.tool-logo {
+  height: 20px; width: 20px; vertical-align: middle;
+  display: inline-block; margin-right: 4px;
+  filter: brightness(0) invert(1) opacity(.7);
+}
+.tool-logo-bright { filter: none; }
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg3); padding: 3px 10px; border-radius: 20px;
+  font-size: .75rem; color: var(--text-dim); margin: 2px 4px 2px 0;
+  border: 1px solid var(--border);
+}
+.tool-badge img { height:14px; width:14px; filter: brightness(0) invert(1); }
+
+/* ── Architecture diagram ── */
+.arch-flow {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 16px 0; justify-content: center;
+}
+.arch-step {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px; text-align: center;
+  min-width: 100px; transition: all .2s;
+}
+.arch-step:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.arch-step .label { font-size: .75rem; color: var(--cyan); font-weight: 600; }
+.arch-step .detail { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
+.arch-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+/* ── Callout boxes ── */
+.callout {
+  background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2);
+  border-radius: 8px; padding: 16px; margin: 16px 0;
+}
+.callout.warning {
+  background: rgba(255,136,0,.05); border-color: rgba(255,136,0,.2);
+}
+.callout.success {
+  background: rgba(0,255,136,.05); border-color: rgba(0,255,136,.2);
+}
+.callout-title { font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+.callout.warning .callout-title { color: var(--orange); }
+.callout.success .callout-title { color: var(--green); }
+
+/* ── Star schema diagram ── */
+.star-schema {
+  display: flex; align-items: center; justify-content: center;
+  gap: 30px; flex-wrap: wrap; margin: 20px 0;
+}
+.star-entity {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 20px; text-align: center;
+  min-width: 120px;
+}
+.star-entity.fact { border-color: var(--yellow); background: rgba(255,215,0,.05); }
+.star-entity.dim { border-color: var(--cyan); background: rgba(0,212,255,.05); }
+.star-entity .entity-name { font-weight: 700; font-size: .9rem; }
+.star-entity.fact .entity-name { color: var(--yellow); }
+.star-entity.dim .entity-name { color: var(--cyan); }
+.star-entity .entity-cols { font-size: .7rem; color: var(--text-dim); margin-top: 4px; }
+.star-arrow { color: var(--text-dim); font-size: 1.5rem; }
+
+/* ── Layer badges ── */
+.layer-badge {
+  display: inline-block; padding: 2px 10px; border-radius: 4px;
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.layer-badge.bronze { background: rgba(205,127,50,.15); color: var(--bronze); border: 1px solid var(--bronze); }
+.layer-badge.silver { background: rgba(192,192,192,.1); color: var(--silver); border: 1px solid var(--silver); }
+.layer-badge.gold { background: rgba(255,215,0,.1); color: var(--gold); border: 1px solid var(--gold); }
+.layer-badge.landing { background: rgba(136,136,153,.1); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+/* ── Hero section ── */
+.hero {
+  text-align: center; padding: 40px 0 60px; margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--green), var(--yellow));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }
+.hero-tools {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+}
+.hero-tool {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.hero-tool img { width:36px; height:36px; filter: brightness(0) invert(1) opacity(.85); }
+.hero-tool span { font-size: .65rem; color: var(--text-dim); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #side-nav { display: none; }
+  main { margin-left:0; padding: 80px 16px 40px; }
+  .hero h1 { font-size: 1.8rem; }
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all .2s;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.back-btn:hover {
+  background: var(--accent, var(--cyan));
+  color: var(--bg);
+  border-color: var(--accent, var(--cyan));
+}
+
+.log-airflow { color: #017cee; font-weight: 600; }
+.log-dbt { color: #ff694a; font-weight: 600; }
+.log-delta { color: #48b984; font-weight: 600; }
+.log-spark { color: #f0883e; font-weight: 600; }
+.log-kafka { color: #b0b8c4; font-weight: 600; }
+.log-info { color: #58a6ff; }
+.log-warn { color: #d29922; }
+.log-ok { color: #3fb950; font-weight: 600; }
+.log-dim { color: #6e7681; }
+.log-cmd { color: #79c0ff; }
+.log-time { color: #8b949e; }
+.log-step { color: #f0883e; font-weight: 600; }
+
+
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn">&#8592;</a>
+  <h1>&lt;/&gt; SQL & Data Modeling</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 20 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+<nav id="side-nav"></nav>
+<main id="main-content">
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Section 00</div>
+  <h2>SQL alapok <span class="tool-badge"><img src="../assets/logos/parquet.svg">Parquet</span></h2>
+  <div class="md-cell"><p>Az SQL a data engineering alapnyelve. Ebben a kurzusban a WebShop Pro projekten keresztül tanulod meg az SQL alapokat és az adatmodellezést.</p></div><div class="callout "><div class="callout-title">Tartalom</div><p>SELECT, JOIN, Aggregáció, Window Functions, CTE, DML/DDL, Tranzakciók, Star Schema, SCD, Normalizálás, Parquet, Teljes analitikai modell</p></div><div class="callout success"><div class="callout-title">Projekt</div><p>Felépítjük a WebShop Pro teljes analitikai adatmodelljét.</p></div>
+</div>
+<div class="section layer-intro" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Táblák és adattípusok</h2>
+  <div class="md-cell"><p>A relációs adatbázis adatokat táblákban tárolja. Minden táblának van sémája.</p></div><table><tr><th>Típus</th><th>Leírás</th><th>Példa</th></tr><tr><td>['INT', 'Egész szám', 'customer_id']</td><td>['VARCHAR(n)', 'Szöveg', 'name']</td><td>['DECIMAL(p,s)', 'Tizedes', 'price']</td><td>['TIMESTAMP', 'Dátum+idő', 'created_at']</td><td>['BOOLEAN', 'Igaz/hamis', 'is_active']</td></tr></table><div class="code-cell" id="cell-1"><div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('1')">&#9654; Run</button></div><div class="code-body"><pre>-- Create customers table
+CREATE TABLE customers (
+    customer_id   INT PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    email         VARCHAR(255) UNIQUE,
+    city          VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active     BOOLEAN DEFAULT TRUE
+);</pre></div><div class="output-area" id="out-1"><div class="output-label">Output:</div><pre>Query OK, 0 rows affected</pre></div></div>
+</div>
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>INSERT, SELECT, WHERE</h2>
+  <div class="md-cell"><p>Adatok beszúrása és lekérdezése.</p></div><div class="code-cell" id="cell-2"><div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('2')">&#9654; Run</button></div><div class="code-body"><pre>INSERT INTO customers VALUES
+    (1, 'Kovacs Anna', 'anna@email.hu', 'Budapest', '2024-01-15', TRUE),
+    (2, 'Nagy Peter', 'peter@email.hu', 'Debrecen', '2024-02-20', TRUE),
+    (3, 'Szabo Kati', 'kati@email.hu', 'Budapest', '2024-03-10', FALSE);
+
+SELECT name, city FROM customers WHERE city = 'Budapest';</pre></div><div class="output-area" id="out-2"><div class="output-label">Output:</div><pre>name        | city
+------------+----------
+Kovacs Anna | Budapest
+Szabo Kati  | Budapest
+
+2 rows</pre></div></div>
+</div>
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>ORDER BY, LIMIT, DISTINCT</h2>
+  <div class="md-cell"><p>Rendezés, limitálás és egyedi értékek.</p></div><div class="code-cell" id="cell-3"><div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('3')">&#9654; Run</button></div><div class="code-body"><pre>SELECT name, price FROM products ORDER BY price DESC LIMIT 5;
+
+SELECT DISTINCT category FROM products ORDER BY category;</pre></div><div class="output-area" id="out-3"><div class="output-label">Output:</div><pre>name            | price
+----------------+-------
+Laptop Pro 16   | 549.99
+Phone Ultra     | 449.99
+
+Audio, Laptop, Phone, Tablet</pre></div></div>
+</div>
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Aggregáció: GROUP BY, HAVING</h2>
+  <div class="md-cell"><p>Aggregáló függvények csoportosítva.</p></div><div class="code-cell" id="cell-4"><div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('4')">&#9654; Run</button></div><div class="code-body"><pre>SELECT p.category, COUNT(*) AS order_count,
+       SUM(oi.quantity * oi.unit_price) AS revenue,
+       ROUND(AVG(oi.unit_price), 2) AS avg_price
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+GROUP BY p.category
+HAVING revenue &gt; 1000
+ORDER BY revenue DESC;</pre></div><div class="output-area" id="out-4"><div class="output-label">Output:</div><pre>category | order_count | revenue  | avg_price
+---------+-------------+----------+----------
+Laptop   |          45 | 24749.55 |    549.99
+Phone    |          62 | 18949.38 |    399.99</pre></div></div>
+</div>
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>JOIN: Táblák összekapcsolása</h2>
+  <div class="md-cell"><p>A JOIN a relációs adatbázisok legerősebb művelete.</p></div><table><tr><th>JOIN típus</th><th>Leírás</th></tr><tr><td>['INNER JOIN', 'Mindkét táblában meglévő sorok']</td><td>['LEFT JOIN', 'Bal tábla összes + jobb egyezések']</td><td>['FULL JOIN', 'Mindkét tábla összes sora']</td></tr></table><div class="code-cell" id="cell-5"><div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('5')">&#9654; Run</button></div><div class="code-body"><pre>SELECT c.name AS customer, p.name AS product,
+       oi.quantity, oi.unit_price,
+       oi.quantity * oi.unit_price AS line_total
+FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.product_id
+ORDER BY c.name;</pre></div><div class="output-area" id="out-5"><div class="output-label">Output:</div><pre>customer    | product       | quantity | unit_price | line_total
+------------+---------------+----------+------------+-----------
+Kovacs Anna | Laptop Pro 16 |        1 |     549.99 |    549.99</pre></div></div>
+</div>
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Subquery és CTE (WITH)</h2>
+  <div class="md-cell"><p>Összetett lekérdezések olvashatóbbá CTE-vel.</p></div><div class="callout success"><div class="callout-title">Pro tip</div><p>Mindig CTE-t használj az allekérdezés helyett!</p></div><div class="code-cell" id="cell-6"><div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('6')">&#9654; Run</button></div><div class="code-body"><pre>WITH customer_revenue AS (
+    SELECT c.customer_id, c.name,
+           SUM(oi.quantity * oi.unit_price) AS total_spent
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    JOIN order_items oi ON o.order_id = oi.order_id
+    GROUP BY c.customer_id, c.name
+)
+SELECT name, total_spent
+FROM customer_revenue
+WHERE total_spent &gt; (SELECT AVG(total_spent) FROM customer_revenue)
+ORDER BY total_spent DESC;</pre></div><div class="output-area" id="out-6"><div class="output-label">Output:</div><pre>name         | total_spent
+-------------+------------
+Kovacs Anna  |    1349.97</pre></div></div>
+</div>
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Window Functions</h2>
+  <div class="md-cell"><p>Ablakfüggvények: sorokat vizsgálnak összevonás nélkül.</p></div><div class="code-cell" id="cell-7"><div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('7')">&#9654; Run</button></div><div class="code-body"><pre>SELECT DATE_TRUNC('month', order_date) AS month,
+       SUM(total_amount) AS revenue,
+       SUM(SUM(total_amount)) OVER (ORDER BY DATE_TRUNC('month', order_date)) AS running_total
+FROM orders
+GROUP BY DATE_TRUNC('month', order_date)
+ORDER BY month;</pre></div><div class="output-area" id="out-7"><div class="output-label">Output:</div><pre>month   | revenue  | running_total
+--------+---------+---------------
+2024-01 | 2349.96 |       2349.96
+2024-02 | 3199.94 |       5549.90
+2024-03 | 4299.91 |       9849.81</pre></div></div>
+</div>
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>CASE WHEN és transzformáció</h2>
+  <div class="md-cell"><p>Feltételes logika SQL-ben.</p></div><div class="code-cell" id="cell-8"><div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('8')">&#9654; Run</button></div><div class="code-body"><pre>SELECT c.name,
+       COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_spent,
+       CASE WHEN SUM(oi.quantity * oi.unit_price) &gt;= 2000 THEN 'VIP'
+            WHEN SUM(oi.quantity * oi.unit_price) &gt;= 500 THEN 'Regular'
+            ELSE 'Occasional' END AS segment
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN order_items oi ON o.order_id = oi.order_id
+GROUP BY c.customer_id, c.name
+ORDER BY total_spent DESC;</pre></div><div class="output-area" id="out-8"><div class="output-label">Output:</div><pre>name         | total_spent | segment
+-------------+------------+----------
+Kovacs Anna  |    1349.97 | Regular
+Szabo Kati   |       0.00 | Occasional</pre></div></div>
+</div>
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>DML: MERGE, UPSERT</h2>
+  <div class="md-cell"><p>Adatmódosító műveletek. A MERGE a data engineering egyik legfontosabb művelete.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre>-- SCD Type 2: Close old + insert new
+UPDATE dim_customer 
+SET valid_to = CURRENT_DATE, is_current = FALSE
+WHERE customer_id = 1 AND is_current = TRUE;
+
+INSERT INTO dim_customer VALUES
+(101, 1, 'Kovacs Anna', 'Szeged', 'Regular', CURRENT_DATE, '9999-12-31', TRUE);
+
+-- MERGE (upsert)
+MERGE INTO products AS target
+USING (VALUES (10, 'New Tablet', 'Tablet', 299.99, 50)) AS src (id, name, cat, price, stock)
+ON target.product_id = src.id
+WHEN MATCHED THEN UPDATE SET price = src.price
+WHEN NOT MATCHED THEN INSERT VALUES (src.id, src.name, src.cat, src.price, src.stock);</pre></div><div class="output-area" id="out-9"><div class="output-label">Output:</div><pre>Query OK, 3 rows affected</pre></div></div>
+</div>
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>DDL, Indexek, Partitioning</h2>
+  <div class="md-cell"><p>Táblaszerkezet módosítása, indexek, partitioning.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre>CREATE INDEX idx_orders_customer ON orders(customer_id);
+CREATE INDEX idx_orders_date ON orders(order_date);
+
+SELECT table_name, table_rows,
+       ROUND(data_length/1024/1024, 2) AS size_mb
+FROM information_schema.tables
+WHERE table_schema = 'webshop_pro' ORDER BY data_length DESC;</pre></div><div class="output-area" id="out-10"><div class="output-label">Output:</div><pre>table_name  | table_rows | size_mb
+------------+-----------+--------
+orders      |    500000 | 125.50
+order_items |   1850000 | 342.10</pre></div></div>
+</div>
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Tranzakciók: ACID</h2>
+  <div class="md-cell"><p>ACID = Atomicity, Consistency, Isolation, Durability.</p></div><table><tr><th>Tulajdonság</th><th>Leírás</th></tr><tr><td>['Atomicity', 'Vagy minden végrehajtódik, vagy sem']</td><td>['Consistency', 'Érvényes állapot a tranzakció után']</td><td>['Isolation', 'Párhuzamos tranzakciók elszigeteltek']</td><td>['Durability', 'Commit-ált adatok tartósan tárolódnak']</td></tr></table><div class="code-cell" id="cell-11"><div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('11')">&#9654; Run</button></div><div class="code-body"><pre>BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 500 WHERE account_id = 1;
+UPDATE accounts SET balance = balance + 500 WHERE account_id = 2;
+COMMIT;</pre></div><div class="output-area" id="out-11"><div class="output-label">Output:</div><pre>Query OK, COMMIT successful</pre></div></div>
+</div>
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>VIEW, UDF</h2>
+  <div class="md-cell"><p>Nézetek és felhasználói függvények.</p></div><div class="code-cell" id="cell-12"><div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('12')">&#9654; Run</button></div><div class="code-body"><pre>CREATE VIEW vw_customer_orders AS
+SELECT c.customer_id, c.name,
+       COUNT(o.order_id) AS order_count,
+       COALESCE(SUM(o.total_amount), 0) AS lifetime_value
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name;
+
+SELECT * FROM vw_customer_orders WHERE order_count &gt; 3;</pre></div><div class="output-area" id="out-12"><div class="output-label">Output:</div><pre>customer_id | name        | order_count | lifetime_value
+------------+-------------+-------------+---------------
+1           | Kovacs Anna |           5 |       1349.97</pre></div></div>
+</div>
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Adatmodellezés alapjai</h2>
+  <div class="md-cell"><p>Három szint: konceptuális, logikai és fizikai.</p></div><table><tr><th>Szint</th><th>Leírás</th><th>Kinek</th></tr><tr><td>['Konceptuális', 'Üzleti entitások', 'Üzleti elemzők']</td><td>['Logikai', 'Táblák, oszlopok, kulcsok', 'Data modelerek']</td><td>['Fizikai', 'Indexek, partitioning', 'DBA']</td></tr></table><div class="callout "><div class="callout-title">WebShop Pro</div><p>Customers, Products, Orders, Order Items, Categories, Payments, Shipments, Reviews.</p></div>
+</div>
+<div class="section layer-general" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Star Schema</h2>
+  <div class="md-cell"><p>Központi fact tábla + dimenzió táblák.</p></div><div class="code-cell" id="cell-14"><div class="code-header"><span class="cell-number">[14]</span><button class="run-btn" onclick="runCell('14')">&#9654; Run</button></div><div class="code-body"><pre>-- Fact table
+CREATE TABLE fact_orders (
+    order_sk    BIGINT PRIMARY KEY,
+    customer_sk BIGINT REFERENCES dim_customer(sk),
+    product_sk  BIGINT REFERENCES dim_product(sk),
+    date_sk     BIGINT REFERENCES dim_date(sk),
+    quantity    INT,
+    unit_price  DECIMAL(10,2),
+    net_amount  DECIMAL(10,2)
+);
+
+-- Dimension: dim_customer
+CREATE TABLE dim_customer (
+    sk BIGINT PRIMARY KEY, customer_id INT,
+    name VARCHAR(100), city VARCHAR(50),
+    segment VARCHAR(20), is_current BOOLEAN
+);</pre></div><div class="output-area" id="out-14"><div class="output-label">Output:</div><pre>Query OK, 4 tables created</pre></div></div>
+</div>
+<div class="section layer-general" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>SCD: Lassan változó dimenziók</h2>
+  <div class="md-cell"><p>SCD stratégiák a dimenzió táblák történeti nyomon követéséhez.</p></div><table><tr><th>SCD típus</th><th>Stratégia</th></tr><tr><td>['Type 0', 'Soha nem változik']</td><td>['Type 1', 'Felülírás']</td><td>['Type 2', 'Új sor + időintervallum']</td><td>['Type 3', 'Régi + új oszlop']</td></tr></table><div class="code-cell" id="cell-15"><div class="code-header"><span class="cell-number">[15]</span><button class="run-btn" onclick="runCell('15')">&#9654; Run</button></div><div class="code-body"><pre>-- SCD Type 2
+UPDATE dim_customer SET valid_to = '2024-06-01', is_current = FALSE
+WHERE customer_id = 1 AND is_current = TRUE;
+
+INSERT INTO dim_customer VALUES
+(101, 1, 'Kovacs Anna', 'Szeged', 'Regular', '2024-06-01', '9999-12-31', TRUE);
+
+SELECT customer_id, name, city, valid_from, is_current
+FROM dim_customer WHERE customer_id = 1;</pre></div><div class="output-area" id="out-15"><div class="output-label">Output:</div><pre>customer_id | name       | city    | valid_from | is_current
+------------+-----------+---------+------------+----------
+1           | Kovacs Anna| Budapest| 2024-01-15 | FALSE
+1           | Kovacs Anna| Szeged  | 2024-06-01 | TRUE</pre></div></div>
+</div>
+<div class="section layer-general" id="s16">
+  <div class="section-number">Section 16</div>
+  <h2>Normalizálás</h2>
+  <div class="md-cell"><p>Normalizálás csökkenti a redundanciát, denormalizálás javítja az olvasást.</p></div><table><tr><th>NF</th><th>Szabály</th></tr><tr><td>['1NF', 'Atomi értékek']</td><td>['2NF', 'Nincs részleges függőség']</td><td>['3NF', 'Nincs tranzitív függőség']</td></tr></table><div class="callout success"><div class="callout-title">Mikor mit?</div><p>OLTP: normalizált. OLAP: denormalizált (star schema).</p></div>
+</div>
+<div class="section layer-general" id="s17">
+  <div class="section-number">Section 17</div>
+  <h2>Parquet és DuckDB <span class="tool-badge"><img src="../assets/logos/parquet.svg">Parquet</span></h2>
+  <div class="md-cell"><p>Parquet oszlopos formátum + DuckDB beágyazható analitikai adatbázis.</p></div><div class="code-cell" id="cell-17"><div class="code-header"><span class="cell-number">[17]</span><button class="run-btn" onclick="runCell('17')">&#9654; Run</button></div><div class="code-body"><pre>import duckdb
+
+conn = duckdb.connect()
+result = conn.execute("""
+    SELECT p.category, COUNT(*) AS orders,
+           SUM(oi.quantity * oi.unit_price) AS revenue
+    FROM read_parquet('gold/fact_orders.parquet') oi
+    JOIN read_parquet('gold/dim_product.parquet') p ON oi.product_sk = p.sk
+    GROUP BY p.category ORDER BY revenue DESC
+""").fetchdf()
+print(result.to_string(index=False))</pre></div><div class="output-area" id="out-17"><div class="output-label">Output:</div><pre>category | orders |  revenue
+---------+--------+---------
+Laptop   |     45 | 24749.55
+Phone    |     62 | 18949.38</pre></div></div>
+</div>
+<div class="section layer-general" id="s18">
+  <div class="section-number">Section 18</div>
+  <h2>Teljes analitikai modell</h2>
+  <div class="md-cell"><p>Staging, intermediate és mart rétegek felépítése.</p></div><div class="code-cell" id="cell-18"><div class="code-header"><span class="cell-number">[18]</span><button class="run-btn" onclick="runCell('18')">&#9654; Run</button></div><div class="code-body"><pre>-- Staging
+CREATE VIEW stg_orders AS
+SELECT order_id, customer_id, order_date, total_amount
+FROM raw_orders WHERE status != 'cancelled';
+
+-- Intermediate
+CREATE VIEW int_customer_orders AS
+SELECT c.name, c.segment, o.order_date, o.total_amount
+FROM stg_orders o
+JOIN dim_customer c ON o.customer_id = c.customer_id;
+
+-- Mart
+CREATE VIEW mart_monthly_revenue AS
+SELECT segment, COUNT(*) AS orders, SUM(total_amount) AS revenue
+FROM int_customer_orders GROUP BY segment;</pre></div><div class="output-area" id="out-18"><div class="output-label">Output:</div><pre>segment    | orders | revenue
+-----------+--------+-------
+VIP        |     28 | 18249.80
+Regular    |     67 | 23499.65</pre></div></div>
+</div>
+<div class="section layer-general" id="s19">
+  <div class="section-number">Section 19</div>
+  <h2>Összefoglalás</h2>
+  <div class="md-cell"><p>Gratulálunk! Végigcsináltad az SQL & Data Modeling kurzust.</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>SELECT, JOIN, GROUP BY</td><td>Python for DE</td></tr><tr><td>Window functions, CTE</td><td>Pandas DataFrame</td></tr><tr><td>Star schema, SCD</td><td>Delta Lake</td></tr><tr><td>DuckDB + Parquet</td><td>PyArrow</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Python for Data Engineering!</p></div>
+</div>
+</main>
+<script>
+// ── State ──
+const completedSections = new Set();
+const allCellIds = [];
+const COURSE_SLUG = 'sql-data-modeling';
+
+// Restore from localStorage
+try {
+  const saved = JSON.parse(localStorage.getItem('ecc:' + COURSE_SLUG + ':completed') || '[]');
+  saved.forEach(id => completedSections.add(id));
+} catch(e) {}
+
+let runAllRunning = false;
+
+// ── Navigation ──
+function buildNav() {
+  const nav = document.getElementById('side-nav');
+  const sections = document.querySelectorAll('.section');
+  const tocData = [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Táblák, típusok"}, {"id": "s2", "num": "02", "label": "SELECT, WHERE"}, {"id": "s3", "num": "03", "label": "ORDER BY, DISTINCT"}, {"id": "s4", "num": "04", "label": "GROUP BY, HAVING"}, {"id": "s5", "num": "05", "label": "JOIN típusok"}, {"id": "s6", "num": "06", "label": "CTE, Subquery"}, {"id": "s7", "num": "07", "label": "Window Functions"}, {"id": "s8", "num": "08", "label": "CASE WHEN"}, {"id": "s9", "num": "09", "label": "DML, MERGE"}, {"id": "s10", "num": "10", "label": "DDL, Index, Partition"}, {"id": "s11", "num": "11", "label": "Tranzakciók, ACID"}, {"id": "s12", "num": "12", "label": "VIEW, UDF"}, {"id": "s13", "num": "13", "label": "Adatmodellezés"}, {"id": "s14", "num": "14", "label": "Star Schema"}, {"id": "s15", "num": "15", "label": "SCD Type 2"}, {"id": "s16", "num": "16", "label": "Normalizálás"}, {"id": "s17", "num": "17", "label": "Parquet + DuckDB"}, {"id": "s18", "num": "18", "label": "Teljes pipeline"}, {"id": "s19", "num": "19", "label": "Összefoglalás"}];
+  
+  nav.innerHTML = tocData.map(item => 
+    `<a href="#${item.id}" class="nav-item" data-section="${item.id}" id="nav-${item.id}">
+      <span class="nav-num">${item.num}</span> ${item.label}
+    </a>`
+  ).join('');
+}
+
+// ── Cell execution ──
+function runCell(cellId) {
+  const cell = document.getElementById('cell-' + cellId);
+  if (!cell) return;
+  const output = document.getElementById('out-' + cellId);
+  if (!output) return;
+  const btn = cell.querySelector('.run-btn');
+  
+  // Already running or done
+  if (cell.classList.contains('running') || btn.classList.contains('done-btn')) return;
+  
+  // Start running
+  cell.classList.add('running');
+  btn.classList.add('running-btn');
+  btn.textContent = '⏳ Running...';
+  
+  // Simulate execution time
+  const delay = 400 + Math.random() * 800;
+  setTimeout(() => {
+    cell.classList.remove('running');
+    cell.classList.add('has-output');
+    btn.classList.remove('running-btn');
+    btn.classList.add('done-btn');
+    btn.textContent = '✓ Done';
+    output.classList.add('visible');
+    
+    // Mark section as completed
+    const section = cell.closest('.section');
+    if (section) {
+      completedSections.add(section.id);
+      // Persist to localStorage
+      try {
+        localStorage.setItem('ecc:' + COURSE_SLUG + ':completed', JSON.stringify([...completedSections]));
+      } catch(e) {}
+      const navItem = document.getElementById('nav-' + section.id);
+      if (navItem) navItem.classList.add('completed');
+    }
+    updateProgress();
+  }, delay);
+}
+
+function updateProgress() {
+  const totalSections = document.querySelectorAll('.section[id]').length;
+  const done = completedSections.size;
+  const pct = Math.round((done / totalSections) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} / ${totalSections} section completed`;
+}
+
+// ── Run All ──
+async function runAll() {
+  if (runAllRunning) return;
+  runAllRunning = true;
+  
+  const cells = document.querySelectorAll('.code-cell');
+  for (const cell of cells) {
+    const id = cell.id.replace('cell-', '');
+    const btn = cell.querySelector('.run-btn');
+    if (!btn.classList.contains('done-btn')) {
+      runCell(id);
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+    }
+  }
+  runAllRunning = false;
+}
+
+// ── Reset ──
+function resetAll() {
+  completedSections.clear();
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    cell.classList.remove('running', 'has-output');
+    const id = cell.id.replace('cell-', '');
+    const output = document.getElementById('out-' + id);
+    if (output) output.classList.remove('visible');
+    const btn = cell.querySelector('.run-btn');
+    if (btn) {
+      btn.classList.remove('running-btn', 'done-btn');
+      btn.textContent = '▶ Run';
+    }
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('completed'));
+  updateProgress();
+}
+
+// ── Scroll spy ──
+function updateActiveNav() {
+  const sections = document.querySelectorAll('.section');
+  let activeId = null;
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 120) activeId = s.id;
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (activeId) {
+    const navItem = document.getElementById('nav-' + activeId);
+    if (navItem) {
+      navItem.classList.add('active');
+      navItem.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+  }
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildNav();
+  updateProgress();
+  
+  // Collect all cell IDs
+  document.querySelectorAll('.code-cell').forEach(cell => {
+    allCellIds.push(cell.id.replace('cell-', ''));
+  });
+  
+  window.addEventListener('scroll', updateActiveNav, {passive: true});
+  updateActiveNav();
+
+  restoreProgress();
+});
+
+function restoreProgress() {
+  completedSections.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const navItem = document.getElementById('nav-' + sectionId);
+      if (navItem) navItem.classList.add('completed');
+      section.querySelectorAll('.code-cell').forEach(cell => {
+        const id = cell.id.replace('cell-', '');
+        const btn = cell.querySelector('.run-btn');
+        const output = document.getElementById('out-' + id);
+        cell.classList.add('has-output');
+        if (btn) { btn.classList.add('done-btn'); btn.textContent = '✓ Done'; }
+        if (output) output.classList.add('visible');
+      });
+    }
+  });
+  updateProgress();
+}
+
+</script>
+</body>
+</html>
