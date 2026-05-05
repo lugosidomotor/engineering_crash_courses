@@ -317,7 +317,7 @@ button{font-family:inherit}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;z-index:300;padding:40px 20px;overflow-y:auto}
 .modal-overlay.active{display:flex;animation:fadeIn .2s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{background:#0d1117;border:1px solid rgba(48,54,61,.8);border-radius:16px;max-width:860px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:slideUp .3s;position:relative;margin:auto 0}
+.modal{background:#0d1117;border:1px solid rgba(48,54,61,.8);border-radius:16px;max-width:860px;width:100%;max-height:calc(100dvh - 80px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:slideUp .3s;position:relative;margin:auto 0}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-header{position:relative;height:180px;overflow:hidden;border-radius:16px 16px 0 0}
 .modal-header img{width:100%;height:100%;object-fit:cover}
@@ -405,8 +405,8 @@ button{font-family:inherit}
   .menu-toggle{display:flex}
   .logo{font-size:.95rem}
   .logo svg{width:20px;height:20px}
-  .modal{margin:0;border-radius:12px 12px 0 0}
-  .modal-overlay{padding:0;align-items:flex-end}
+  .modal{margin:0;border-radius:12px 12px 0 0;max-height:100dvh;touch-action:pan-y}
+  .modal-overlay{padding:0;align-items:flex-end;overflow:hidden}
   .modal-header{height:130px;border-radius:12px 12px 0 0}
   .modal-header-content h2{font-size:1.1rem}
   .modal-body{padding:18px}
