@@ -152,8 +152,8 @@ Permissions: data-engineers (read/write), analysts (read-only)</pre></div></div>
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
   <h2>Bronze réteg: adatbetöltés</h2>
-  <div class="md-cell"><p>Auto Loader: automatikus fájlfelfedezés és séma-inferencia.</p></div><div class="code-cell" id="cell-4"><div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('4')">&#9654; Run</button></div><div class="code-body"><pre># Auto Loader: incremental file ingestion
-(df = spark.readStream.format('cloudFiles')
+<div class="md-cell"><p>Auto Loader: automatikus fájlfelfedezés és séma-inferencia.</p></div><div class="code-cell" id="cell-4"><div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('4')">&#9654; Run</button></div><div class="code-body"><pre># Auto Loader: incremental file ingestion
+query = (spark.readStream.format('cloudFiles')
     .option('cloudFiles.format', 'csv')
     .option('cloudFiles.schemaLocation', 's3://webshop/schema/orders')
     .option('header', True)

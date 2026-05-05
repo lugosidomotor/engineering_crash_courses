@@ -105,19 +105,19 @@
 <!-- S0: Intro -->
 <div class="section layer-intro" id="s0">
   <div class="section-number">Intro</div>
-  <h2>MLOps: churn modell a tanulastol a productionig
+  <h2>MLOps: churn modell a tanítástól a productionig
     <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span>
     <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span>
   </h2>
   <div class="md-cell">
-    <p>Ebben a kurzusban egy <strong>churn predikció modellt</strong> viszunk végig a teljes élettartam-cikluson: kísérlet a tanítás, regisztráció, validáció, deployment, monitoring es drift detektálás.</p>
+    <p>Ebben a kurzusban egy <strong>churn predikciós modellt</strong> viszünk végig a teljes életcikluson: kísérletkövetés, tanítás, regisztráció, validáció, deployment, monitoring és drift detektálás.</p>
     <div class="callout">
       <div class="callout-title">Projekt: WebShop Pro Churn Model</div>
-      <p>A <strong>WebShop Pro</strong> felhasználói adatokból építünk churn modellt, amit aztán FastAPI-n szolgáltatunk ki, Docker-be csomagolunk, monitorozunk es drift-et detektálunk rajta.</p>
+      <p>A <strong>WebShop Pro</strong> felhasználói adatokból építünk churn modellt, amit aztán FastAPI-n szolgáltatunk ki, Dockerbe csomagolunk, monitorozunk, és driftet detektálunk rajta.</p>
     </div>
     <div class="callout success">
       <div class="callout-title">Learning outcome</div>
-      <p>A kurzus végére fel fogsz építeni egy ML pipeline-t kísérlet követéssel, modell regisztrációval, FastAPI szolgáltatással, Docker konténerizációval es monitoringgal.</p>
+      <p>A kurzus végére felépítesz egy ML pipeline-t kísérletkövetéssel, modellregisztrációval, FastAPI szolgáltatással, Docker konténerizációval és monitoringgal.</p>
     </div>
   </div>
 </div>
@@ -132,8 +132,8 @@
       <tr><td><strong>MLOps</strong></td><td>ML modellek teljes élettartam-ciklusának kezelése: tanítás, deployment, monitoring</td></tr>
       <tr><td><strong>Experiment tracking</strong></td><td>Kísérletek naplózása: paraméterek, metrikák, modellek</td></tr>
       <tr><td><strong>Model Registry</strong></td><td>Modell verziókezelés: staging, production, archived</td></tr>
-      <tr><td><strong>CI/CD</strong></td><td>Continuous Integration/Deployment: automatizált tesztelés es kiszolgálás</td></tr>
-      <tr><td><strong>Drift</strong></td><td>Adat eltolódás: ha az új adatok eltérnek a tanító adatoktol</td></tr>
+      <tr><td><strong>CI/CD</strong></td><td>Continuous Integration/Deployment: automatizált tesztelés és kiszolgálás</td></tr>
+      <tr><td><strong>Drift</strong></td><td>Adateltolódás: ha az új adatok eltérnek a tanító adatoktól</td></tr>
       <tr><td><strong>A/B testing</strong></td><td>Két modell verzió párhuzamos tesztelése</td></tr>
     </table>
     <div class="callout">
@@ -199,11 +199,11 @@
 <!-- S4: MLflow alapok -->
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>MLflow alapok: kísérlet követés <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
-  <div class="md-cell"><p>Az <strong>MLflow</strong> a legnépszerűbb ML kísérlet követő. Naplózza a paramétereket, metrikákat es a modelleket.</p></div>
+  <h2>MLflow alapok: kísérletkövetés <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <div class="md-cell"><p>Az <strong>MLflow</strong> az egyik legnépszerűbb ML kísérletkövető eszköz. Naplózza a paramétereket, metrikákat és modelleket.</p></div>
   <div class="code-cell" id="cell-s4">
     <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('s4')">▶ Run</button></div>
-    <div class="code-body"><pre><span class="cm"># MLflow kísérlet beallitas</span>
+    <div class="code-body"><pre><span class="cm"># MLflow kísérlet beállítása</span>
 mlflow.set_experiment(<span class="str">"webshop-churn"</span>)
 
 <span class="cm"># Szintetikus churn adatok</span>
@@ -236,10 +236,10 @@ data[<span class="str">"churn"</span>] = ((data[<span class="str">"last_days"</s
   </div>
 </div>
 
-<!-- S5: Kísérlet követés -->
+<!-- S5: Kísérletkövetés -->
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>Kísérlet követés: paraméterek es metrikák <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>Kísérletkövetés: paraméterek és metrikák <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
   <div class="md-cell"><p>Az MLflow <code>log_param</code>, <code>log_metric</code>, <code>log_model</code> függvényeivel naplózzuk a kísérletet.</p></div>
   <div class="code-cell" id="cell-s5">
     <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('s5')">▶ Run</button></div>
@@ -279,7 +279,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
 <!-- S6: Model regisztráció -->
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>Model Registry: modell verziózas <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>Model Registry: modellverziózás <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
   <div class="md-cell"><p>A Model Registry-ben a modellek <strong>None → Staging → Production → Archived</strong> élettartam-cikluson mennek keresztül.</p></div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
@@ -494,11 +494,9 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 <span class="kw">EXPOSE</span> <span class="num">8000</span>
 <span class="kw">CMD</span> [<span class="str">"uvicorn"</span>, <span class="str">"app:app"</span>, <span class="str">"--host"</span>, <span class="str">"0.0.0.0"</span>, <span class="str">"--port"</span>, <span class="str">"8000"</span>]
 
-<span class="cm"># Build es futtas</span>
+<span class="cm"># Build és futtatás</span>
 <span class="cm"># docker build -t webshop-churn-api .</span>
-<span class="cm"># docker run -p 8000:8000 webshop-churn-api</span>
-
-<span class="fn">print</span>(<span class="str">"Dockerfile készen!"</span>)</pre></div>
+<span class="cm"># docker run -p 8000:8000 webshop-churn-api</span></pre></div>
     <div class="output-area" id="out-s10">
       <div class="output-label">Output:</div>
       <pre><span class="log-docker">[docker]</span> <span class="log-cmd">$ docker build -t webshop-churn-api .</span>
@@ -560,15 +558,15 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
   </div>
 </div>
 
-<!-- S12: Monitoring es drift -->
+<!-- S12: Monitoring és drift -->
 <div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>Monitoring es drift detektálás <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
+  <h2>Monitoring és drift detektálás <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
   <div class="md-cell">
     <p>A modell deployment után <strong>monitorozni kell</strong>. Két tipikus probléma:</p>
     <ul>
-      <li><strong>Data drift:</strong> az input adatok eltolódnak (pl. több idós vásárló)</li>
-      <li><strong>Concept drift:</strong> a kapcsolat változik az input es output között</li>
+      <li><strong>Data drift:</strong> az input adatok eltolódnak (pl. több idős vásárló)</li>
+      <li><strong>Concept drift:</strong> a kapcsolat változik az input és output között</li>
     </ul>
   </div>
   <div class="code-cell" id="cell-s12">
@@ -589,7 +587,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 
     <span class="kw">return</span> drift_detected, alerts
 
-<span class="cm"># Szimulált új adat (drift: több idós, magasabb jövedelem)</span>
+<span class="cm"># Szimulált új adat (drift: több idős, magasabb jövedelem)</span>
 new_data = pd.DataFrame({
     <span class="str">"age"</span>: np.random.randint(<span class="num">40</span>, <span class="num">80</span>, <span class="num">200</span>),
     <span class="str">"income"</span>: np.random.randint(<span class="num">60000</span>, <span class="num">150000</span>, <span class="num">200</span>),
@@ -628,7 +626,7 @@ np.random.seed(<span class="num">42</span>)
 n_requests = <span class="num">1000</span>
 
 <span class="cm"># Model A: jelenlegi (acc=0.950)</span>
-<span class="cm"># Model B: új, featured engineering (acc=0.965)</span>
+<span class="cm"># Model B: új, feature engineering (acc=0.965)</span>
 
 results_a = {<span class="str">"correct"</span>: <span class="num">0</span>, <span class="str">"total"</span>: <span class="num">0</span>}
 results_b = {<span class="str">"correct"</span>: <span class="num">0</span>, <span class="str">"total"</span>: <span class="num">0</span>}
@@ -647,18 +645,18 @@ results_b = {<span class="str">"correct"</span>: <span class="num">0</span>, <sp
 
 <span class="cm"># Statisztikai szignifikancia (egyszerű z-test)</span>
 improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span class="str">"total"</span>]) - (results_a[<span class="str">"correct"</span>]/results_a[<span class="str">"total"</span>])
-<span class="fn">print</span>(<span class="str">f"\\nJobbulás: {improvement:+.3f}"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">f"\\nJavulás: {improvement:+.3f}"</span>)</pre></div>
     <div class="output-area" id="out-s13">
       <div class="output-label">Output:</div>
       <pre><span class="log-step">[ab-test]</span> Model A: <span class="log-info">758/798 = 0.950</span>
 <span class="log-step">[ab-test]</span> Model B: <span class="log-info">193/202 = 0.955</span>
 
-<span class="log-ok">Jobbulás: +0.006</span></pre>
+<span class="log-ok">Javulás: +0.006</span></pre>
     </div>
   </div>
   <div class="callout">
     <div class="callout-title">Production A/B</div>
-    <p>Valójában: canary deployment (1% forgalom), statisztikai szignifikancia számítás, gradual rollout, automatikus rollback ha rosszabb.</p>
+    <p>Valójában: canary deployment (1% forgalom), statisztikai szignifikancia számítás, fokozatos rollout, automatikus rollback, ha rosszabb.</p>
   </div>
 </div>
 
@@ -671,14 +669,14 @@ improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span cla
       <div class="callout-title">Mit építettünk?</div>
       <p>Egy teljes ML pipeline-t a tanítástól a monitoringig:</p>
       <ul>
-        <li>✅ MLflow kísérlet követés (paraméterek, metrikák, modellek)</li>
-        <li>✅ Model Registry (verziózas, staging → production)</li>
+        <li>✅ MLflow kísérletkövetés (paraméterek, metrikák, modellek)</li>
+        <li>✅ Model Registry (verziózás, staging → production)</li>
         <li>✅ Churn modell építése feature engineering-gel</li>
-        <li>✅ Automatizalt model validáció</li>
+        <li>✅ Automatizált modellvalidáció</li>
         <li>✅ FastAPI REST API szolgáltatás</li>
         <li>✅ Docker konténerizáció</li>
         <li>✅ CI/CD pipeline (teszt → build → deploy)</li>
-        <li>✅ Monitoring es drift detektálás</li>
+        <li>✅ Monitoring és drift detektálás</li>
         <li>✅ A/B tesztelés</li>
       </ul>
     </div>
@@ -734,7 +732,7 @@ improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span cla
 <script>
 window.COURSE_CONFIG = {
   slug: 'aiops-mlops',
-  toc: [{"id": "s0", "num": "00", "label": "Intro - Churn modell deployment"}, {"id": "s1", "num": "01", "label": "Fogalmi térkép"}, {"id": "s2", "num": "02", "label": "Architektúratérkép"}, {"id": "s3", "num": "03", "label": "Környezet"}, {"id": "s4", "num": "04", "label": "MLflow alapok"}, {"id": "s5", "num": "05", "label": "Kísérlet követés"}, {"id": "s6", "num": "06", "label": "Model regisztráció"}, {"id": "s7", "num": "07", "label": "Churn modell építés"}, {"id": "s8", "num": "08", "label": "Model validáció"}, {"id": "s9", "num": "09", "label": "FastAPI szolgáltatás"}, {"id": "s10", "num": "10", "label": "Docker konténerizáció"}, {"id": "s11", "num": "11", "label": "CI/CD pipeline"}, {"id": "s12", "num": "12", "label": "Monitoring es drift"}, {"id": "s13", "num": "13", "label": "A/B tesztelés"}, {"id": "s14", "num": "14", "label": "Összefoglalás"}]
+  toc: [{"id": "s0", "num": "00", "label": "Intro - Churn modell deployment"}, {"id": "s1", "num": "01", "label": "Fogalmi térkép"}, {"id": "s2", "num": "02", "label": "Architektúratérkép"}, {"id": "s3", "num": "03", "label": "Környezet"}, {"id": "s4", "num": "04", "label": "MLflow alapok"}, {"id": "s5", "num": "05", "label": "Kísérletkövetés"}, {"id": "s6", "num": "06", "label": "Model regisztráció"}, {"id": "s7", "num": "07", "label": "Churn modell építés"}, {"id": "s8", "num": "08", "label": "Model validáció"}, {"id": "s9", "num": "09", "label": "FastAPI szolgáltatás"}, {"id": "s10", "num": "10", "label": "Docker konténerizáció"}, {"id": "s11", "num": "11", "label": "CI/CD pipeline"}, {"id": "s12", "num": "12", "label": "Monitoring és drift"}, {"id": "s13", "num": "13", "label": "A/B tesztelés"}, {"id": "s14", "num": "14", "label": "Összefoglalás"}]
 };
 </script>
 <script src="../assets/courses-detail.js"></script>

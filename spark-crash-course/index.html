@@ -158,8 +158,8 @@
   <h2>Környezet beállítása <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
   <div class="code-cell" id="cell-s3">
     <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s3')">▶ Run</button></div>
-    <div class="code-body"><pre><span class="cm"># PySpark telepítés és indítás</span>
-pip install pyspark delta-spark
+<div class="code-body"><pre><span class="cm"># PySpark telepítés és indítás</span>
+<span class="cm"># Terminálban: pip install pyspark delta-spark</span>
 
 <span class="cm"># Spark Session létrehozása</span>
 <span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
@@ -482,7 +482,7 @@ df.filter(<span class="str">"age > 30"</span>).select(<span class="str">"name"</
 <!-- ═══ S11: Streaming ═══ -->
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
-  <h2>Structured Streaming: Kafka → Delta <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/kafka.svg">Kafka</span></h2>
+  <h2>Structured Streaming: Kafka → Delta <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
   <div class="code-cell" id="cell-s11">
     <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('s11')">▶ Run</button></div>
     <div class="code-body"><pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> from_json, col

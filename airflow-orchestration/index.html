@@ -260,16 +260,16 @@ Task succeeded on attempt 2!</pre></div></div>
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
   <h2>Connections és Hooks</h2>
-  <div class="md-cell"><p>Airflow connection-ök: adatbázis, API, cloud kapcsolatok.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre># Define connection via UI or CLI
-airflow connections add 'webshop_postgres' \
-    --conn-type 'postgres' \
-    --conn-host 'postgres' \
-    --conn-port 5432 \
-    --conn-login 'admin' \
-    --conn-password 'secret' \
-    --conn-schema 'webshop_pro'
+<div class="md-cell"><p>Airflow kapcsolatok: adatbázis-, API- és cloud-elérések központi kezelése.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre># Terminálban vagy az Airflow UI-ban hozd létre:
+# airflow connections add 'webshop_postgres' \
+#     --conn-type 'postgres' \
+#     --conn-host 'postgres' \
+#     --conn-port 5432 \
+#     --conn-login 'admin' \
+#     --conn-password 'secret' \
+#     --conn-schema 'webshop_pro'
 
-# Use in task
+# DAG-kódban így használod:
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 def load_to_postgres(**context):

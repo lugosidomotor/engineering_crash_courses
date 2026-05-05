@@ -249,8 +249,11 @@ df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"append
 df_v5 = spark.read.format(<span class="str">"delta"</span>).option(<span class="str">"versionAsOf"</span>,<span class="num">5</span>).load(<span class="str">"/data/features"</span>)
 
 <span class="cm"># Upsert (merge)</span>
-delta_table.alias(<span class="str">"t"</span>).merge(updates.alias(<span class="str">"s"</span>),<span class="str">"t.id=s.id"</span>)
-  .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()</pre></div><div class="output-area" id="out-s13"><div class="output-label">Output:</div><pre><span class="log-delta">[delta]</span> <span class="log-dim">Version:</span> <span class="log-time">42</span> | <span class="log-dim">Rows:</span> <span class="log-info">1.2M</span> | <span class="log-dim">Size:</span> <span class="log-info">8.3GB</span>
+(delta_table.alias(<span class="str">"t"</span>)
+  .merge(updates.alias(<span class="str">"s"</span>), <span class="str">"t.id=s.id"</span>)
+  .whenMatchedUpdateAll()
+  .whenNotMatchedInsertAll()
+  .execute())</pre></div><div class="output-area" id="out-s13"><div class="output-label">Output:</div><pre><span class="log-delta">[delta]</span> <span class="log-dim">Version:</span> <span class="log-time">42</span> | <span class="log-dim">Rows:</span> <span class="log-info">1.2M</span> | <span class="log-dim">Size:</span> <span class="log-info">8.3GB</span>
 <span class="log-delta">[delta]</span> <span class="log-ok">Time travel to v5: OK</span>
 <span class="log-delta">[delta]</span> <span class="log-ok">Merge:</span> <span class="log-info">50k updated, 2k inserted</span></pre></div></div>
 </div>
@@ -275,7 +278,7 @@ config = {
 <div class="section layer-intro" id="s16">
   <div class="section-number">Section 16</div>
   <h2>Train/Serve Skew</h2>
-  <table><tr><th>Skew</th><th>Példa</th><th>Megoldás</th></tr><tr><td>Feature</td><td>Tanítás: bruttó. Serving: nettó</td><td>Feature Store</td></tr><tr><td>Label</td><td>Tanítás: click. Serving: purchase.</td><td>Egyértelmű definíció</td></tr><tr><td>Distribution</td><td>Tanítás: 2024. Serving: 2025.</td><td>Monitoring+retraining</td></tr><tr><td>Latency</td><td>Batch vs online aggregation</td><td>Ugyanaz a kód+store</td></tr></table><div class="callout"><div class="callout-title">Megoldás</div><p>A Feature Store <strong>eleve megoldja</strong> a skew-t: tanítás és serving ugyanazt a store-t használja.</p></div>
+  <table><tr><th>Skew</th><th>Példa</th><th>Megoldás</th></tr><tr><td>Feature</td><td>Tanítás: bruttó. Serving: nettó</td><td>Feature Store</td></tr><tr><td>Label</td><td>Tanítás: click. Serving: purchase.</td><td>Egyértelmű definíció</td></tr><tr><td>Distribution</td><td>Tanítás: 2024. Serving: 2025.</td><td>Monitoring + retraining</td></tr><tr><td>Latency</td><td>Batch vs online aggregation</td><td>Ugyanaz a kód és store</td></tr></table><div class="callout"><div class="callout-title">Megoldás</div><p>A Feature Store <strong>csökkenti</strong> a skew kockázatát: tanítás és serving ugyanabból a definiált feature-forrásból dolgozik.</p></div>
 </div>
 <div class="section layer-intro" id="s17">
   <div class="section-number">Section 17</div>
