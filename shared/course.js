@@ -103,7 +103,99 @@
     var bar = document.getElementById('progress-bar');
     if (bar) bar.style.width = pct + '%';
     var txt = document.getElementById('progress-text');
-    if (txt) txt.textContent = done + ' / ' + totalSections + ' section completed';
+    if (txt) txt.textContent = done + ' / ' + totalSections + ' szekció kész';
+  }
+
+  // ── Mark section complete (works for any section, even without code) ──
+  function markSectionComplete(sectionId, persist) {
+    if (!sectionId) return;
+    var section = document.getElementById(sectionId);
+    if (!section) return;
+    if (completedSections.has(sectionId)) return;
+    completedSections.add(sectionId);
+    section.classList.add('completed');
+    var navItem = document.getElementById('nav-' + sectionId);
+    if (navItem) navItem.classList.add('completed');
+    var btn = section.querySelector('.section-complete-btn');
+    if (btn) {
+      btn.classList.add('done');
+      btn.innerHTML = '✓ Kész';
+    }
+    if (persist !== false) {
+      try {
+        localStorage.setItem('ecc:' + COURSE_SLUG + ':completed', JSON.stringify(Array.from(completedSections)));
+      } catch(e) {}
+    }
+    updateProgress();
+  }
+  function unmarkSectionComplete(sectionId) {
+    if (!sectionId) return;
+    var section = document.getElementById(sectionId);
+    if (!section) return;
+    completedSections.delete(sectionId);
+    section.classList.remove('completed');
+    var navItem = document.getElementById('nav-' + sectionId);
+    if (navItem) navItem.classList.remove('completed');
+    var btn = section.querySelector('.section-complete-btn');
+    if (btn) {
+      btn.classList.remove('done');
+      btn.innerHTML = '○ Jelöld késznek';
+    }
+    try {
+      localStorage.setItem('ecc:' + COURSE_SLUG + ':completed', JSON.stringify(Array.from(completedSections)));
+    } catch(e) {}
+    updateProgress();
+  }
+  window.markSectionComplete = markSectionComplete;
+
+  // Add "mark complete" button to every section
+  function addSectionCompleteButtons() {
+    document.querySelectorAll('.section[id]').forEach(function(section) {
+      if (section.id === 'further-learning-section') return;
+      if (section.querySelector('.section-complete-btn')) return;
+      var btn = document.createElement('button');
+      btn.className = 'section-complete-btn';
+      btn.type = 'button';
+      var isDone = completedSections.has(section.id);
+      btn.innerHTML = isDone ? '✓ Kész' : '○ Jelöld késznek';
+      if (isDone) btn.classList.add('done');
+      btn.addEventListener('click', function() {
+        if (completedSections.has(section.id)) {
+          unmarkSectionComplete(section.id);
+        } else {
+          markSectionComplete(section.id);
+        }
+      });
+      section.appendChild(btn);
+    });
+  }
+
+  // Auto-mark section as visited when it stays >3s with >40% in viewport
+  function setupAutoMarkOnView() {
+    if (!('IntersectionObserver' in window)) return;
+    var timers = {};
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var id = entry.target.id;
+        if (!id || id === 'further-learning-section') return;
+        if (entry.isIntersecting && entry.intersectionRatio > 0.4) {
+          if (!timers[id] && !completedSections.has(id)) {
+            timers[id] = setTimeout(function() {
+              // Only auto-mark if still visible
+              var rect = entry.target.getBoundingClientRect();
+              var visible = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.2;
+              if (visible) markSectionComplete(id);
+              delete timers[id];
+            }, 4000);
+          }
+        } else {
+          if (timers[id]) { clearTimeout(timers[id]); delete timers[id]; }
+        }
+      });
+    }, { threshold: [0.4, 0.6] });
+    document.querySelectorAll('.section[id]').forEach(function(s) {
+      if (s.id !== 'further-learning-section') observer.observe(s);
+    });
   }
 
   // ── Run Cell (with animation) ──
@@ -183,6 +275,7 @@
     });
     document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('completed', 'active'); });
     document.querySelectorAll('.section.completed').forEach(function(s) { s.classList.remove('completed'); });
+    document.querySelectorAll('.section-complete-btn').forEach(function(b) { b.classList.remove('done'); b.innerHTML = '○ Jelöld késznek'; });
     // Reset quiz
     document.querySelectorAll('.quiz-option').forEach(function(o) {
       o.classList.remove('correct', 'wrong');
@@ -230,6 +323,128 @@
     updateProgress();
   }
 
+  // ── Injected "Course intro" panel at the top (tagline + prerequisites) ──
+  function injectCourseIntro() {
+    var main = document.getElementById('main-content');
+    if (!main) return;
+    var details = (window.COURSE_DETAILS || {})[COURSE_SLUG];
+    if (!details) return;
+    if (document.getElementById('course-intro-panel')) return;
+
+    function escape(s){ return (s||'').replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+
+    var html = '<div id="course-intro-panel" class="course-intro-panel">';
+    if (details.tagline) {
+      html += '<div class="cip-tagline">' + escape(details.tagline) + '</div>';
+    }
+
+    // Notebook download CTA (always try — file may or may not exist; link is per-slug)
+    var nbName = (COURSE_SLUG === 'delta-table-crash-course')
+      ? 'data_engineering_crash_course.ipynb'
+      : 'notebook.ipynb';
+    html += '<div class="cip-actions">';
+    html += '<a class="cip-action cip-action-primary" href="./' + nbName + '" download><span>📓</span> Jupyter notebook letöltése</a>';
+    html += '<a class="cip-action" href="https://github.com/lugosidomotor/engineering_crash_courses/blob/main/' + COURSE_SLUG + '/' + nbName + '" target="_blank" rel="noopener"><span>🐙</span> GitHub-on</a>';
+    html += '</div>';
+
+    if (details.prerequisites && details.prerequisites.length) {
+      html += '<div class="cip-block"><div class="cip-block-title">🎯 Előfeltételek</div><ul class="cip-block-list">';
+      details.prerequisites.forEach(function(p){ html += '<li>' + escape(p) + '</li>'; });
+      html += '</ul></div>';
+    }
+    if (details.outcomes && details.outcomes.length) {
+      html += '<div class="cip-block"><div class="cip-block-title">✅ Mit fogsz tudni a végén</div><ul class="cip-block-list">';
+      details.outcomes.slice(0, 5).forEach(function(o){ html += '<li>' + escape(o) + '</li>'; });
+      if (details.outcomes.length > 5) {
+        html += '<li class="cip-more">… és még ' + (details.outcomes.length - 5) + ' dolog</li>';
+      }
+      html += '</ul></div>';
+    }
+
+    // Diagram (only if defined in courses-detail.js)
+    if (details.diagram && details.diagram.svg) {
+      html += '<div class="cip-diagram">';
+      html += '<div class="cip-block-title">📊 ' + escape(details.diagram.title || 'Áttekintő diagram') + '</div>';
+      html += '<div class="cip-diagram-svg">' + details.diagram.svg + '</div>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+
+    main.insertAdjacentHTML('afterbegin', html);
+  }
+
+  // ── Injected "Further learning" section ──
+  // Reads from window.COURSE_DETAILS (loaded separately from assets/courses-detail.js if present).
+  function injectFurtherLearning() {
+    var main = document.getElementById('main-content');
+    if (!main) return;
+    var details = (window.COURSE_DETAILS || {})[COURSE_SLUG];
+    if (!details) return;
+    if (document.getElementById('further-learning-section')) return;
+
+    var rTypeLabels = {book:'Könyv',doc:'Docs',tutorial:'Tutorial',tool:'Tool',article:'Cikk',video:'Videó'};
+
+    function escape(s){ return (s||'').replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+
+    var html = '<div class="section layer-intro" id="further-learning-section" style="margin-top:80px">';
+    html += '<div class="section-number">További</div>';
+    html += '<h2>📚 További tanulás és következő lépések</h2>';
+
+    if (details.tagline) {
+      html += '<div class="md-cell" style="padding:14px 18px;background:rgba(179,102,255,.06);border-left:3px solid var(--purple);border-radius:8px;margin-bottom:20px;font-style:italic;color:var(--text)"><p style="margin:0">' + escape(details.tagline) + '</p></div>';
+    }
+
+    if (details.outcomes && details.outcomes.length) {
+      html += '<h3>✅ Amit most már tudsz</h3><ul class="fl-list">';
+      details.outcomes.forEach(function(o) { html += '<li>' + escape(o) + '</li>'; });
+      html += '</ul>';
+    }
+
+    if (details.keyTopics && details.keyTopics.length) {
+      html += '<h3>🎯 Kulcstémák áttekintése</h3>';
+      html += '<div class="fl-topics">';
+      details.keyTopics.forEach(function(t) {
+        html += '<div class="fl-topic"><strong>' + escape(t.title) + '</strong><span>' + escape(t.desc) + '</span></div>';
+      });
+      html += '</div>';
+    }
+
+    if (details.resources && details.resources.length) {
+      html += '<h3>🔗 Ajánlott források</h3><div class="fl-links">';
+      details.resources.forEach(function(r) {
+        html += '<a class="fl-link" href="' + escape(r.url) + '" target="_blank" rel="noopener">';
+        html += '<span class="fl-link-type">' + (rTypeLabels[r.type] || escape(r.type)) + '</span>';
+        html += '<span class="fl-link-title">' + escape(r.title) + '</span></a>';
+      });
+      html += '</div>';
+    }
+
+    if (details.videos && details.videos.length) {
+      html += '<h3>▶️ Videó ajánló</h3><div class="fl-links">';
+      details.videos.forEach(function(v) {
+        html += '<a class="fl-link" href="' + escape(v.url) + '" target="_blank" rel="noopener">';
+        html += '<span class="fl-link-type">Videó</span>';
+        html += '<span class="fl-link-title">' + escape(v.title) + ' <span style="color:var(--text-dim)">· ' + escape(v.channel) + '</span></span></a>';
+      });
+      html += '</div>';
+    }
+
+    if (details.related && details.related.length) {
+      html += '<h3>🔄 Kapcsolódó kurzusok</h3><div class="fl-related">';
+      details.related.forEach(function(slug) {
+        var label = slug.replace(/-/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();});
+        html += '<a class="fl-related-chip" href="../' + slug + '/">' + label + ' →</a>';
+      });
+      html += '</div>';
+    }
+
+    html += '<div class="fl-back"><a href="../index.html" class="fl-back-btn">← Vissza az összes kurzushoz</a></div>';
+    html += '</div>';
+
+    main.insertAdjacentHTML('beforeend', html);
+  }
+
   // ── Init ──
   document.addEventListener('DOMContentLoaded', function() {
     updateProgress();
@@ -239,6 +454,10 @@
     window.addEventListener('scroll', updateActiveNav, {passive: true});
     updateActiveNav();
     restoreProgress();
+    injectCourseIntro();
+    injectFurtherLearning();
+    addSectionCompleteButtons();
+    setupAutoMarkOnView();
   });
 
   // ── Keyboard shortcuts ──

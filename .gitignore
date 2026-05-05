@@ -1,0 +1,52 @@
+# ── Local artifacts ──
+log/
+*.log
+*.tmp
+*.bak
+
+# ── OS files ──
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ── Editor / IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+.python-version
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ── Node ──
+node_modules/
+
+# ── Notebook outputs (keep .ipynb but strip large outputs if needed) ──
+# *.ipynb_checkpoints are already ignored above
+
+# ── Local Delta / Parquet / data output from courses ──
+# (students may generate these while running notebooks)
+data/
+output/
+**/_delta_log/
+**/*.parquet
+!assets/**/*.parquet
+!**/fixtures/**/*.parquet
+
+# ── Todo / personal ──
+todo.md.bak
+
+# ── Claude Code ──
+.claude/

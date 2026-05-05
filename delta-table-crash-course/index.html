@@ -4,7 +4,88 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Delta Table Crash Course</title>
+<!-- AUTO-SEO-INJECTED -->
+<title>Delta Table Crash Course — Engineering Crash Course</title>
+<meta name="description" content="Delta Lake a nulláról: Bronze/Silver/Gold lakehouse, ACID tranzakciók, time travel, séma verziózás. Magyar kurzus.">
+<meta name="keywords" content="Delta Table Crash Course, data engineering magyarul, AI engineering, crash course, tanfolyam, projektalapú">
+<meta name="author" content="Lugosi Dömötör">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0d1117">
+<link rel="canonical" href="https://lugosidomotor.github.io/engineering_crash_courses/delta-table-crash-course/">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Delta Table Crash Course — Engineering Crash Course">
+<meta property="og:description" content="Delta Lake a nulláról: Bronze/Silver/Gold lakehouse, ACID tranzakciók, time travel, séma verziózás. Magyar kurzus.">
+<meta property="og:url" content="https://lugosidomotor.github.io/engineering_crash_courses/delta-table-crash-course/">
+<meta property="og:site_name" content="Engineering Crash Courses">
+<meta property="og:locale" content="hu_HU">
+<meta property="og:image" content="https://lugosidomotor.github.io/engineering_crash_courses/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Delta Table Crash Course">
+<meta name="twitter:description" content="Delta Lake a nulláról: Bronze/Silver/Gold lakehouse, ACID tranzakciók, time travel, séma verziózás. Magyar kurzus.">
+<meta name="twitter:image" content="https://lugosidomotor.github.io/engineering_crash_courses/assets/og-image.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Delta Table Crash Course",
+  "description": "Delta Lake a nulláról: Bronze/Silver/Gold lakehouse, ACID tranzakciók, time travel, séma verziózás. Magyar kurzus.",
+  "url": "https://lugosidomotor.github.io/engineering_crash_courses/delta-table-crash-course/",
+  "inLanguage": "hu",
+  "provider": {
+    "@type": "Organization",
+    "name": "Engineering Crash Courses",
+    "url": "https://lugosidomotor.github.io/engineering_crash_courses/",
+    "sameAs": "https://github.com/lugosidomotor/engineering_crash_courses"
+  },
+  "educationalLevel": "Kezdő",
+  "timeRequired": "PT4H",
+  "numberOfCredits": 26,
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "HUF",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": {
+    "@type": "CourseInstance",
+    "courseMode": "online",
+    "inLanguage": "hu"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Főoldal",
+      "item": "https://lugosidomotor.github.io/engineering_crash_courses/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kurzusok",
+      "item": "https://lugosidomotor.github.io/engineering_crash_courses/#courses"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Delta Table Crash Course",
+      "item": "https://lugosidomotor.github.io/engineering_crash_courses/delta-table-crash-course/"
+    }
+  ]
+}
+</script>
+
 <link rel="stylesheet" href="../shared/course.css">
 </head>
 <body>
@@ -1293,6 +1374,7 @@ window.COURSE_CONFIG = {
   toc: [{"id": "s0", "num": "00", "label": "Intro - Delta table lokálisan"}, {"id": "s1", "num": "01", "label": "Fogalmi térkép"}, {"id": "s2", "num": "02", "label": "Architektúra-térkép"}, {"id": "s3", "num": "03", "label": "Notebook bootstrap"}, {"id": "s4", "num": "04", "label": "Környezet ellenőrzése"}, {"id": "s5", "num": "05", "label": "Importok és célmappa"}, {"id": "s6", "num": "06", "label": "Forrásadat DataFrame"}, {"id": "s7", "num": "07", "label": "Delta table létrehozása"}, {"id": "s8", "num": "08", "label": "Fájlrendszer tartalma"}, {"id": "s9", "num": "09", "label": "_delta_log tartalma"}, {"id": "s10", "num": "10", "label": "Delta table olvasása"}, {"id": "s11", "num": "11", "label": "Schema lekérdezése"}, {"id": "s12", "num": "12", "label": "Append: új adatok"}, {"id": "s13", "num": "13", "label": "Verziók és time travel"}, {"id": "s14", "num": "14", "label": "Metastore + Azure"}, {"id": "s16", "num": "16", "label": "ETL és ELT elmélet"}, {"id": "s17", "num": "17", "label": "ETL demo"}, {"id": "s18", "num": "18", "label": "ELT demo + összehasonlítás"}, {"id": "s20", "num": "20", "label": "Bronze/Silver/Gold elmélet"}, {"id": "s21", "num": "21", "label": "Bronze/Silver/Gold demo"}, {"id": "s22", "num": "22", "label": "Fact/Dimension + Star Schema"}, {"id": "s24", "num": "24", "label": "Batch feldolgozás"}, {"id": "s25", "num": "25", "label": "Streaming / micro-batch"}, {"id": "s26", "num": "26", "label": "Batch vs Streaming"}, {"id": "s27", "num": "27", "label": "Open source catalog toolok"}, {"id": "s28", "num": "28", "label": "Összefoglalás"}]
 };
 </script>
+<script src="../assets/courses-detail.js"></script>
 <script src="../shared/course.js"></script>
 </body>
 </html>
