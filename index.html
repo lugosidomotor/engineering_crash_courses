@@ -86,7 +86,7 @@
 <style>
 /* ── Reset ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 body{font-family:'Inter',system-ui,sans-serif;background:#0d1117;color:#e6edf3;line-height:1.6;min-height:100vh;overflow-x:hidden}
 a{color:#58a6ff;text-decoration:none}
 a:hover{text-decoration:underline}
@@ -111,7 +111,7 @@ button{font-family:inherit}
 .menu-toggle svg{width:18px;height:18px}
 
 /* ── Hero ── */
-.hero{max-width:1200px;margin:0 auto;padding:80px 24px 40px;text-align:center;position:relative}
+.hero{max-width:1200px;margin:0 auto;padding:80px 24px 40px;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(88,166,255,.1) 0%,transparent 60%);z-index:-1;pointer-events:none}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(88,166,255,.12);color:#58a6ff;padding:6px 16px;border-radius:20px;font-size:.82rem;font-weight:600;margin-bottom:20px;border:1px solid rgba(88,166,255,.25)}
 .hero-badge .dot{width:6px;height:6px;border-radius:50%;background:#3fb950;box-shadow:0 0 8px #3fb950;animation:pulse 2s infinite}
@@ -263,7 +263,7 @@ button{font-family:inherit}
 .platform-item h4{font-size:.88rem;font-weight:600;margin-bottom:4px}
 .platform-item p{font-size:.78rem;color:#8b949e;line-height:1.4}
 
-.flow-diagram{margin:30px 0;padding:24px;background:rgba(13,17,23,.5);border:1px solid rgba(48,54,61,.4);border-radius:12px;overflow-x:auto}
+.flow-diagram{margin:30px 0;padding:24px;background:rgba(13,17,23,.5);border:1px solid rgba(48,54,61,.4);border-radius:12px;overflow-x:auto;max-width:100%;contain:layout paint}
 .flow-diagram-title{font-size:.85rem;color:#8b949e;margin-bottom:16px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
 .flow-chain{display:flex;align-items:center;gap:8px;min-width:max-content}
 .flow-node{padding:10px 16px;background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:8px;font-size:.82rem;color:#e6edf3;font-weight:500;white-space:nowrap;min-width:120px;text-align:center}
@@ -385,9 +385,15 @@ button{font-family:inherit}
   .course-grid{grid-template-columns:1fr;gap:16px}
   .paths-container{grid-template-columns:1fr;gap:14px}
   .controls{flex-direction:column;align-items:stretch;gap:10px}
+  .controls > *{min-width:0;width:100%;max-width:100%}
+  .search-box{min-width:0;width:100%;max-width:100%}
+  .search-box input,.sort-select{min-width:0;width:100%;max-width:100%}
   .filter-chips{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .filter-chips{min-width:0;width:100%;max-width:100%}
   .filter-chips::-webkit-scrollbar{height:2px}
   .chip{flex-shrink:0;white-space:nowrap}
+  .flow-diagram{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+  .flow-chain{max-width:max-content}
   .platform-diagram{grid-template-columns:repeat(2,1fr);gap:10px}
   .platform-item{padding:12px}
   .stats-bar{grid-template-columns:repeat(2,1fr);padding:16px;gap:10px}
