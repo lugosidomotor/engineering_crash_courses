@@ -360,14 +360,14 @@
       html += '</dl>';
       html += '<div class="cip-project-tools">' + (project.tools || []).map(function(t){ return '<span>' + escape(t) + '</span>'; }).join('') + '</div>';
       if (project.labServices && project.labServices.length) {
-        html += '<div class="cip-lab-services"><strong>Docker lab service-ek:</strong>' + project.labServices.map(function(s){ return '<span>' + escape(s) + '</span>'; }).join('') + '</div>';
+        html += '<div class="cip-lab-services"><strong>Local Docker Lab service-ek:</strong>' + project.labServices.map(function(s){ return '<span>' + escape(s) + '</span>'; }).join('') + '</div>';
       }
       if (caseStudy.lab && caseStudy.lab.command) {
         html += '<div class="cip-lab-command"><code>' + escape(caseStudy.lab.command) + '</code></div>';
       }
       html += '<div class="cip-actions cip-project-actions">';
       html += '<a class="cip-action cip-action-primary" href="../webshop-pro/" target="_blank" rel="noopener">WebShop Pro demo megnyitása</a>';
-      html += '<a class="cip-action" href="../webshop-lab/" target="_blank" rel="noopener">Docker lab térkép</a>';
+      html += '<a class="cip-action" href="../webshop-lab/" target="_blank" rel="noopener">Local Docker Lab</a>';
       html += '</div>';
       html += '</div>';
       html += '<div class="cip-project-shot"><img src="../assets/images/webshop-pro-dashboard.png" alt="WebShop Pro demo dashboard screenshot"></div>';
@@ -428,7 +428,7 @@
         html += '<div class="fl-lab-services">' + project.labServices.map(function(s){ return '<span>' + escape(s) + '</span>'; }).join('') + '</div>';
       }
       html += '<a href="../webshop-pro/" target="_blank" rel="noopener">Demo megnyitása →</a>';
-      html += '<a href="../webshop-lab/" target="_blank" rel="noopener">Docker lab térkép →</a>';
+      html += '<a href="../webshop-lab/" target="_blank" rel="noopener">Local Docker Lab →</a>';
       html += '</div>';
     }
 

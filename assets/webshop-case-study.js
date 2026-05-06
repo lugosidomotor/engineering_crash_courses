@@ -33,7 +33,7 @@ window.WEBSHOP_CASE_STUDY = {
   ],
   artifacts: [
     { label: "Demo app", value: "webshop-pro/index.html" },
-    { label: "Docker lab", value: "docker-compose.yml + webshop-lab/*" },
+    { label: "Local Docker Lab", value: "docker-compose.yml + webshop-lab/*" },
     { label: "Forrásadatok", value: "webshop-pro/fixtures/*.json" },
     { label: "Platform térkép", value: "webshop-pro/project-map.json" },
     { label: "Screenshotok", value: "assets/images/webshop-pro-*.png" }

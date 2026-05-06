@@ -34,7 +34,7 @@ pre{margin:0;overflow:auto;color:#dbeafe}
 .command-note::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px rgba(63,185,80,.7)}
 .terminal{overflow:hidden;border:1px solid rgba(88,166,255,.22);border-radius:15px;background:#05080d;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 .terminal-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;border-bottom:1px solid rgba(48,54,61,.78);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
-.terminal-label{display:inline-flex;align-items:center;gap:8px;color:#9fb7d8;font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.terminal-label{display:inline-flex;align-items:center;padding-left:42px;position:relative;color:#9fb7d8;font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .terminal-label::before{content:"";width:9px;height:9px;border-radius:50%;background:#ff5f56;box-shadow:15px 0 #ffbd2e,30px 0 #27c93f}
 .copy-command{border:1px solid rgba(88,166,255,.28);background:rgba(88,166,255,.09);color:#dbeafe;border-radius:9px;padding:5px 9px;font:700 .72rem Inter,system-ui,sans-serif;cursor:pointer;transition:background .16s ease,transform .16s ease,border-color .16s ease}
 .copy-command:hover{background:rgba(88,166,255,.18);border-color:rgba(88,166,255,.52);transform:translateY(-1px)}
@@ -73,7 +73,7 @@ td code{display:inline-block;max-width:100%;background:#05080d;border:1px solid 
 <header class="lab-topbar">
   <div class="lab-topbar-inner">
     <a class="back-link" href="../index.html">← Vissza a főoldalra</a>
-    <div class="topbar-note">Docker lab térkép · lokális WebShop Pro stack</div>
+    <div class="topbar-note">Local Docker Lab · lokális WebShop Pro stack</div>
   </div>
 </header>
 <main id="content">
@@ -191,6 +191,145 @@ docker compose logs -f api airflow dbt</code></pre>
         <tr><td>MLOps/LLMOps</td><td>mlflow, api, prometheus, grafana</td><td>MLflow demo run, FastAPI /predict, Grafana dashboard</td></tr>
       </tbody>
     </table>
+  </section>
+
+  <section class="section card">
+    <h2>WebShop Pro felület</h2>
+    <p>A http://localhost:8010/ címen elérhető dummy webshop három nézetet tartalmaz:</p>
+    <div class="steps">
+      <div class="step">
+        <b>B</b>
+        <h3>Bolt nézet</h3>
+        <p>Termékkatalógus kártyákkal, kosárba tevés és vásárlás (POST /api/simulate-order), valós idejű rendelésgenerálás (automatikus, 8-15 másodpercenként).</p>
+      </div>
+      <div class="step">
+        <b>A</b>
+        <h3>Admin nézet</h3>
+        <p>Rendelések táblázat, készletkezelés, bevétel és rendelésszám statisztikák.</p>
+      </div>
+      <div class="step">
+        <b>D</b>
+        <h3>Dashboard nézet</h3>
+        <p>KPI metrikák (bevétel, konverzió, AOV, support ticketek), termék teljesítmény tábla, élő clickstream esemény feed, pipeline blueprint.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Gyakorló parancsok</h2>
+
+    <div class="command-grid" style="grid-template-columns:1fr">
+      <article class="command-card">
+        <h3>Bootstrap riport (Python / Delta / Parquet / data quality)</h3>
+        <p>Beolvassa a fixture JSON fájlokat, Bronze/Silver/Gold Parquet fájlokat generál, Delta Lake táblát próbál létrehozni, ellenőrzi a PostgreSQL kapcsolatot és teszteli a FastAPI health endpointot.</p>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="terminal-label">PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <pre><code>docker compose exec lab-runner python /lab/runner/scripts/bootstrap_lab.py</code></pre>
+        </div>
+      </article>
+
+      <article class="command-card">
+        <h3>Spark ETL indítása</h3>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="terminal-label">PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <pre><code>docker compose exec spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/webshop-lab/spark/jobs/webshop_spark_etl.py</code></pre>
+        </div>
+      </article>
+
+      <article class="command-card">
+        <h3>Kafka topicok és események</h3>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="terminal-label">PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <pre><code># Topicok listázása
+docker compose exec kafka /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+# Események olvasása
+docker compose exec kafka /opt/apache/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic webshop.events --from-beginning --max-messages 10</code></pre>
+        </div>
+      </article>
+
+      <article class="command-card">
+        <h3>dbt újrafuttatás</h3>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="terminal-label">PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <pre><code>docker compose exec dbt dbt run --profiles-dir /usr/app/profiles
+docker compose exec dbt dbt test --profiles-dir /usr/app/profiles</code></pre>
+        </div>
+      </article>
+
+      <article class="command-card">
+        <h3>Churn prediction és rendelés szimulálása</h3>
+        <div class="terminal">
+          <div class="terminal-bar"><span class="terminal-label">PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <pre><code># Churn prediction
+curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" -d '{"customer_id":"C-1842"}'
+
+# Új rendelés
+curl -X POST http://localhost:8000/api/simulate-order</code></pre>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Architektúra</h2>
+    <div class="terminal">
+      <div class="terminal-bar"><span class="terminal-label">arch</span></div>
+      <pre style="font-size:.8rem;line-height:1.6">┌─────────────────────────────────────────────────────────────────┐
+│ WebShop Pro Frontend (nginx :8010)                              │
+│  Bolt │ Admin │ Dashboard                                       │
+└────────────┬────────────────────────────────────────────────────┘
+             │ REST API
+┌────────────▼────────────────────────────────────────────────────┐
+│ FastAPI (:8000)                                                 │
+│  /api/catalog  /api/orders  /api/events  /api/metrics           │
+│  /api/simulate-order  /predict  /metrics (prometheus)           │
+└────────────┬────────────────────────────────────────────────────┘
+             │
+┌────────────▼────────────────────────────────────────────────────┐
+│ PostgreSQL (:5432)                                              │
+│  raw.catalog │ raw.orders │ raw.events │ ml.predictions         │
+│  analytics.* (views) │ ml.customer_features (view)              │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ Kafka (:9092)                                                   │
+│  webshop.events │ webshop.orders │ webshop.support              │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ MinIO (:9000/:9001)                                             │
+│  webshop-bronze │ webshop-silver │ webshop-gold │ webshop-artifacts │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ MLflow (:5000) │ Grafana (:3000) │ Prometheus (:9090)           │
+│ Airflow (:8088) │ dbt (:8092) │ Spark (:8090)                   │
+│ ChromaDB (:8001) │ Streamlit (:8501) │ Jupyter (:8888)          │
+└─────────────────────────────────────────────────────────────────┘</pre>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Megjegyzések</h2>
+    <div class="steps" style="grid-template-columns:1fr">
+      <div class="step" style="border-left:3px solid var(--accent);background:rgba(88,166,255,.06)">
+        <p style="margin:0">A WebShop Pro automatikusan generál rendeléseket 8-15 másodpercenként, így a Dashboard valós idejűnek hat.</p>
+      </div>
+      <div class="step" style="border-left:3px solid var(--accent);background:rgba(88,166,255,.06)">
+        <p style="margin:0">A Databricks kurzushoz JupyterLab + Spark + MLflow + Unity Catalog OSS kombináció szolgál.</p>
+      </div>
+      <div class="step" style="border-left:3px solid var(--accent);background:rgba(88,166,255,.06)">
+        <p style="margin:0">Kuberneteshez deployment manifest található a <code class="inline-cmd">webshop-lab/kubernetes/</code> mappában.</p>
+      </div>
+      <div class="step" style="border-left:3px solid var(--accent);background:rgba(88,166,255,.06)">
+        <p style="margin:0">OpenAI kulcs nélkül offline demo válasz fut; kulccsal a kurzusokban lehet valódi API hívást bekötni.</p>
+      </div>
+      <div class="step" style="border-left:3px solid var(--accent);background:rgba(88,166,255,.06)">
+        <p style="margin:0">A ChromaDB előre feltöltődik a webshop szabályzataival (szállítás, garancia, visszaküldés).</p>
+      </div>
+    </div>
+    <p style="margin-top:16px"><strong>Előfeltételek:</strong> Docker Desktop (Windows/Mac) vagy Docker Engine + Docker Compose v2 (Linux), minimum 8 GB RAM, 20 GB szabad lemezterület.</p>
   </section>
 </main>
 <script>
