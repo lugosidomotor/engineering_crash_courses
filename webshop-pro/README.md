@@ -2,11 +2,11 @@
 
 Ez a mappa a kurzusok közös dummy webshop esettanulmánya. Nem production alkalmazás, hanem oktatási demo: ugyanazt a mini webshopot használjuk SQL-hez, Pythonhoz, Delta Lake-hez, Sparkhoz, streaminghez, dbt-hez, RAG-hez és MLOps-hoz.
 
-## Futtatás teljes Docker labbal
+## Futtatás a teljes Local Docker Lab környezettel
 
 Repo gyökeréből:
 
-```powershell
+```shell
 docker compose up -d --build
 ```
 
@@ -22,7 +22,7 @@ Ilyenkor a demo már a FastAPI + PostgreSQL rétegre csatlakozik. Az "Új rendel
 
 Repo gyökeréből:
 
-```powershell
+```shell
 python -m http.server 8010 --bind 127.0.0.1
 ```
 

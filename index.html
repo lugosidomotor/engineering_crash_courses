@@ -258,10 +258,16 @@ button{font-family:inherit}
 .platform-section h2{font-size:1.6rem;margin-bottom:8px}
 .platform-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.82fr);gap:28px;align-items:center;margin-bottom:28px}
 .platform-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
-.platform-lab-strip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;margin:20px 0 28px;padding:16px;border:1px solid rgba(63,185,80,.24);border-radius:14px;background:linear-gradient(135deg,rgba(63,185,80,.08),rgba(88,166,255,.07))}
+.platform-lab-strip{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);gap:16px;align-items:stretch;margin:20px 0 28px;padding:16px;border:1px solid rgba(63,185,80,.24);border-radius:14px;background:linear-gradient(135deg,rgba(63,185,80,.08),rgba(88,166,255,.07))}
 .platform-lab-strip strong{display:block;margin-bottom:4px;color:#e6edf3}
-.platform-lab-strip code{display:inline-block;color:#3fb950;font-family:'JetBrains Mono',monospace;font-size:.78rem;word-break:break-word}
 .platform-lab-strip p{margin:0;color:#8b949e;font-size:.84rem}
+.platform-command{overflow:hidden;border:1px solid rgba(88,166,255,.22);border-radius:14px;background:#05080d;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px rgba(0,0,0,.2)}
+.platform-command-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.75);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015))}
+.platform-command-dots{display:flex;align-items:center;gap:5px}
+.platform-command-dots span{width:8px;height:8px;border-radius:50%;display:block}.platform-command-dots span:nth-child(1){background:#ff5f56}.platform-command-dots span:nth-child(2){background:#ffbd2e}.platform-command-dots span:nth-child(3){background:#27c93f}
+.platform-command-label{color:#9fb7d8;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.platform-command code{display:flex;gap:10px;align-items:flex-start;padding:14px 15px;color:#dbeafe;font-family:'JetBrains Mono',monospace;font-size:.84rem;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.platform-command code::before{content:"$";flex:0 0 auto;color:#3fb950}
 .platform-shot{margin:0;border:1px solid rgba(48,54,61,.6);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.03)}
 .platform-shot img{width:100%;aspect-ratio:16/10;object-fit:cover}
 .platform-shot figcaption{padding:10px 14px;color:#8b949e;font-size:.78rem}
@@ -714,9 +720,15 @@ button{font-family:inherit}
   <div class="platform-lab-strip">
     <div>
       <strong>A projekt lokálisan is végigjátszható.</strong>
-      <p>A Local Docker Lab elindítja a webshopot, az adatbázist, az adatpipeline-eszközöket, az AI/RAG réteget és a monitoringot. A Local Docker Lab térképen minden service-nél látod, melyik kurzushoz tartozik, milyen URL-en éred el, és kell-e hozzá belépési adat.</p>
+      <p>A Local Docker Lab elindítja a webshopot, az adatbázist, az adatpipeline-eszközöket, az AI/RAG réteget és a monitoringot. A Local Docker Lab oldalon minden service-nél látod, melyik kurzushoz tartozik, milyen URL-en éred el, és kell-e hozzá belépési adat.</p>
     </div>
-    <code>docker compose up -d --build</code>
+    <div class="platform-command" aria-label="Local Docker Lab indító parancs">
+      <div class="platform-command-top">
+        <span class="platform-command-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="platform-command-label">shell</span>
+      </div>
+      <code>docker compose up -d --build</code>
+    </div>
   </div>
 
   <div class="platform-story-grid">

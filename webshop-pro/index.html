@@ -165,15 +165,23 @@
     <button class="nav-tab active" data-view="shop">🛒 Bolt</button>
     <button class="nav-tab" data-view="admin">⚙️ Admin</button>
     <button class="nav-tab" data-view="dashboard">📊 Dashboard</button>
-    <a class="nav-tab-link" href="../webshop-lab/">🗺️ Lab térkép</a>
+    <a class="nav-tab-link" href="../webshop-lab/">Local Docker Lab</a>
   </nav>
   <div style="display:flex;align-items:center;gap:10px">
-    <div class="status-pill" id="api-status"><span></span> demo fut</div>
+    <div class="status-pill" id="api-status"><span></span> statikus előnézet</div>
     <button class="cart-btn" id="cart-toggle" aria-label="Kosár megnyitása">
       🛒<span class="cart-badge" id="cart-count"></span>
     </button>
   </div>
 </header>
+
+<div class="runtime-notice" id="runtime-notice">
+  <div>
+    <strong>Statikus előnézet</strong>
+    <span id="runtime-notice-text">A webshop compose nélkül fixture adatokból dolgozik. A teljes interaktív módhoz, valódi API-val és adatbázisba írással, indítsd el a Local Docker Labot.</span>
+  </div>
+  <a href="../webshop-lab/">Local Docker Lab</a>
+</div>
 
 <!-- Cart overlay + sidebar -->
 <div class="cart-overlay" id="cart-overlay"></div>

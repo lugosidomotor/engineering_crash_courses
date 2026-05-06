@@ -195,12 +195,19 @@ services:
     user: root
     entrypoint: ["/bin/bash", "-lc"]
     command: >
-      "chmod -R 777 /opt/webshop-output 2>/dev/null;
-      set -e;
+      "set -e;
+      export PATH=\"/home/airflow/.local/bin:$${PATH}\";
+      install -d -m 0775 -o airflow -g root /opt/airflow /opt/airflow/logs /opt/airflow/plugins;
+      if [ -f /opt/airflow/airflow.db ]; then chown airflow:root /opt/airflow/airflow.db; fi;
+      chown -R airflow:root /opt/airflow/logs /opt/airflow/plugins;
+      install -d -m 0777 -o airflow -g root /opt/webshop-output /opt/webshop-output/airflow /opt/webshop-output/spark;
+      chown -R airflow:root /opt/webshop-output;
+      chmod -R a+rwX /opt/webshop-output;
+      exec su airflow -s /bin/bash -c 'export PATH=\"/home/airflow/.local/bin:$${PATH}\";
       airflow db migrate;
       airflow users create --username admin --password admin --firstname WebShop --lastname Admin --role Admin --email admin@example.com || true;
       airflow scheduler > /tmp/airflow-scheduler.log 2>&1 &
-      exec airflow webserver"
+      exec airflow webserver'"
     labels:
       webshop.course: "airflow-orchestration"
       webshop.role: "Daily webshop DAG orchestration"

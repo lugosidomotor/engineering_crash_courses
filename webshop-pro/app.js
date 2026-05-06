@@ -646,11 +646,27 @@ async function refreshData() {
 
 function updateApiStatus() {
   const status = document.querySelector('#api-status');
-  if (!status) return;
-  status.classList.toggle('live', state.apiConnected);
-  status.innerHTML = state.apiConnected
-    ? '<span></span> compose API live'
-    : '<span></span> fixture fallback';
+  const notice = document.querySelector('#runtime-notice');
+  const noticeText = document.querySelector('#runtime-notice-text');
+
+  if (status) {
+    status.classList.toggle('live', state.apiConnected);
+    status.innerHTML = state.apiConnected
+      ? '<span></span> compose API live'
+      : '<span></span> statikus előnézet';
+  }
+
+  if (notice) {
+    notice.classList.toggle('live', state.apiConnected);
+    const title = notice.querySelector('strong');
+    if (title) title.textContent = state.apiConnected ? 'Teljes interaktív mód' : 'Statikus előnézet';
+  }
+
+  if (noticeText) {
+    noticeText.textContent = state.apiConnected
+      ? 'A Local Docker Lab fut: a webshop FastAPI-n keresztül olvas és ír a lokális stackbe.'
+      : 'A webshop compose nélkül fixture adatokból dolgozik. A teljes interaktív módhoz, valódi API-val és adatbázisba írással, indítsd el a Local Docker Labot.';
+  }
 }
 
 /* ============================================================

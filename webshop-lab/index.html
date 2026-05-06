@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WebShop Pro Docker Lab</title>
+<title>WebShop Pro Local Docker Lab</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='64' height='64' rx='16' fill='%230d1117'/%3E%3Cpath d='M14 20h36v24H14z' fill='%2358a6ff'/%3E%3Cpath d='M22 28h20v4H22zm0 9h13v4H22z' fill='white'/%3E%3C/svg%3E">
 <style>
 :root{--bg:#0d1117;--panel:#111827;--panel2:#0f172a;--line:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;--yellow:#ffd166;--red:#ff7b72}
@@ -33,9 +33,12 @@ pre{margin:0;overflow:auto;color:#dbeafe}
 .command-note{display:flex;align-items:center;gap:9px;color:#c9d1d9;font-size:.9rem;font-weight:700}
 .command-note::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px rgba(63,185,80,.7)}
 .terminal{overflow:hidden;border:1px solid rgba(88,166,255,.22);border-radius:15px;background:#05080d;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-.terminal-bar{display:table;width:100%;padding:9px 11px;border-bottom:1px solid rgba(48,54,61,.78);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
-.terminal-label{display:inline-flex;align-items:center;gap:6px;color:#9fb7d8;font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.terminal-label i{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}.terminal-label i:nth-child(1){background:#ff5f56}.terminal-label i:nth-child(2){background:#ffbd2e}.terminal-label i:nth-child(3){background:#27c93f}
+.terminal-bar{display:grid;grid-template-columns:45px minmax(0,1fr) auto;align-items:center;gap:10px;min-height:42px;padding:8px 11px;border-bottom:1px solid rgba(48,54,61,.78);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+.terminal-bar-left{display:flex;align-items:center;min-width:45px}
+.terminal-bar-center{min-width:0;display:flex;align-items:center;justify-content:center;text-align:center}
+.terminal-bar-right{display:flex;align-items:center;justify-content:flex-end;min-width:max-content}
+.terminal-dots{display:block;width:45px;height:12px;flex:0 0 45px}
+.terminal-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9fb7d8;font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .copy-command{border:1px solid rgba(88,166,255,.28);background:rgba(88,166,255,.09);color:#dbeafe;border-radius:9px;padding:5px 9px;font:700 .72rem Inter,system-ui,sans-serif;cursor:pointer;transition:background .16s ease,transform .16s ease,border-color .16s ease}
 .copy-command:hover{background:rgba(88,166,255,.18);border-color:rgba(88,166,255,.52);transform:translateY(-1px)}
 .copy-command:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
@@ -79,7 +82,7 @@ td code{display:inline-block;max-width:100%;background:#05080d;border:1px solid 
 <main id="content">
   <section class="hero">
     <div>
-      <div class="kicker">WebShop Pro lab</div>
+      <div class="kicker">WebShop Pro Local Docker Lab</div>
       <h1>Egy indítható compose stack az összes kurzushoz.</h1>
       <p>A dummy webshop, az adatplatform, az AI/RAG réteg és a monitoring ugyanabban a lokális környezetben fut. Így a kurzusok nem különálló példák: ugyanarra a projektre mutatnak vissza.</p>
     </div>
@@ -88,7 +91,7 @@ td code{display:inline-block;max-width:100%;background:#05080d;border:1px solid 
       <div class="command-panel">
         <div class="command-note">Repo gyökérből futtasd</div>
         <div class="terminal">
-          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">PowerShell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
           <pre><code>docker compose up -d --build
 docker compose ps</code></pre>
         </div>
@@ -175,7 +178,7 @@ docker compose logs -f api airflow dbt</code></pre>
   </section>
 
   <section class="section card">
-    <h2>Kurzus -> service térkép</h2>
+    <h2>Local Docker Lab: kurzus -> service</h2>
     <table>
       <thead><tr><th>Kurzus</th><th>Compose service-ek</th><th>Előre betöltött anyag</th></tr></thead>
       <tbody>
@@ -223,7 +226,7 @@ docker compose logs -f api airflow dbt</code></pre>
         <h3>Bootstrap riport (Python / Delta / Parquet / data quality)</h3>
         <p>Beolvassa a fixture JSON fájlokat, Bronze/Silver/Gold Parquet fájlokat generál, Delta Lake táblát próbál létrehozni, ellenőrzi a PostgreSQL kapcsolatot és teszteli a FastAPI health endpointot.</p>
         <div class="terminal">
-          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">PowerShell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
           <pre><code>docker compose exec lab-runner python /lab/runner/scripts/bootstrap_lab.py</code></pre>
         </div>
       </article>
@@ -231,7 +234,7 @@ docker compose logs -f api airflow dbt</code></pre>
       <article class="command-card">
         <h3>Spark ETL indítása</h3>
         <div class="terminal">
-          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">PowerShell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
           <pre><code>docker compose exec spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/webshop-lab/spark/jobs/webshop_spark_etl.py</code></pre>
         </div>
       </article>
@@ -239,7 +242,7 @@ docker compose logs -f api airflow dbt</code></pre>
       <article class="command-card">
         <h3>Kafka topicok és események</h3>
         <div class="terminal">
-          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">PowerShell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
           <pre><code># Topicok listázása
 docker compose exec kafka /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 
@@ -251,7 +254,7 @@ docker compose exec kafka /opt/apache/kafka/bin/kafka-console-consumer.sh --boot
       <article class="command-card">
         <h3>dbt újrafuttatás</h3>
         <div class="terminal">
-          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">PowerShell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
           <pre><code>docker compose exec dbt dbt run --profiles-dir /usr/app/profiles
 docker compose exec dbt dbt test --profiles-dir /usr/app/profiles</code></pre>
         </div>
@@ -260,12 +263,33 @@ docker compose exec dbt dbt test --profiles-dir /usr/app/profiles</code></pre>
       <article class="command-card">
         <h3>Churn prediction és rendelés szimulálása</h3>
         <div class="terminal">
-          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">PowerShell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
           <pre><code># Churn prediction
 curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" -d '{"customer_id":"C-1842"}'
 
 # Új rendelés
 curl -X POST http://localhost:8000/api/simulate-order</code></pre>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Leállítás és takarítás</h2>
+    <p>A normál leállítás megtartja a volume-okban lévő adatokat. A teljes törlés akkor kell, ha tiszta állapotból akarod újraépíteni a labot.</p>
+    <div class="command-grid" style="grid-template-columns:1fr">
+      <article class="command-card">
+        <h3>Normál leállítás</h3>
+        <div class="terminal">
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <pre><code>docker compose down</code></pre>
+        </div>
+      </article>
+      <article class="command-card">
+        <h3>Teljes reset volume-okkal</h3>
+        <div class="terminal">
+          <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+          <pre><code>docker compose down --volumes --remove-orphans</code></pre>
         </div>
       </article>
     </div>

@@ -1,4 +1,4 @@
-# WebShop Pro Lab — Docker Compose útmutató
+# WebShop Pro Local Docker Lab
 
 Ez a mappa a kurzusok közös, lokálisan futtatható tanulóplatformja. A cél nem egy production-grade webshop, hanem egy olyan projektalap, ahol ugyanazt az adatutat látod végig:
 
@@ -14,14 +14,14 @@ dummy webshop -> PostgreSQL/Kafka -> bronze/silver/gold -> dbt/Spark/Airflow -> 
 
 ## Indítás
 
-```powershell
+```shell
 # Repo gyökérből
 docker compose up -d --build
 ```
 
 Ez elindítja az összes service-t. Az első indulás 5-10 percet vehet igénybe az image-ek letöltése miatt.
 
-```powershell
+```shell
 # Állapot ellenőrzése
 docker compose ps
 
@@ -74,7 +74,7 @@ A http://localhost:8010/ címen elérhető dummy webshop három nézetet tartalm
 
 ### Bootstrap riport (Python / Delta / Parquet / data quality)
 
-```powershell
+```shell
 docker compose exec lab-runner python /lab/runner/scripts/bootstrap_lab.py
 ```
 
@@ -87,44 +87,44 @@ Ez a parancs:
 
 ### Spark ETL indítása
 
-```powershell
+```shell
 docker compose exec spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/webshop-lab/spark/jobs/webshop_spark_etl.py
 ```
 
 ### Kafka topicok listázása
 
-```powershell
+```shell
 docker compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 ```
 
 ### Kafka események olvasása
 
-```powershell
+```shell
 docker compose exec kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic webshop.events --from-beginning --max-messages 10
 ```
 
 ### dbt újrafuttatás
 
-```powershell
+```shell
 docker compose exec dbt dbt run --profiles-dir /usr/app/profiles
 docker compose exec dbt dbt test --profiles-dir /usr/app/profiles
 ```
 
 ### Churn prediction próba
 
-```powershell
+```shell
 curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" -d "{\"customer_id\":\"C-1842\"}"
 ```
 
 ### Új rendelés szimulálása
 
-```powershell
+```shell
 curl -X POST http://localhost:8000/api/simulate-order
 ```
 
 ## Leállítás
 
-```powershell
+```shell
 # Normál leállítás (adatok megmaradnak)
 docker compose down
 
