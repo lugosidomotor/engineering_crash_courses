@@ -38,8 +38,8 @@ A `kafka-init` és `minio-init` service-ek sikeres lefutás után kilépnek. Ez 
 | Kurzussite | http://localhost:8020/ | - | Összes kurzus statikus oldala |
 | WebShop Pro | http://localhost:8010/ | - | Interaktív dummy webshop (Bolt, Admin, Dashboard) |
 | FastAPI docs | http://localhost:8000/docs | - | REST API dokumentáció |
-| Airflow | http://localhost:8088/ | admin / admin | DAG orchestrator |
-| Spark master | http://localhost:8090/ | - | Spark UI |
+| Airflow | http://localhost:8088/ | admin / admin | DAG orchestrator, Spark ETL submit |
+| Spark master | http://localhost:8090/ | - | Spark UI és REST submit endpoint |
 | dbt docs | http://localhost:8092/ | - | Analytics modellek és lineage |
 | MinIO | http://localhost:9001/ | minioadmin / minioadmin | S3-kompatibilis tároló |
 | MLflow | http://localhost:5000/ | - | Kísérletkövetés |
@@ -85,11 +85,13 @@ Ez a parancs:
 - Ellenőrzi a PostgreSQL kapcsolatot
 - Teszteli a FastAPI health endpointot
 
-### Spark ETL indítása
+### Spark ETL indítása kézzel
 
 ```shell
 docker compose exec spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/webshop-lab/spark/jobs/webshop_spark_etl.py
 ```
+
+Az Airflow `webshop_daily_etl` DAG ugyanezt a Spark jobot automatikusan is meghívja a Spark master REST API-ján keresztül. A kézi parancs akkor hasznos, ha külön csak a Spark kurzusrészt akarod próbálgatni.
 
 ### Kafka topicok listázása
 
@@ -141,8 +143,8 @@ docker compose down --volumes --remove-orphans
 | Docker | teljes compose | egy parancsból reprodukálható lokális platform |
 | Delta Lake | lab-runner, spark-master, minio | bronze/silver/gold Delta táblák |
 | Open Table Formats | lab-runner, minio, unity-catalog | Delta/Iceberg/Hudi összehasonlítás |
-| Spark | spark-master, spark-worker | DataFrame ETL, customer feature tábla |
-| Airflow | airflow | webshop_daily_etl DAG |
+| Spark | spark-master, spark-worker | DataFrame ETL, product performance Parquet kimenet |
+| Airflow | airflow, spark-master, spark-worker | webshop_daily_etl DAG, amely Spark ETL-t is submitol |
 | dbt | dbt, postgres | staging és mart modellek, dbt docs |
 | Streaming | kafka, event-producer | clickstream topicok, valós idejű események |
 | AI Data Engineer | lab-runner, feast, kafka | feature engineering, data quality |

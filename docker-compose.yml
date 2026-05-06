@@ -134,6 +134,8 @@ services:
     image: apache/spark:3.5.3-scala2.12-java17-python3-ubuntu
     container_name: webshop-spark-master
     user: root
+    environment:
+      SPARK_MASTER_OPTS: "-Dspark.master.rest.enabled=true"
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.master.Master
@@ -145,6 +147,7 @@ services:
       - "8080"
     ports:
       - "7077:7077"
+      - "6066:6066"
       - "8090:8080"
     volumes:
       - ./webshop-lab:/opt/webshop-lab
@@ -163,9 +166,9 @@ services:
       - org.apache.spark.deploy.worker.Worker
       - spark://spark-master:7077
       - --cores
-      - "1"
+      - "2"
       - --memory
-      - 1G
+      - 2G
       - --webui-port
       - "8081"
     ports:

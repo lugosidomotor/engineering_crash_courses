@@ -29,7 +29,7 @@
     "delta-table-crash-course": ["minio", "spark-master", "lab-runner"],
     "open-table-formats": ["minio", "unity-catalog", "lab-runner"],
     "spark-crash-course": ["spark-master", "spark-worker", "databricks-local"],
-    "airflow-orchestration": ["airflow"],
+    "airflow-orchestration": ["airflow", "spark-master", "spark-worker"],
     "dbt-analytics-engineering": ["dbt", "postgres"],
     "databricks-lakehouse": ["databricks-local", "unity-catalog", "spark-master", "mlflow"],
     "streaming-engineering": ["kafka", "event-producer", "spark-master"],

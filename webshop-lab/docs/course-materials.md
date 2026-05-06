@@ -16,8 +16,8 @@ Ez a dokumentum kerül be a lab több rétegébe:
 | Docker & Local Data Platform | teljes compose | lokális fejlesztői stack |
 | Delta Table Crash Course | lab-runner, minio, spark-master | Delta/Parquet kimenetek |
 | Open Table Formats | lab-runner, minio, unity-catalog | Delta/Iceberg/Hudi döntési minta |
-| Apache Spark Crash Course | spark-master, spark-worker | `webshop_spark_etl.py` |
-| Airflow & Orchestration | airflow | `webshop_daily_etl` DAG |
+| Apache Spark Crash Course | spark-master, spark-worker | `webshop_spark_etl.py`, silver/gold Parquet kimenetek |
+| Airflow & Orchestration | airflow, spark-master, spark-worker | `webshop_daily_etl` DAG, amely Spark ETL-t submitol |
 | dbt Analytics Engineering | dbt, postgres | staging és mart modellek |
 | Streaming Engineering | kafka, event-producer | clickstream topicok |
 | AI Data Engineer | lab-runner, dbt, kafka | feature store és data quality minta |

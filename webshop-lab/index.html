@@ -161,8 +161,8 @@ docker compose logs -f api airflow dbt</code></pre>
       <a class="service" href="http://localhost:8020/"><strong>Kurzussite</strong><span>Statikus kurzusoldalak</span><em class="pill">course-site</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:8010/"><strong>WebShop Pro</strong><span>Interaktív dummy webshop</span><em class="pill">webshop</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:8000/docs"><strong>FastAPI docs</strong><span>REST API, webshop adatok, churn endpoint</span><em class="pill">api</em><div class="login"><code>nincs login</code></div></a>
-      <a class="service" href="http://localhost:8088/"><strong>Airflow</strong><span>webshop_daily_etl DAG</span><em class="pill">airflow</em><div class="login"><code>admin</code><code>admin</code></div></a>
-      <a class="service" href="http://localhost:8090/"><strong>Spark master</strong><span>Spark UI</span><em class="pill">spark-master</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8088/"><strong>Airflow</strong><span>webshop_daily_etl DAG, Spark ETL submit</span><em class="pill">airflow</em><div class="login"><code>admin</code><code>admin</code></div></a>
+      <a class="service" href="http://localhost:8090/"><strong>Spark master</strong><span>Spark UI és REST submit endpoint</span><em class="pill">spark-master</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:8092/"><strong>dbt docs</strong><span>Lineage, staging és mart modellek</span><em class="pill">dbt</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:9001/"><strong>MinIO</strong><span>Bronze/Silver/Gold és course-materials bucket</span><em class="pill">minio</em><div class="login"><code>minioadmin</code><code>minioadmin</code></div></a>
       <a class="service" href="http://localhost:5000/"><strong>MLflow</strong><span>webshop-pro-course-lab experiment</span><em class="pill">mlflow</em><div class="login"><code>nincs login</code></div></a>
@@ -186,8 +186,8 @@ docker compose logs -f api airflow dbt</code></pre>
         <tr><td>Python</td><td>lab-runner, lab-bootstrap</td><td>JSON -> Parquet, quality report, <code>/output/course-materials</code></td></tr>
         <tr><td>Docker</td><td>teljes compose</td><td>minden service címkézve van kurzus szerint</td></tr>
         <tr><td>Delta / Open formats</td><td>lab-runner, minio, unity-catalog</td><td>Bronze/Silver/Gold kimenetek, MinIO artifactok</td></tr>
-        <tr><td>Spark</td><td>spark-master, spark-worker</td><td><code>webshop_spark_etl.py</code></td></tr>
-        <tr><td>Airflow</td><td>airflow</td><td><code>webshop_daily_etl</code> DAG</td></tr>
+        <tr><td>Spark</td><td>spark-master, spark-worker</td><td><code>webshop_spark_etl.py</code>, silver/gold Parquet kimenetek</td></tr>
+        <tr><td>Airflow</td><td>airflow, spark-master, spark-worker</td><td><code>webshop_daily_etl</code> DAG, amely Spark ETL-t is submitol</td></tr>
         <tr><td>dbt</td><td>dbt, postgres</td><td>staging és marts modellek, dbt docs</td></tr>
         <tr><td>Streaming</td><td>kafka, event-producer</td><td>folyamatos clickstream események</td></tr>
         <tr><td>AI/RAG</td><td>chroma, streamlit, api</td><td>support policy és kurzusösszefoglaló dokumentumok ChromaDB-ben</td></tr>
@@ -232,7 +232,8 @@ docker compose logs -f api airflow dbt</code></pre>
       </article>
 
       <article class="command-card">
-        <h3>Spark ETL indítása</h3>
+        <h3>Spark ETL indítása kézzel</h3>
+        <p>Az Airflow DAG automatikusan is meghívja ezt a Spark jobot. Ezt a parancsot akkor használd, ha csak a Spark feldolgozást akarod külön futtatni.</p>
         <div class="terminal">
           <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
           <pre><code>docker compose exec spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/webshop-lab/spark/jobs/webshop_spark_etl.py</code></pre>
