@@ -26,8 +26,10 @@ Ez elindítja az összes service-t. Az első indulás 5-10 percet vehet igénybe
 docker compose ps
 
 # Logok követése
-docker compose logs -f api kafka airflow
+docker compose logs -f api kafka airflow dbt
 ```
+
+A `kafka-init` és `minio-init` service-ek sikeres lefutás után kilépnek. Ez normális, mert előkészítő konténerek: topicokat, bucketeket és induló fájlokat hoznak létre.
 
 ## Fontos URL-ek
 

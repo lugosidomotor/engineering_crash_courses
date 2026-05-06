@@ -24,6 +24,7 @@ try:
     metrics = get_json("/api/metrics")
     catalog = pd.DataFrame(get_json("/api/catalog"))
     events = pd.DataFrame(get_json("/api/events"))
+    materials = pd.DataFrame(get_json("/api/course-materials"))
 except Exception as exc:
     st.error(f"Nem érem el a FastAPI service-t: {exc}")
     st.stop()
@@ -38,6 +39,9 @@ with left:
 
     st.subheader("Termékkatalógus")
     st.dataframe(catalog, use_container_width=True, hide_index=True)
+
+    st.subheader("Kurzusanyag kapcsolatok")
+    st.dataframe(materials, use_container_width=True, hide_index=True)
 
 with right:
     st.subheader("Churn prediction API")

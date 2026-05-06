@@ -28,7 +28,7 @@ window.WEBSHOP_CASE_STUDY = {
   },
   overview: [
     "Egy dummy e-commerce rendszer termékkatalógussal, rendelésekkel és clickstream eseményekkel.",
-    "Ugyanaz az adat megy végig source -> bronze -> silver -> gold -> AI -> ops rétegeken.",
+    "Ugyanaz az adat megy végig a source -> bronze -> silver -> gold -> AI -> ops rétegeken.",
     "Minden kurzus egy konkrét platformréteget épít hozzá, nem elszigetelt tutorialt."
   ],
   artifacts: [
@@ -54,7 +54,7 @@ window.WEBSHOP_CASE_STUDY = {
       dailyUse: "Megérted, miből készül egy dashboard vagy egy üzleti riport, és hogyan kapcsolod össze a szétszórt adatokat."
     },
     "python-data-engineering": {
-      role: "A JSON/CSV webshop forrásokat betöltöd, validálod és előkészíted feldolgozásra.",
+      role: "A JSON webshop forrásokat betöltöd, validálod és előkészíted feldolgozásra.",
       artifact: "Ingest pipeline: catalog.json, orders.json, events.json -> tisztított dataset.",
       tools: ["Python", "pandas", "Parquet"],
       labServices: ["lab-runner", "postgres"],
@@ -83,7 +83,7 @@ window.WEBSHOP_CASE_STUDY = {
     },
     "spark-crash-course": {
       role: "A rendeléseket, clickstreamet és katalógust Spark DataFrame API-val dolgozod fel.",
-      artifact: "Nagy volumen ETL: joinok, aggregációk, customer feature tábla.",
+      artifact: "Nagy volumenű ETL: joinok, aggregációk, customer feature tábla.",
       tools: ["Apache Spark", "Spark SQL", "Delta Lake"],
       labServices: ["spark-master", "spark-worker", "databricks-local"],
       dailyUse: "Nagy adatnál is átlátható, optimalizálható feldolgozást tudsz írni."
@@ -103,7 +103,7 @@ window.WEBSHOP_CASE_STUDY = {
       dailyUse: "A riportok logikája verziózott, tesztelt és mások számára is érthető lesz."
     },
     "databricks-lakehouse": {
-      role: "A WebShop Pro lakehouse-t managed platform gondolkodásmóddal viszed tovább.",
+      role: "A WebShop Pro lakehouse-t managed platform gondolkodással viszed tovább.",
       artifact: "Workspace workflow, Unity Catalog jogosultságok, MLflow integráció.",
       tools: ["Databricks", "Unity Catalog", "Delta Lake", "MLflow"],
       labServices: ["databricks-local", "unity-catalog", "spark-master", "mlflow"],
@@ -114,10 +114,10 @@ window.WEBSHOP_CASE_STUDY = {
       artifact: "events topic -> streaming silver table -> realtime KPI.",
       tools: ["Apache Kafka", "Spark Structured Streaming", "Delta Lake"],
       labServices: ["kafka", "event-producer", "spark-master"],
-      dailyUse: "Nem csak napi batch riportot tudsz, hanem közeli valós idejű jelzéseket is."
+      dailyUse: "Nem csak napi batch riportot tudsz, hanem közel valós idejű jelzéseket is."
     },
     "ai-data-engineer": {
-      role: "A webshop ügyfél és termék feature-jeit AI-ready formátumba szervezed.",
+      role: "A webshop ügyfél- és termékfeature-jeit AI-ready formátumba szervezed.",
       artifact: "customer_features, product_features, Feast feature view, data quality check.",
       tools: ["Feast", "Great Expectations", "Spark", "dbt"],
       labServices: ["lab-runner", "dbt", "kafka", "postgres"],
@@ -125,7 +125,7 @@ window.WEBSHOP_CASE_STUDY = {
     },
     "ai-engineering": {
       role: "A webshop szabályzataiból és rendelésadataiból RAG ügyfélszolgálati asszisztenst építesz.",
-      artifact: "Support chatbot: shipping, return, warranty kérdésekre forrásra hivatkozva.",
+      artifact: "Support chatbot: shipping, return, warranty kérdések forrásra hivatkozva.",
       tools: ["OpenAI", "ChromaDB", "Streamlit", "Python"],
       labServices: ["chroma", "streamlit", "api"],
       dailyUse: "Az AI válaszai nem hasból jönnek, hanem visszakeresett, ellenőrizhető kontextusból."
@@ -138,7 +138,7 @@ window.WEBSHOP_CASE_STUDY = {
       dailyUse: "Látod, mikor romlik a bot, és nem érzés alapján döntesz az AI minőségéről."
     },
     "llmops-genai-production": {
-      role: "A support botot production gondolkodásmóddal verziózod, méred és monitorozod.",
+      role: "A support botot production gondolkodással verziózod, méred és monitorozod.",
       artifact: "Prompt registry, cost tracking, latency dashboard, fallback flow.",
       tools: ["MLflow", "Grafana", "OpenAI", "Docker"],
       labServices: ["mlflow", "prometheus", "grafana", "api"],

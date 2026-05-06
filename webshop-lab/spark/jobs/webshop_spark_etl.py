@@ -11,12 +11,17 @@ OUTPUT = "/opt/webshop-output/spark"
 spark = (
     SparkSession.builder
     .appName("webshop-pro-spark-etl")
+    .config("spark.default.parallelism", "1")
+    .config("spark.executor.memory", "512m")
+    .config("spark.sql.shuffle.partitions", "1")
     .getOrCreate()
 )
 
-catalog = spark.read.json(str(FIXTURES / "catalog.json"))
-orders = spark.read.json(str(FIXTURES / "orders.json"))
-events = spark.read.json(str(FIXTURES / "events.json"))
+json_reader = spark.read.option("multiLine", "true")
+
+catalog = json_reader.json(str(FIXTURES / "catalog.json"))
+orders = json_reader.json(str(FIXTURES / "orders.json"))
+events = json_reader.json(str(FIXTURES / "events.json"))
 
 paid_orders = orders.filter(col("status") == "paid")
 
@@ -37,7 +42,7 @@ product_performance = (
     .fillna({"paid_revenue": 0, "paid_units": 0, "product_view_sessions": 0})
 )
 
-paid_orders.write.mode("overwrite").parquet(f"{OUTPUT}/silver/paid_orders")
-product_performance.write.mode("overwrite").parquet(f"{OUTPUT}/gold/product_performance")
+paid_orders.coalesce(1).write.mode("overwrite").parquet(f"{OUTPUT}/silver/paid_orders")
+product_performance.coalesce(1).write.mode("overwrite").parquet(f"{OUTPUT}/gold/product_performance")
 
 spark.stop()

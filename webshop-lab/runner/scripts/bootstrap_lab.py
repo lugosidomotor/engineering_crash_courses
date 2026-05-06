@@ -12,6 +12,72 @@ FIXTURES = Path("/fixtures")
 OUTPUT = Path("/output")
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://webshop:webshop@postgres:5432/webshop")
 API_URL = os.getenv("API_URL", "http://api:8000").rstrip("/")
+CHROMA_URL = os.getenv("CHROMA_URL", "http://chroma:8000").rstrip("/")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000").rstrip("/")
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://minio:9000").rstrip("/")
+
+COURSE_MATERIALS = [
+    {
+        "id": "sql-data-modeling",
+        "title": "SQL & Data Modeling",
+        "service": "postgres",
+        "summary": "A raw.catalog, raw.orders es raw.events tablakon gyakorolhatoak a JOIN-ok, aggregaciok es star schema alapok.",
+    },
+    {
+        "id": "python-data-engineering",
+        "title": "Python for Data Engineering",
+        "service": "lab-runner",
+        "summary": "A fixture JSON adatokbol Bronze/Silver/Gold Parquet kimenetek keszulnek a /output kotetbe.",
+    },
+    {
+        "id": "spark-crash-course",
+        "title": "Apache Spark Crash Course",
+        "service": "spark-master",
+        "summary": "A spark/jobs/webshop_spark_etl.py nagyobb adatpipeline-kent dolgozza fel ugyanazt a webshop adatutat.",
+    },
+    {
+        "id": "airflow-orchestration",
+        "title": "Airflow & Orchestration",
+        "service": "airflow",
+        "summary": "A webshop_daily_etl DAG mutatja, hogyan lesz a kezi scriptbol utemezett, kovetheto workflow.",
+    },
+    {
+        "id": "dbt-analytics-engineering",
+        "title": "dbt Analytics Engineering",
+        "service": "dbt",
+        "summary": "A staging es mart modellek a webshop riportreteget dokumentalt, tesztelt SQL projektta alakitjak.",
+    },
+    {
+        "id": "ai-engineering",
+        "title": "AI Engineering",
+        "service": "chroma, streamlit, api",
+        "summary": "A webshop support szabalyzatok ChromaDB-be kerulnek, a Streamlit UI pedig bemutatja a RAG felhasznaloi utat.",
+    },
+    {
+        "id": "aiops-mlops",
+        "title": "AIOps & MLOps",
+        "service": "mlflow, api, prometheus, grafana",
+        "summary": "A /predict endpoint, MLflow demo run es Grafana dashboard megmutatja a modell serving es monitoring kapcsolatot.",
+    },
+]
+
+SUPPORT_DOCS = [
+    {
+        "id": "shipping-policy",
+        "title": "Szallitasi szabalyzat",
+        "text": "Fizetett rendelestol szamitva a WebShop Pro standard szallitasi ideje 2 munkanap Budapesten es 3 munkanap videki cimre.",
+    },
+    {
+        "id": "return-policy",
+        "title": "Visszakuldes",
+        "text": "A vasarlo 14 napon belul jelezheti az elallast. A termeknek serulesmentes allapotban kell visszaerkeznie.",
+    },
+    {
+        "id": "warranty-policy",
+        "title": "Garancia",
+        "text": "Minden elektronikai termekhez legalabb 12 honap jotallas tartozik. Premium termekeknel ez 24 honap.",
+    },
+]
 
 
 def read_fixture(name):
@@ -49,6 +115,94 @@ def validate_orders(orders):
     return problems
 
 
+def write_course_materials():
+    target = OUTPUT / "course-materials"
+    target.mkdir(parents=True, exist_ok=True)
+    for material in COURSE_MATERIALS:
+        body = "\n".join([
+            f"# {material['title']}",
+            "",
+            f"Service: `{material['service']}`",
+            "",
+            material["summary"],
+            "",
+        ])
+        (target / f"{material['id']}.md").write_text(body, encoding="utf-8")
+    (target / "support-policies.json").write_text(
+        json.dumps(SUPPORT_DOCS, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    return str(target)
+
+
+def preload_chroma():
+    try:
+        import chromadb
+
+        host = CHROMA_URL.replace("http://", "").replace("https://", "").split(":")[0]
+        port = int(CHROMA_URL.rsplit(":", 1)[1]) if ":" in CHROMA_URL.replace("http://", "") else 8000
+        client = chromadb.HttpClient(host=host, port=port)
+        collection = client.get_or_create_collection("webshop_course_materials")
+        docs = SUPPORT_DOCS + [
+            {
+                "id": material["id"],
+                "title": material["title"],
+                "text": material["summary"],
+            }
+            for material in COURSE_MATERIALS
+        ]
+        collection.upsert(
+            ids=[doc["id"] for doc in docs],
+            documents=[doc["text"] for doc in docs],
+            metadatas=[{"title": doc["title"], "source": "webshop-pro-lab"} for doc in docs],
+            embeddings=[[float(index), 1.0, 0.5, 0.25] for index, _ in enumerate(docs, start=1)],
+        )
+        return {"collection": "webshop_course_materials", "documents": len(docs)}
+    except Exception as exc:
+        return {"status": "skipped", "error": str(exc)}
+
+
+def preload_mlflow(report):
+    try:
+        import mlflow
+
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        mlflow.set_experiment("webshop-pro-course-lab")
+        with mlflow.start_run(run_name="bootstrap-course-materials"):
+            mlflow.log_param("project", "WebShop Pro")
+            mlflow.log_param("course_count", len(COURSE_MATERIALS))
+            mlflow.log_metric("catalog_rows", report["source_rows"]["catalog"])
+            mlflow.log_metric("order_rows", report["source_rows"]["orders"])
+            mlflow.log_metric("event_rows", report["source_rows"]["events"])
+            mlflow.log_artifact(str(OUTPUT / "webshop_lab_report.json"))
+        return {"experiment": "webshop-pro-course-lab", "status": "created"}
+    except Exception as exc:
+        return {"status": "skipped", "error": str(exc)}
+
+
+def preload_minio_artifacts():
+    try:
+        import boto3
+
+        client = boto3.client(
+            "s3",
+            endpoint_url=MINIO_ENDPOINT,
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "minioadmin"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin"),
+        )
+        for bucket in ["webshop-bronze", "webshop-silver", "webshop-gold", "webshop-artifacts"]:
+            try:
+                client.create_bucket(Bucket=bucket)
+            except Exception:
+                pass
+        for file in (OUTPUT / "course-materials").glob("*"):
+            client.upload_file(str(file), "webshop-artifacts", f"course-materials/{file.name}")
+        client.upload_file(str(OUTPUT / "webshop_lab_report.json"), "webshop-artifacts", "reports/webshop_lab_report.json")
+        return {"bucket": "webshop-artifacts", "status": "uploaded"}
+    except Exception as exc:
+        return {"status": "skipped", "error": str(exc)}
+
+
 def main():
     catalog = pd.DataFrame(read_fixture("catalog.json"))
     orders = pd.DataFrame(read_fixture("orders.json"))
@@ -57,6 +211,11 @@ def main():
     events["ts"] = pd.to_datetime(events["ts"], utc=True)
 
     report = {
+        "source_rows": {
+            "catalog": int(len(catalog)),
+            "orders": int(len(orders)),
+            "events": int(len(events)),
+        },
         "bronze": {
             "catalog": write_layer("bronze/catalog", catalog),
             "orders": write_layer("bronze/orders", orders),
@@ -104,7 +263,15 @@ def main():
     except Exception as exc:
         report["api_health"] = {"status": "unreachable", "error": str(exc)}
 
+    report["course_materials"] = write_course_materials()
+
     output_file = OUTPUT / "webshop_lab_report.json"
+    output_file.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    report["chroma"] = preload_chroma()
+    output_file.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    report["mlflow"] = preload_mlflow(report)
+    output_file.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    report["minio_artifacts"] = preload_minio_artifacts()
     output_file.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

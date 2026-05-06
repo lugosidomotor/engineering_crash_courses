@@ -1,6 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS raw;
 CREATE SCHEMA IF NOT EXISTS analytics;
 CREATE SCHEMA IF NOT EXISTS ml;
+CREATE SCHEMA IF NOT EXISTS course;
 
 CREATE TABLE IF NOT EXISTS raw.catalog (
   sku TEXT PRIMARY KEY,
@@ -42,6 +43,14 @@ CREATE TABLE IF NOT EXISTS ml.predictions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS course.materials (
+  course_slug TEXT PRIMARY KEY,
+  course_title TEXT NOT NULL,
+  primary_services TEXT[] NOT NULL,
+  artifact TEXT NOT NULL,
+  how_to_use TEXT NOT NULL
+);
+
 INSERT INTO raw.catalog (sku, name, category, brand, price, stock, rating, margin) VALUES
   ('WP-LAP-14', 'Northbyte Ultrabook 14', 'Laptop', 'Northbyte', 429900, 18, 4.7, 0.18),
   ('WP-MON-32', 'PixelForge 32Q monitor', 'Monitor', 'PixelForge', 159900, 34, 4.5, 0.22),
@@ -79,6 +88,21 @@ INSERT INTO raw.events (event_id, session_id, customer_id, event_type, sku, ts) 
   ('E-9007', 'S-443', 'C-2034', 'product_view', 'WP-MON-32', '2026-05-06T08:21:11Z'),
   ('E-9008', 'S-444', 'C-2099', 'support_question', 'WP-CAM-4K', '2026-05-06T08:42:33Z')
 ON CONFLICT (event_id) DO NOTHING;
+
+INSERT INTO course.materials (course_slug, course_title, primary_services, artifact, how_to_use) VALUES
+  ('sql-data-modeling', 'SQL & Data Modeling', ARRAY['postgres'], 'raw.catalog, raw.orders, raw.events, analytics.product_performance', 'Kapcsolódj a PostgreSQL-hez, és ezen a webshop sémán gyakorold a JOIN, GROUP BY és window function példákat.'),
+  ('python-data-engineering', 'Python for Data Engineering', ARRAY['lab-runner', 'postgres'], '/output/bronze, /output/silver, /output/gold', 'Futtasd a bootstrap_lab.py scriptet, ami a fixture adatokból Parquet és minőségi riport kimenetet készít.'),
+  ('docker-local-data-platform', 'Docker & Local Data Platform', ARRAY['course-site', 'webshop', 'postgres', 'minio', 'prometheus', 'grafana'], 'docker-compose.yml', 'A teljes lokális platform ugyanebből a compose fájlból indul, service-ekre bontva.'),
+  ('spark-crash-course', 'Apache Spark Crash Course', ARRAY['spark-master', 'spark-worker'], 'webshop_spark_etl.py', 'Spark DataFrame API-val épül a paid_orders silver és product_performance gold réteg.'),
+  ('airflow-orchestration', 'Airflow & Orchestration', ARRAY['airflow'], 'webshop_daily_etl DAG', 'Az Airflow UI-ban látszik, hogyan láncolódik az ingest, quality check, gold build és serving health check.'),
+  ('dbt-analytics-engineering', 'dbt Analytics Engineering', ARRAY['dbt', 'postgres'], 'staging és mart modellek', 'A dbt docs lineage nézetben látszik, hogyan lesz raw adatból riportolható mart.'),
+  ('ai-engineering', 'AI Engineering', ARRAY['chroma', 'streamlit', 'api'], 'webshop_course_materials Chroma collection', 'A support szabályzatok és kurzusösszefoglalók vektoros kereséshez vannak előkészítve.'),
+  ('aiops-mlops', 'AIOps & MLOps', ARRAY['mlflow', 'api', 'prometheus', 'grafana'], 'FastAPI /predict, MLflow run, Grafana dashboard', 'A modell serving és monitoring ugyanarra a webshop feature rétegre mutat.')
+ON CONFLICT (course_slug) DO UPDATE SET
+  course_title = EXCLUDED.course_title,
+  primary_services = EXCLUDED.primary_services,
+  artifact = EXCLUDED.artifact,
+  how_to_use = EXCLUDED.how_to_use;
 
 CREATE OR REPLACE VIEW analytics.product_performance AS
 SELECT

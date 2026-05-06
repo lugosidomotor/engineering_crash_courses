@@ -206,20 +206,17 @@ Console: http://localhost:9001</pre></div></div>
   <h2>Spark konténer <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
   <div class="md-cell"><p>Apache Spark standalone cluster Docker-ben.</p></div><div class="code-cell" id="cell-6"><div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('6')">&#9654; Run</button></div><div class="code-body"><pre># docker-compose.yml - Spark
   spark-master:
-    image: bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=master
+    image: apache/spark:3.5.3-scala2.12-java17-python3-ubuntu
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master", "--port", "7077", "--webui-port", "8080"]
     ports:
       - '8080:8080'
       - '7077:7077'
 
   spark-worker:
-    image: bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
+    image: apache/spark:3.5.3-scala2.12-java17-python3-ubuntu
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077", "--cores", "1", "--memory", "1G", "--webui-port", "8081"]
     depends_on:
-      - spark-master</pre></div><div class="output-area" id="out-6"><div class="output-label">Output:</div><pre>$ docker-compose up spark
+      - spark-master</pre></div><div class="output-area" id="out-6"><div class="output-label">Output:</div><pre>$ docker compose up spark-master spark-worker
 Spark Master: running at spark://localhost:7077
 Web UI: http://localhost:8080
 Workers: 1 alive</pre></div></div>

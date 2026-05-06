@@ -2,6 +2,7 @@ import os
 import random
 import time
 from datetime import datetime, timezone
+from functools import wraps
 
 import psycopg
 from fastapi import FastAPI, HTTPException
@@ -45,6 +46,7 @@ def query(sql, params=None, fetch="all"):
 
 def timed(endpoint):
     def decorator(fn):
+        @wraps(fn)
         def wrapper(*args, **kwargs):
             start = time.perf_counter()
             try:
@@ -98,6 +100,18 @@ def events():
         SELECT event_id, session_id, customer_id, event_type, sku, ts
         FROM raw.events
         ORDER BY ts
+        """
+    )
+
+
+@app.get("/api/course-materials")
+@timed("course_materials")
+def course_materials():
+    return query(
+        """
+        SELECT course_slug, course_title, primary_services, artifact, how_to_use
+        FROM course.materials
+        ORDER BY course_slug
         """
     )
 

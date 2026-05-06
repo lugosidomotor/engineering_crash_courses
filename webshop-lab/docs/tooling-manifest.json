@@ -1,25 +1,30 @@
 {
-  "purpose": "WebShop Pro lokalis lab: minden kurzus ugyanarra a futtathato dummy webshop platformra hivatkozik.",
+  "purpose": "WebShop Pro lokális lab: minden kurzus ugyanarra a futtatható dummy webshop platformra hivatkozik.",
   "start_command": "docker compose up -d --build",
+  "check_command": "docker compose ps",
+  "reset_command": "docker compose down --volumes --remove-orphans",
   "core_urls": [
-    {"name": "Kurzussite", "url": "http://localhost:8020/"},
-    {"name": "Dummy webshop", "url": "http://localhost:8010/"},
-    {"name": "FastAPI docs", "url": "http://localhost:8000/docs"},
+    {"name": "Kurzussite", "url": "http://localhost:8020/", "login": "nincs"},
+    {"name": "Dummy webshop", "url": "http://localhost:8010/", "login": "nincs"},
+    {"name": "FastAPI docs", "url": "http://localhost:8000/docs", "login": "nincs"},
     {"name": "Airflow", "url": "http://localhost:8088/", "login": "admin / admin"},
-    {"name": "Spark master", "url": "http://localhost:8090/"},
-    {"name": "dbt docs", "url": "http://localhost:8092/"},
+    {"name": "Spark master", "url": "http://localhost:8090/", "login": "nincs"},
+    {"name": "dbt docs", "url": "http://localhost:8092/", "login": "nincs"},
     {"name": "MinIO console", "url": "http://localhost:9001/", "login": "minioadmin / minioadmin"},
-    {"name": "MLflow", "url": "http://localhost:5000/"},
-    {"name": "Streamlit AI support", "url": "http://localhost:8501/"},
-    {"name": "ChromaDB API", "url": "http://localhost:8001/api/v1/heartbeat"},
-    {"name": "Prometheus", "url": "http://localhost:9090/"},
+    {"name": "MLflow", "url": "http://localhost:5000/", "login": "nincs"},
+    {"name": "Streamlit AI support", "url": "http://localhost:8501/", "login": "nincs"},
+    {"name": "ChromaDB API", "url": "http://localhost:8001/api/v1/heartbeat", "login": "nincs"},
+    {"name": "Prometheus", "url": "http://localhost:9090/", "login": "nincs"},
     {"name": "Grafana", "url": "http://localhost:3000/", "login": "admin / admin"},
-    {"name": "Unity Catalog OSS", "url": "http://localhost:8089/"},
-    {"name": "Databricks local notebook analogue", "url": "http://localhost:8888/"}
+    {"name": "Unity Catalog OSS", "url": "http://localhost:8089/", "login": "nincs"},
+    {"name": "JupyterLab", "url": "http://localhost:8888/", "login": "token nélkül"}
   ],
+  "database_credentials": {
+    "postgres": "postgresql://webshop:webshop@localhost:5432/webshop"
+  },
   "course_services": {
     "sql-data-modeling": ["postgres"],
-    "python-data-engineering": ["lab-runner", "postgres"],
+    "python-data-engineering": ["lab-runner", "lab-bootstrap", "postgres"],
     "docker-local-data-platform": ["course-site", "webshop", "postgres", "minio", "prometheus", "grafana"],
     "delta-table-crash-course": ["minio", "spark-master", "lab-runner"],
     "open-table-formats": ["minio", "unity-catalog", "lab-runner"],
@@ -34,9 +39,17 @@
     "llmops-genai-production": ["mlflow", "grafana", "prometheus", "api"],
     "aiops-mlops": ["mlflow", "api", "prometheus", "grafana"]
   },
+  "preloaded_materials": {
+    "postgres": "raw, analytics, ml és course sémák",
+    "minio": "webshop-bronze, webshop-silver, webshop-gold és webshop-artifacts bucket",
+    "kafka": "webshop.events, webshop.orders, webshop.support topic",
+    "chroma": "webshop_course_materials collection",
+    "mlflow": "webshop-pro-course-lab experiment",
+    "grafana": "WebShop Pro Course Lab dashboard"
+  },
   "cloud_or_runtime_notes": {
-    "Databricks": "Lokalisan JupyterLab + Spark + MLflow + Unity Catalog OSS adja ugyanazt a tanulasi mental modellt.",
-    "Kubernetes": "A compose nem indit nested Kubernetes clustert; a deployment manifest a webshop-lab/kubernetes mappaban van.",
-    "OpenAI": "Az OpenAI API kulcs opcionális. A lab alapbol offline demo valaszt ad, hogy kulcs nelkul is tanulhato legyen."
+    "Databricks": "Lokálisan JupyterLab + Spark + MLflow + Unity Catalog OSS adja ugyanazt a tanulási mental modellt.",
+    "Kubernetes": "A compose nem indít nested Kubernetes clustert; a deployment manifest a webshop-lab/kubernetes mappában van.",
+    "OpenAI": "Az OpenAI API kulcs opcionális. A lab alapból offline demo választ ad, hogy kulcs nélkül is tanulható legyen."
   }
 }
