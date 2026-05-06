@@ -1,10 +1,10 @@
 # WebShop Pro demo projekt
 
-Ez a mappa a kurzusok kozos dummy webshop esettanulmanya. Nem production alkalmazas, hanem oktatasi demo: ugyanazt a mini webshopot hasznaljuk SQL-hez, Pythonhoz, Delta Lake-hez, Sparkhoz, streaminghez, dbt-hez, RAG-hez es MLOps-hoz.
+Ez a mappa a kurzusok közös dummy webshop esettanulmánya. Nem production alkalmazás, hanem oktatási demo: ugyanazt a mini webshopot használjuk SQL-hez, Pythonhoz, Delta Lake-hez, Sparkhoz, streaminghez, dbt-hez, RAG-hez és MLOps-hoz.
 
-## Futtatas teljes Docker labbal
+## Futtatás teljes Docker labbal
 
-Repo gyokerbol:
+Repo gyökeréből:
 
 ```powershell
 docker compose up -d --build
@@ -16,11 +16,11 @@ Majd nyisd meg:
 http://localhost:8010/
 ```
 
-Ilyenkor a demo mar a FastAPI + PostgreSQL retegre csatlakozik. Az "Uj rendeles" gomb API-n keresztul ir uj rendelest a `raw.orders` tablaba, a Prometheus pedig meri az endpoint forgalmat.
+Ilyenkor a demo már a FastAPI + PostgreSQL rétegre csatlakozik. Az "Új rendelés" gomb API-n keresztül ír új rendelést a `raw.orders` táblába, a Prometheus pedig méri az endpoint forgalmat.
 
-## Futtatas csak statikus fallbackkel
+## Futtatás csak statikus fallbackkel
 
-Repo gyokerbol:
+Repo gyökeréből:
 
 ```powershell
 python -m http.server 8010 --bind 127.0.0.1
@@ -32,26 +32,26 @@ Majd nyisd meg:
 http://127.0.0.1:8010/webshop-pro/
 ```
 
-## Mit szimulal?
+## Mit szimulál?
 
-- webshop katalogus es rendelestabla
-- clickstream es checkout esemenyek
-- FastAPI serving API es PostgreSQL source DB, ha a compose stack fut
+- webshop katalógus és rendeléstábla
+- clickstream és checkout események
+- FastAPI serving API és PostgreSQL source DB, ha a compose stack fut
 - Bronze/Silver/Gold adatfolyam
-- tool status panel az osszes kurzusban szereplo technologiaval
-- AI support/RAG, churn scoring es observability helye a rendszerben
+- tool status panel az összes kurzusban szereplő technológiával
+- AI support/RAG, churn scoring és observability helye a rendszerben
 
-## Oktatasi szerep
+## Oktatási szerep
 
-Minden kurzus ugyanahhoz a projekthez ad hozza egy reteget:
+Minden kurzus ugyanahhoz a projekthez ad hozzá egy réteget:
 
-- SQL: relacios modell, JOIN, aggregacio
-- Python: ingest es validacio
-- Docker: lokalis stack inditas
-- Delta Lake: tranzakcios lakehouse tablazatok
+- SQL: relációs modell, JOIN, aggregáció
+- Python: ingest és validáció
+- Docker: lokális stack indítás
+- Delta Lake: tranzakciós lakehouse táblázatok
 - Spark: nagy volumen ETL
 - Airflow: napi DAG
 - dbt: analytics martok
 - Streaming: Kafka clickstream
-- AI Engineering: RAG ugyfelszolgalat
-- MLOps: churn modell serving es monitoring
+- AI Engineering: RAG ügyfélszolgálat
+- MLOps: churn modell serving és monitoring

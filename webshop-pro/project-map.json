@@ -1,17 +1,17 @@
 {
   "name": "WebShop Pro",
-  "purpose": "Kozos oktatasi esettanulmany Data es AI Engineering kurzusokhoz",
+  "purpose": "Közös oktatási esettanulmány Data és AI Engineering kurzusokhoz",
   "business_questions": [
-    "Melyik csatorna hozza a legtobb bevetelt?",
-    "Melyik termeknel fogy el hamar a keszlet?",
-    "Melyik ugyfel valoszinuleg lemorzsolodik?",
-    "Milyen valaszt adjon az AI ugyfelszolgalat a webshop szabalyzata alapjan?"
+    "Melyik csatorna hozza a legtobb bevételt?",
+    "Melyik terméknél fogy el hamar a készlet?",
+    "Melyik ügyfél valószínűleg lemorzsolódik?",
+    "Milyen választ adjon az AI ügyfélszolgálat a webshop szabályzata alapján?"
   ],
   "layers": [
     {"layer": "source", "examples": ["orders.json", "events.json", "catalog.json"]},
-    {"layer": "bronze", "examples": ["nyers rendelesek", "nyers clickstream"]},
-    {"layer": "silver", "examples": ["tisztitott rendeles", "validalt termekkatalogus"]},
-    {"layer": "gold", "examples": ["napi KPI", "ugyfel feature tabla", "termek teljesitmeny"]},
+    {"layer": "bronze", "examples": ["nyers rendelések", "nyers clickstream"]},
+    {"layer": "silver", "examples": ["tisztított rendelés", "validált termékkatalógus"]},
+    {"layer": "gold", "examples": ["napi KPI", "ügyfél feature tábla", "termék teljesítmény"]},
     {"layer": "ai", "examples": ["RAG support bot", "churn score", "prompt eval"]},
     {"layer": "ops", "examples": ["Airflow DAG", "MLflow run", "Grafana dashboard"]}
   ],
@@ -40,8 +40,8 @@
     ]
   },
   "notes": [
-    "Databricks lokal labban JupyterLab + Spark + MLflow + Unity Catalog OSS kombinacioval jelenik meg.",
-    "Kuberneteshez compose helyett deployment manifest keszul a webshop-lab/kubernetes mappaban.",
-    "OpenAI kulcs nelkul offline demo valasz fut; kulccsal a kurzusokban lehet valodi API hivast bekotni."
+    "Databricks lokális labban JupyterLab + Spark + MLflow + Unity Catalog OSS kombinációval jelenik meg.",
+    "Kuberneteshez compose helyett deployment manifest készül a webshop-lab/kubernetes mappában.",
+    "OpenAI kulcs nélkül offline demo válasz fut; kulccsal a kurzusokban lehet valódi API hívást bekötni."
   ]
 }

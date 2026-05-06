@@ -18,8 +18,9 @@ services:
     ports:
       - "8010:80"
     volumes:
-      - ./webshop-pro:/usr/share/nginx/html:ro
-      - ./webshop-lab:/usr/share/nginx/html/webshop-lab:ro
+      - ./webshop-pro:/usr/share/nginx/html/webshop-pro:ro
+      - ./webshop-lab:/usr/share/nginx/html/webshop-lab
+      - ./webshop-lab/nginx/webshop.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       api:
         condition: service_started
@@ -60,6 +61,11 @@ services:
       - "9001:9001"
     volumes:
       - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     labels:
       webshop.course: "docker-local-data-platform,delta-table-crash-course,open-table-formats"
       webshop.role: "S3-compatible object storage for bronze/silver/gold layers"
@@ -69,12 +75,12 @@ services:
     container_name: webshop-minio-init
     depends_on:
       minio:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./webshop-pro/fixtures:/fixtures:ro
     entrypoint: ["/bin/sh", "-c"]
     command: >
-      "until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 2; done;
+      "mc alias set local http://minio:9000 minioadmin minioadmin;
       mc mb -p local/webshop-bronze local/webshop-silver local/webshop-gold local/webshop-artifacts || true;
       mc cp /fixtures/*.json local/webshop-bronze/source/ || true;
       echo 'MinIO buckets created and webshop fixtures copied.'"
@@ -96,7 +102,13 @@ services:
     ports:
       - "9092:9092"
     volumes:
-      - kafka-data:/apache/kafka
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 20s
     labels:
       webshop.course: "streaming-engineering,ai-data-engineer"
       webshop.role: "Clickstream and checkout event bus"
@@ -106,13 +118,13 @@ services:
     container_name: webshop-kafka-init
     depends_on:
       kafka:
-        condition: service_started
+        condition: service_healthy
     entrypoint: ["/bin/bash", "-lc"]
     command: >
-      "for i in {1..30}; do /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list && break || sleep 2; done;
-      /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.events --partitions 3 --replication-factor 1;
+      "/opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.events --partitions 3 --replication-factor 1;
       /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.orders --partitions 3 --replication-factor 1;
-      /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.support --partitions 1 --replication-factor 1"
+      /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.support --partitions 1 --replication-factor 1;
+      echo 'Kafka topics created.'"
 
   spark-master:
     image: apache/spark:4.0.2
@@ -135,7 +147,7 @@ services:
       webshop.role: "Spark master for ETL and feature jobs"
 
   spark-worker:
-    image: apache/spark:3.5.1
+    image: apache/spark:4.0.2
     container_name: webshop-spark-worker
     environment:
       SPARK_MODE: worker
@@ -248,6 +260,11 @@ services:
       - "8001:8000"
     volumes:
       - chroma-data:/chroma/chroma
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     labels:
       webshop.course: "ai-engineering,rag-evaluation-ai-safety"
       webshop.role: "Vector database for support-policy retrieval"
@@ -322,7 +339,7 @@ services:
   databricks-local:
     image: quay.io/jupyter/pyspark-notebook:spark-3.5.0
     container_name: webshop-databricks-local
-    command: start-notebook.py --ServerApp.token='' --ServerApp.password='' --NotebookApp.token='' --NotebookApp.password=''
+    command: start-notebook.py --ServerApp.token='' --ServerApp.password=''
     ports:
       - "8888:8888"
     volumes:
@@ -366,13 +383,13 @@ services:
       postgres:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
       api:
         condition: service_started
       minio:
-        condition: service_started
+        condition: service_healthy
       chroma:
-        condition: service_started
+        condition: service_healthy
       mlflow:
         condition: service_started
     labels:
@@ -395,6 +412,41 @@ services:
     labels:
       webshop.course: "streaming-engineering"
       webshop.role: "Publishes fixture clickstream events to Kafka"
+
+  lab-bootstrap:
+    build:
+      context: ./webshop-lab/runner
+    container_name: webshop-lab-bootstrap
+    command: python /lab/runner/scripts/bootstrap_lab.py
+    environment:
+      DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      API_URL: http://api:8000
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      CHROMA_URL: http://chroma:8000
+      MINIO_ENDPOINT: http://minio:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+    volumes:
+      - ./webshop-lab:/lab
+      - ./webshop-pro/fixtures:/fixtures:ro
+      - lab-output:/output
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api:
+        condition: service_started
+      minio:
+        condition: service_healthy
+      chroma:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    labels:
+      webshop.course: "all"
+      webshop.role: "Predefined data seed, Chroma policy docs, MLflow demo run"
 
 volumes:
   postgres-data:
