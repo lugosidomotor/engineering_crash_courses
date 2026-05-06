@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webshop-api
+  labels:
+    app: webshop-api
+    course: aiops-mlops
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webshop-api
+  template:
+    metadata:
+      labels:
+        app: webshop-api
+    spec:
+      containers:
+        - name: api
+          image: webshop-fastapi:local
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: webshop-db
+                  key: database-url
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webshop-api
+spec:
+  selector:
+    app: webshop-api
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP

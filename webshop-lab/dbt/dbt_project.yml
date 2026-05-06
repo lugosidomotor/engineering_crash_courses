@@ -1,0 +1,19 @@
+name: webshop_pro
+version: "1.0.0"
+config-version: 2
+
+profile: webshop_pro
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  webshop_pro:
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table

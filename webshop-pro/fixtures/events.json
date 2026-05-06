@@ -1,0 +1,10 @@
+[
+  {"event_id":"E-9001","session_id":"S-441","customer_id":"C-1842","event_type":"product_view","sku":"WP-LAP-14","ts":"2026-05-06T08:10:15Z"},
+  {"event_id":"E-9002","session_id":"S-441","customer_id":"C-1842","event_type":"add_to_cart","sku":"WP-LAP-14","ts":"2026-05-06T08:12:08Z"},
+  {"event_id":"E-9003","session_id":"S-441","customer_id":"C-1842","event_type":"checkout_started","sku":"WP-LAP-14","ts":"2026-05-06T08:14:44Z"},
+  {"event_id":"E-9004","session_id":"S-442","customer_id":"C-1721","event_type":"product_view","sku":"WP-KBD-MX","ts":"2026-05-06T08:15:29Z"},
+  {"event_id":"E-9005","session_id":"S-442","customer_id":"C-1721","event_type":"add_to_cart","sku":"WP-KBD-MX","ts":"2026-05-06T08:16:10Z"},
+  {"event_id":"E-9006","session_id":"S-443","customer_id":"C-2034","event_type":"search","sku":"WP-MON-32","ts":"2026-05-06T08:20:02Z"},
+  {"event_id":"E-9007","session_id":"S-443","customer_id":"C-2034","event_type":"product_view","sku":"WP-MON-32","ts":"2026-05-06T08:21:11Z"},
+  {"event_id":"E-9008","session_id":"S-444","customer_id":"C-2099","event_type":"support_question","sku":"WP-CAM-4K","ts":"2026-05-06T08:42:33Z"}
+]

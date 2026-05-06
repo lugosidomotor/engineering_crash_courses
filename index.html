@@ -256,6 +256,29 @@ button{font-family:inherit}
 /* ── WebShop Pro ── */
 .platform-section{background:linear-gradient(135deg,rgba(22,27,34,.9),rgba(13,17,23,.95));border:1px solid rgba(48,54,61,.6);border-radius:16px;padding:40px;margin:40px auto;max-width:1200px}
 .platform-section h2{font-size:1.6rem;margin-bottom:8px}
+.platform-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.82fr);gap:28px;align-items:center;margin-bottom:28px}
+.platform-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.platform-lab-strip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;margin:20px 0 28px;padding:16px;border:1px solid rgba(63,185,80,.24);border-radius:14px;background:linear-gradient(135deg,rgba(63,185,80,.08),rgba(88,166,255,.07))}
+.platform-lab-strip strong{display:block;margin-bottom:4px;color:#e6edf3}
+.platform-lab-strip code{display:inline-block;color:#3fb950;font-family:'JetBrains Mono',monospace;font-size:.78rem;word-break:break-word}
+.platform-lab-strip p{margin:0;color:#8b949e;font-size:.84rem}
+.platform-shot{margin:0;border:1px solid rgba(48,54,61,.6);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.03)}
+.platform-shot img{width:100%;aspect-ratio:16/10;object-fit:cover}
+.platform-shot figcaption{padding:10px 14px;color:#8b949e;font-size:.78rem}
+.platform-story-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0}
+.platform-story-grid article{background:rgba(255,255,255,.035);border:1px solid rgba(48,54,61,.5);border-radius:12px;padding:16px}
+.platform-story-grid span{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(88,166,255,.14);color:#58a6ff;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+.platform-story-grid h3{font-size:.96rem;margin-bottom:6px}
+.platform-story-grid p{font-size:.8rem;color:#8b949e;line-height:1.55}
+.platform-course-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:26px}
+.platform-course-card{background:rgba(255,255,255,.035);border:1px solid rgba(48,54,61,.5);border-radius:12px;padding:16px}
+.platform-course-card h3{font-size:.92rem;margin-bottom:8px;color:#e6edf3}
+.platform-course-card p{font-size:.78rem;color:#8b949e;line-height:1.5;margin-bottom:12px}
+.platform-course-card .tools,.platform-course-card .services{display:flex;flex-wrap:wrap;gap:6px}
+.platform-course-card .services{margin-top:8px}
+.platform-course-card .tools span,.platform-course-card .services span{font-size:.68rem;font-family:'JetBrains Mono',monospace;border-radius:999px;padding:3px 8px}
+.platform-course-card .tools span{color:#58a6ff;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.22)}
+.platform-course-card .services span{color:#3fb950;background:rgba(63,185,80,.09);border:1px solid rgba(63,185,80,.22)}
 .platform-diagram{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:24px 0}
 .platform-item{background:rgba(255,255,255,.03);border:1px solid rgba(48,54,61,.5);border-radius:10px;padding:16px;text-align:center;transition:all .2s;position:relative}
 .platform-item:hover{border-color:rgba(88,166,255,.35);transform:translateY(-2px)}
@@ -382,6 +405,9 @@ button{font-family:inherit}
   .section h2{font-size:1.25rem;word-break:break-word}
   .platform-section{padding:24px 16px;margin:24px 16px}
   .platform-section h2{font-size:1.3rem}
+  .platform-hero{grid-template-columns:1fr}
+  .platform-lab-strip{grid-template-columns:1fr}
+  .platform-story-grid{grid-template-columns:1fr}
   .course-grid{grid-template-columns:1fr;gap:16px}
   .paths-container{grid-template-columns:1fr;gap:14px}
   .controls{flex-direction:column;align-items:stretch;gap:10px}
@@ -666,87 +692,75 @@ button{font-family:inherit}
 
 <!-- WebShop Pro Platform -->
 <section class="platform-section" id="platform">
-  <div class="section-label">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-    Közös esettanulmány
+  <div class="platform-hero">
+    <div>
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Közös projektalap
+      </div>
+      <h2>WebShop Pro Platform</h2>
+      <p class="section-desc">A kurzusok egy közös dummy webshopra épülnek. Ugyanazokkal a rendelésekkel, termékekkel és clickstream eseményekkel dolgozol SQL-ben, Pythonban, Sparkban, Delta Lake-ben, dbt-ben, RAG-ben és MLOps-ban is.</p>
+      <div class="platform-actions">
+        <a href="./webshop-pro/" class="btn btn-primary">WebShop demo megnyitása</a>
+        <a href="./webshop-lab/" class="btn btn-secondary">Docker lab térkép</a>
+        <a href="./webshop-pro/project-map.json" class="btn btn-secondary" target="_blank" rel="noopener">Platform map JSON</a>
+      </div>
+    </div>
+    <figure class="platform-shot">
+      <img src="./assets/images/webshop-pro-dashboard.png" alt="WebShop Pro demo dashboard screenshot">
+      <figcaption>Futtatható dummy webshop dashboard, amelyből a kurzusok adatai indulnak.</figcaption>
+    </figure>
   </div>
-  <h2>🛒 WebShop Pro Platform</h2>
-  <p class="section-desc">A kurzusok nem elszigetelt tutorialok — egy közös webshop esettanulmány köré épülnek. Minden kurzus más-más réteget épít fel a platformon belül, így a tudás fokozatosan integrálódik.</p>
+
+  <div class="platform-lab-strip">
+    <div>
+      <strong>Most már egy teljes lokális stack is tartozik hozzá.</strong>
+      <p>Dummy webshop + Postgres + MinIO + Kafka + Spark + Airflow + dbt + MLflow + FastAPI + Chroma + Streamlit + Prometheus + Grafana + Unity Catalog OSS.</p>
+    </div>
+    <code>docker compose up -d --build</code>
+  </div>
+
+  <div class="platform-story-grid">
+    <article>
+      <span>1</span>
+      <h3>Forrásrendszer</h3>
+      <p>Termékkatalógus, rendelések és clickstream események JSON fixture-ökben. Ezekből indul az SQL, Python és Docker alapozás.</p>
+    </article>
+    <article>
+      <span>2</span>
+      <h3>Lakehouse</h3>
+      <p>Bronze/Silver/Gold rétegek Delta Lake-kel és Sparkkal. Itt tanulod meg a tisztítást, joinokat, time travelt és optimalizálást.</p>
+    </article>
+    <article>
+      <span>3</span>
+      <h3>Analytics</h3>
+      <p>dbt martok készülnek napi bevételhez, termékteljesítményhez és customer lifetime value riportokhoz.</p>
+    </article>
+    <article>
+      <span>4</span>
+      <h3>AI és Ops</h3>
+      <p>RAG ügyfélszolgálat, churn modell, MLflow tracking, FastAPI serving és Grafana monitoring ugyanarra a webshopra.</p>
+    </article>
+  </div>
 
   <div class="flow-diagram">
-    <div class="flow-diagram-title">Adatfolyam: Források → Lakehouse → AI alkalmazás</div>
+    <div class="flow-diagram-title">Adatfolyam: source → bronze → silver → gold → AI → ops</div>
     <div class="flow-chain">
-      <div class="flow-node">📥 Kafka / CDC</div>
+      <div class="flow-node">orders / events</div>
       <span class="flow-arrow">→</span>
-      <div class="flow-node bronze">🥉 Bronze<br><small>nyers</small></div>
+      <div class="flow-node bronze">Bronze<br><small>nyers ingest</small></div>
       <span class="flow-arrow">→</span>
-      <div class="flow-node silver">🥈 Silver<br><small>tisztított</small></div>
+      <div class="flow-node silver">Silver<br><small>tisztított</small></div>
       <span class="flow-arrow">→</span>
-      <div class="flow-node gold">🥇 Gold<br><small>KPI / mart</small></div>
+      <div class="flow-node gold">Gold<br><small>KPI / mart</small></div>
       <span class="flow-arrow">→</span>
-      <div class="flow-node">📊 BI / dbt</div>
+      <div class="flow-node ai">RAG + churn</div>
       <span class="flow-arrow">→</span>
-      <div class="flow-node ai">🤖 RAG + MLOps</div>
+      <div class="flow-node">monitoring</div>
     </div>
   </div>
 
-  <div class="platform-diagram">
-    <div class="platform-item">
-      <div class="pi-icon">🗃️</div>
-      <h4>Delta Table</h4>
-      <p>Bronze/Silver/Gold lakehouse rétegek</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">⚡</div>
-      <h4>Apache Spark</h4>
-      <p>Nagy volumenű ETL, joinok, streaming</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">📊</div>
-      <h4>Open Table Formats</h4>
-      <p>Delta vs Iceberg vs Hudi összehasonlítás</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">🌊</div>
-      <h4>Streaming</h4>
-      <p>Real-time Kafka clickstream pipeline</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">🧠</div>
-      <h4>AI Data Engineer</h4>
-      <p>Feature store, data quality, lineage</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">💬</div>
-      <h4>AI Engineering</h4>
-      <p>RAG ügyfélszolgálati chatbot</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">🔍</div>
-      <h4>RAG Evaluation</h4>
-      <p>Hallucination detection, eval pipeline</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">🚀</div>
-      <h4>AIOps & MLOps</h4>
-      <p>Churn modell deployment, monitoring</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">☁️</div>
-      <h4>Databricks</h4>
-      <p>Managed lakehouse workflow</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">🔄</div>
-      <h4>Airflow</h4>
-      <p>Ütemezett pipeline-ok</p>
-    </div>
-    <div class="platform-item">
-      <div class="pi-icon">📐</div>
-      <h4>dbt</h4>
-      <p>Analytics layer és marts</p>
-    </div>
-  </div>
+  <div class="platform-course-map" id="platform-course-map" aria-label="WebShop Pro kurzus kapcsolatok"></div>
 </section>
 
 <!-- Karrier / Következő lépések -->
@@ -1072,6 +1086,7 @@ button{font-family:inherit}
   </div>
 </footer>
 
+<script src="./assets/webshop-case-study.js?v=webshop-pro"></script>
 <script src="./assets/courses-detail.js"></script>
 <script>
 // Course data (embedded)
@@ -1436,6 +1451,25 @@ function renderStack(){
   }).join('');
 }
 
+function renderPlatformCourseMap(){
+  const grid = document.getElementById('platform-course-map');
+  const caseStudy = window.WEBSHOP_CASE_STUDY;
+  if(!grid || !caseStudy || !caseStudy.courses) return;
+  grid.innerHTML = COURSES.map(course => {
+    const project = caseStudy.courses[course.slug];
+    if(!project) return '';
+    const tools = (project.tools || []).slice(0, 4).map(t => `<span>${t}</span>`).join('');
+    const services = (project.labServices || []).slice(0, 5).map(s => `<span>${s}</span>`).join('');
+    return `
+      <article class="platform-course-card">
+        <h3>${course.title}</h3>
+        <p>${project.role}</p>
+        <div class="tools">${tools}</div>
+        <div class="services">${services}</div>
+      </article>`;
+  }).join('');
+}
+
 // ── Path progress (on load, update path-steps marks) ──
 function renderPathProgress(){
   document.querySelectorAll('.path-steps li[data-slug]').forEach(li => {
@@ -1646,6 +1680,7 @@ document.querySelectorAll('#header-nav a').forEach(a => {
 document.addEventListener('DOMContentLoaded', () => {
   renderCourses();
   renderStack();
+  renderPlatformCourseMap();
   renderPathProgress();
   renderMyProgress();
   // Update stats

@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebShop Pro demo | Engineering Crash Courses</title>
+<meta name="description" content="Futtathato dummy webshop esettanulmany a Data es AI Engineering kurzusokhoz.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='64' height='64' rx='16' fill='%230d1117'/%3E%3Cpath d='M16 20h32l-4 24H20z' fill='%2358a6ff'/%3E%3Ccircle cx='24' cy='48' r='3' fill='%23fff'/%3E%3Ccircle cx='42' cy='48' r='3' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css?v=webshop-pro">
+</head>
+<body>
+<header class="topbar">
+  <a class="back-link" href="../index.html">Vissza a kurzusokhoz</a>
+  <div class="brand">
+    <span class="brand-mark">WP</span>
+    <div>
+      <strong>WebShop Pro</strong>
+      <span>dummy commerce + data platform</span>
+    </div>
+  </div>
+  <div class="status-pill" id="api-status"><span></span> demo fut</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <div class="kicker"><span></span> kozos projektalap</div>
+      <h1>Egy webshop, amire az osszes Data es AI kurzus raepul.</h1>
+      <p>A demo ugyanazokat az adatokat mutatja, amelyeket a kurzusokban feldolgozol: termekkatalogus, rendelesek, clickstream, lakehouse retegek, RAG ugyfelszolgalat, churn scoring es monitoring.</p>
+      <div class="hero-actions">
+        <a href="#dashboard" class="button primary">Dashboard megnyitasa</a>
+        <a href="#stack" class="button">Tool stack</a>
+        <a href="../webshop-lab/" class="button">Docker lab térkép</a>
+      </div>
+    </div>
+    <aside class="terminal-card" aria-label="Lokalis futtatasi parancsok">
+      <div class="terminal-top">
+        <span></span><span></span><span></span>
+      </div>
+      <pre><code>docker compose up -d --build
+open http://localhost:8010/
+open http://localhost:8000/docs
+
+sources -> bronze -> silver -> gold -> ai -> ops</code></pre>
+    </aside>
+  </section>
+
+  <section class="metrics" id="dashboard" aria-label="Webshop KPI">
+    <article>
+      <span>Mai bevetel</span>
+      <strong id="revenue">0 Ft</strong>
+      <small>orders.json alapjan</small>
+    </article>
+    <article>
+      <span>Konverzio</span>
+      <strong id="conversion">0%</strong>
+      <small>checkout / session</small>
+    </article>
+    <article>
+      <span>Atlagos kosar</span>
+      <strong id="aov">0 Ft</strong>
+      <small>paid rendelesek</small>
+    </article>
+    <article>
+      <span>AI ticket</span>
+      <strong id="tickets">0</strong>
+      <small>support event</small>
+    </article>
+  </section>
+
+  <section class="layout">
+    <article class="panel wide">
+      <div class="panel-head">
+        <div>
+          <span class="panel-kicker">gold mart</span>
+          <h2>Termek teljesitmeny</h2>
+        </div>
+        <button class="ghost-button" id="simulate-order">Uj rendeles</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Termek</th>
+              <th>Kategoria</th>
+              <th>Keszlet</th>
+              <th>Bevetel</th>
+              <th>Margin</th>
+            </tr>
+          </thead>
+          <tbody id="product-table"></tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="panel">
+      <span class="panel-kicker">streaming</span>
+      <h2>Clickstream</h2>
+      <div class="event-feed" id="event-feed"></div>
+    </article>
+
+    <article class="panel">
+      <span class="panel-kicker">ai engineering</span>
+      <h2>Support RAG</h2>
+      <div class="chat">
+        <div class="msg user">Mikor erkezik meg a monitor?</div>
+        <div class="msg bot">A rendelese fizetett statuszu. A varhato szallitas 2 munkanap, a valasz a rendelestabla es a szallitasi szabalyzat alapjan keszult.</div>
+      </div>
+    </article>
+  </section>
+
+  <section class="pipeline panel" aria-label="Adatplatform folyamat">
+    <span class="panel-kicker">platform blueprint</span>
+    <h2>Ugyanez lesz kurzusokban is kodolva</h2>
+    <div class="pipeline-track">
+      <div><strong>Sources</strong><span>orders, events, catalog</span></div>
+      <div><strong>Bronze</strong><span>raw append-only</span></div>
+      <div><strong>Silver</strong><span>clean + quality</span></div>
+      <div><strong>Gold</strong><span>KPI, marts, features</span></div>
+      <div><strong>AI</strong><span>RAG + churn</span></div>
+      <div><strong>Ops</strong><span>Airflow, MLflow, Grafana</span></div>
+    </div>
+  </section>
+
+  <section class="panel stack-panel" id="stack">
+    <span class="panel-kicker">course tool matrix</span>
+    <h2>Az osszes kurzusban szereplo tool helye</h2>
+    <div class="tool-grid" id="tool-grid"></div>
+  </section>
+</main>
+
+<script src="./app.js"></script>
+</body>
+</html>

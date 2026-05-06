@@ -1,0 +1,12 @@
+webshop_pro:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: webshop
+      password: webshop
+      port: 5432
+      dbname: webshop
+      schema: analytics
+      threads: 4

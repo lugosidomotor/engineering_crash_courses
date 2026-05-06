@@ -1,0 +1,42 @@
+{
+  "purpose": "WebShop Pro lokalis lab: minden kurzus ugyanarra a futtathato dummy webshop platformra hivatkozik.",
+  "start_command": "docker compose up -d --build",
+  "core_urls": [
+    {"name": "Kurzussite", "url": "http://localhost:8020/"},
+    {"name": "Dummy webshop", "url": "http://localhost:8010/"},
+    {"name": "FastAPI docs", "url": "http://localhost:8000/docs"},
+    {"name": "Airflow", "url": "http://localhost:8088/", "login": "admin / admin"},
+    {"name": "Spark master", "url": "http://localhost:8090/"},
+    {"name": "dbt docs", "url": "http://localhost:8092/"},
+    {"name": "MinIO console", "url": "http://localhost:9001/", "login": "minioadmin / minioadmin"},
+    {"name": "MLflow", "url": "http://localhost:5000/"},
+    {"name": "Streamlit AI support", "url": "http://localhost:8501/"},
+    {"name": "ChromaDB API", "url": "http://localhost:8001/api/v1/heartbeat"},
+    {"name": "Prometheus", "url": "http://localhost:9090/"},
+    {"name": "Grafana", "url": "http://localhost:3000/", "login": "admin / admin"},
+    {"name": "Unity Catalog OSS", "url": "http://localhost:8089/"},
+    {"name": "Databricks local notebook analogue", "url": "http://localhost:8888/"}
+  ],
+  "course_services": {
+    "sql-data-modeling": ["postgres"],
+    "python-data-engineering": ["lab-runner", "postgres"],
+    "docker-local-data-platform": ["course-site", "webshop", "postgres", "minio", "prometheus", "grafana"],
+    "delta-table-crash-course": ["minio", "spark-master", "lab-runner"],
+    "open-table-formats": ["minio", "unity-catalog", "lab-runner"],
+    "spark-crash-course": ["spark-master", "spark-worker", "databricks-local"],
+    "airflow-orchestration": ["airflow"],
+    "dbt-analytics-engineering": ["dbt", "postgres"],
+    "databricks-lakehouse": ["databricks-local", "unity-catalog", "spark-master", "mlflow"],
+    "streaming-engineering": ["kafka", "event-producer", "spark-master"],
+    "ai-data-engineer": ["lab-runner", "kafka", "dbt", "postgres"],
+    "ai-engineering": ["chroma", "streamlit", "api"],
+    "rag-evaluation-ai-safety": ["lab-runner", "chroma", "api"],
+    "llmops-genai-production": ["mlflow", "grafana", "prometheus", "api"],
+    "aiops-mlops": ["mlflow", "api", "prometheus", "grafana"]
+  },
+  "cloud_or_runtime_notes": {
+    "Databricks": "Lokalisan JupyterLab + Spark + MLflow + Unity Catalog OSS adja ugyanazt a tanulasi mental modellt.",
+    "Kubernetes": "A compose nem indit nested Kubernetes clustert; a deployment manifest a webshop-lab/kubernetes mappaban van.",
+    "OpenAI": "Az OpenAI API kulcs opcionális. A lab alapbol offline demo valaszt ad, hogy kulcs nelkul is tanulhato legyen."
+  }
+}

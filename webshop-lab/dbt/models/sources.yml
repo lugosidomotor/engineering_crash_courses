@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: catalog
+        description: WebShop Pro product catalog.
+      - name: orders
+        description: WebShop Pro order source table.
+      - name: events
+        description: Clickstream and support events.

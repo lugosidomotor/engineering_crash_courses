@@ -1,0 +1,408 @@
+name: webshop-pro-lab
+
+services:
+  course-site:
+    image: nginx:1.27-alpine
+    container_name: webshop-course-site
+    ports:
+      - "8020:80"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+    labels:
+      webshop.course: "all"
+      webshop.role: "Static course site"
+
+  webshop:
+    image: nginx:1.27-alpine
+    container_name: webshop-pro-demo
+    ports:
+      - "8010:80"
+    volumes:
+      - ./webshop-pro:/usr/share/nginx/html:ro
+      - ./webshop-lab:/usr/share/nginx/html/webshop-lab:ro
+    depends_on:
+      api:
+        condition: service_started
+    labels:
+      webshop.course: "project"
+      webshop.role: "Dummy webshop frontend"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: webshop-postgres
+    environment:
+      POSTGRES_DB: webshop
+      POSTGRES_USER: webshop
+      POSTGRES_PASSWORD: webshop
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./webshop-lab/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webshop -d webshop"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    labels:
+      webshop.course: "sql-data-modeling,docker-local-data-platform"
+      webshop.role: "Relational source and serving database"
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: webshop-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    labels:
+      webshop.course: "docker-local-data-platform,delta-table-crash-course,open-table-formats"
+      webshop.role: "S3-compatible object storage for bronze/silver/gold layers"
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    container_name: webshop-minio-init
+    depends_on:
+      minio:
+        condition: service_started
+    volumes:
+      - ./webshop-pro/fixtures:/fixtures:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 2; done;
+      mc mb -p local/webshop-bronze local/webshop-silver local/webshop-gold local/webshop-artifacts || true;
+      mc cp /fixtures/*.json local/webshop-bronze/source/ || true;
+      echo 'MinIO buckets created and webshop fixtures copied.'"
+
+  kafka:
+    image: apache/kafka:4.0.2
+    container_name: webshop-kafka
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_NODE_ID: "1"
+      KAFKA_CFG_PROCESS_ROLES: "broker,controller"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/apache/kafka
+    labels:
+      webshop.course: "streaming-engineering,ai-data-engineer"
+      webshop.role: "Clickstream and checkout event bus"
+
+  kafka-init:
+    image: apache/kafka:4.0.2
+    container_name: webshop-kafka-init
+    depends_on:
+      kafka:
+        condition: service_started
+    entrypoint: ["/bin/bash", "-lc"]
+    command: >
+      "for i in {1..30}; do /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list && break || sleep 2; done;
+      /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.events --partitions 3 --replication-factor 1;
+      /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.orders --partitions 3 --replication-factor 1;
+      /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.support --partitions 1 --replication-factor 1"
+
+  spark-master:
+    image: apache/spark:4.0.2
+    container_name: webshop-spark-master
+    environment:
+      SPARK_MODE: master
+      SPARK_RPC_AUTHENTICATION_ENABLED: "no"
+      SPARK_RPC_ENCRYPTION_ENABLED: "no"
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
+      SPARK_SSL_ENABLED: "no"
+    ports:
+      - "7077:7077"
+      - "8090:8080"
+    volumes:
+      - ./webshop-lab:/opt/webshop-lab
+      - ./webshop-pro/fixtures:/opt/webshop-fixtures:ro
+      - lab-output:/opt/webshop-output
+    labels:
+      webshop.course: "spark-crash-course,delta-table-crash-course,streaming-engineering,ai-data-engineer"
+      webshop.role: "Spark master for ETL and feature jobs"
+
+  spark-worker:
+    image: apache/spark:3.5.1
+    container_name: webshop-spark-worker
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 1G
+      SPARK_WORKER_CORES: 1
+      SPARK_RPC_AUTHENTICATION_ENABLED: "no"
+      SPARK_RPC_ENCRYPTION_ENABLED: "no"
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
+      SPARK_SSL_ENABLED: "no"
+    ports:
+      - "8091:8081"
+    volumes:
+      - ./webshop-lab:/opt/webshop-lab
+      - lab-output:/opt/webshop-output
+    depends_on:
+      spark-master:
+        condition: service_started
+
+  airflow:
+    image: apache/airflow:2.10.3-python3.11
+    container_name: webshop-airflow
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+      AIRFLOW_HOME: /opt/airflow
+    ports:
+      - "8088:8080"
+    volumes:
+      - ./webshop-lab/airflow/dags:/opt/airflow/dags:ro
+      - ./webshop-pro/fixtures:/opt/webshop-fixtures:ro
+      - lab-output:/opt/webshop-output
+    entrypoint: ["/bin/bash", "-lc"]
+    command: >
+      "airflow db migrate &&
+      airflow users create --username admin --password admin --firstname WebShop --lastname Admin --role Admin --email admin@example.com || true &&
+      airflow scheduler &
+      exec airflow webserver"
+    labels:
+      webshop.course: "airflow-orchestration"
+      webshop.role: "Daily webshop DAG orchestration"
+
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.9.latest
+    container_name: webshop-dbt
+    working_dir: /usr/app
+    entrypoint: ["/bin/bash", "-lc"]
+    command: >
+      "dbt debug --profiles-dir /usr/app/profiles &&
+      dbt run --profiles-dir /usr/app/profiles &&
+      dbt test --profiles-dir /usr/app/profiles &&
+      dbt docs generate --profiles-dir /usr/app/profiles &&
+      dbt docs serve --profiles-dir /usr/app/profiles --host 0.0.0.0 --port 8080"
+    ports:
+      - "8092:8080"
+    volumes:
+      - ./webshop-lab/dbt:/usr/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      webshop.course: "dbt-analytics-engineering,ai-data-engineer"
+      webshop.role: "Analytics engineering models and docs"
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.20.3
+    container_name: webshop-mlflow
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+      --port 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-data:/mlflow
+    labels:
+      webshop.course: "aiops-mlops,llmops-genai-production,databricks-lakehouse"
+      webshop.role: "Experiment tracking, model registry and prompt/version metadata"
+
+  api:
+    build:
+      context: ./webshop-lab/api
+    container_name: webshop-fastapi
+    environment:
+      DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      CHROMA_URL: http://chroma:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    labels:
+      webshop.course: "aiops-mlops,llmops-genai-production"
+      webshop.role: "FastAPI serving layer for webshop app and churn prediction"
+
+  chroma:
+    image: chromadb/chroma:0.5.23
+    container_name: webshop-chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    labels:
+      webshop.course: "ai-engineering,rag-evaluation-ai-safety"
+      webshop.role: "Vector database for support-policy retrieval"
+
+  streamlit:
+    build:
+      context: ./webshop-lab/streamlit
+    container_name: webshop-streamlit
+    environment:
+      API_URL: http://api:8000
+      CHROMA_URL: http://chroma:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_started
+      chroma:
+        condition: service_started
+    labels:
+      webshop.course: "ai-engineering"
+      webshop.role: "RAG/support demo UI"
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: webshop-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./webshop-lab/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      api:
+        condition: service_started
+    labels:
+      webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production"
+      webshop.role: "Metrics collection"
+
+  grafana:
+    image: grafana/grafana:11.2.2
+    container_name: webshop-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_DEFAULT_THEME: dark
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./webshop-lab/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./webshop-lab/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_started
+    labels:
+      webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production"
+      webshop.role: "Dashboards for business, API and model health"
+
+  unity-catalog:
+    image: unitycatalog/unitycatalog:main
+    container_name: webshop-unity-catalog
+    ports:
+      - "8089:8080"
+    volumes:
+      - unity-catalog-data:/opt/unitycatalog/etc/data
+    labels:
+      webshop.course: "databricks-lakehouse,open-table-formats"
+      webshop.role: "OSS Unity Catalog server for local governance practice"
+
+  databricks-local:
+    image: quay.io/jupyter/pyspark-notebook:spark-3.5.0
+    container_name: webshop-databricks-local
+    command: start-notebook.py --ServerApp.token='' --ServerApp.password='' --NotebookApp.token='' --NotebookApp.password=''
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./webshop-lab:/home/jovyan/webshop-lab
+      - ./webshop-pro/fixtures:/home/jovyan/webshop-fixtures:ro
+      - lab-output:/home/jovyan/webshop-output
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      SPARK_MASTER: spark://spark-master:7077
+    depends_on:
+      spark-master:
+        condition: service_started
+      mlflow:
+        condition: service_started
+      unity-catalog:
+        condition: service_started
+    labels:
+      webshop.course: "databricks-lakehouse,spark-crash-course"
+      webshop.role: "Local notebook workspace that mirrors Databricks learning flows"
+
+  lab-runner:
+    build:
+      context: ./webshop-lab/runner
+    container_name: webshop-lab-runner
+    command: tail -f /dev/null
+    environment:
+      DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      API_URL: http://api:8000
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      CHROMA_URL: http://chroma:8000
+      MINIO_ENDPOINT: http://minio:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+    volumes:
+      - ./webshop-lab:/lab
+      - ./webshop-pro/fixtures:/fixtures:ro
+      - lab-output:/output
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      api:
+        condition: service_started
+      minio:
+        condition: service_started
+      chroma:
+        condition: service_started
+      mlflow:
+        condition: service_started
+    labels:
+      webshop.course: "python-data-engineering,delta-table-crash-course,open-table-formats,ai-data-engineer,rag-evaluation-ai-safety"
+      webshop.role: "Python/pandas/Parquet/Delta/Iceberg/GE/Feast/RAGAS playground"
+
+  event-producer:
+    build:
+      context: ./webshop-lab/runner
+    container_name: webshop-event-producer
+    command: python /lab/runner/scripts/produce_events.py
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    volumes:
+      - ./webshop-lab:/lab
+      - ./webshop-pro/fixtures:/fixtures:ro
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    labels:
+      webshop.course: "streaming-engineering"
+      webshop.role: "Publishes fixture clickstream events to Kafka"
+
+volumes:
+  postgres-data:
+  minio-data:
+  kafka-data:
+  lab-output:
+  mlflow-data:
+  chroma-data:
+  prometheus-data:
+  grafana-data:
+  unity-catalog-data:

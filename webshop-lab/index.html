@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebShop Pro Docker Lab</title>
+<style>
+:root{--bg:#0d1117;--panel:#111827;--line:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 10% 0%,rgba(88,166,255,.16),transparent 34rem),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6}
+main{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:56px 0 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:28px;align-items:start}
+.card{background:rgba(17,24,39,.82);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.kicker{color:var(--accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;font-size:.76rem;letter-spacing:.1em}
+h1{font-size:clamp(2.3rem,6vw,4.8rem);line-height:1.02;margin:.3em 0;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;color:transparent}
+h2{margin:0 0 12px}
+p{color:var(--muted);max-width:760px}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{margin:0;background:#05080d;border:1px solid var(--line);border-radius:14px;padding:16px;overflow:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:24px}
+.service{display:flex;flex-direction:column;gap:8px}
+.service strong{font-size:1rem}
+.service span{color:var(--muted);font-size:.9rem}
+.pill{display:inline-flex;width:max-content;padding:3px 9px;border-radius:999px;background:rgba(63,185,80,.12);color:var(--green);font-size:.72rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.section{margin-top:34px}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-size:.78rem;text-transform:uppercase}
+@media(max-width:760px){.hero{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div>
+      <div class="kicker">WebShop Pro lab</div>
+      <h1>Egy compose stack az összes kurzushoz.</h1>
+      <p>A dummy webshop, az adatplatform, az AI/RAG réteg és a monitoring ugyanabban a lokális stackben indul. Így minden kurzusnál vissza tudsz menni ugyanarra a konkrét projektre.</p>
+    </div>
+    <div class="card">
+      <h2>Indítás</h2>
+      <pre><code>docker compose up -d --build
+docker compose ps</code></pre>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Fontos URL-ek</h2>
+    <div class="grid">
+      <a class="service" href="http://localhost:8020/"><strong>Kurzussite</strong><span>Statikus kurzusoldalak</span><em class="pill">course-site</em></a>
+      <a class="service" href="http://localhost:8010/"><strong>Dummy webshop</strong><span>WebShop Pro frontend</span><em class="pill">webshop</em></a>
+      <a class="service" href="http://localhost:8000/docs"><strong>FastAPI</strong><span>Serving API + churn endpoint</span><em class="pill">api</em></a>
+      <a class="service" href="http://localhost:8088/"><strong>Airflow</strong><span>admin / admin</span><em class="pill">airflow</em></a>
+      <a class="service" href="http://localhost:8090/"><strong>Spark</strong><span>Master UI</span><em class="pill">spark-master</em></a>
+      <a class="service" href="http://localhost:8092/"><strong>dbt docs</strong><span>Lineage és modellek</span><em class="pill">dbt</em></a>
+      <a class="service" href="http://localhost:9001/"><strong>MinIO</strong><span>minioadmin / minioadmin</span><em class="pill">minio</em></a>
+      <a class="service" href="http://localhost:5000/"><strong>MLflow</strong><span>Experiment tracking</span><em class="pill">mlflow</em></a>
+      <a class="service" href="http://localhost:8501/"><strong>Streamlit</strong><span>AI support UI</span><em class="pill">streamlit</em></a>
+      <a class="service" href="http://localhost:3000/"><strong>Grafana</strong><span>admin / admin</span><em class="pill">grafana</em></a>
+      <a class="service" href="http://localhost:9090/"><strong>Prometheus</strong><span>Metrikák</span><em class="pill">prometheus</em></a>
+      <a class="service" href="http://localhost:8888/"><strong>Notebook workspace</strong><span>Databricks lokális analóg</span><em class="pill">databricks-local</em></a>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Kurzus -> service térkép</h2>
+    <table>
+      <thead><tr><th>Kurzus</th><th>Compose service-ek</th><th>Mit látsz benne?</th></tr></thead>
+      <tbody>
+        <tr><td>SQL</td><td>postgres</td><td>raw és analytics sémák, JOIN-olható webshop táblák</td></tr>
+        <tr><td>Python</td><td>lab-runner</td><td>fixture ingest, Parquet írás, validációs riport</td></tr>
+        <tr><td>Docker</td><td>teljes compose</td><td>egy parancsból reprodukálható lokális platform</td></tr>
+        <tr><td>Spark / Delta / Open formats</td><td>spark-master, spark-worker, minio, unity-catalog</td><td>lakehouse feldolgozás és table format mental model</td></tr>
+        <tr><td>Airflow</td><td>airflow</td><td>webshop_daily_etl DAG</td></tr>
+        <tr><td>dbt</td><td>dbt, postgres</td><td>staging és mart modellek, dbt docs</td></tr>
+        <tr><td>Streaming</td><td>kafka, event-producer</td><td>clickstream topicok</td></tr>
+        <tr><td>AI/RAG</td><td>chroma, streamlit, api</td><td>support asszisztens és vektor DB helye</td></tr>
+        <tr><td>MLOps/LLMOps</td><td>mlflow, api, prometheus, grafana</td><td>model serving, tracking, metrikák és dashboard</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>

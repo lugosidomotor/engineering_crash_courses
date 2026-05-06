@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: stg_catalog
+    columns:
+      - name: sku
+        tests: [not_null, unique]
+      - name: price
+        tests: [not_null]
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests: [not_null, unique]
+      - name: sku
+        tests: [not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              values: ["paid", "refunded", "cancelled"]
+  - name: mart_daily_revenue
+    description: Gold mart for channel-level revenue reporting.
+  - name: mart_product_performance
+    description: Gold mart behind the WebShop Pro dashboard.
+  - name: mart_customer_features
+    description: Minimal customer feature table for AI Data Engineer and MLOps courses.

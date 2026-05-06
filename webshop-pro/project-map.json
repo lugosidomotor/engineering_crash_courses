@@ -1,0 +1,47 @@
+{
+  "name": "WebShop Pro",
+  "purpose": "Kozos oktatasi esettanulmany Data es AI Engineering kurzusokhoz",
+  "business_questions": [
+    "Melyik csatorna hozza a legtobb bevetelt?",
+    "Melyik termeknel fogy el hamar a keszlet?",
+    "Melyik ugyfel valoszinuleg lemorzsolodik?",
+    "Milyen valaszt adjon az AI ugyfelszolgalat a webshop szabalyzata alapjan?"
+  ],
+  "layers": [
+    {"layer": "source", "examples": ["orders.json", "events.json", "catalog.json"]},
+    {"layer": "bronze", "examples": ["nyers rendelesek", "nyers clickstream"]},
+    {"layer": "silver", "examples": ["tisztitott rendeles", "validalt termekkatalogus"]},
+    {"layer": "gold", "examples": ["napi KPI", "ugyfel feature tabla", "termek teljesitmeny"]},
+    {"layer": "ai", "examples": ["RAG support bot", "churn score", "prompt eval"]},
+    {"layer": "ops", "examples": ["Airflow DAG", "MLflow run", "Grafana dashboard"]}
+  ],
+  "docker_lab": {
+    "compose_file": "docker-compose.yml",
+    "start": "docker compose up -d --build",
+    "guide": "webshop-lab/index.html",
+    "services": [
+      {"name": "course-site", "url": "http://localhost:8020/", "course": "all"},
+      {"name": "webshop", "url": "http://localhost:8010/", "course": "project"},
+      {"name": "postgres", "url": "localhost:5432", "course": "sql-data-modeling"},
+      {"name": "minio", "url": "http://localhost:9001/", "course": "docker-local-data-platform"},
+      {"name": "kafka", "url": "localhost:9092", "course": "streaming-engineering"},
+      {"name": "spark-master", "url": "http://localhost:8090/", "course": "spark-crash-course"},
+      {"name": "airflow", "url": "http://localhost:8088/", "course": "airflow-orchestration"},
+      {"name": "dbt", "url": "http://localhost:8092/", "course": "dbt-analytics-engineering"},
+      {"name": "mlflow", "url": "http://localhost:5000/", "course": "aiops-mlops"},
+      {"name": "api", "url": "http://localhost:8000/docs", "course": "aiops-mlops"},
+      {"name": "chroma", "url": "http://localhost:8001/api/v1/heartbeat", "course": "ai-engineering"},
+      {"name": "streamlit", "url": "http://localhost:8501/", "course": "ai-engineering"},
+      {"name": "prometheus", "url": "http://localhost:9090/", "course": "llmops-genai-production"},
+      {"name": "grafana", "url": "http://localhost:3000/", "course": "aiops-mlops"},
+      {"name": "unity-catalog", "url": "http://localhost:8089/", "course": "databricks-lakehouse"},
+      {"name": "databricks-local", "url": "http://localhost:8888/", "course": "databricks-lakehouse"},
+      {"name": "lab-runner", "url": "docker compose exec lab-runner bash", "course": "python-data-engineering"}
+    ]
+  },
+  "notes": [
+    "Databricks lokal labban JupyterLab + Spark + MLflow + Unity Catalog OSS kombinacioval jelenik meg.",
+    "Kuberneteshez compose helyett deployment manifest keszul a webshop-lab/kubernetes mappaban.",
+    "OpenAI kulcs nelkul offline demo valasz fut; kulccsal a kurzusokban lehet valodi API hivast bekotni."
+  ]
+}
