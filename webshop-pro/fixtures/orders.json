@@ -1,0 +1,10 @@
+[
+  {"order_id":"O-10031","customer_id":"C-1842","sku":"WP-LAP-14","qty":1,"gross_amount":429900,"city":"Budapest","channel":"organic","status":"paid","ordered_at":"2026-05-06T08:15:12Z"},
+  {"order_id":"O-10032","customer_id":"C-1721","sku":"WP-KBD-MX","qty":2,"gross_amount":77800,"city":"Szeged","channel":"paid_search","status":"paid","ordered_at":"2026-05-06T08:18:47Z"},
+  {"order_id":"O-10033","customer_id":"C-2034","sku":"WP-MON-32","qty":1,"gross_amount":159900,"city":"Debrecen","channel":"newsletter","status":"paid","ordered_at":"2026-05-06T08:24:03Z"},
+  {"order_id":"O-10034","customer_id":"C-1777","sku":"WP-HUB-C","qty":1,"gross_amount":24900,"city":"Pecs","channel":"organic","status":"refunded","ordered_at":"2026-05-06T08:29:51Z"},
+  {"order_id":"O-10035","customer_id":"C-1660","sku":"WP-NAS-4B","qty":1,"gross_amount":219900,"city":"Gyor","channel":"partner","status":"paid","ordered_at":"2026-05-06T08:37:19Z"},
+  {"order_id":"O-10036","customer_id":"C-2099","sku":"WP-CAM-4K","qty":1,"gross_amount":52900,"city":"Budapest","channel":"organic","status":"paid","ordered_at":"2026-05-06T08:44:02Z"},
+  {"order_id":"O-10037","customer_id":"C-1842","sku":"WP-KBD-MX","qty":1,"gross_amount":38900,"city":"Budapest","channel":"recommendation","status":"paid","ordered_at":"2026-05-06T08:51:26Z"},
+  {"order_id":"O-10038","customer_id":"C-1988","sku":"WP-MON-32","qty":2,"gross_amount":319800,"city":"Miskolc","channel":"paid_social","status":"paid","ordered_at":"2026-05-06T09:02:41Z"}
+]

@@ -50,3 +50,8 @@ todo.md.bak
 
 # ── Claude Code ──
 .claude/
+
+# ── dbt build artifacts ──
+webshop-lab/dbt/target/
+webshop-lab/dbt/run/
+webshop-lab/dbt/logs/

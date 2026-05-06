@@ -347,6 +347,33 @@
     html += '<a class="cip-action" href="https://github.com/lugosidomotor/engineering_crash_courses/blob/main/' + COURSE_SLUG + '/' + nbName + '" target="_blank" rel="noopener"><span>🐙</span> GitHub-on</a>';
     html += '</div>';
 
+    var caseStudy = window.WEBSHOP_CASE_STUDY || null;
+    var project = caseStudy && caseStudy.courses ? caseStudy.courses[COURSE_SLUG] : null;
+    if (project) {
+      html += '<div class="cip-project-panel">';
+      html += '<div class="cip-project-copy">';
+      html += '<div class="cip-block-title">🛒 WebShop Pro projektkapcsolat</div>';
+      html += '<p>' + escape(project.role) + '</p>';
+      html += '<dl>';
+      html += '<dt>Ebben a kurzusban készül</dt><dd>' + escape(project.artifact) + '</dd>';
+      html += '<dt>Miért hasznos a mindennapokban?</dt><dd>' + escape(project.dailyUse) + '</dd>';
+      html += '</dl>';
+      html += '<div class="cip-project-tools">' + (project.tools || []).map(function(t){ return '<span>' + escape(t) + '</span>'; }).join('') + '</div>';
+      if (project.labServices && project.labServices.length) {
+        html += '<div class="cip-lab-services"><strong>Docker lab service-ek:</strong>' + project.labServices.map(function(s){ return '<span>' + escape(s) + '</span>'; }).join('') + '</div>';
+      }
+      if (caseStudy.lab && caseStudy.lab.command) {
+        html += '<div class="cip-lab-command"><code>' + escape(caseStudy.lab.command) + '</code></div>';
+      }
+      html += '<div class="cip-actions cip-project-actions">';
+      html += '<a class="cip-action cip-action-primary" href="../webshop-pro/" target="_blank" rel="noopener">WebShop Pro demo megnyitása</a>';
+      html += '<a class="cip-action" href="../webshop-lab/" target="_blank" rel="noopener">Docker lab térkép</a>';
+      html += '</div>';
+      html += '</div>';
+      html += '<div class="cip-project-shot"><img src="../assets/images/webshop-pro-dashboard.png" alt="WebShop Pro demo dashboard screenshot"></div>';
+      html += '</div>';
+    }
+
     if (details.prerequisites && details.prerequisites.length) {
       html += '<div class="cip-block"><div class="cip-block-title">🎯 Előfeltételek</div><ul class="cip-block-list">';
       details.prerequisites.forEach(function(p){ html += '<li>' + escape(p) + '</li>'; });
@@ -390,6 +417,20 @@
     var html = '<div class="section layer-intro" id="further-learning-section" style="margin-top:80px">';
     html += '<div class="section-number">További</div>';
     html += '<h2>📚 További tanulás és következő lépések</h2>';
+
+    var caseStudy = window.WEBSHOP_CASE_STUDY || null;
+    var project = caseStudy && caseStudy.courses ? caseStudy.courses[COURSE_SLUG] : null;
+    if (project) {
+      html += '<div class="fl-project-recap">';
+      html += '<strong>WebShop Pro-ban ezt a réteget építetted hozzá:</strong>';
+      html += '<p>' + escape(project.artifact) + '</p>';
+      if (project.labServices && project.labServices.length) {
+        html += '<div class="fl-lab-services">' + project.labServices.map(function(s){ return '<span>' + escape(s) + '</span>'; }).join('') + '</div>';
+      }
+      html += '<a href="../webshop-pro/" target="_blank" rel="noopener">Demo megnyitása →</a>';
+      html += '<a href="../webshop-lab/" target="_blank" rel="noopener">Docker lab térkép →</a>';
+      html += '</div>';
+    }
 
     if (details.tagline) {
       html += '<div class="md-cell" style="padding:14px 18px;background:rgba(179,102,255,.06);border-left:3px solid var(--purple);border-radius:8px;margin-bottom:20px;font-style:italic;color:var(--text)"><p style="margin:0">' + escape(details.tagline) + '</p></div>';

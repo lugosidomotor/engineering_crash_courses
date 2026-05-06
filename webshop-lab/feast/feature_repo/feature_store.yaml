@@ -1,0 +1,9 @@
+project: webshop_pro
+registry: /output/feast/registry.db
+provider: local
+offline_store:
+  type: file
+online_store:
+  type: sqlite
+  path: /output/feast/online_store.db
+entity_key_serialization_version: 2

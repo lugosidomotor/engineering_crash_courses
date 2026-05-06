@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
@@ -206,20 +206,17 @@ Console: http://localhost:9001</pre></div></div>
   <h2>Spark konténer <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
   <div class="md-cell"><p>Apache Spark standalone cluster Docker-ben.</p></div><div class="code-cell" id="cell-6"><div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('6')">&#9654; Run</button></div><div class="code-body"><pre># docker-compose.yml - Spark
   spark-master:
-    image: bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=master
+    image: apache/spark:3.5.3-scala2.12-java17-python3-ubuntu
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master", "--port", "7077", "--webui-port", "8080"]
     ports:
       - '8080:8080'
       - '7077:7077'
 
   spark-worker:
-    image: bitnami/spark:3.5
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
+    image: apache/spark:3.5.3-scala2.12-java17-python3-ubuntu
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077", "--cores", "1", "--memory", "1G", "--webui-port", "8081"]
     depends_on:
-      - spark-master</pre></div><div class="output-area" id="out-6"><div class="output-label">Output:</div><pre>$ docker-compose up spark
+      - spark-master</pre></div><div class="output-area" id="out-6"><div class="output-label">Output:</div><pre>$ docker compose up spark-master spark-worker
 Spark Master: running at spark://localhost:7077
 Web UI: http://localhost:8080
 Workers: 1 alive</pre></div></div>
@@ -418,7 +415,8 @@ window.COURSE_CONFIG = {
   toc: [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Docker alapok"}, {"id": "s2", "num": "02", "label": "Dockerfile"}, {"id": "s3", "num": "03", "label": "Docker Compose"}, {"id": "s4", "num": "04", "label": "PostgreSQL"}, {"id": "s5", "num": "05", "label": "MinIO (S3)"}, {"id": "s6", "num": "06", "label": "Spark konténer"}, {"id": "s7", "num": "07", "label": "Airflow"}, {"id": "s8", "num": "08", "label": "MLflow"}, {"id": "s9", "num": "09", "label": "Prometheus + Grafana"}, {"id": "s10", "num": "10", "label": "Networking"}, {"id": "s11", "num": "11", "label": "Volumes"}, {"id": "s12", "num": "12", "label": "Config, secrets"}, {"id": "s13", "num": "13", "label": "Teljes platform"}, {"id": "s14", "num": "14", "label": "Health checks"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}]
 };
 </script>
+<script src="../assets/webshop-case-study.js?v=webshop-pro"></script>
 <script src="../assets/courses-detail.js"></script>
-<script src="../shared/course.js"></script>
+<script src="../shared/course.js?v=webshop-pro"></script>
 </body>
 </html>

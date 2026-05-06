@@ -1,0 +1,47 @@
+{
+  "name": "WebShop Pro",
+  "purpose": "Közös oktatási esettanulmány Data és AI Engineering kurzusokhoz",
+  "business_questions": [
+    "Melyik csatorna hozza a legtöbb bevételt?",
+    "Melyik terméknél fogy el hamar a készlet?",
+    "Melyik ügyfél valószínűleg lemorzsolódik?",
+    "Milyen választ adjon az AI ügyfélszolgálat a webshop szabályzata alapján?"
+  ],
+  "layers": [
+    {"layer": "source", "examples": ["orders.json", "events.json", "catalog.json"]},
+    {"layer": "bronze", "examples": ["nyers rendelések", "nyers clickstream"]},
+    {"layer": "silver", "examples": ["tisztított rendelés", "validált termékkatalógus"]},
+    {"layer": "gold", "examples": ["napi KPI", "ügyfél feature tábla", "termék teljesítmény"]},
+    {"layer": "ai", "examples": ["RAG support bot", "churn score", "prompt eval"]},
+    {"layer": "ops", "examples": ["Airflow DAG", "MLflow run", "Grafana dashboard"]}
+  ],
+  "docker_lab": {
+    "compose_file": "docker-compose.yml",
+    "start": "docker compose up -d --build",
+    "guide": "webshop-lab/index.html",
+    "services": [
+      {"name": "course-site", "url": "http://localhost:8020/", "course": "all", "login": "nincs"},
+      {"name": "webshop", "url": "http://localhost:8010/", "course": "project", "login": "nincs"},
+      {"name": "postgres", "url": "localhost:5432", "course": "sql-data-modeling", "login": "webshop / webshop"},
+      {"name": "minio", "url": "http://localhost:9001/", "course": "docker-local-data-platform", "login": "minioadmin / minioadmin"},
+      {"name": "kafka", "url": "localhost:9092", "course": "streaming-engineering", "login": "nincs"},
+      {"name": "spark-master", "url": "http://localhost:8090/", "course": "spark-crash-course", "login": "nincs"},
+      {"name": "airflow", "url": "http://localhost:8088/", "course": "airflow-orchestration", "login": "admin / admin"},
+      {"name": "dbt", "url": "http://localhost:8092/", "course": "dbt-analytics-engineering", "login": "nincs"},
+      {"name": "mlflow", "url": "http://localhost:5000/", "course": "aiops-mlops", "login": "nincs"},
+      {"name": "api", "url": "http://localhost:8000/docs", "course": "aiops-mlops", "login": "nincs"},
+      {"name": "chroma", "url": "http://localhost:8001/api/v1/heartbeat", "course": "ai-engineering", "login": "nincs"},
+      {"name": "streamlit", "url": "http://localhost:8501/", "course": "ai-engineering", "login": "nincs"},
+      {"name": "prometheus", "url": "http://localhost:9090/", "course": "llmops-genai-production", "login": "nincs"},
+      {"name": "grafana", "url": "http://localhost:3000/", "course": "aiops-mlops", "login": "admin / admin"},
+      {"name": "unity-catalog", "url": "http://localhost:8089/", "course": "databricks-lakehouse", "login": "nincs"},
+      {"name": "databricks-local", "url": "http://localhost:8888/", "course": "databricks-lakehouse", "login": "token nélkül"},
+      {"name": "lab-runner", "url": "docker compose exec lab-runner bash", "course": "python-data-engineering", "login": "nincs"}
+    ]
+  },
+  "notes": [
+    "Databricks lokális labban JupyterLab + Spark + MLflow + Unity Catalog OSS kombinációval jelenik meg.",
+    "Kuberneteshez compose helyett deployment manifest készül a webshop-lab/kubernetes mappában.",
+    "OpenAI kulcs nélkül offline demo válasz fut; kulccsal a kurzusokban lehet valódi API hívást bekötni."
+  ]
+}

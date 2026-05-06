@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebShop Pro Docker Lab</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='64' height='64' rx='16' fill='%230d1117'/%3E%3Cpath d='M14 20h36v24H14z' fill='%2358a6ff'/%3E%3Cpath d='M22 28h20v4H22zm0 9h13v4H22z' fill='white'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#0d1117;--panel:#111827;--panel2:#0f172a;--line:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;--yellow:#ffd166;--red:#ff7b72}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 10% 0%,rgba(88,166,255,.16),transparent 34rem),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6}
+main{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:48px 0 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:28px;align-items:start}
+.card{background:rgba(17,24,39,.86);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.kicker{color:var(--accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;font-size:.76rem;letter-spacing:.1em}
+h1{font-size:clamp(2.1rem,6vw,4.6rem);line-height:1.03;margin:.3em 0;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;color:transparent}
+h2{margin:0 0 12px;font-size:1.28rem}
+h3{margin:0 0 8px;font-size:1rem}
+p{color:var(--muted);max-width:780px}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{margin:0;background:#05080d;border:1px solid var(--line);border-radius:14px;padding:16px;overflow:auto;color:#dbeafe}
+.section{margin-top:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
+.service{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.035)}
+.service strong{font-size:1rem;color:#fff}
+.service span,.service small{color:var(--muted);font-size:.86rem}
+.pill{display:inline-flex;width:max-content;padding:3px 9px;border-radius:999px;background:rgba(63,185,80,.12);color:var(--green);font-size:.72rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.login{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.login code{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:7px;padding:3px 7px;color:#fff;font-size:.74rem}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px}
+.step{border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.035)}
+.step b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(88,166,255,.14);color:var(--accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin-bottom:8px}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-size:.78rem;text-transform:uppercase}
+.warn{border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.07)}
+.ok{color:var(--green)}
+.muted{color:var(--muted)}
+@media(max-width:760px){.hero{grid-template-columns:1fr}main{width:min(100% - 22px,1180px);padding-top:28px}.card{padding:16px}}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div>
+      <div class="kicker">WebShop Pro lab</div>
+      <h1>Egy indítható compose stack az összes kurzushoz.</h1>
+      <p>A dummy webshop, az adatplatform, az AI/RAG réteg és a monitoring ugyanabban a lokális környezetben fut. Így a kurzusok nem különálló példák: ugyanarra a projektre mutatnak vissza.</p>
+    </div>
+    <div class="card">
+      <h2>Gyors indítás</h2>
+      <pre><code>docker compose up -d --build
+docker compose ps</code></pre>
+      <p>Első induláskor az image-ek letöltése miatt 5-10 perc is lehet. Ha valami piros, először nézd meg a logot: <code>docker compose logs -f api</code>.</p>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Indítás lépésről lépésre</h2>
+    <div class="steps">
+      <div class="step"><b>1</b><h3>Docker ellenőrzése</h3><pre><code>docker --version
+docker compose version</code></pre></div>
+      <div class="step"><b>2</b><h3>Stack indítása</h3><pre><code>docker compose up -d --build</code></pre></div>
+      <div class="step"><b>3</b><h3>Állapot nézése</h3><pre><code>docker compose ps
+docker compose logs -f api airflow dbt</code></pre></div>
+      <div class="step"><b>4</b><h3>Előkészítő script</h3><pre><code>docker compose exec lab-bootstrap python /lab/runner/scripts/bootstrap_lab.py</code></pre></div>
+    </div>
+  </section>
+
+  <section class="section card warn">
+    <h2>Ha nem indul minden</h2>
+    <table>
+      <thead><tr><th>Tünet</th><th>Mit nézz meg?</th><th>Javítás</th></tr></thead>
+      <tbody>
+        <tr><td>Port ütközés</td><td>5432, 8010, 8088, 9001, 3000, 9090</td><td>Állítsd le a másik service-t, vagy módosítsd a bal oldali host portot a compose-ban.</td></tr>
+        <tr><td>Airflow lassan jön fel</td><td><code>docker compose logs -f airflow</code></td><td>Első DB migrációkor türelem; 1-2 perc normális.</td></tr>
+        <tr><td>dbt kilép</td><td><code>docker compose logs dbt</code></td><td>A Postgresnek egészségesnek kell lennie; utána futtasd újra: <code>docker compose up -d dbt</code>.</td></tr>
+        <tr><td>Kafka topic nincs</td><td><code>docker compose logs kafka-init</code></td><td>Futtasd újra: <code>docker compose up kafka-init</code>.</td></tr>
+        <tr><td><code>kafka-init</code> vagy <code>minio-init</code> kilépett</td><td>Exit 0 státusz</td><td>Ez normális: ezek előkészítő service-ek, lefutnak, létrehozzák az erőforrásokat, majd befejeződnek.</td></tr>
+        <tr><td>Teljes reset kell</td><td>Régi volume-ok maradtak</td><td><code>docker compose down --volumes --remove-orphans</code>, majd újraindítás.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section card">
+    <h2>Service-ek, URL-ek és belépési adatok</h2>
+    <div class="grid">
+      <a class="service" href="http://localhost:8020/"><strong>Kurzussite</strong><span>Statikus kurzusoldalak</span><em class="pill">course-site</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8010/"><strong>WebShop Pro</strong><span>Interaktív dummy webshop</span><em class="pill">webshop</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8000/docs"><strong>FastAPI docs</strong><span>REST API, webshop adatok, churn endpoint</span><em class="pill">api</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8088/"><strong>Airflow</strong><span>webshop_daily_etl DAG</span><em class="pill">airflow</em><div class="login"><code>admin</code><code>admin</code></div></a>
+      <a class="service" href="http://localhost:8090/"><strong>Spark master</strong><span>Spark UI</span><em class="pill">spark-master</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8092/"><strong>dbt docs</strong><span>Lineage, staging és mart modellek</span><em class="pill">dbt</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:9001/"><strong>MinIO</strong><span>Bronze/Silver/Gold és course-materials bucket</span><em class="pill">minio</em><div class="login"><code>minioadmin</code><code>minioadmin</code></div></a>
+      <a class="service" href="http://localhost:5000/"><strong>MLflow</strong><span>webshop-pro-course-lab experiment</span><em class="pill">mlflow</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8501/"><strong>Streamlit</strong><span>AI support és kurzusanyag nézet</span><em class="pill">streamlit</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8001/api/v1/heartbeat"><strong>ChromaDB</strong><span>webshop_course_materials collection</span><em class="pill">chroma</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:3000/"><strong>Grafana</strong><span>API és modell monitoring dashboard</span><em class="pill">grafana</em><div class="login"><code>admin</code><code>admin</code></div></a>
+      <a class="service" href="http://localhost:9090/"><strong>Prometheus</strong><span>FastAPI metrikák</span><em class="pill">prometheus</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8089/"><strong>Unity Catalog OSS</strong><span>Lakehouse governance gyakorló service</span><em class="pill">unity-catalog</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:8888/"><strong>JupyterLab</strong><span>Databricks lokális analóg</span><em class="pill">databricks-local</em><div class="login"><code>token nélkül</code></div></a>
+      <div class="service"><strong>PostgreSQL</strong><span>raw, analytics, ml és course sémák</span><em class="pill">postgres :5432</em><div class="login"><code>webshop</code><code>webshop</code><code>db: webshop</code></div></div>
+      <div class="service"><strong>Kafka</strong><span>webshop.events, webshop.orders, webshop.support</span><em class="pill">kafka :9092</em><div class="login"><code>nincs login</code></div></div>
+    </div>
+  </section>
+
+  <section class="section card">
+    <h2>Kurzus -> service térkép</h2>
+    <table>
+      <thead><tr><th>Kurzus</th><th>Compose service-ek</th><th>Előre betöltött anyag</th></tr></thead>
+      <tbody>
+        <tr><td>SQL</td><td>postgres</td><td><code>raw.*</code>, <code>analytics.*</code>, <code>course.materials</code></td></tr>
+        <tr><td>Python</td><td>lab-runner, lab-bootstrap</td><td>JSON -> Parquet, quality report, <code>/output/course-materials</code></td></tr>
+        <tr><td>Docker</td><td>teljes compose</td><td>minden service címkézve van kurzus szerint</td></tr>
+        <tr><td>Delta / Open formats</td><td>lab-runner, minio, unity-catalog</td><td>Bronze/Silver/Gold kimenetek, MinIO artifactok</td></tr>
+        <tr><td>Spark</td><td>spark-master, spark-worker</td><td><code>webshop_spark_etl.py</code></td></tr>
+        <tr><td>Airflow</td><td>airflow</td><td><code>webshop_daily_etl</code> DAG</td></tr>
+        <tr><td>dbt</td><td>dbt, postgres</td><td>staging és marts modellek, dbt docs</td></tr>
+        <tr><td>Streaming</td><td>kafka, event-producer</td><td>folyamatos clickstream események</td></tr>
+        <tr><td>AI/RAG</td><td>chroma, streamlit, api</td><td>support policy és kurzusösszefoglaló dokumentumok ChromaDB-ben</td></tr>
+        <tr><td>MLOps/LLMOps</td><td>mlflow, api, prometheus, grafana</td><td>MLflow demo run, FastAPI /predict, Grafana dashboard</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>

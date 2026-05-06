@@ -1,0 +1,62 @@
+[
+  {
+    "sku": "WP-LAP-14",
+    "name": "Northbyte Ultrabook 14",
+    "category": "Laptop",
+    "brand": "Northbyte",
+    "price": 429900,
+    "stock": 18,
+    "rating": 4.7,
+    "margin": 0.18
+  },
+  {
+    "sku": "WP-MON-32",
+    "name": "PixelForge 32Q monitor",
+    "category": "Monitor",
+    "brand": "PixelForge",
+    "price": 159900,
+    "stock": 34,
+    "rating": 4.5,
+    "margin": 0.22
+  },
+  {
+    "sku": "WP-KBD-MX",
+    "name": "KeyLab MX mechanikus billentyuzet",
+    "category": "Kiegeszito",
+    "brand": "KeyLab",
+    "price": 38900,
+    "stock": 112,
+    "rating": 4.8,
+    "margin": 0.31
+  },
+  {
+    "sku": "WP-HUB-C",
+    "name": "DockFlow USB-C hub",
+    "category": "Kiegeszito",
+    "brand": "DockFlow",
+    "price": 24900,
+    "stock": 61,
+    "rating": 4.3,
+    "margin": 0.29
+  },
+  {
+    "sku": "WP-NAS-4B",
+    "name": "VaultBox 4-bay NAS",
+    "category": "Storage",
+    "brand": "VaultBox",
+    "price": 219900,
+    "stock": 9,
+    "rating": 4.6,
+    "margin": 0.2
+  },
+  {
+    "sku": "WP-CAM-4K",
+    "name": "ClearMeet 4K webkamera",
+    "category": "Kiegeszito",
+    "brand": "ClearMeet",
+    "price": 52900,
+    "stock": 47,
+    "rating": 4.4,
+    "margin": 0.27
+  }
+]

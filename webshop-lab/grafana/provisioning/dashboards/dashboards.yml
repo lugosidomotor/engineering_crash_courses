@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: WebShop Pro dashboards
+    orgId: 1
+    folder: WebShop Pro
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards
