@@ -88,7 +88,7 @@ td code{display:inline-block;max-width:100%;background:#05080d;border:1px solid 
       <div class="command-panel">
         <div class="command-note">Repo gyökérből futtasd</div>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">PowerShell</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker compose up -d --build
 docker compose ps</code></pre>
         </div>
@@ -104,7 +104,7 @@ docker compose ps</code></pre>
         <h3><span class="step-number">1</span>Docker ellenőrzése</h3>
         <p>Nézd meg, hogy a CLI és a Compose plugin elérhető-e.</p>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>check</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">check</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker --version
 docker compose version</code></pre>
         </div>
@@ -113,7 +113,7 @@ docker compose version</code></pre>
         <h3><span class="step-number">2</span>Stack indítása</h3>
         <p>Felépíti a saját image-eket és elindítja a teljes labot.</p>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>start</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">start</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker compose up -d --build</code></pre>
         </div>
       </article>
@@ -121,7 +121,7 @@ docker compose version</code></pre>
         <h3><span class="step-number">3</span>Állapot nézése</h3>
         <p>Gyors kép arról, melyik service fut és hol kell logot nézni.</p>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>status</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">status</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker compose ps
 docker compose logs -f api airflow dbt</code></pre>
         </div>
@@ -130,7 +130,7 @@ docker compose logs -f api airflow dbt</code></pre>
         <h3><span class="step-number">4</span>Előkészítő script</h3>
         <p>Újragenerálja a tanuló artifactokat, ha kézzel akarod futtatni.</p>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>seed</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">seed</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker compose exec lab-bootstrap python /lab/runner/scripts/bootstrap_lab.py</code></pre>
         </div>
       </article>
@@ -223,7 +223,7 @@ docker compose logs -f api airflow dbt</code></pre>
         <h3>Bootstrap riport (Python / Delta / Parquet / data quality)</h3>
         <p>Beolvassa a fixture JSON fájlokat, Bronze/Silver/Gold Parquet fájlokat generál, Delta Lake táblát próbál létrehozni, ellenőrzi a PostgreSQL kapcsolatot és teszteli a FastAPI health endpointot.</p>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">PowerShell</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker compose exec lab-runner python /lab/runner/scripts/bootstrap_lab.py</code></pre>
         </div>
       </article>
@@ -231,7 +231,7 @@ docker compose logs -f api airflow dbt</code></pre>
       <article class="command-card">
         <h3>Spark ETL indítása</h3>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">PowerShell</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker compose exec spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/webshop-lab/spark/jobs/webshop_spark_etl.py</code></pre>
         </div>
       </article>
@@ -239,7 +239,7 @@ docker compose logs -f api airflow dbt</code></pre>
       <article class="command-card">
         <h3>Kafka topicok és események</h3>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">PowerShell</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code># Topicok listázása
 docker compose exec kafka /opt/apache/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 
@@ -251,7 +251,7 @@ docker compose exec kafka /opt/apache/kafka/bin/kafka-console-consumer.sh --boot
       <article class="command-card">
         <h3>dbt újrafuttatás</h3>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">PowerShell</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code>docker compose exec dbt dbt run --profiles-dir /usr/app/profiles
 docker compose exec dbt dbt test --profiles-dir /usr/app/profiles</code></pre>
         </div>
@@ -260,7 +260,7 @@ docker compose exec dbt dbt test --profiles-dir /usr/app/profiles</code></pre>
       <article class="command-card">
         <h3>Churn prediction és rendelés szimulálása</h3>
         <div class="terminal">
-          <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>PowerShell</span><button class="copy-command" type="button">Másolás</button></div>
+          <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">PowerShell</span></span><button class="copy-command" type="button">Másolás</button></div>
           <pre><code># Churn prediction
 curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" -d '{"customer_id":"C-1842"}'
 
@@ -274,7 +274,7 @@ curl -X POST http://localhost:8000/api/simulate-order</code></pre>
   <section class="section card">
     <h2>Architektúra</h2>
     <div class="terminal">
-      <div class="terminal-bar"><span class="terminal-label"><i></i><i></i><i></i>arch</span></div>
+      <div class="terminal-bar"><span style="display:flex;align-items:center;gap:8px"><span class="terminal-dots"><i></i><i></i><i></i></span><span class="terminal-label">arch</span></div>
       <pre style="font-size:.8rem;line-height:1.6">┌─────────────────────────────────────────────────────────────────┐
 │ WebShop Pro Frontend (nginx :8010)                              │
 │  Bolt │ Admin │ Dashboard                                       │
