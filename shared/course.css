@@ -750,13 +750,6 @@ tr:hover td { background: rgba(0,212,255,.05); }
   font-weight: 700;
   flex-shrink: 0;
 }
-.cip-block-list .cip-more {
-  color: var(--text-dim);
-  font-style: italic;
-  background: transparent;
-}
-.cip-block-list .cip-more::before { content: ''; }
-
 /* ── Further learning (auto-injected from courses-detail.js) ── */
 #further-learning-section h3 { margin-top: 24px; font-size: 1rem; color: var(--text); font-weight: 700; }
 .fl-list { list-style:none; padding:0; margin:0 0 16px; display:flex; flex-direction:column; gap:6px; }

@@ -381,10 +381,7 @@
     }
     if (details.outcomes && details.outcomes.length) {
       html += '<div class="cip-block"><div class="cip-block-title">✅ Mit fogsz tudni a végén</div><ul class="cip-block-list">';
-      details.outcomes.slice(0, 5).forEach(function(o){ html += '<li>' + escape(o) + '</li>'; });
-      if (details.outcomes.length > 5) {
-        html += '<li class="cip-more">… és még ' + (details.outcomes.length - 5) + ' dolog</li>';
-      }
+      details.outcomes.forEach(function(o){ html += '<li>' + escape(o) + '</li>'; });
       html += '</ul></div>';
     }
 
