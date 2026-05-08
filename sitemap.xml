@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/</loc><lastmod>2026-05-05</lastmod><priority>1.0</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/sql-data-modeling/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/python-data-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/docker-local-data-platform/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/delta-table-crash-course/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/open-table-formats/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/spark-crash-course/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/airflow-orchestration/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/dbt-analytics-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/databricks-lakehouse/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/streaming-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/ai-data-engineer/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/ai-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/rag-evaluation-ai-safety/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/llmops-genai-production/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
-  <url><loc>https://lugosidomotor.github.io/engineering_crash_courses/aiops-mlops/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/</loc><lastmod>2026-05-05</lastmod><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://dataengineer.hu/sql-data-modeling/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/python-data-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/docker-local-data-platform/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/delta-table-crash-course/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/open-table-formats/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/spark-crash-course/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/airflow-orchestration/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/dbt-analytics-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/databricks-lakehouse/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/streaming-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/ai-data-engineer/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/ai-engineering/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/rag-evaluation-ai-safety/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/llmops-genai-production/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
+  <url><loc>https://dataengineer.hu/aiops-mlops/</loc><lastmod>2026-05-05</lastmod><priority>0.8</priority></url>
 </urlset>
