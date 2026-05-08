@@ -48,7 +48,7 @@
   }
   .cart-overlay.open{opacity:1;pointer-events:auto}
   .cart-sidebar{
-    position:fixed;top:0;right:0;z-index:51;width:min(420px,90vw);height:100vh;
+    position:fixed;top:0;right:0;z-index:51;width:min(420px,92vw);height:100vh;height:100dvh;
     background:var(--panel);border-left:1px solid var(--line);
     transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
     display:flex;flex-direction:column;
@@ -56,44 +56,44 @@
   .cart-sidebar.open{transform:translateX(0)}
   .cart-header{
     display:flex;align-items:center;justify-content:space-between;
-    padding:20px 24px;border-bottom:1px solid var(--line);
+    padding:16px 18px;border-bottom:1px solid var(--line);
   }
-  .cart-header h2{margin:0;font-size:1.15rem}
+  .cart-header h2{margin:0;font-size:1rem}
   .cart-close{
-    width:32px;height:32px;border:1px solid var(--line);border-radius:8px;
-    background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;font-size:1.1rem;
+    width:30px;height:30px;border:1px solid var(--line);border-radius:8px;
+    background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;font-size:1rem;
     display:grid;place-items:center;
   }
-  .cart-body{flex:1;overflow-y:auto;padding:16px 24px}
+  .cart-body{flex:1;overflow-y:auto;padding:14px 18px;-webkit-overflow-scrolling:touch}
   .cart-item{
-    display:flex;gap:14px;align-items:center;padding:12px 0;
+    display:flex;gap:12px;align-items:center;padding:10px 0;
     border-bottom:1px solid var(--line);
   }
   .cart-item-img{
-    width:48px;height:48px;border-radius:10px;background:rgba(255,255,255,.06);
-    display:grid;place-items:center;font-size:1.4rem;
+    width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.06);
+    display:grid;place-items:center;font-size:1.2rem;flex-shrink:0;
   }
   .cart-item-info{flex:1;min-width:0}
-  .cart-item-info strong{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .cart-item-info small{color:var(--muted);font-size:.78rem}
-  .cart-item-qty{display:flex;align-items:center;gap:6px}
+  .cart-item-info strong{display:block;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cart-item-info small{color:var(--muted);font-size:.72rem}
+  .cart-item-qty{display:flex;align-items:center;gap:5px}
   .cart-item-qty button{
-    width:26px;height:26px;border:1px solid var(--line);border-radius:6px;
-    background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;font-size:.9rem;
+    width:24px;height:24px;border:1px solid var(--line);border-radius:6px;
+    background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;font-size:.8rem;
     display:grid;place-items:center;
   }
-  .cart-item-qty span{font-weight:700;min-width:18px;text-align:center;font-size:.9rem}
+  .cart-item-qty span{font-weight:700;min-width:16px;text-align:center;font-size:.82rem}
   .cart-item-price{
-    font-family:"JetBrains Mono",monospace;font-size:.9rem;color:var(--accent);
+    font-family:"JetBrains Mono",monospace;font-size:.82rem;color:var(--accent);
     white-space:nowrap;
   }
   .cart-footer{
-    padding:20px 24px;border-top:1px solid var(--line);
-    display:flex;flex-direction:column;gap:12px;
+    padding:16px 18px;border-top:1px solid var(--line);
+    display:flex;flex-direction:column;gap:10px;
   }
-  .cart-total{display:flex;justify-content:space-between;font-size:1.05rem;font-weight:700}
+  .cart-total{display:flex;justify-content:space-between;font-size:.95rem;font-weight:700}
   .cart-total .amount{font-family:"JetBrains Mono",monospace;color:var(--accent)}
-  .cart-empty{text-align:center;color:var(--muted);padding:48px 0;font-size:.95rem}
+  .cart-empty{text-align:center;color:var(--muted);padding:40px 0;font-size:.88rem}
 
   /* --- Product grid --- */
   .product-grid{
@@ -150,12 +150,6 @@
   .toast.info{background:linear-gradient(135deg,#2563eb,var(--accent));border:1px solid rgba(88,166,255,.4)}
   @keyframes toast-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
   @keyframes toast-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(16px)}}
-
-  @media(max-width:560px){
-    .nav-tab{padding:6px 12px;font-size:.78rem}
-    .nav-tab-link{padding:6px 10px;font-size:.72rem}
-    .admin-stat strong{font-size:1.1rem}
-  }
 </style>
 </head>
 <body>
