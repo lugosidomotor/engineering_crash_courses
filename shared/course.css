@@ -426,8 +426,8 @@ tr:hover td { background: rgba(0,212,255,.05); }
   .arch-flow { gap: 4px; }
   .arch-step { padding: 6px 10px; min-width: 70px; font-size: .8rem; }
   .quiz-option { font-size: .82rem; padding: 8px 12px; }
-  .cip-project-panel { grid-template-columns:1fr; padding:14px; }
-  .cip-project-shot { display:none; }
+  .cip-project-panel { display:block; padding:14px; }
+  .cip-project-shot { display:none !important; }
 }
 
 @media (max-width: 600px) {
