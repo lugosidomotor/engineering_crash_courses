@@ -93,6 +93,5 @@ A teljes kurzus-sorozat egy Docker Compose környezettel használható, amely az
 
 Részletes útmutató és szolgáltatás lista: [`webshop-pro/project-map.json`](webshop-pro/project-map.json)
 
-## Licenc
-
-© Dr. Sándor Attila Pabar — [dataengineer.hu](https://dataengineer.hu)
+© Lugosi Dömötör
+ 
