@@ -350,11 +350,13 @@
     var caseStudy = window.WEBSHOP_CASE_STUDY || null;
     var project = caseStudy && caseStudy.courses ? caseStudy.courses[COURSE_SLUG] : null;
     if (project) {
-      html += '<div class="cip-project-panel">';
+      var isMobile = window.innerWidth <= 900;
+      var panelStyle = isMobile ? ' style="display:block;padding:14px"' : '';
+      html += '<div class="cip-project-panel"' + panelStyle + '>';
       html += '<div class="cip-project-copy">';
       html += '<div class="cip-block-title">🛒 WebShop Pro projektkapcsolat</div>';
       html += '<p>' + escape(project.role) + '</p>';
-      html += '<dl>';
+      html += '<dl' + (isMobile ? ' style="grid-template-columns:1fr"' : '') + '>';
       html += '<dt>Ebben a kurzusban készül</dt><dd>' + escape(project.artifact) + '</dd>';
       html += '<dt>Miért hasznos a mindennapokban?</dt><dd>' + escape(project.dailyUse) + '</dd>';
       html += '</dl>';
@@ -370,7 +372,10 @@
       html += '<a class="cip-action" href="../webshop-lab/" target="_blank" rel="noopener">Local Docker Lab</a>';
       html += '</div>';
       html += '</div>';
-      html += '<div class="cip-project-shot"><img src="../assets/images/webshop-pro-dashboard.png" alt="WebShop Pro demo dashboard screenshot"></div>';
+      var isMobile = window.innerWidth <= 900;
+      if (!isMobile) {
+        html += '<div class="cip-project-shot"><img src="../assets/images/webshop-pro-dashboard.png" alt="WebShop Pro demo dashboard screenshot"></div>';
+      }
       html += '</div>';
     }
 
