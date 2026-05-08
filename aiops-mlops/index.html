@@ -603,11 +603,10 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
   <div class="section-number">Section 12</div>
   <h2>Monitoring és drift detektálás <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
   <div class="md-cell">
-    <p>A modell deployment után <strong>monitorozni kell</strong>. Két tipikus probléma:</p>
-    <ul>
-      <li><strong>Data drift:</strong> az input adatok eltolódnak (pl. több idős vásárló)</li>
-      <li><strong>Concept drift:</strong> a kapcsolat változik az input és output között</li>
-    </ul>
+    <p>A modell deployment után <strong>folyamatos monitorozásra</strong> van szükség, mert az ML modellek teljesítménye az idő múlásával romolhat. Két tipikus probléma fenyeget: a <strong>data drift</strong>, amikor a bemeneti adatok eltolódnak a tanító adatokhoz képest (pl. a felhasználók életkora megemelkedik, a jövedelemszerkezet megváltozik), és a <strong>concept drift</strong>, amikor maga a kapcsolat változik az input és az output között (pl. a vásárlói magatartás alapvetően átalakul egy új versenytárs miatt). Mindkettő a modell pontosságának romlásához vezet.</p>
+    <p><strong>Miért kritikus?</strong> Productionben a modell csendben romolhat — a predikciók egyre pontatlanabbak lesznek, de ezt senki nem veszi észre, amíg valamilyen üzleti metrika (pl. megtartási arány, bevétel) el nem kezd csökkenni. A drift detektálás korai figyelmeztetést ad, még mielőtt az üzleti hatás jelentős lenne. Statisztikai tesztekkel (KS-test, PSI) összehasonlítjuk a referencia (tanító) és a jelenlegi adateloszlást, és ha a különbség meghaladja a küszöböt, riasztást küldünk.</p>
+    <p><strong>A folyamat:</strong> A lenti kódban egy egyszerű drift detektálást valósítunk meg: a referencia adatok (tanító halmaz) és az újonnan érkező adatok feature-önkénti átlagait hasonlítjuk össze. Ha egy változó átlaga eltérése meghaladja a 5%-os küszöböt, driftet jelentünk. A szimulált új adatokban szándékosan idősebb és magasabb jövedelmű vásárlókat generálunk, hogy a drift jól látható legyen.</p>
+    <p><strong>Tip:</strong> Productionben az egyszerű átlag-összehasonlítás helyett használj statisztikai teszteket: <strong>KS-test</strong> (Kolmogorov-Smirnov) a folytonos változók eloszlásának összehasonlítására, <strong>PSI</strong> (Population Stability Index) a teljes populáció stabilitásának mérésére, vagy dedikált könyvtárakat, mint az <strong>Evidently AI</strong>. A detektált drift automatikusan triggereljen újra tanítást (retrain) a friss adatokon.</p>
   </div>
   <div class="code-cell" id="cell-s12">
     <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('s12')">▶ Run</button></div>
