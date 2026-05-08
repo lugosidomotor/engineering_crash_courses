@@ -178,7 +178,15 @@
 <div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
   <h2>Környezet előkészítése <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
-  <div class="md-cell"><p>Szükséges csomagok és az OpenAI kliens inicializálása.</p></div>
+  <div class="md-cell">
+    <p>Mielőtt elkezdenénk a RAG chatbot építését, be kell állítanunk a fejlesztői környezetünket. Ehhez három fő Python csomagra van szükségünk: az <strong>openai</strong> könyvtár az LLM és embedding API hívásokhoz, a <strong>chromadb</strong> a vektoradatbázis műveleteihez, és a <strong>numpy</strong> a numerikus számításokhoz, például a koszinusz-hasonlóság kiszámításához.</p>
+    <p>Az <code>OpenAI()</code> kliens automatikusan az <code>OPENAI_API_KEY</code> környezeti változóból olvassa be az API kulcsot. Ha ez nincs beállítva, a hívások hibát dobnak. Éles környezetben soha ne hardkódold az API kulcsot a forráskódba -- használj <code>.env</code> fájlt vagy secret managert.</p>
+    <p>A kódban látod az alapvető importokat: az <code>os</code> és <code>json</code> modulok fájl- és adatkezeléshez, a <code>time</code> pedig a válaszidő méréséhez kell majd a későbbi szekciókban. Minden további szakasz ezekre az alapokra épül.</p>
+    <div class="callout">
+      <div class="callout-title">Telepítés</div>
+      <p>Futtasd a terminálban: <code>pip install openai chromadb numpy</code>. Az API kulcsot a <code>export OPENAI_API_KEY="sk-..."</code> paranccsal állítsd be, vagy hozz létre egy <code>.env</code> fájlt.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s3">
     <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s3')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># pip install openai chromadb numpy</span>
@@ -282,7 +290,15 @@ Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
   <h2>Structured outputs: JSON válasz <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
-  <div class="md-cell"><p>A Responses API beépítetten támogatja a <strong>JSON schema</strong> kikényszerítést. Kritikus RAG rendszerekben: a válasz mellett forrást, megbízhatóságot, kategóriát is visszaad.</p></div>
+  <div class="md-cell">
+    <p>A <strong>structured output</strong> (strukturált kimenet) azt jelenti, hogy az LLM válaszát nem szabad szabad formátumú szövegként kezelnünk, hanem egy előre meghatározott JSON sémának megfelelő objektumként kapjuk vissza. Ez kulcsfontosságú RAG rendszerekben, ahol a válasz mellé forrást, megbízhatósági pontszámot és kategóriát is vissza kell adni a downstream rendszerek számára.</p>
+    <p>A Responses API beépítetten támogatja a <strong>JSON schema</strong> kikényszerítést a <code>text.format</code> paraméterén keresztül. Nem kell kérned az LLM-et, hogy "válaszolj JSON-ban" és remélni a legjobbakat -- az API garantálja, hogy a válasz illeszkedik a megadott sémára. Ez azért forradalmi, mert megszünteti a kimenet parsing hibáit, amelyek a termelési rendszerek egyik leggyakoribb hibaforrásai.</p>
+    <p>A példában egy <code>support_answer</code> sémát definiálunk három mezővel: <code>answer</code> (a tényleges válaszszöveg), <code>category</code> (enum: szallitas, visszakuldes, garancia, egyeb), és <code>confidence</code> (0-1 közötti szám). A modell mindig ezt a struktúrát adja vissza, így a frontend kód biztonsággal dolgozhatja fel.</p>
+    <div class="callout">
+      <div class="callout-title">Gyakori hiba</div>
+      <p>Ne keverd a <code>response.output_text</code>-et a <code>response.choices[0].message.content</code>-tel. Előbbi az új Responses API, utóbbi a régi Chat Completions formátum. A structured output esetén az <code>output_text</code> egy JSON string, amit <code>json.loads()</code>-szal kell parse-olni.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
     <div class="code-body"><pre><span class="kw">import</span> json
@@ -331,7 +347,15 @@ result = json.loads(response.output_text)
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
   <h2>Tool calling: függvények hívása <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
-  <div class="md-cell"><p>Az LLM <strong>függvényeket hívhat</strong>. A modell eldönti, mikor melyik eszközt használja. Folyamat: modell → function_call → te futtatod → eredmény vissza → végleges válasz.</p></div>
+  <div class="md-cell">
+    <p>A <strong>tool calling</strong> (eszközhívás) az a képesség, amellyel az LLM képes külső függvényeket meghívni a válaszgenerálás során. Nem te magad döntöd el, mikor hívod a függvényt -- a modell maga ismeri fel a szituációt, és automatikusan kéri a függvény meghívását, ha szükséges. Ez teszi az LLM-et "ügynökké": önállóan tervez és cselekszik.</p>
+    <p>A folyamat lépései: (1) elküldöd a kérdést az LLM-nek a definiált eszközökkel együtt, (2) a modell felismeri, hogy egy tool-t kell hívnia, és visszaadja a függvény nevét és paramétereit, (3) te futtatod a saját kódodat az eredménnyel, (4) visszaküldöd az eredményt a modellnek, (5) a modell a végleges választ generálja az eredmény alapján.</p>
+    <p>A példában egy <code>get_order_status</code> függvényt definiálunk, amely rendelésszám alapján lekérdezi a rendelés státuszát. Amikor a felhasználó azt kérdezi, "Mi a helyzet a WSP-12345 rendeléssel?", a modell felismeri, hogy rendelésszám van a szövegben, és automatikusan meghívja a tool-t.</p>
+    <div class="callout">
+      <div class="callout-title">Fontos</div>
+      <p>A tool definícióban a <code>description</code> mező kritikus: a modell ebből érti meg, mikor használja az eszközt. Minél pontosabb a leírás, annál kevesebb a téves hívás. Mindig adj magyar nyelvű, egyértelmű leírást.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s7">
     <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('s7')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># Tool definíció</span>
@@ -426,7 +450,15 @@ vec_vissza    = np.array([<span class="num">0.1</span>, <span class="num">0.2</s
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
   <h2>OpenAI Embeddings API <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
-  <div class="md-cell"><p>Az OpenAI <code>text-embedding-3-small</code> modellje 1536 dimenziós vektorokat generál. Olcsó és gyors.</p></div>
+  <div class="md-cell">
+    <p>Az OpenAI <code>text-embedding-3-small</code> modellje a legköltséghatékonyabb embedding megoldás: 1536 dimenziós vektorokat generál, és nagyjából $0.02 dollárba kerül 1 millió tokenenként. Ez azt jelenti, hogy 1000 átlagos dokumentum (kb. 500K token) feldolgozása mindössze 1 centbe kerül -- ez teszi praktikussá a kísérletezést és a prototípusépítést.</p>
+    <p>Az <code>embeddings.create()</code> hívás egy vektorlistát ad vissza: minden bemeneti szöveghez egy 1536 lebegőpontos számból álló tömböt. Ezek a számok a szöveg szemantikai jelentését kódolják -- a hasonló jelentésű szövegek vektorai közel helyezkednek el egymáshoz a vektortérben. Az API válasza tartalmazza a felhasznált tokenek számát is, ami a költségszámításhoz szükséges.</p>
+    <p>Éles környezetben érdemes az embeddingeket gyorsítótárazni, mert ugyanarra a szövegre mindig ugyanazt a vektort kapod. Ha a dokumentumaid nem változnak, felesleges minden alkalommal újra generálni az embeddingeket -- tárold őket a vektoradatbázisban, és csak az új vagy módosított dokumentumokat töltsd fel.</p>
+    <div class="callout">
+      <div class="callout-title">Modell választás</div>
+      <p>A <code>text-embedding-3-small</code> olcsó és gyors, a legtöbb RAG használathoz elegendő. Ha maximális pontosság kell, próbáld a <code>text-embedding-3-large</code> modellt (3072 dimenzió, kb. 3x drágább). A dimenziócsökkentés is támogatott az API-ban.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s9">
     <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('s9')">▶ Run</button></div>
     <div class="code-body"><pre>emb_response = client.embeddings.create(
@@ -457,7 +489,15 @@ vector = emb_response.data[<span class="num">0</span>].embedding
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
   <h2>ChromaDB alapok: vektoradatbázis <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span></h2>
-  <div class="md-cell"><p>A <strong>ChromaDB</strong> nyílt forráskódú vektoradatbázis. Lokálisan fut, nem kell szerver. Három művelet: <code>add</code>, <code>query</code>, <code>delete</code>.</p></div>
+  <div class="md-cell">
+    <p>A <strong>ChromaDB</strong> egy nyílt forráskódú vektoradatbázis, amelyet kifejezetten AI alkalmazásokhoz terveztek. Lokálisan futtatható, nem kell hozzá külön szerver vagy felhőszolgáltatás -- ez teszi ideálissá a fejlesztéshez és prototípusokhoz. Három alapvető művelete van: <code>add</code> (dokumentumok hozzáadása), <code>query</code> (hasonlósági keresés) és <code>delete</code> (eltávolítás).</p>
+    <p>A ChromaDB kulcsfontosságú eleme a RAG rendszernek: itt tároljuk a dokumentumok embeddingjeit, és ide küldjük a felhasználói kérdés embeddingjét kereséskor. A ChromaDB automatikusan generálja az embeddingeket, ha nem adsz meg saját embedding funkciót -- a háttérben egy alapértelmezett modellt használ ehhez. Éles környezetben érdemes saját OpenAI embedding funkciót megadni a jobb minőség érdekében.</p>
+    <p>A kódban egy <code>webshop_docs</code> nevű gyűjteményt (collection) hozunk létre, majd három dokumentumot adunk hozzá. Minden dokumentum kap egy egyedi azonosítót (<code>doc1</code>, <code>doc2</code>, <code>doc3</code>), és a ChromaDB automatikusan elkészíti a vektorábrázolásukat. A <code>count()</code> metódus visszaadja a tárolt dokumentumok számát.</p>
+    <div class="callout">
+      <div class="callout-title">Persistencia</div>
+      <p>A demóban <code>chromadb.Client()</code> in-memory módot használ -- a adatok a program leállásakor elvesznek. Éles használatra <code>chromadb.PersistentClient(path="./chroma_data")</code> használatával a adatok lemezre íródnak, és újraindítás után is megmaradnak.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s10">
     <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('s10')">▶ Run</button></div>
     <div class="code-body"><pre><span class="kw">import</span> chromadb
@@ -566,7 +606,15 @@ napon belül megtörténik. 6. Elektromos termékekre a garancia 2 év érvénye
 <div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
   <h2>Dokumentumok betöltése: WebShop Pro tudásbázis <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
-  <div class="md-cell"><p>A WebShop Pro dokumentumai. A valóságban ezek PDF-ek, Notion oldalak lennének. Mi most Python dictionary-kben tároljuk.</p></div>
+  <div class="md-cell">
+    <p>A WebShop Pro tudásbázisa négy dokumentumból áll: szállítási tájékoztató, visszaküldési szabályzat, garanciális feltételek és gyakori kérdések. A valóságban ezek PDF dokumentumok, Notion oldalak, Confluence wikik vagy akár adatbázis-lekérdezések eredményei lennének. Most egyszerű Python dictionary-kben tároljuk őket a demonstráció kedvéért.</p>
+    <p>A dokumentumok betöltése után a korábban definiált <code>chunk_text()</code> függvénnyel daraboljuk őket, és minden chunkhoz metaadatot rendelünk -- konkrétan a forrásdokumentum címét. Ez a metaadat később lehetővé teszi, hogy a RAG válaszban hivatkozzunk a forrásra, ami kritikus a felhasználói bizalom és a válaszok ellenőrizhetősége szempontjából.</p>
+    <p>Az <code>all_chunks</code> lista végül az összes feldarabolt szövegrészt tartalmazza azonosítóval, szöveggel és forrással. Ez a strukturált formátum teszi lehetővé a ChromaDB-be való feltöltést a következő szekcióban. Figyeld meg, hogy minden chunk egyedi ID-t kap (<code>szallitas_chunk0</code>, <code>szallitas_chunk1</code>, stb.), ami a későbbi frissítések és törlések esetén is fontos.</p>
+    <div class="callout">
+      <div class="callout-title">Gyakorlati tanács</div>
+      <p>Éles rendszerben a dokumentumok betöltése gyakran a legbonyolultabb rész: PDF-ekből szöveget kinyerni, táblázatokat kezelni, képek OCR-ét elvégezni. Ehhez érdemes olyan könyvtárakat használni, mint a <code>unstructured</code>, <code>PyPDF2</code> vagy <code>docling</code>.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s12">
     <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('s12')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># WebShop Pro tudásbázis</span>
@@ -625,7 +673,15 @@ all_chunks = []
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
   <h2>Indexelés: ChromaDB feltöltése <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span> <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
-  <div class="md-cell"><p>Chunkok betöltése ChromaDB-be. A ChromaDB automatikusan generál embeddingeket.</p></div>
+  <div class="md-cell">
+    <p>Az <strong>indexelés</strong> az a lépés, ahol a feldarabolt dokumentumchunkokat betöltjük a ChromaDB-be. A ChromaDB automatikusan generál embeddingeket minden chunkhoz, és indexet épít a gyors hasonlósági kereséshez. Ez a lépés "előkészíti a terepet" a későbbi lekérdezések számára -- indexelés nélkül nem tudunk keresni.</p>
+    <p>A kódban egy új <code>webshop_rag</code> gyűjteményt hozunk létre, és az <code>add()</code> metódussal feltöltjük a chunkokkal. Három paramétert adunk át: <code>documents</code> (a chunk szövegei), <code>ids</code> (egyedi azonosítók) és <code>metadatas</code> (forrásinformáció). A metadata filtering lehetővé teszi, hogy később csak bizonyos forrásokra keressünk -- például csak a szállítási dokumentumok között.</p>
+    <p>Éles környezetben az indexelés egy batch folyamat, amely ütemezetten fut (pl. naponta), és frissíti a vektoradatbázist az új vagy módosított dokumentumokkal. Inkrementális frissítés esetén csak a változott chunkokat kell újra indexelni, nem az egész tudásbázist. A ChromaDB upsert művelete is támogatja ezt a használati esetet.</p>
+    <div class="callout">
+      <div class="callout-title">Teljesítmény</div>
+      <p>Néhány ezer dokumentum indexelése másodpercek alatt megtörténik. Nagyobb tudásbázisok (millió dokumentum) esetén érdemes dedikált vektoradatbázist használni (Pinecone, Weaviate, Qdrant), amelyek oszlopos indexeléssel és shardinggal gyorsítják a keresést.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s13">
     <div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('s13')">▶ Run</button></div>
     <div class="code-body"><pre>rag_collection = chroma_client.create_collection(name=<span class="str">"webshop_rag"</span>)
@@ -650,7 +706,15 @@ rag_collection.add(
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
   <h2>Vektoros keresés: a releváns chunkok megkeresése <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span></h2>
-  <div class="md-cell"><p>A felhasználói kérdést embedding-gé alakítjuk, majd a ChromaDB megkeresi a legközelebbi vektorokat. Ez a <strong>retrieval</strong> lépés.</p></div>
+  <div class="md-cell">
+    <p>A <strong>vektoros keresés</strong> (vector search) a RAG rendszer szíve: a felhasználói kérdést embedding-gé alakítjuk, majd a ChromaDB megkeresi a hozzá legközelebbi vektorokat a vektortérben. Ez a <strong>retrieval</strong> (visszakeresés) lépés -- a RAG rövidítés első betűje. Minél relevánsabb chunkokat találunk, annál jobb választ tud generálni az LLM.</p>
+    <p>A <code>retrieve()</code> függvény a ChromaDB <code>query()</code> metódusát használja: elküldi a kérdés szövegét, és a ChromaDB automatikusan embedding-gé alakítja, majd koszinusz-hasonlóság alapján megkeresi a <code>n_results</code> darab legközelebbi chunkot. Az eredmény tartalmazza a dokumentum szövegét, a metaadatokat (forrás) és a távolságot -- minél kisebb a távolság, annál relevánsabb a találat.</p>
+    <p>A példában a "Mennyibe kerül a szállítás?" kérdésre a rendszer a szállítási dokumentum chunkjait találja meg a legkisebb távolsággal. A távolság értékek tipikusan 0 és 2 között mozognak, ahol a 0 tökéletes egyezést jelent. Éles környezetben érdemes beállítani egy távolság-küszöböt: ha a legjobb találat is túl messze van, a rendszer jelezheti, hogy nem talál releváns információt.</p>
+    <div class="callout">
+      <div class="callout-title">Hibrid keresés</div>
+      <p>A sima vektoros keresés négyzetesen rossz lehet kulcsszó-pontos lekérdezéseknél (pl. "WSP-12345 rendelés"). Éles környezetben érdemes <strong>hibrid keresést</strong> használni: a vektoros keresés eredményeit kombinálja kulcsszavas kereséssel (BM25), így mind a szemantikai, mind a lexikai pontosság megmarad.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s14">
     <div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('s14')">▶ Run</button></div>
     <div class="code-body"><pre><span class="kw">def</span> <span class="fn">retrieve</span>(query, n_results=<span class="num">3</span>):
@@ -811,7 +875,15 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 <div class="section layer-general" id="s17">
   <div class="section-number">Section 17</div>
   <h2>Cost és latency tracking <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
-  <div class="md-cell"><p>Production RAG rendszereknél kritikus a <strong>költség</strong> és <strong>válaszidő</strong> monitorozása.</p></div>
+  <div class="md-cell">
+    <p>A <strong>költség- és válaszidő-monitorozás</strong> (cost és latency tracking) elengedhetetlen minden termelési RAG rendszernél. Egyetlen GPT-4o hívás $0.01-0.05 dollárba kerülhet, és egy rosszul optimalizált RAG pipeline könnyen napi tíz vagy száz dolláros számlát generálhat. A válaszidő pedig közvetlenül befolyásolja a felhasználói élményt -- ha a chatbot 5 másodpercig gondolkodik, a felhasználók elhagyják az oldalt.</p>
+    <p>A <code>rag_query_tracked()</code> függvény egy wrapper, amely megméri a teljes folyamat és az LLM hívás külön-külön eltelt idejét. Ez a felbontás fontos, mert a retrieval lokális és gyors (ezredmásodpercek), míg az LLM hívás távoli API és lassabb (száz milliszekundumoktól másodpercekig). A szűk keresztmetszet azonosítása segíti az optimalizálást.</p>
+    <p>A token szám alapján kiszámítható a költség: GPT-4o esetén $2.50/1M input token és $10/1M output token. A <code>response.usage</code> objektum tartalmazza a bemeneti és kimeneti tokenek számát, amiből automatizáltan számolható a költség. Éles rendszerben ezeket az adatokat Prometheus vagy Grafana dashboardra küldjük, és alertinget állítunk be a küszöbértékekre.</p>
+    <div class="callout">
+      <div class="callout-title">Optimalizálási tippek</div>
+      <p>A költség csökkentésére: (1) használj kisebb modellt (GPT-4o-mini) egyszerű kérdéseknél, (2) cache-eld a gyakori kérdések válaszait, (3) korlátozd a kontextus hosszát. A válaszidő javítására: (4) használj streaming választ, (5) párhuzamosítsd a retrieval-t, (6) válassz gyorsabb embedding modellt.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s17">
     <div class="code-header"><span class="cell-number">[16]</span><button class="run-btn" onclick="runCell('s17')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># Cost és latency wrapper</span>
@@ -859,7 +931,15 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 <div class="section layer-general" id="s18">
   <div class="section-number">Section 18</div>
   <h2>Streamlit UI: chat frontend <span class="tool-badge"><img src="../assets/logos/streamlit.svg">Streamlit</span></h2>
-  <div class="md-cell"><p>A <strong>Streamlit</strong> a leggyorsabb módja egy chat UI felépítésének Pythonban. Pár sorból működő chatbot.</p></div>
+  <div class="md-cell">
+    <p>A <strong>Streamlit</strong> egy Python webes keretrendszer, amely pár sornyi kóddal lehetővé teszi interaktív webes alkalmazások készítését -- HTML, CSS vagy JavaScript ismerete nélkül. A RAG chatbot esetén ez a leggyorsabb módja annak, hogy a háttérben futó Python logikát felhasználói felülettel lássuk el, és a chatbotot böngészőből lehessen elérni.</p>
+    <p>A kód három fő részből áll: (1) a chat előzmények tárolása a <code>session_state</code>-ben, ami minden felhasználói munkamenethez külön memóriát biztosít, (2) a korábbi üzenetek megjelenítése a <code>st.chat_message()</code> widgettel, amely automatikusan formázza a beszélgetést, és (3) az új üzenetek fogadása a <code>st.chat_input()</code> widgettel, amely egy beviteli mezőt jelenít meg a chat alján.</p>
+    <p>Amikor a felhasználó beír egy kérdést, a Streamlit meghívja a korábban definiált <code>rag_query()</code> függvényt, megkapja a választ, és megjeleníti az "assistant" szerepkörű üzenetként. A teljes beszélgetés előzmények megmaradnak a munkamenet alatt, így a felhasználó görgethet és visszanézheti a korábbi kérdéseket és válaszokat.</p>
+    <div class="callout">
+      <div class="callout-title">Futtatás</div>
+      <p>Mentsd el a kódot <code>app.py</code> néven, majd futtasd a <code>streamlit run app.py</code> paranccsal. A Streamlit automatikusan megnyitja a böngészőt a <code>localhost:8501</code> címen. A kód minden módosítás után automatikusan újratöltődik a böngészőben.</p>
+    </div>
+  </div>
   <div class="code-cell" id="cell-s18">
     <div class="code-header"><span class="cell-number">[17]</span><button class="run-btn" onclick="runCell('s18')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># streamlit run app.py</span>
@@ -977,4 +1057,5 @@ window.COURSE_CONFIG = {
 <script src="../assets/webshop-case-study.js?v=webshop-pro"></script>
 <script src="../assets/courses-detail.js"></script>
 <script src="../shared/course.js?v=2025may2"></script>
+</body>
 </html>

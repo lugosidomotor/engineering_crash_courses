@@ -166,12 +166,14 @@ services:
 <div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
   <h2>Topic, Partition, Consumer Group <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
-  <div class="md-cell"><p>A Kafka három alapfogalma:</p>
+  <div class="md-cell"><p>A Kafka három alapfogalma a <strong>topic</strong>, a <strong>partition</strong> és a <strong>consumer group</strong>. Ezek együtt határozzák meg, hogyan áramlanak az események a rendszerben, és hogyan skálázható a feldolgozás.</p>
 <ul>
-<li><strong>Topic</strong> — kategória, amire a producerek küldenek és a consumerek olvasnak (pl. <code>webshop.orders</code>)</li>
-<li><strong>Partition</strong> — a topic vízszintes skálázási egysége. Minden partition rendezett, append-only log</li>
-<li><strong>Consumer Group</strong> — consumerek csoportja, ahol minden partitiont pontosan egy consumer olvas</li>
-</ul></div><div class="code-cell" id="cell-s3">
+<li><strong>Topic</strong> — kategória, amire a producerek küldenek és a consumerek olvasnak (pl. <code>webshop.orders</code>). Gondolj rá úgy, mint egy adatbázis táblára, de stream-ként: az üzenetek sorrendben érkeznek, és a topic konfigurálható retenciós szabály alapján őrzi meg őket.</li>
+<li><strong>Partition</strong> — a topic vízszintes skálázási egysége. Minden partition egy rendezett, append-only log. A particionálás kulcs alapján történik: azonos kulcsú üzenetek mindig ugyanarra a partitionra kerülnek, így garantált a sorrend. Minél több partition, annál több consumer dolgozhat párhuzamosan.</li>
+<li><strong>Consumer Group</strong> — consumerek csoportja, ahol minden partitiont pontosan egy consumer olvas. Ha egy consumer kiesik, a Kafka automatikusan újraosztja a partitionöket (rebalance). A group.id határozza meg, mely consumerek tartoznak össze.</li>
+</ul>
+<p><strong>WebShop Pro:</strong> A <code>webshop.purchases</code> topic 6 partitionnel rendelkezik, így akár 6 consumer dolgozhat párhuzamosan. A rendeléseket user_id alapján particionáljuk, így egy adott felhasználó rendelései mindig sorrendben érkeznek.</p>
+<p><span class="glossary-term" data-def="Események azonosítója, ami meghatározza melyik partitionra kerül">Partition key</span> · <span class="glossary-term" data-def="Ha egy consumer kiesik, a partitionök újraosztása a megmaradt consumerek között">Rebalance</span></p></div><div class="code-cell" id="cell-s3">
     <div class="code-header">
       <span class="cell-number">[3]</span>
       <button class="run-btn" onclick="runCell('s3')">&#9654; Run</button>
@@ -255,12 +257,14 @@ print(json.dumps(purchase_event, indent=2, ensure_ascii=False))</pre></div>
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
   <h2>Kafka Producer <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
-  <div class="md-cell"><p>A producer felel az események Kafka-ba küldéséért. Kulcsfontosságú beállítások:</p>
+  <div class="md-cell"><p>A <strong>Kafka Producer</strong> felel az események Kafka topicokba küldéséért. Bár egy egyszerű <code>send()</code> hívás is elegendő az üzenet elküldéséhez, production környezetben több kulcsfontosságú beállítást is meg kell adni a megbízhatóság és a teljesítmény érdekében.</p>
 <ul>
-<li><strong>acks=all</strong> — minden broker visszaigazolja a írást (max durability)</li>
-<li><strong>key</strong> — azonos key = azonos partition (rendezettség garantált)</li>
-<li><strong>compression</strong> — gzip/snappy/lz4 csökkenti a hálózati forgalmat</li>
-</ul></div><div class="code-cell" id="cell-s5">
+<li><strong>acks=all</strong> — minden in-sync replica broker visszaigazolja az írást, mielőtt a producer megkapja a megerősítést. Ez biztosítja a maximális tartósságot: ha a broker összeomlik, az adat nem vész el. Az <code>acks=1</code> gyorsabb, de kockázatosabb.</li>
+<li><strong>key</strong> — az üzenet kulcsa meghatározza, melyik partitionra kerül (hash-alapú partitioner). Azonos kulcs = azonos partition, ami garantálja a sorrendet az adott kulcshoz. WebShop Pro-ban a user_id-át használjuk key-ként.</li>
+<li><strong>compression</strong> — gzip, snappy vagy lz4 tömörítés csökkenti a hálózati forgalmat és a tárolási igényt. A snappy a leggyorsabb, a gzip a leghatékonyabb tömörítés szempontjából.</li>
+</ul>
+<p><strong>WebShop Pro forgatókönyv:</strong> Amikor egy felhasználó kosárba tesz egy terméket, a frontend AJAX hívást indít, ami egy producer endpointot hí meg. A producer <code>user_id</code> alapján key-ként küldi az eseményt, így az azonos felhasználó összes kosár-eseménye ugyanarra a partitionra kerül, garantálva a cronológiai sorrendet.</p>
+<p><strong>Tip:</strong> Mindig használj <code>acks=all</code>-t pénzügyi tranzakcióknál, és fontold meg a <code>enable.idempotence=true</code> beállítást, ami megakadályozza az üzenet duplikációt hálózati hiba esetén.</p></div><div class="code-cell" id="cell-s5">
     <div class="code-header">
       <span class="cell-number">[5]</span>
       <button class="run-btn" onclick="runCell('s5')">&#9654; Run</button>
@@ -301,12 +305,14 @@ Sent to partition 0 at offset 0</pre>
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
   <h2>Kafka Consumer <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
-  <div class="md-cell"><p>A consumer olvassa a topic üzeneteket. Fontos fogalmak:</p>
+  <div class="md-cell"><p>A <strong>Kafka Consumer</strong> olvassa a topic üzeneteket, és azokat továbbítja az üzleti logikának. A consumer működése több fontos koncepcióra épül, amelyek megértése elengedhetetlen egy megbízható streaming pipeline felépítéséhez.</p>
 <ul>
-<li><strong>Consumer Group</strong> — azonos group.id-val rendelkező consumerek megosztják a partition-okat</li>
-<li><strong>Offset</strong> — hol tart a consumer az olvasásban</li>
-<li><strong>auto.offset.reset</strong> — új consumer hol kezdjen: <code>earliest</code> vagy <code>latest</code></li>
-</ul></div><div class="code-cell" id="cell-s6">
+<li><strong>Consumer Group</strong> — azonos <code>group.id</code>-val rendelkező consumerek megosztják a partitionöket egymás között. Minden partitiont pontosan egy consumer olvas a csoporton belül. Ha több consumer van, mint partition, a felesleges consumerek tétlenek maradnak (standby). Ha kevesebb, akkor egy consumer több partitiont is olvashat.</li>
+<li><strong>Offset</strong> — egy monoton növekvő szám, ami megmutatja, hol tart a consumer az adott partition olvasásában. A Kafka tárolja az offsetet (committed offset), így ha a consumer újraindul, onnan folytatja, ahol abbahagyta — nem kell újraolvasni a már feldolgozott üzeneteket.</li>
+<li><strong>auto.offset.reset</strong> — amikor egy teljesen új consumer (vagy egy olyan, aminek nincs mentett offsetje) elkezdi az olvasást, ez a beállítás határozza meg, hol kezdjen: <code>earliest</code> (a legrégebbi üzenettől) vagy <code>latest</code> (csak az új üzenetek).</li>
+</ul>
+<p><strong>WebShop Pro példa:</strong> Az analytics consumer group (<code>webshop-analytics</code>) a <code>webshop.cart_events</code> topicot olvassa. Ha a consumer leáll és újraindul, a mentett offset alapján folytatja, így egyetlen kosár-esemény sem marad ki. A manual commit (<code>enable.auto.commit=false</code>) biztosítja, hogy csak a sikeresen feldolgozott üzenetek offsetje kerül mentésre.</p>
+<p><strong>Tip:</strong> Production-ben mindig használd a <code>enable.auto.commit=false</code> beállítást és manuálisan commitolj csak azokat az offseteket, amelyekhez tartozó üzeneteket sikeresen feldolgoztad. Ez megakadályozza az adatvesztést.</p></div><div class="code-cell" id="cell-s6">
     <div class="code-header">
       <span class="cell-number">[6]</span>
       <button class="run-btn" onclick="runCell('s6')">&#9654; Run</button>
@@ -339,12 +345,13 @@ for msg in consumer:
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
   <h2>Exactly-once vs at-least-once <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span></h2>
-  <div class="md-cell"><p>A <strong>delivery guarantee</strong> az egyik legfontosabb kérdés streaming-ben:</p>
+  <div class="md-cell"><p>A <strong>delivery guarantee</strong> (kézbesítési garancia) az egyik legfontosabb architekturális döntés streaming rendszerek tervezésekor. A három fő szint között kell választani, és a döntés hatással van a rendszer megbízhatóságára, teljesítményére és komplexitására.</p>
 <ul>
-<li><strong>At-most-once</strong> — üzenet elveszhet (fire and forget)</li>
-<li><strong>At-least-once</strong> — üzenet biztos megérkezik, de lehet duplikált</li>
-<li><strong>Exactly-once</strong> — üzenet pontosan egyszer érkezik (legdrágább)</li>
-</ul></div><table><tr><th>Garancia</th><th>Elveszhet?</th><th>Duplikálódhat?</th><th>Teljesítmény</th><th>Használat</th></tr><tr><td>At-most-once</td><td>Igen</td><td>Nem</td><td>Legjobb</td><td>Metrikák, logok</td></tr><tr><td>At-least-once</td><td>Nem</td><td>Igen</td><td>Jó</td><td>Idempotens feldolgozás</td></tr><tr><td>Exactly-once</td><td>Nem</td><td>Nem</td><td>Lassabb</td><td>Pénzügyi tranzakciók</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: exactly-once (pénzügyi). Page views: at-least-once (idempotens aggregálás).</p></div>
+<li><strong>At-most-once</strong> — a producer elküldi az üzenetet és nem vár visszaigazolást. Ha valami hiba történik (hálózati probléma, broker összeomlás), az üzenet elveszhet. Ez a leggyorsabb megközelítés, de a legkevésbé megbízható. Olyan esetekben megfelelő, ahol egy-egy elveszett üzenet nem kritikus.</li>
+<li><strong>At-least-once</strong> — a producer újrapróbálkozik, amíg meg nem kapja a visszaigazolást. Ha hiba történik, az üzenet újraküldésre kerül. Ez garantálja, hogy egyetlen üzenet sem vész el, de duplikátumok előfordulhatnak. A consumer oldalon idempotens feldolgozással (pl. deduplikáció event_id alapján) kezelhető a probléma.</li>
+<li><strong>Exactly-once</strong> — az üzenet pontosan egyszer kerül kézbesítésre, sem el nem veszik, sem nem duplikálódik. Ez a legerősebb garancia, de a legdrágább: tranzakciós protokollt és kételyes koordinációt igényel a producer, a broker és a consumer között. A Kafka <code>enable.idempotence=true</code> és tranzakciós API-ja biztosítja ezt.</li>
+</ul>
+<p><strong>WebShop Pro stratégia:</strong> A rendelések (<code>webshop.purchases</code>) exactly-once garanciát kapnak, mert pénzügyi tranzakciók — egy duplikált rendelés komoly ügyféligénylési problémát okozna. A page view események at-least-once garanciával működnek, mert az aggregált metrikák idempotensek (egy extra page view minimális torzítást okoz).</p></div><table><tr><th>Garancia</th><th>Elveszhet?</th><th>Duplikálódhat?</th><th>Teljesítmény</th><th>Használat</th></tr><tr><td>At-most-once</td><td>Igen</td><td>Nem</td><td>Legjobb</td><td>Metrikák, logok</td></tr><tr><td>At-least-once</td><td>Nem</td><td>Igen</td><td>Jó</td><td>Idempotens feldolgozás</td></tr><tr><td>Exactly-once</td><td>Nem</td><td>Nem</td><td>Lassabb</td><td>Pénzügyi tranzakciók</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: exactly-once (pénzügyi). Page views: at-least-once (idempotens aggregálás).</p></div>
 </div>
 
 <div class="section layer-general" id="s8">
@@ -405,7 +412,9 @@ Sent to DLQ: Missing product_id</pre>
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
   <h2>Spark Structured Streaming <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
-  <div class="md-cell"><p>A <strong>Spark Structured Streaming</strong> a Spark batch API-ját kiterjeszti streaming-re. A lényeg: <em>micro-batch</em> módban kis batch-ekként dolgozza fel az adatot, de a API ugyanaz, mint a batch DataFrame-eknél.</p>
+  <div class="md-cell"><p>A <strong>Spark Structured Streaming</strong> az Apache Spark deklaratív streaming API-ja, amely a batch DataFrame API-t terjeszti ki folyamatos adatfeldolgozásra. A lényeg: nem kell külön streaming koncepciókat megtanulnod — ugyanazok a transzformációk (<code>select</code>, <code>filter</code>, <code>groupBy</code>, <code>join</code>) működnek, mint batch módban, de a motor a háttérben folyamatosan futtatja őket.</p>
+<p>A motor <em>micro-batch</em> módban működik alapértelmezetten: a bejövő adatfolyamot kis, fix időközönként (pl. 500ms vagy 5s) batch-ekre bontja, majd mindegyiket egy-egy Spark job-ként dolgozza fel. Létezik <em>continuous processing</em> mód is, ami milliszekendumos késleltetést biztosít, de korlátozottabb operátorokkal.</p>
+<p><strong>Miért Spark és nem sima Python consumer?</strong> Mert a Spark automatikusan kezeli a fault tolerance-t (checkpointing), a state-kezelést (aggregációk, window-ok), és skálázható több node-ra. Egy sima Python consumer nem tud amortizálni egy rebalance-t, nem tud nagy state-et tartani memóriában, és nem tud pontosan egyszer szematikusan dolgozni.</p>
 <p><span class="glossary-term" data-def="A streaming feldolgozás kis batch-ekben történik, pl. 500ms vagy 1s időablakokban">Micro-batch</span> · <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="noopener">Spark Streaming docs 📖</a></p></div><div class="code-cell" id="cell-s9">
     <div class="code-header">
       <span class="cell-number">[9]</span>
@@ -452,8 +461,10 @@ print("Streaming query definiálva (micro-batch, 5s trigger)")</pre></div>
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
   <h2>Watermarking <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
-  <div class="md-cell"><p>A <strong>watermark</strong> megmondja a Sparknak, hogy mennyi ideig várjon a későn érkező adatokra. Ha egy esemény <code>maxDelay</code>-en túl érkezik, a Spark eldobja vagy külön kezeli.</p>
-<p><strong>WebShop Pro:</strong> Ha egy felhasználó kosárba tesz valamit mobilon, de a hálózat miatt 2 perc múlva érkezik meg a Kafka-hoz — a watermark kezeli ezt.</p></div><div class="code-cell" id="cell-s10">
+  <div class="md-cell"><p>A <strong>watermark</strong> a Spark Structured Streaming egyik legfontosabb mechanizmusa, amely meghatározza, meddig várjon a motor a későn érkező (late) eseményekre, mielőtt lezár egy időablakot. Megadja a maximális késleltetést, amit az engine tolerál — ezen túl érkező adatokat eldobja vagy külön kezeli.</p>
+<p><strong>Hogyan működik?</strong> A Spark folyamatosan nyomon követi a legfrissebb esemény-időt minden partitionön. Ha egy új esemény érkezik, az esemény időpontja alapján frissíti a watermarket: <code>watermark = max(event_time) - maxDelay</code>. Bármely ablak, amelynek a vége a watermark előtt van, lezárul és kimenetre kerül. A későn érkező, de még a watermark ablakon belüli események frissítik a korábbi ablak eredményét.</p>
+<p><strong>WebShop Pro:</strong> Ha egy felhasználó mobilon kosárba tesz valamit, de a hálózat miatt 2 perc múlva érkezik meg a Kafka-hoz, a 2 perces watermark ezt még kezeli. Ha viszont 10 percet késik, a Spark eldobja, mert a watermark már túlhaladt az adott ablakon. Ez egy ésszerű kompromisszum a valós idejű feldolgozás pontossága és teljesítménye között.</p>
+<p><strong>Tip:</strong> A watermark beállítása kritikus egyensúly: túl kis érték → sok late data elvész; túl nagy érték → az ablakok lassan zárulnak, nő a memória-használat és a késleltetés. Kezdd a várható hálózati késleltetés 2-3-szorosával, és monitorozd a late data arányt.</p></div><div class="code-cell" id="cell-s10">
     <div class="code-header">
       <span class="cell-number">[10]</span>
       <button class="run-btn" onclick="runCell('s10')">&#9654; Run</button>
@@ -487,18 +498,23 @@ print("Windowed aggregation: 5 min windows, 2 min watermark")</pre></div>
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
   <h2>Late arriving data <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
-  <div class="md-cell"><p>A <strong>late data</strong> olyan esemény, ami a watermark után érkezik. Három stratégia:</p>
+  <div class="md-cell"><p>A <strong>late data</strong> (későn érkező adat) olyan esemény, amelynek az esemény-időpontja már a watermark mögött van, amikor megérkezik a feldolgozó rendszerbe. Ez gyakran előfordozik mobil hálózati késleltetés, óraszinkronizációs problémák vagy upstream rendszer leállás miatt.</p>
+<p>A Spark Structured Streaming három stratégiát kínál a late data kezelésére:</p>
 <ol>
-<li><strong>Drop</strong> — figyelmen kívül hagyjuk (alapértelmezett)</li>
-<li><strong>Update</strong> — frissítjük a korábbi ablak eredményt</li>
-<li><strong>Append</strong> — új sorként hozzáadjuk</li>
-</ol></div><table><tr><th>Stratégia</th><th>Output mode</th><th>Használat</th><th>Költség</th></tr><tr><td>Drop late</td><td>Append</td><td>Metrikák ahol nem kritikus</td><td>Ingyenes</td></tr><tr><td>Update result</td><td>Update</td><td>Real-time dashboard</td><td>Közepes (state storage)</td></tr><tr><td>Reprocess</td><td>Complete</td><td>Pontos aggregáció</td><td>Magas (teljes state)</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: Update mode (pontos kell). Page views: Drop late (nem kritikus ha egy view elveszik).</p></div>
+<li><strong>Drop</strong> — figyelmen kívül hagyjuk a későn érkező eseményeket (alapértelmezett viselkedés). A legegyszerűbb és leggyorsabb megoldás, de adatvesztéssel jár. Olyan metrikáknál megfelelő, ahol egy-két elveszett esemény nem torzítja jelentősen az eredményt.</li>
+<li><strong>Update</strong> — frissítjük a korábbi ablak eredményét az új adattal. A kimenetben a korábbi sor felülíródik a frissített értékkel. Ez alkalmas real-time dashboardokhoz, ahol a pontosság fontos, de a state mérete nőhet, mert a Spark-nak memóriában kell tartania a korábbi ablakok állapotát.</li>
+<li><strong>Append</strong> — új sorként hozzáadjuk az eredményhez, a korábbi ablak eredménye nem módosul. Ritkábban használt, de hasznos lehet audit célú naplózásnál.</li>
+</ol>
+<p><strong>WebShop Pro:</strong> A rendeléseknél Update módot használunk, mert a rendelési statisztikáknak pontosnak kell lenniük. A page view-knál Drop módot, mert egy-két elveszett page view nem kritikus az aggregált metrikák szempontjából.</p></div><table><tr><th>Stratégia</th><th>Output mode</th><th>Használat</th><th>Költség</th></tr><tr><td>Drop late</td><td>Append</td><td>Metrikák ahol nem kritikus</td><td>Ingyenes</td></tr><tr><td>Update result</td><td>Update</td><td>Real-time dashboard</td><td>Közepes (state storage)</td></tr><tr><td>Reprocess</td><td>Complete</td><td>Pontos aggregáció</td><td>Magas (teljes state)</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: Update mode (pontos kell). Page views: Drop late (nem kritikus ha egy view elveszik).</p></div>
 </div>
 
 <div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
   <h2>Stream-to-Delta <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
-  <div class="md-cell"><p>A streaming adatok Delta táblába írása a leggyakoribb lakehouse minta. A Spark Structured Streaming natívan támogatja a Delta sink-et.</p></div><div class="code-cell" id="cell-s12">
+  <div class="md-cell"><p>A streaming adatok Delta táblába írása a leggyakoribb lakehouse minta, amely ötvözi a streaming feldolgozás valós idejűségét a Delta Lake ACID tranzakcióinak megbízhatóságával. A Spark Structured Streaming natívan támogatja a Delta sink-et, így egyetlen API hívással írhatunk stream-ből Delta táblába.</p>
+<p><strong>Hogyan működik?</strong> A Spark minden micro-batch-ben új Parquet fájlokat ír a Delta tábla könyvtárába, és atomi művelettel frissíti a <code>_delta_log/</code> tranzakciós naplót. A <code>checkpointLocation</code> könyvtár tartalmazza a streaming progress-t (offsetek, state), így ha a query újraindul, onnan folytatja, ahol abbahagyta — ez a fault tolerance alapja.</p>
+<p><strong>Output módok:</strong> Az <code>append</code> mód csak új sorokat ad hozzá (későn érkező adatok nem módosítják a korábbiakat). Az <code>update</code> mód frissíti a meglévő sorokat (pl. aggregációknál). A <code>complete</code> mód minden micro-batch-ben kiírja a teljes eredményt (ritkán használt, nagy state-nél drága).</p>
+<p><strong>WebShop Pro:</strong> A kosár-események és készlet-frissítések is Delta táblákba íródnak. A kosár-események append módban, mert csak új események jönnek. A készlet-frissítések update módban, mert a termékkészlet értéke felülíródik a legfrissebb állapottal.</p></div><div class="code-cell" id="cell-s12">
     <div class="code-header">
       <span class="cell-number">[12]</span>
       <button class="run-btn" onclick="runCell('s12')">&#9654; Run</button>
@@ -542,7 +558,10 @@ print("2 streaming query fut: cart_events → Delta, inventory → Delta")</pre>
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
   <h2>Real-time feature update <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
-  <div class="md-cell"><p>Az ML modellek frissítéséhez real-time feature-k kellenek. Például: <em>"a felhasználó az elmúlt 10 percben hány terméket nézett meg"</em>. Ezt a streaming pipeline számolja és egy feature store-ba írja.</p></div><div class="code-cell" id="cell-s13">
+  <div class="md-cell"><p>Az ML modellek valós idejű frissítéséhez <strong>real-time feature-ökre</strong> van szükség. A batch-alapú feature engineering (pl. napi aggregáció) túl lassú az olyan alkalmazásokhoz, mint a valós idejű termékajánlás vagy a csalásdetektálás. A streaming pipeline képes folyamatosan frissíteni a feature-öket, ahogy az adatok érkeznek.</p>
+<p><strong>Mik azok a real-time feature-ök?</strong> Olyan aggregált jellemzők, amelyek egy csúszó időablakban (sliding window) számítódnak. Például: <em>"a felhasználó az elmúlt 10 percben hány terméket nézett meg"</em>, <em>"az elmúlt 1 órában mennyit költött"</em>, vagy <em>"az adott IP címről hány sikertelen bejelentkezési kísérlet történt az elmúlt 5 percben"</em>.</p>
+<p>A Spark Structured Streaming <code>groupBy(window(...), key)</code> operátorral natívan támogatja a csúszó ablakokat. A <code>complete</code> output módot használjuk, mert minden trigger-ben a teljes, frissített aggregációt ki akarjuk írni a feature store-ba. A Delta Lake-ben tárolt feature-öket az ML modell közvetlenül olvashatja a legfrissebb állapotban.</p>
+<p><strong>WebShop Pro:</strong> A kosár-események stream-ből 10 perces csúszó ablakkal (1 perces slide) számítjuk a termékenkénti eseményszámot és mennyiséget. Ezek a feature-ök bemenetként szolgálnak a termékajánló modellnek.</p></div><div class="code-cell" id="cell-s13">
     <div class="code-header">
       <span class="cell-number">[13]</span>
       <button class="run-btn" onclick="runCell('s13')">&#9654; Run</button>
@@ -580,7 +599,10 @@ print("Real-time feature update: 10 min sliding window, 1 min slide, 1 min trigg
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
   <h2>WebShop Pro streaming pipeline <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span> <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span></h2>
-  <div class="md-cell"><p>A teljes WebShop Pro streaming architektúra összerakva:</p></div><div class="code-cell" id="cell-s14">
+  <div class="md-cell"><p>A teljes <strong>WebShop Pro streaming architektúra</strong> egy end-to-end pipeline, amely a frontend eseményektől a Delta Lake táblákig terjed. Ez a szakasz összefoglalja a kurzus során tanultakat egy koherens rendszerarchitektúrává.</p>
+<p><strong>Architektúra áttekintés:</strong> A webshop frontend minden felhasználói interakciót Kafka topicokra küld (page views, kosár-események, rendelések, készlet-frissítések). A Spark Structured Streaming feliratkozik ezekre a topicokra, parse-olja a JSON üzeneteket, alkalmazza a watermarking-ot és az ablakos aggregációkat, majd az eredményt Delta Lake táblákba írja. A hibás üzenetek Dead Letter Queue-ba kerülnek, a valós idejű feature-ök pedig egy külön feature store Delta táblát táplálnak.</p>
+<p><strong>Topic tervezés:</strong> A <code>webshop.purchases</code> topic 12 partitionnel rendelkezik (a legnagyobb forgalmú) és végtelen retencióval (a rendeléseket sosem töröljük). A <code>webshop.page_views</code> 1 napos retencióval működik (a régi page view-kat a Kafka automatikusan törli). A particionálás száma a várható forgalom és a párhuzamos consumerek száma alapján került meghatározásra.</p>
+<p><strong>Tip:</strong> Éles környezetben a topic-ok számát, a partition-ök számát és a retenciót a tényleges adatmennyiség és SLA alapján kell meghatározni. Kezdd konzervatív értékekkel, és monitorozd a consumer lag-et (hány üzenet van lemaradásban) a skálázás döntéshez.</p></div><div class="code-cell" id="cell-s14">
     <div class="code-header">
       <span class="cell-number">[14]</span>
       <button class="run-btn" onclick="runCell('s14')">&#9654; Run</button>
@@ -621,7 +643,10 @@ for topic, cfg in pipeline_topics.items():
 <div class="section layer-general" id="s15">
   <div class="section-number">Section 15</div>
   <h2>Összefoglalás </h2>
-  <div class="md-cell"><p>Gratulálunk! Megtanultad a streaming engineering alapokat!</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>Event-driven architektúra</td><td>RAG Evaluation & AI Safety</td></tr><tr><td>Kafka producer/consumer</td><td>LLM eval pipeline</td></tr><tr><td>Exactly-once, DLQ</td><td>Hallucination detection</td></tr><tr><td>Spark Structured Streaming</td><td>Guardrails & safety</td></tr><tr><td>Watermarking, late data</td><td>Production eval pipeline</td></tr><tr><td>Stream-to-Delta</td><td>Real-time AI features</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>RAG Evaluation & AI Safety — ahol megtanuljuk, honnan tudjuk, hogy az AI jól válaszol!</p></div><div class="quiz-box" data-answer="1">
+  <div class="md-cell"><p>Gratulálunk! Ebben a kurzusban megismerted a streaming engineering alapjait, az event-driven architektúrától a teljes production pipeline felépítéséig. A streaming nem csak egy technológia — egy teljesen más gondolkodásmód az adatfeldolgozásról.</p>
+<p><strong>Főbb tanulságok:</strong> Megtanultad, hogy a Kafka topic/partition/consumer group modellje hogyan teszi lehetővé a skálázható és megbízható esemény-feldolgozást. Megértetted a delivery guarantee-k (at-most-once, at-least-once, exactly-once) közötti különbségeket és azt, hogy mikor melyiket érdemes választani. A Spark Structured Streaming micro-batch modellje, a watermarking és a late data kezelés mind olyan eszközök, amelyek a valós idejű feldolgozás kihívásait oldják meg.</p>
+<p><strong>WebShop Pro teljes kép:</strong> A kurzus végére felépítettél egy teljes streaming pipeline-t, amely a webshop eseményeit valós időben dolgozza fel, Delta Lake táblákba írja az eredményeket, és valós idejű feature-öket biztosít az ML modelleknek. Ez az architektúra iparági standard, és a tanultakat bármilyen streaming use case-re alkalmazhatod.</p>
+<p><strong>Tip:</strong> A következő lépés a RAG Evaluation & AI Safety kurzus, ahol megtanulod, hogyan értékeld, hogy egy AI rendszer mennyire megbízható — ami kritikus kiegészítője a streaming pipeline-ból származó real-time adatok felhasználásának.</p></div><table><tr><th>Megtanultuk</th><th>Következő</th></tr><tr><td>Event-driven architektúra</td><td>RAG Evaluation & AI Safety</td></tr><tr><td>Kafka producer/consumer</td><td>LLM eval pipeline</td></tr><tr><td>Exactly-once, DLQ</td><td>Hallucination detection</td></tr><tr><td>Spark Structured Streaming</td><td>Guardrails & safety</td></tr><tr><td>Watermarking, late data</td><td>Production eval pipeline</td></tr><tr><td>Stream-to-Delta</td><td>Real-time AI features</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>RAG Evaluation & AI Safety — ahol megtanuljuk, honnan tudjuk, hogy az AI jól válaszol!</p></div><div class="quiz-box" data-answer="1">
 <h3>Quiz: Mi a Kafka consumer group lényege?</h3>
 <button class="quiz-option">Az összes consumer ugyanazt az üzenetet kapja</button><button class="quiz-option">A partition-ok megosztódnak a consumerek között</button><button class="quiz-option">A producerek csoportosítása</button><button class="quiz-option">A topic replikáció</button>
 <div class="quiz-feedback"></div>
