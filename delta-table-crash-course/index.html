@@ -154,7 +154,8 @@ Data Warehouse rész: fact/dimension és gold réteg, vagyis riportbarát modell
   <div class="section-number">Section 02</div>
   <h2>Architektúra-térkép</h2>
   <div class="md-cell">
-    <p>A architektúra-térkép azt mutatja meg, hogyan áll össze egy tipikus data engineering platform a forrásrendszerektől a fogyasztásig.</p>
+    <p>A architektúra-térkép azt mutatja meg, hogyan áll össze egy tipikus data engineering platform a forrásrendszerektől a fogyasztásig. A hatszakaszos folyamat (forrás, beérkeztetés, tárolás, feldolgozás, metaadat, fogyasztás) szinte minden modern adatplatformon megtalálható valamilyen formában, függetlenül attól, hogy Databricks, Snowflake, vagy saját építésű megoldásról van szó.</p>
+    <p>A diagram vizuálisan is megmutatja az adatáramlás irányát: balról jobbra halad a nyers adat a forrásrendszerektől a feldolgozott, riportkész adatokig. Minden szakasznak megvannak a saját tipikus eszközei és technológiái, de a Delta Lake a "tárolás" sávban tölt be kulcsszerepet, mint a nyílt táblázatformátum, amely összeköti a feldolgozó rendszereket a tároló réteggel.</p>
   </div>
   <div class="arch-flow">
     <div class="arch-step"><div class="label">Forrás</div><div class="detail">OLTP, API, IoT</div></div>
@@ -199,7 +200,10 @@ Data Warehouse rész: fact/dimension és gold réteg, vagyis riportbarát modell
     <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span>
   </h2>
   <div class="md-cell">
-    <p>Ez a notebook teljesen bootstrapelt: a projekt gyökerében lévő <code>bootstrap.ps1</code> vagy <code>bootstrap.sh</code> létrehozza a <code>.venv</code> virtuális környezetet, telepíti a <code>requirements.txt</code> csomagjait, és regisztrálja a Jupyter kernelt.</p>
+    <p>Ez a notebook teljesen bootstrapelt: a projekt gyökerében lévő <code>bootstrap.ps1</code> vagy <code>bootstrap.sh</code> létrehozza a <code>.venv</code> virtuális környezetet, telepíti a <code>requirements.txt</code> csomagjait, és regisztrálja a Jupyter kernelt. Ez biztosítja, hogy mindenki ugyanabban a környezetben futtatja a kódot, függetlenül attól, hogy milyen operációs rendszert használ.</p>
+    <p>A data engineering projektekben a reproduckálható környezet kiemelkedően fontos: ha a csapattagok különböző csomagverziókkal dolgoznak, akkor könnyen előfordulhat, hogy az egyik gépen működő pipeline a másikon hibát dob. A virtuális környezet (venv) ezt a kockázatot szünteti meg úgy, hogy minden függőséget a projekt könyvtárában tart, a globális Python telepítés érintetlenül hagyása mellett.</p>
+    <p>A kódban a <code>REQUIRED_IMPORTS</code> lista határozza meg, mely csomagoknak feltétlenül elérhetőnek kell lenniük a futás elkezdése előtt. Az <code>os.name</code> ágon a szkript megkülönbözteti a Windows és Linux/macOS környezeteket, így a megfelelő bootstrap szkriptet hívja meg. A <code>subprocess.check_call()</code> biztosítja, hogy ha a bootstrap bármely lépése sikertelen, a notebook azonnal jelezze a hibát.</p>
+    <p><strong>Tip:</strong> Ha a bootstrap lefutott, a <code>.venv</code> mappa tartalmazza a teljes Python környezetet -- ezt érdemes hozzáadni a <code>.gitignore</code>-hoz, mert a gépen generálódik, nem pedig verziózandó.</p>
   </div>
   <div class="code-cell" id="cell-s3">
     <div class="code-header">
@@ -247,7 +251,10 @@ subprocess.check_call(bootstrap_cmd, cwd=project_dir)
     <span class="tool-badge"><img src="../assets/logos/arrow.svg">pyarrow</span>
   </h2>
   <div class="md-cell">
-    <p>A példához a <code>deltalake</code> Python csomagot használjuk. Ez a delta-rs projekt Python bindingja, és <strong>Spark nélkül</strong> is tud Delta táblát írni/olvasni.</p>
+    <p>A példához a <code>deltalake</code> Python csomagot használjuk. Ez a delta-rs projekt Python bindingja, és <strong>Spark nélkül</strong> is tud Delta táblát írni/olvasni. A delta-rs egy Rust nyelven írt, nagy teljesítményű Delta Lake implementáció, amely lehetővé teszi, hogy nem csak JVM-alapú rendszerekben (pl. Spark) használjuk a Delta formátumot, hanem tiszta Python környezetben is.</p>
+    <p>A data engineering gyakorlatban ez azért jelentős, mert sok ETL pipeline nem igényel elosztott feldolgozást -- egy egyszerű Python scripttel is létrehozhatsz production-grade Delta táblákat, amelyek aztán bármely Delta-kompatibilis eszközzel (Spark, Databricks, Trino, Presto) olvashatók. A <code>pyarrow</code> biztosítja a hatékony memórián belüli adatkezelést, a <code>pandas</code> pedig a kényelmes DataFrame API-t.</p>
+    <p>A kódcella meghívja a <code>sys.executable</code> útvonalat, valamint a három fő csomag verziószámát, hogy ellenőrizhesd: a megfelelő virtuális környezet aktív, és a verziók kompatibilisek egymással.</p>
+    <p><strong>Tip:</strong> A <code>deltalake</code> csomag verziója határozza meg, mely Delta protokollverziókat tudja írni és olvasni -- régebbi verziók nem támogatják például a column mapping vagy a deletion vectors funkciókat.</p>
   </div>
   <div class="code-cell" id="cell-s4">
     <div class="code-header">
@@ -279,7 +286,10 @@ subprocess.check_call(bootstrap_cmd, cwd=project_dir)
   <div class="section-number">Section 05</div>
   <h2>Importok és lokális célmappa</h2>
   <div class="md-cell">
-    <p>A Delta table fizikailag egy mappa lesz a gépeden. Ebben lesznek a Parquet adatfájlok és a <code>_delta_log</code> könyvtár.</p>
+    <p>A Delta table fizikailag egy mappa lesz a gépeden. Ebben lesznek a Parquet adatfájlok és a <code>_delta_log</code> könyvtár. Ez a kettősség a Delta Lake alapja: az adatok maguk Parquet formátumban tárolódnak (amely már önmagában is oszlopos és tömörített), de a tranzakciós napló adja hozzá az ACID garanciákat, a verziózást és a sémakezelést.</p>
+    <p>A kódban a <code>base_dir</code> egy gyűjtőmappa, amely alá az összes demo Delta tábla kerülni fog. A <code>shutil.rmtree()</code> hívás biztosítja, hogy minden futtatásnál tiszta lappal induljunk -- ez a notebook kontextusában praktikus, de production környezetben természetesen nem törölnénk az adatokat.</p>
+    <p>A <code>DeltaTable</code> import a meglévő Delta táblák olvasásához kell, a <code>write_deltalake</code> pedig az íráshoz. A <code>Path</code> osztály a <code>pathlib</code>-ből platformfüggetlen útvonalkezelést biztosít, így Windows és Linux alatt is ugyanaz a kód működik.</p>
+    <p><strong>Tip:</strong> A <code>base_dir.mkdir(parents=True, exist_ok=True)</code> létrehozza a szülőkönyvtárakat is, ha még nem léteznek -- hasznos, ha mélyebb könyvtárszerkezetet szeretnél felépíteni.</p>
   </div>
   <div class="code-cell" id="cell-s5">
     <div class="code-header">
@@ -315,7 +325,10 @@ table_path</pre></div>
     <span class="tool-badge"><img src="../assets/logos/pandas.svg">pandas</span>
   </h2>
   <div class="md-cell">
-    <p>Ez lehetne CSV-ből, API-ból vagy adatbázisból jövő adat is. Most kézzel készítünk egy kis táblát.</p>
+    <p>Ez lehetne CSV-ből, API-ból vagy adatbázisból jövő adat is. Most kézzel készítünk egy kis táblát, amely rendelési adatokat tartalmaz. A DataFrame négy rendelést mutat be, mindegyikhez rendelésszám (<code>order_id</code>), vásárló azonosító (<code>customer_id</code>), összeg (<code>amount</code>), dátum (<code>order_date</code>) és forrásrendszer (<code>source_system</code>) tartozik.</p>
+    <p>A valós adatfolyamatokban az ilyen forrásadat általában egy OLTP adatbázisból, egy REST API válaszából vagy egy beérkező CSV fájlból származik. A pandas <code>DataFrame</code> egy univerzális közbenső formátum: szinte bármilyen adatforrást be tudunk tölteni bele, majd onnan a <code>write_deltalake</code> segítségével Delta táblaként kiírni. A <code>pd.to_datetime()</code> biztosítja, hogy a dátum oszlop valóban dátumtípusként legyen tárolva, nem pedig szövegként.</p>
+    <p>A <code>source_system</code> oszlop jelzi, hogy a rendelés honnan érkezett -- ez később a bronze/silver rétegekben fontos lesz, amikor forrásalapú szűréseket vagy statisztikákat készítünk.</p>
+    <p><strong>Tip:</strong> Éles adatfolyamatokban a forrásadatot soha nem módosítjuk azonnal -- először a bronze rétegbe mentjük eredeti formájában, hogy vissza lehessen nyomozni bármilyen adatminőségi problémát.</p>
   </div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header">
@@ -353,9 +366,10 @@ sales_df</pre></div>
     <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
   </h2>
   <div class="md-cell">
-    <p>Itt történik a lényeg. A <code>write_deltalake(...)</code> létrehozza a Delta table-t a megadott mappában.</p>
-    <p><strong>Nem kell hozzá:</strong> Databricks, Synapse, Azure, metastore, cluster</p>
-    <p>Kell hozzá egy Delta-kompatibilis writer, jelen esetben a <code>deltalake</code> csomag.</p>
+    <p>Itt történik a lényeg. A <code>write_deltalake(...)</code> létrehozza a Delta table-t a megadott mappában. Ez az a pont, amikor egy egyszerű pandas DataFrame-ből egy verziózott, ACID tranzakciókat támogató táblává válik az adat. A függvény a háttérben Parquet fájlokat hoz létre az adatoknak, és egy <code>_delta_log</code> könyvtárat a metaadatoknak.</p>
+    <p><strong>Nem kell hozzá:</strong> Databricks, Synapse, Azure, metastore, cluster. Ez az egyik legfontosabb tanulság: a Delta Lake egy nyílt formátum, amelyhez csak egy kompatibilis writer kell. A <code>deltalake</code> Python csomag éppen ilyen writer, és bármilyen fájlrendszerre tud írni -- legyen az lokális mappa, S3 bucket vagy ADLS container.</p>
+    <p>A <code>write_deltalake()</code> első paramétere a célmappa útvonala stringként, a második pedig az adat (pandas DataFrame, PyArrow Table vagy RecordBatchReader). Alapértelmezetten <code>mode="overwrite"</code> módban fut, ami azt jelenti, hogy ha már létezik tábla a mappában, felülírja. Később látni fogjuk az <code>append</code> módot is.</p>
+    <p><strong>Tip:</strong> Ha a célmappa már tartalmaz egy Delta táblát és más sémával írsz rá, a <code>write_deltalake</code> alapértelmezetten hibát dob -- ez véletlen sématörés ellen véd. Ha szándékosan módosítani akarod a sémát, a <code>schema_mode="overwrite"</code> paramétert kell használnod.</p>
   </div>
   <div class="code-cell" id="cell-s7">
     <div class="code-header">
@@ -380,7 +394,10 @@ sales_df</pre></div>
     <span class="tool-badge"><img src="../assets/logos/parquet.svg">Parquet</span>
   </h2>
   <div class="md-cell">
-    <p>A Delta table mappájában Parquet fájlokat és egy <code>_delta_log</code> mappát kell látnod.</p>
+    <p>A Delta table mappájában Parquet fájlokat és egy <code>_delta_log</code> mappát kell látnod. A kódcella a <code>rglob("*")</code> segítségével rekurzívan listázza ki a tartalmat, és megjelöli, hogy mi könyvtár (<code>[DIR]</code>) és mi fájl (<code>[FILE]</code>).</p>
+    <p>A Parquet fájl tartalmazza magát az adatot -- ebben az esetben a négy rendelési sort oszlopos, Snappy tömörítéssel. A fájl neve tartalmaz egy egyedi azonosítót (UUID), ami garantálja, hogy akkor sem lesz névütközés, ha több writer párhuzamosan ír ugyanabba a táblába. A <code>_delta_log</code> könyvtárban pedig a tranzakciós napló található, amely a következő sectionben részletesen bemutatásra kerül.</p>
+    <p>Fontos megérteni, hogy ez a kettősség (adatfájlok + napló) az, ami megkülönbözteti a Delta táblát egy sima Parquet fájlokra írt mappától. Ha csak Parquet fájlok lennének, nem lenne sémakezelés, nem lenne verziózás, és nem lennének ACID tranzakciók sem.</p>
+    <p><strong>Tip:</strong> Soha ne manuálisan módosítsd vagy töröld a Parquet fájlokat a Delta tábla mappájában -- mindig a Delta API-n keresztül kezeldd az adatokat, különben a tranzakciós napló és az adatfájlok inkonzisztenssé válnak.</p>
   </div>
   <div class="code-cell" id="cell-s8">
     <div class="code-header">
@@ -415,7 +432,10 @@ sales_df</pre></div>
     <span class="tool-badge"><img src="../assets/logos/json.svg">JSON</span>
   </h2>
   <div class="md-cell">
-    <p>A <code>_delta_log</code> JSON fájlok írják le a tábla tranzakcióit. Itt van például a schema és az, hogy mely Parquet fájlok tartoznak a táblához.</p>
+    <p>A <code>_delta_log</code> JSON fájlok írják le a tábla tranzakcióit. Itt van például a schema és az, hogy mely Parquet fájlok tartoznak a táblához. Minden Delta log fájl egy-egy verziót (commitot) képvisel: a <code>00000000000000000000.json</code> a 0. verzió, a <code>00000000000000000001.json</code> az 1. verzió, és így tovább.</p>
+    <p>A log fájl nem egyetlen JSON objektum, hanem <strong>JSON Lines</strong> formátumú: minden sor egy önálló JSON objektum, egy-egy "action"-t ír le. Az első kódcella kilistázza a log fájlokat, a második pedig beolvassa és formázottan kiírja az első log tartalmát. A <code>json.loads()</code> hívás soronként dolgozza fel a fájlt, a <code>json.dumps(..., indent=2)</code> pedig ember által olvashatóra formázza a kimenetet.</p>
+    <p>A log tartalmában négyféle bejegyzést fogsz látni: <strong>protocol</strong> (Delta protokoll verzió), <strong>metaData</strong> (tábla azonosító, séma, formátum), <strong>add</strong> (hozzáadott Parquet fájl elérési útja és mérete), valamint <strong>commitInfo</strong> (milyen művelet történt, pl. CREATE_TABLE). Ez a felépítés teszi lehetővé a time travel-t és az ACID garanciákat.</p>
+    <p><strong>Tip:</strong> A Delta log fájlok kis méretűek, de nagyon sok apró fájl keletkezhet sok írás esetén -- éles rendszerekben az <code>OPTIMIZE</code> és a log compaction segít ezt kezelni.</p>
   </div>
   <div class="code-cell" id="cell-s9">
     <div class="code-header">
@@ -498,7 +518,10 @@ log_files</pre></div>
   <div class="section-number">Section 10</div>
   <h2>Delta table olvasása path alapján</h2>
   <div class="md-cell">
-    <p>Most nincs metastore. Nem tudjuk azt mondani, hogy <code>SELECT * FROM silver.sales</code>, mert nincs ilyen regisztrált táblanév. De <strong>path alapján</strong> tökéletesen olvasható a Delta table.</p>
+    <p>Most nincs metastore. Nem tudjuk azt mondani, hogy <code>SELECT * FROM silver.sales</code>, mert nincs ilyen regisztrált táblanév. De <strong>path alapján</strong> tökéletesen olvasható a Delta table. A <code>DeltaTable(path)</code> konstruktor megnyitja a táblát, a <code>.to_pandas()</code> pedig az egész tábla tartalmát egy pandas DataFrame-ként adja vissza.</p>
+    <p>A path-alapú olvasás a legegyszerűbb módja a Delta táblák elérésének, és teljesen elegendő ETL jobok, ad hoc elemzések és notebookok esetén. A DeltaTable objektum nem tölti be azonnal az összes adatot a memóriába -- csak a metaadatokat olvassa be, és az adatok csak a <code>.to_pandas()</code> vagy <code>.to_pyarrow()</code> hívásakor kerülnek betöltésre.</p>
+    <p>Ha lenne metastore (pl. Databricks Unity Catalog vagy Hive Metastore), akkor a táblanév alapján is elérnéd ugyanezt az adatot, mert a metastore leképezi a logikai nevet a fizikai útvonalra. De a tábla önmagában, a fizikai fájlokkal, metastore nélkül is teljes értékűen létezik és olvasható.</p>
+    <p><strong>Tip:</strong> Nagy táblák esetén a <code>.to_pyarrow()</code> jobb választás lehet a <code>.to_pandas()</code> helyett, mert a PyArrow kevesebb memóriát használ és lazy evaluációt támogat.</p>
   </div>
   <div class="code-cell" id="cell-s10">
     <div class="code-header">
@@ -527,7 +550,10 @@ dt.to_pandas()</pre></div>
   <div class="section-number">Section 11</div>
   <h2>Schema lekérdezése</h2>
   <div class="md-cell">
-    <p>A schema nem a storage accountból jön. A schema a <strong>Delta metadata része</strong> lett, amikor megírtuk a táblát.</p>
+    <p>A schema nem a storage accountból jön. A schema a <strong>Delta metadata része</strong> lett, amikor megírtuk a táblát. A <code>dt.schema().json()</code> hívás a tranzakciós napló <code>metaData</code> bejegyzéséből olvassa ki a séma információt, nem pedig magukból a Parquet fájlokból (bár azok is tartalmaznak sémát).</p>
+    <p>Ez azért fontos, mert így a Delta Lake garantálja a séma konzisztenciáját: mindenki, aki olvassa a táblát, ugyanazt a sémát kapja, függetlenül attól, hogy melyik eszközt használja. A séma tartalmazza az oszlopok nevét, típusát, nullability-jét és egyéb metaadatokat. A <code>timestamp</code> típus például mikrosecundumos pontossággal és UTC időzónával van tárolva, ahogy az a kimenetben is látszik.</p>
+    <p>A kimenetből jól látható, hogy a <code>order_id</code> integer, a <code>customer_id</code> string, a <code>order_date</code> pedig egy strukturált timestamp típus. Ez a típusinformáció a Delta logban van rögzítve, és minden új adatíráskor validálva lesz a séma ellen.</p>
+    <p><strong>Tip:</strong> A Delta Lake támogatja a séma evolúciót is (<code>schema_mode="merge"</code>), ami új oszlopok hozzáadását teszi lehetővé anélkül, hogy a meglévő adatokat újra kellene írni.</p>
   </div>
   <div class="code-cell" id="cell-s11">
     <div class="code-header">
@@ -565,7 +591,10 @@ Delta table schema</code></pre>
   <div class="section-number">Section 12</div>
   <h2>Új adatok hozzáírása (append)</h2>
   <div class="md-cell">
-    <p>Most appendelünk két új sort. Ettől <strong>új Parquet fájl</strong> és <strong>új Delta log verzió</strong> jön létre.</p>
+    <p>Most appendelünk két új sort. Ettől <strong>új Parquet fájl</strong> és <strong>új Delta log verzió</strong> jön létre. A <code>write_deltalake(..., mode="append")</code> nem írja felül a meglévő adatokat, hanem hozzáadja az új adatokat a táblához, létrehozva egy új verziót a tranzakciós naplóban.</p>
+    <p>A kódban először létrehozunk egy új DataFrame-et (<code>new_sales_df</code>) két rendeléssel, majd az <code>append</code> módú írással hozzáadjuk a meglévő táblához. Utána újra megnyitjuk a DeltaTable objektumot, hogy lássuk a frissített tartalmat. Az eredménytáblában már 6 sort fogsz látni -- az eredeti 4-et és az újonnan hozzáadott 2-t, az utóbbiakat a kimenetben zöld színnel kiemelve.</p>
+    <p>Az append művelet a Delta Lake-ben atomi (atomic): vagy teljes egészében sikeres, vagy egyáltalán nem történik meg. Ez az ACID "A" (Atomicity) garancia, ami azt jelenti, hogy soha nem fogod látni félig írt adatot, ami production rendszerekben kritikus fontosságú.</p>
+    <p><strong>Tip:</strong> A <code>DeltaTable(path)</code> objektumot újra kell hozzárendelni az append után, mert a régi objektum még a régi verzióra hivatkozik -- a Delta tábla nem dinamikusan frissíti magát a memóriában.</p>
   </div>
   <div class="code-cell" id="cell-s12">
     <div class="code-header">
@@ -607,7 +636,10 @@ dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
   </h2>
   <div class="md-cell">
-    <p>A Delta log miatt a tábla <strong>verziózott</strong>. Az első írás volt a 0. verzió, az append után létrejött az 1. verzió.</p>
+    <p>A Delta log miatt a tábla <strong>verziózott</strong>. Az első írás volt a 0. verzió, az append után létrejött az 1. verzió. A kód első cellája kilistázza a <code>_delta_log</code> mappában lévő JSON fájlokat, a második cella pedig bemutatja a <strong>time travel</strong> funkciót: a <code>DeltaTable(path, version=N)</code> paraméterrel bármelyik korábbi verziót be tudod tölteni.</p>
+    <p>A time travel az egyik legerősebb Delta Lake funkció, mert lehetővé teszi az adatok bármely korábbi állapotának lekérdezését. Ez auditálásra, hibakeresésre, ML kísérletek reprodukálására és adatvisszaállításra is használható. A 0. verzió 4 sort tartalmaz (az eredeti írás), az 1. verzió pedig már 6-ot (az append után).</p>
+    <p>A színfalak mögött a Delta Lake úgy oldja meg a time travel-t, hogy minden verzió log fájlja feljegyzi, mely Parquet fájlok tartoznak az adott verzióhoz. Amikor egy régi verziót kérsz, a reader összeállítja a megfelelő fájllistát a log fájlokból, és csak azokat olvassa be. A régi adatfájlok mindaddig megmaradnak, amíg a <code>VACUUM</code> parancs törli őket.</p>
+    <p><strong>Tip:</strong> Alapértelmezetten a <code>VACUUM</code> 7 napnál régebbi fájlokat töröl -- ha hosszabb time travel ablakra van szükséged, állítsd be a <code>delta.logRetentionDuration</code> táblatulajdonságot.</p>
   </div>
   <div class="code-cell" id="cell-s13">
     <div class="code-header">
@@ -657,8 +689,8 @@ version_1 = DeltaTable(<span class="fn">str</span>(table_path), version=<span cl
     <span class="tool-badge"><img src="../assets/logos/databricks.svg">Databricks</span>
   </h2>
   <div class="md-cell">
-    <p>Ebben a notebookban <strong>nincs metastore</strong>. Csak egy Delta table van egy lokális path-on. A metastore akkor jön képbe, amikor ehhez a path-hoz <strong>táblanevet akarsz rendelni</strong>.</p>
-    <p>Például Databricksben vagy Spark SQL-ben:</p>
+    <p>Ebben a notebookban <strong>nincs metastore</strong>. Csak egy Delta table van egy lokális path-on. A metastore akkor jön képbe, amikor ehhez a path-hoz <strong>táblanevet akarsz rendelni</strong>. A metastore (metaadat-tároló) lényegében egy névkönyv: egy logikai nevet (pl. <code>silver.sales</code>) rendel egy fizikai útvonalhoz (pl. <code>/path/to/sales_delta</code>), és tárolja a sémát, a jogosultságokat és egyéb metaadatokat.</p>
+    <p>Például Databricksben vagy Spark SQL-ben a <code>CREATE TABLE</code> paranccsal regisztrálod a táblát a metastore-ban, utána pedig egyszerű SQL-ből hivatkozhatsz rá név alapján, anélkül hogy ismerned kellene a fizikai elérési utat. Ez kényelmesebbé teszi a lekérdezést, és lehetővé teszi a jogosultságkezelést, a lineage követést és a tábla-felfedezhetőséget (discovery).</p>
     <pre><code><span class="kw">CREATE TABLE</span> silver.sales
 <span class="kw">USING DELTA</span>
 <span class="kw">LOCATION</span> <span class="str">'/path/to/delta_demo_output/sales_delta'</span>;</code></pre>
@@ -670,7 +702,8 @@ version_1 = DeltaTable(<span class="fn">str</span>(table_path), version=<span cl
   </table>
   <div class="md-cell">
     <h3>Azure-ban ugyanez</h3>
-    <p>Lokális path helyett ADLS path lenne:</p>
+    <p>Lokális path helyett ADLS path lenne. A fizikai szerkezet <strong>ugyanaz</strong> marad: Parquet fájlok + <code>_delta_log</code>. A különbség csak az, hogy a fájlok nem a helyi lemezen, hanem egy Azure Data Lake Storage (ADLS) Gen2 containerben vannak, és az elérési útvonal <code>abfss://</code> sémát használ.</p>
+    <p>A Databricks Python API-ban a <code>df.write.format("delta")</code> hívás ugyanúgy működik, csak az útvonal más. A <code>CREATE TABLE</code> SQL parancs is megegyezik -- a metastore regisztrálja az ADLS útvonalat, és onnantól a <code>silver.sales</code> táblanévvel hivatkozhatsz rá. Ez az egyik legszebb tulajdonsága a nyílt formátumoknak: amit lokálisan megtanulsz, azt egy az egyben átültetheted a felhőbe.</p>
     <pre><code><span class="cm"># ADLS path</span>
 abfss://silver@stcompanydata.dfs.core.windows.net/sales_delta
 
@@ -683,7 +716,7 @@ df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwr
 <span class="kw">CREATE TABLE</span> silver.sales
 <span class="kw">USING DELTA</span>
 <span class="kw">LOCATION</span> <span class="str">'abfss://silver@stcompanydata.dfs.core.windows.net/sales_delta'</span>;</code></pre>
-    <p>A fizikai szerkezet <strong>ugyanaz</strong>: Parquet fájlok + <code>_delta_log</code>.</p>
+    <p>A fizikai szerkezet <strong>ugyanaz</strong>: Parquet fájlok + <code>_delta_log</code>. A Delta Lake formátum nem kötődik egyetlen felhőszolgáltatóhoz sem -- ugyanaz a tábla működik Azure-on, AWS-en (S3) és GCP-n (GCS) is.</p>
   </div>
 </div>
 
@@ -696,9 +729,10 @@ df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwr
     <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span>
   </h2>
   <div class="md-cell">
-    <p>Az ETL és az ELT nem fájlformátum, nem Databricks feature. Inkább arról szól, hogy <strong>mikor történik a transzformáció</strong>.</p>
+    <p>Az ETL és az ELT nem fájlformátum, nem Databricks feature. Inkább arról szól, hogy <strong>mikor történik a transzformáció</strong>. Az ETL (Extract-Transform-Load) esetén az adatot már a betöltés előtt megtisztítod, típusozod és üzleti logikával látod el, és csak a kész eredményt töltöd be a célrendszerbe. Az ELT (Extract-Load-Transform) esetén viszont a nyers adatot gyorsan betöltöd a célrendszerbe, és csak utána transzformálod.</p>
     <pre><code>ETL = Extract → Transform → Load
 ELT = Extract → Load → Transform</code></pre>
+    <p>A lakehouse architektúrában az ELT a domináns megközelítés, mert a nyers adat megőrzése (bronze réteg) biztosítja az újrafeldolgozhatóságot, az auditálhatóságot és a rugalmasságot. Ha az üzleti logika változik, egyszerűen újrafuttathatod a bronze → silver transzformációt, anélkül hogy vissza kellene menned a forrásrendszerhez. A táblázat összehasonlítja a két megközelítés jellemzőit.</p>
     <table>
       <tr><th>Minta</th><th>Mikor tisztítod?</th><th>Hova kerül először?</th><th>Tipikus lakehouse réteg</th></tr>
       <tr><td><strong>ETL</strong></td><td>Betöltés előtt</td><td>Már tisztított tábla</td><td>silver/gold jellegű output</td></tr>
@@ -712,7 +746,10 @@ ELT = Extract → Load → Transform</code></pre>
 <div class="section layer-general" id="s17">
   <div class="section-number">Section 17</div>
   <h2>ETL demo: előbb transzformálunk, utána töltünk Delta táblába</h2>
-  <div class="md-cell"><p>ETL esetén először Pythonban megtisztítjuk és üzleti oszlopokat képzünk, és csak a kész adatot írjuk ki.</p></div>
+  <div class="md-cell"><p>ETL esetén először Pythonban megtisztítjuk és üzleti oszlopokat képzünk, és csak a kész adatot írjuk ki. Ez a klasszikus ETL (Extract-Transform-Load) minta: az adat már a Delta táblába íráskor tisztított, típusozott és üzletileg felhasználható formátumú.</p>
+    <p>A demo három cellából áll: az első létrehozza a nyers forrásadatot (ahogy egy OLTP rendszerből érkezhetne, szöveges mezőkkel, formázatlan összegekkel), a második elvégzi a transzformációt (szóközök eltávolítása, típuskonverzió, nettó összeg számítása, logikai oszlop képzése), a harmadik pedig kiírja az eredményt egy Delta táblába.</p>
+    <p>A transzformációs lépésben a <code>str.replace(" ", "")</code> eltávolítja a számokból az ezres elválasztó szóközöket, az <code>astype("int64")</code> számmá konvertál, a nettó összeg képzése pedig a bruttó összeg és a kedvezmény százalék alapján történik. Az <code>is_online</code> oszlop egy logikai jelző, amely egyszerűbb szűréseket tesz lehetővé.</p>
+    <p><strong>Tip:</strong> Az ETL minta hátránya, hogy ha a transzformációs logika változik, a teljes folyamatot újra kell futtatni -- a nyers adat már nincs sehol tárolva ebben a megközelítésben.</p></div>
 
   <div class="code-cell" id="cell-s17a">
     <div class="code-header"><span class="cell-number">[17a]</span><button class="run-btn" onclick="runCell('s17a')">▶ Run</button></div>
@@ -790,7 +827,10 @@ DeltaTable(<span class="fn">str</span>(etl_table_path)).to_pandas().sort_values(
   <div class="section-number">Section 18-19</div>
   <h2>ELT demo: előbb betöltjük raw Delta táblába, utána transzformálunk</h2>
   <div class="md-cell">
-    <p>ELT esetén a nyers adatot gyorsan eltesszük egy <span class="layer-badge bronze">bronze</span> táblába, majd abból készül a <span class="layer-badge silver">silver</span> tábla.</p>
+    <p>ELT esetén a nyers adatot gyorsan eltesszük egy <span class="layer-badge bronze">bronze</span> táblába, majd abból készül a <span class="layer-badge silver">silver</span> tábla. Ez a megközelítés a modern lakehouse architektúrák domináns mintája, mert a nyers adat megőrzése lehetővé teszi a transzformációs logika későbbi módosítását és az adatok újrafeldolgozását.</p>
+    <p>A demo két fő lépést mutat be: először a nyers adatot (<code>etl_source_df</code>, amelyet az előző ETL sectionben készítettünk) azonnal beírjuk a bronze Delta táblába, változatlan formátumban, szöveges mezőkkel együtt. Ezután a bronze táblából olvasva elvégezzük a tisztítást (típuskonverzió, üzleti számítások) és az eredményt egy silver Delta táblába írjuk.</p>
+    <p>A harmadik cella összehasonlítja a két megközelítést: láthatod, hogy az ETL egyetlen Delta táblát hozott létre (a kuráltat), míg az ELT kettőt (bronze/raw és silver/curated). A különbség a flexibilitásban rejlik: az ELT esetén bármikor újragenerálhatod a silver réteget más logikával, anélkül hogy hozzányúlnál a forrásadathoz.</p>
+    <p><strong>Tip:</strong> A bronze tábla megőrzi az eredetihez közeli állapotot. Ha változik a logika, a silver újragenerálható -- ez a lakehouse egyik legnagyobb előnye a hagyományos ETL megoldásokkal szemben.</p>
   </div>
 
   <div class="code-cell" id="cell-s18a">
@@ -883,7 +923,7 @@ demo_tables = {
   <div class="section-number">Section 20</div>
   <h2>Landing, Bronze, Silver, Gold rétegek</h2>
   <div class="md-cell">
-    <p>A lakehouse rétegezés arra való, hogy az adat útja ne egyetlen nagy feldolgozás legyen, hanem jól elkülönített állomások sorozata.</p>
+    <p>A lakehouse rétegezés arra való, hogy az adat útja ne egyetlen nagy feldolgozás legyen, hanem jól elkülönített állomások sorozata. Minden réteg más-más feldolgozottsági szintet képvisel: a Landing a teljesen nyers fájlokat, a Bronze a nyers de már Delta formátumú adatot, a Silver a tisztított és típusozott adatot, a Gold pedig az aggregált, riportkész KPI-kat tartalmazza.</p>
     <div class="arch-flow">
       <div class="arch-step" style="border-color:var(--text-dim)"><span class="layer-badge landing">Landing</span><div class="detail">Nyers CSV fájlok</div></div>
       <div class="arch-arrow">→</div>
@@ -1035,9 +1075,11 @@ DeltaTable(<span class="fn">str</span>(gold_daily_sales_path)).to_pandas()</pre>
   <div class="section-number">Section 22-24</div>
   <h2>Fact és Dimension táblák (Star Schema)</h2>
   <div class="md-cell">
-    <p>A <strong>fact</strong> és <strong>dimension</strong> fogalmak a klasszikus adattárház-modellezésből jönnek.</p>
+    <p>A <strong>fact</strong> és <strong>dimension</strong> fogalmak a klasszikus adattárház-modellezésből jönnek. A fact tábla mérhető eseményeket tartalmaz (rendelések, tranzakciók, kattintások), a dimension táblák pedig leíró entitásokat (vásárlók, termékek, dátumok, csatornák). A kettő együtt alkotja a <strong>Star Schema</strong>-t, amely a BI riportok és dashboardok mögötti leggyakoribb adatmodell.</p>
     <pre><code>Fact = mérhető események (rendelések, összegek)
 Dimension = leíró entitások (vásárló, csatorna, dátum)</code></pre>
+    <p>A Star Schema előnye, hogy a riportkészítő eszközök (Power BI, Tableau, Superset) natívan támogatják: a fact tábla külső kulcsaival kapcsolódik a dimension táblákhoz, és a felhasználó egyszerű drag-and-drop műveletekkel tud riportokat készíteni. A dimension táblák "kiszélesítik" a fact táblát az ember által olvasható leírókkal, így a végfelhasználó nem azonosítókat lát, hanem neveket, címkéket és kategóriákat.</p>
+    <p>A következő cellák bemutatják, hogyan épül fel a <code>dim_customer</code>, <code>dim_channel</code>, <code>dim_date</code> és <code>fact_sales</code> tábla a silver réteg adataiból, majd hogyan joinolva létrejön egy riportbarát Sales Mart nézet.</p>
   </div>
 
   <div class="star-schema">
@@ -1174,7 +1216,10 @@ customer_kpi_df</pre></div>
   <div class="section-number">Section 24</div>
   <h2>Batch feldolgozás</h2>
   <div class="md-cell">
-    <p>Batch feldolgozásnál egyszerre egy véges adatcsomagot dolgozol fel. Például: minden éjjel 01:00-kor beolvasod az előző napi CSV-ket, frissíted a bronze, silver és gold rétegeket.</p>
+    <p>Batch feldolgozásnál egyszerre egy véges adatcsomagot dolgozol fel. Például: minden éjjel 01:00-kor beolvasod az előző napi CSV-ket, frissíted a bronze, silver és gold rétegeket. Ez a legelterjedtebb feldolgozási mód a data engineeringben, mert egyszerűen megtervezhető, könnyen újrafuttatható, és a hibakeresés is viszonylag egyértelmű.</p>
+    <p>A kódcella egy összefoglaló táblázatban mutatja be a batch pipeline lépéseit: az extract fázisban CSV fájlokat olvasunk be, a load bronze-ba írjuk a nyers adatot, a transform silver-ben tisztítjuk, végül az aggregate gold-ban aggregáljuk a KPI-kat. Minden lépés batch jellegű, azaz egyszerre dolgozza fel a teljes adatcsomagot.</p>
+    <p>A batch feldolgozás fő előnye az egyszerűség: ha valami hiba történik, újra lehet futtatni az egész folyamatot (idempotens pipeline), és a végeredmény garantáltan konzisztens lesz. A hátránya, hogy az adat frissessége a batch ütemezésétől függ -- ha naponta fut, akkor a riportok legfeljebb egy napos adatot mutatnak.</p>
+    <p><strong>Tip:</strong> A batch pipelineok tervezésénél érdemes az idempotenciára törekedni: azaz a többszori futtatás ugyanazt az eredményt adja, nem duplikál adatot, és nem okoz mellékhatást.</p>
   </div>
   <div class="code-cell" id="cell-s24">
     <div class="code-header"><span class="cell-number">[24]</span><button class="run-btn" onclick="runCell('s24')">▶ Run</button></div>
@@ -1209,7 +1254,10 @@ batch_summary</pre></div>
     <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark Streaming</span>
   </h2>
   <div class="md-cell">
-    <p>Valódi streaminghez Spark Structured Streaming, Flink, Kafka kell. Itt <strong>micro-batch szimulációt</strong> csinálunk.</p>
+    <p>Valódi streaminghez Spark Structured Streaming, Flink, Kafka kell. Itt <strong>micro-batch szimulációt</strong> csinálunk, amely bemutatja a streaming gondolkodásmód alapjait anélkül, hogy valódi streaming infrastruktúrára lenne szükség. A micro-batch lényegében kicsi, gyakran ismétlődő batch-ek sorozata -- a legtöbb "streaming" rendszer (beleértve a Spark Structured Streaming-et is) valójában így működik a színfalak mögött.</p>
+    <p>A kódcella két batch-et szimulál, mintha azok időben egymás után érkeznének (például 30 másodpercenként). Minden batch esetén a teljes pipeline lefut: a nyers adat a bronze táblába kerül (az első batch overwrite, a többi append), majd a bronze-ból újraolvassuk az összes eddigi adatot, transzformáljuk silver-re, aggregáljuk gold-ra, és felülírjuk a silver/gold táblákat. Így minden batch után a silver és gold táblák a teljes eddigi történetet tükrözik.</p>
+    <p>A különbség az egyszerű batch és a micro-batch között az, hogy itt az adat folyamatosan érkezik és feldolgozásra kerül, nem pedig egyetlen nagy futásban. A <code>_batch_id</code> oszlop a bronze rétegben nyomon követi, melyik adat melyik batch-ből származik, ami segíti az auditálást és a hibakeresést.</p>
+    <p><strong>Tip:</strong> Éles streaming rendszerekben a checkpointing és a watermarks biztosítják, hogy a rendszer összeomlás esetén pontosan onnan folytatódhassa a feldolgozást, ahol abbamaradt -- ez a szimulációban nem jelenik meg, de production-ben elengedhetetlen.</p>
   </div>
 
   <div class="code-cell" id="cell-s25a">
