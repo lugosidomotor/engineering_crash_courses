@@ -1,6 +1,30 @@
 name: webshop-pro-lab
 
+# ╔════════════════════════════════════════════════════════════════════╗
+# ║  PROFILE SYSTEM — csak azt indítsd, ami a kurzushoz kell!       ║
+# ║                                                                   ║
+# ║  docker compose up -d                         → core (~512 MB)  ║
+# ║  docker compose --profile sql up -d           → core (SQL csak postgres)  ║
+# ║  docker compose --profile docker up -d        → core + minio, spark, airflow, monitoring  ║
+# ║  docker compose --profile airflow up -d       → core + airflow              ║
+# ║  docker compose --profile dbt up -d           → core + dbt                  ║
+# ║  docker compose --profile delta up -d         → core + minio, spark, lab    ║
+# ║  docker compose --profile spark up -d         → core + spark, databricks, mlflow, unity  ║
+# ║  docker compose --profile databricks up -d    → core + databricks, spark, mlflow, unity  ║
+# ║  docker compose --profile streaming up -d     → core + kafka, spark, kafka-ui  ║
+# ║  docker compose --profile otf up -d           → core + minio, lab, unity     ║
+# ║  docker compose --profile python up -d        → core + lab-runner (nehéz)    ║
+# ║  docker compose --profile ai-eng up -d        → core + chroma, streamlit, api, mlflow  ║
+# ║  docker compose --profile ai-de up -d         → core + kafka, minio, lab, mlflow  ║
+# ║  docker compose --profile aiops up -d         → core + mlflow, api, monitoring  ║
+# ║  docker compose --profile llmops up -d        → core + mlflow, api, monitoring  ║
+# ║  docker compose --profile rag up -d           → core + chroma, lab, mlflow   ║
+# ║  docker compose --profile all up -d           → MINDEN (~7 GB)              ║
+# ╚════════════════════════════════════════════════════════════════════╝
+
 services:
+  # ─── CORE (mindig elindul, nem kell profile) ───────────────────
+
   course-site:
     image: nginx:1.27-alpine
     container_name: webshop-course-site
@@ -8,6 +32,10 @@ services:
       - "8020:80"
     volumes:
       - ./:/usr/share/nginx/html:ro
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     labels:
       webshop.course: "all"
       webshop.role: "Static course site"
@@ -24,6 +52,11 @@ services:
     depends_on:
       api:
         condition: service_healthy
+        required: false
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     labels:
       webshop.course: "project"
       webshop.role: "Dummy webshop frontend"
@@ -45,13 +78,36 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
       webshop.course: "sql-data-modeling,docker-local-data-platform"
       webshop.role: "Relational source and serving database"
 
+  adminer:
+    image: adminer
+    container_name: webshop-adminer
+    ports:
+      - "8082:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    labels:
+      webshop.course: "all"
+      webshop.role: "PostgreSQL web UI"
+
+  # ─── STORAGE (minio) ───────────────────────────────────────────
+
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     container_name: webshop-minio
+    profiles: ["docker", "delta", "otf", "ai-de", "all"]
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -61,6 +117,10 @@ services:
       - "9001:9001"
     volumes:
       - minio-data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
       webshop.course: "docker-local-data-platform,delta-table-crash-course,open-table-formats"
       webshop.role: "S3-compatible object storage for bronze/silver/gold layers"
@@ -68,6 +128,7 @@ services:
   minio-init:
     image: minio/mc:RELEASE.2025-04-16T18-13-26Z
     container_name: webshop-minio-init
+    profiles: ["docker", "delta", "otf", "ai-de", "all"]
     depends_on:
       minio:
         condition: service_started
@@ -84,9 +145,12 @@ services:
       mc cp --recursive /docs/ local/webshop-artifacts/course-materials/docs/ || true;
       echo 'MinIO buckets created and webshop fixtures copied.'"
 
+  # ─── STREAMING (kafka) ─────────────────────────────────────────
+
   kafka:
     image: apache/kafka:3.9.1
     container_name: webshop-kafka
+    profiles: ["streaming", "ai-de", "all"]
     hostname: kafka
     environment:
       CLUSTER_ID: "4L6g3nShT-eMCtK--X86sw"
@@ -105,6 +169,7 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_NUM_PARTITIONS: "3"
       KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
+      KAFKA_HEAP_OPTS: "-Xmx384m -Xms128m"
     ports:
       - "9092:29092"
     healthcheck:
@@ -113,6 +178,10 @@ services:
       timeout: 10s
       retries: 15
       start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     labels:
       webshop.course: "streaming-engineering,ai-data-engineer"
       webshop.role: "Clickstream and checkout event bus"
@@ -120,6 +189,7 @@ services:
   kafka-init:
     image: apache/kafka:3.9.1
     container_name: webshop-kafka-init
+    profiles: ["streaming", "ai-de", "all"]
     depends_on:
       kafka:
         condition: service_healthy
@@ -130,12 +200,37 @@ services:
       /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic webshop.support --partitions 1 --replication-factor 1;
       echo 'Kafka topics created.'"
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: webshop-kafka-ui
+    profiles: ["streaming", "ai-de", "all"]
+    ports:
+      - "8083:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    labels:
+      webshop.course: "streaming-engineering,ai-data-engineer"
+      webshop.role: "Kafka topic browser and consumer lag viewer"
+
+  # ─── SPARK ─────────────────────────────────────────────────────
+
   spark-master:
     image: apache/spark:3.5.3-scala2.12-java17-python3-ubuntu
     container_name: webshop-spark-master
+    profiles: ["docker", "delta", "spark", "streaming", "databricks", "all"]
     user: root
     environment:
       SPARK_MASTER_OPTS: "-Dspark.master.rest.enabled=true"
+      SPARK_MASTER_MEMORY: "1g"
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.master.Master
@@ -153,6 +248,10 @@ services:
       - ./webshop-lab:/opt/webshop-lab
       - ./webshop-pro/fixtures:/opt/webshop-fixtures:ro
       - lab-output:/opt/webshop-output
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     labels:
       webshop.course: "spark-crash-course,delta-table-crash-course,streaming-engineering,ai-data-engineer"
       webshop.role: "Spark master for ETL and feature jobs"
@@ -160,7 +259,10 @@ services:
   spark-worker:
     image: apache/spark:3.5.3-scala2.12-java17-python3-ubuntu
     container_name: webshop-spark-worker
+    profiles: ["docker", "delta", "spark", "streaming", "databricks", "all"]
     user: root
+    environment:
+      SPARK_WORKER_MEMORY: "1g"
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.worker.Worker
@@ -168,7 +270,7 @@ services:
       - --cores
       - "2"
       - --memory
-      - 2G
+      - "1G"
       - --webui-port
       - "8081"
     ports:
@@ -180,10 +282,19 @@ services:
     depends_on:
       spark-master:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    labels:
+      webshop.course: "spark-crash-course,delta-table-crash-course,streaming-engineering"
+
+  # ─── ORCHESTRATION ─────────────────────────────────────────────
 
   airflow:
     image: apache/airflow:2.10.3-python3.11
     container_name: webshop-airflow
+    profiles: ["docker", "airflow", "all"]
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
@@ -211,6 +322,10 @@ services:
       airflow users create --username admin --password admin --firstname WebShop --lastname Admin --role Admin --email admin@example.com || true;
       airflow scheduler > /tmp/airflow-scheduler.log 2>&1 &
       exec airflow webserver'"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     labels:
       webshop.course: "airflow-orchestration"
       webshop.role: "Daily webshop DAG orchestration"
@@ -218,6 +333,7 @@ services:
   dbt:
     image: ghcr.io/dbt-labs/dbt-postgres:1.9.latest
     container_name: webshop-dbt
+    profiles: ["dbt", "all"]
     working_dir: /usr/app
     entrypoint: ["/bin/bash", "-lc"]
     command: >
@@ -233,13 +349,20 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     labels:
       webshop.course: "dbt-analytics-engineering,ai-data-engineer"
       webshop.role: "Analytics engineering models and docs"
 
+  # ─── ML / MONITORING ───────────────────────────────────────────
+
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.20.3
     container_name: webshop-mlflow
+    profiles: ["spark", "databricks", "ai-eng", "ai-de", "aiops", "llmops", "rag", "all"]
     command: >
       mlflow server
       --backend-store-uri sqlite:////mlflow/mlflow.db
@@ -250,6 +373,10 @@ services:
       - "5000:5000"
     volumes:
       - mlflow-data:/mlflow
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     labels:
       webshop.course: "aiops-mlops,llmops-genai-production,databricks-lakehouse"
       webshop.role: "Experiment tracking, model registry and prompt/version metadata"
@@ -258,6 +385,7 @@ services:
     build:
       context: ./webshop-lab/api
     container_name: webshop-fastapi
+    profiles: ["ai-eng", "ai-de", "aiops", "llmops", "all"]
     environment:
       DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop
       MLFLOW_TRACKING_URI: http://mlflow:5000
@@ -269,52 +397,25 @@ services:
         condition: service_healthy
       mlflow:
         condition: service_started
+        required: false
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5).read()\""]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
       webshop.course: "aiops-mlops,llmops-genai-production"
       webshop.role: "FastAPI serving layer for webshop app and churn prediction"
 
-  chroma:
-    image: chromadb/chroma:0.5.23
-    container_name: webshop-chroma
-    environment:
-      IS_PERSISTENT: "TRUE"
-      PERSIST_DIRECTORY: /chroma/chroma
-      ANONYMIZED_TELEMETRY: "FALSE"
-    ports:
-      - "8001:8000"
-    volumes:
-      - chroma-data:/chroma/chroma
-    labels:
-      webshop.course: "ai-engineering,rag-evaluation-ai-safety"
-      webshop.role: "Vector database for support-policy retrieval"
-
-  streamlit:
-    build:
-      context: ./webshop-lab/streamlit
-    container_name: webshop-streamlit
-    environment:
-      API_URL: http://api:8000
-      CHROMA_URL: http://chroma:8000
-    ports:
-      - "8501:8501"
-    depends_on:
-      api:
-        condition: service_healthy
-      chroma:
-        condition: service_started
-    labels:
-      webshop.course: "ai-engineering"
-      webshop.role: "RAG/support demo UI"
-
   prometheus:
     image: prom/prometheus:v2.55.1
     container_name: webshop-prometheus
+    profiles: ["docker", "aiops", "llmops", "all"]
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -326,6 +427,11 @@ services:
     depends_on:
       api:
         condition: service_healthy
+        required: false
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
       webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production"
       webshop.role: "Metrics collection"
@@ -333,6 +439,7 @@ services:
   grafana:
     image: grafana/grafana:11.2.2
     container_name: webshop-grafana
+    profiles: ["docker", "aiops", "llmops", "all"]
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
@@ -346,17 +453,73 @@ services:
     depends_on:
       prometheus:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     labels:
       webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production"
       webshop.role: "Dashboards for business, API and model health"
 
+  # ─── AI ────────────────────────────────────────────────────────
+
+  chroma:
+    image: chromadb/chroma:0.5.23
+    container_name: webshop-chroma
+    profiles: ["ai-eng", "rag", "all"]
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    labels:
+      webshop.course: "ai-engineering,rag-evaluation-ai-safety"
+      webshop.role: "Vector database for support-policy retrieval"
+
+  streamlit:
+    build:
+      context: ./webshop-lab/streamlit
+    container_name: webshop-streamlit
+    profiles: ["ai-eng", "all"]
+    environment:
+      API_URL: http://api:8000
+      CHROMA_URL: http://chroma:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+      chroma:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    labels:
+      webshop.course: "ai-engineering"
+      webshop.role: "RAG/support demo UI"
+
+  # ─── DATABRICKS ────────────────────────────────────────────────
+
   unity-catalog:
     image: unitycatalog/unitycatalog:latest
     container_name: webshop-unity-catalog
+    profiles: ["spark", "databricks", "otf", "all"]
     ports:
       - "8089:8080"
     volumes:
       - unity-catalog-data:/opt/unitycatalog/etc/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     labels:
       webshop.course: "databricks-lakehouse,open-table-formats"
       webshop.role: "OSS Unity Catalog server for local governance practice"
@@ -364,6 +527,7 @@ services:
   databricks-local:
     image: quay.io/jupyter/pyspark-notebook:spark-3.5.0
     container_name: webshop-databricks-local
+    profiles: ["spark", "databricks", "all"]
     command: start-notebook.py --ServerApp.token='' --ServerApp.password=''
     ports:
       - "8888:8888"
@@ -380,16 +544,24 @@ services:
         condition: service_started
       mlflow:
         condition: service_started
+        required: false
       unity-catalog:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     labels:
       webshop.course: "databricks-lakehouse,spark-crash-course"
       webshop.role: "Local notebook workspace that mirrors Databricks learning flows"
+
+  # ─── LAB PLAYGROUND ────────────────────────────────────────────
 
   lab-runner:
     build:
       context: ./webshop-lab/runner
     container_name: webshop-lab-runner
+    profiles: ["python", "delta", "otf", "ai-de", "rag", "all"]
     command: tail -f /dev/null
     environment:
       DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop
@@ -409,14 +581,23 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+        required: false
       api:
         condition: service_healthy
+        required: false
       minio:
         condition: service_started
+        required: false
       chroma:
         condition: service_started
+        required: false
       mlflow:
         condition: service_started
+        required: false
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     labels:
       webshop.course: "python-data-engineering,delta-table-crash-course,open-table-formats,ai-data-engineer,rag-evaluation-ai-safety"
       webshop.role: "Python/pandas/Parquet/Delta/Iceberg/GE/Feast/RAGAS playground"
@@ -425,6 +606,7 @@ services:
     build:
       context: ./webshop-lab/runner
     container_name: webshop-event-producer
+    profiles: ["streaming", "all"]
     command: python /lab/runner/scripts/produce_events.py
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -442,6 +624,7 @@ services:
     build:
       context: ./webshop-lab/runner
     container_name: webshop-lab-bootstrap
+    profiles: ["all"]
     command: /bin/sh -lc "python /lab/runner/scripts/bootstrap_lab.py && tail -f /dev/null"
     environment:
       DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop

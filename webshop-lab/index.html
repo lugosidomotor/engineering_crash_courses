@@ -135,12 +135,53 @@ td code{display:inline-block;max-width:100%;background:#05080d;border:1px solid 
         <div class="command-note">Repo gyökérből futtasd</div>
         <div class="terminal">
           <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">shell</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
-          <pre><code>docker compose up -d --build
-docker compose ps</code></pre>
+          <pre><code># Csak az alap service-ek (course-site, postgres, adminer):
+docker compose up -d --build
+
+# Vagy egy kurzus profil:
+docker compose --profile delta up -d --build
+
+# Vagy minden:
+docker compose --profile all up -d --build</code></pre>
         </div>
       </div>
       <p>Első induláskor az image-ek letöltése miatt 5-10 perc is lehet. Ha valami piros, először nézd meg a logot: <code class="inline-cmd">docker compose logs -f api</code>.</p>
     </div>
+  </section>
+
+  <section class="section card">
+    <h2>Kurzus profilok — csak azt indítsd, ami kell!</h2>
+    <p>A teljes lab ~7 GB RAM-ot eszik. Ha csak egy kurzust csinálsz, használd a profilokat — csak a szükséges service-ek indulnak el, a többi békén hagyva.</p>
+    <table>
+      <thead><tr><th>Profil</th><th>Parancs</th><th>Service-ek</th><th>RAM</th></tr></thead>
+      <tbody>
+        <tr><td><code>core</code> (alap)</td><td><code>docker compose up -d</code></td><td>course-site, webshop, postgres, adminer</td><td>~400 MB</td></tr>
+        <tr><td><code>sql</code></td><td><code>--profile sql</code></td><td>core (csak postgres)</td><td>~400 MB</td></tr>
+        <tr><td><code>python</code></td><td><code>--profile python</code></td><td>core + lab-runner</td><td>~1 GB</td></tr>
+        <tr><td><code>docker</code></td><td><code>--profile docker</code></td><td>core + minio, spark, airflow, monitoring</td><td>~3.5 GB</td></tr>
+        <tr><td><code>delta</code></td><td><code>--profile delta</code></td><td>core + minio, spark, lab-runner</td><td>~3 GB</td></tr>
+        <tr><td><code>spark</code></td><td><code>--profile spark</code></td><td>core + spark, databricks, mlflow, unity</td><td>~5 GB</td></tr>
+        <tr><td><code>databricks</code></td><td><code>--profile databricks</code></td><td>core + databricks, spark, mlflow, unity</td><td>~5 GB</td></tr>
+        <tr><td><code>airflow</code></td><td><code>--profile airflow</code></td><td>core + airflow</td><td>~1.5 GB</td></tr>
+        <tr><td><code>dbt</code></td><td><code>--profile dbt</code></td><td>core + dbt</td><td>~1 GB</td></tr>
+        <tr><td><code>streaming</code></td><td><code>--profile streaming</code></td><td>core + kafka, spark, kafka-ui</td><td>~3 GB</td></tr>
+        <tr><td><code>otf</code></td><td><code>--profile otf</code></td><td>core + minio, lab-runner, unity</td><td>~2 GB</td></tr>
+        <tr><td><code>ai-eng</code></td><td><code>--profile ai-eng</code></td><td>core + chroma, streamlit, api, mlflow</td><td>~2 GB</td></tr>
+        <tr><td><code>ai-de</code></td><td><code>--profile ai-de</code></td><td>core + kafka, minio, lab-runner, mlflow</td><td>~3 GB</td></tr>
+        <tr><td><code>aiops</code></td><td><code>--profile aiops</code></td><td>core + mlflow, api, monitoring</td><td>~2 GB</td></tr>
+        <tr><td><code>llmops</code></td><td><code>--profile llmops</code></td><td>core + mlflow, api, monitoring</td><td>~2 GB</td></tr>
+        <tr><td><code>rag</code></td><td><code>--profile rag</code></td><td>core + chroma, lab-runner, mlflow</td><td>~2 GB</td></tr>
+        <tr class="highlight"><td><code>all</code></td><td><code>--profile all</code></td><td>MINDEN service</td><td>~7 GB</td></tr>
+      </tbody>
+    </table>
+    <div class="command-panel">
+      <div class="command-note">Példa: csak az Airflow kurzushoz</div>
+      <div class="terminal">
+        <div class="terminal-bar"><div class="terminal-bar-left"><svg class="terminal-dots" viewBox="0 45 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="5" fill="#ff5f56"/><circle cx="21" cy="6" r="5" fill="#ffbd2e"/><circle cx="36" cy="6" r="5" fill="#27c93f"/></svg></div><div class="terminal-bar-center"><span class="terminal-label">profile</span></div><div class="terminal-bar-right"><button class="copy-command" type="button">Másolás</button></div></div>
+        <pre><code>docker compose --profile airflow up -d --build</code></pre>
+      </div>
+    </div>
+    <p class="note">Tipp: több profil is kombinálható: <code class="inline-cmd">docker compose --profile airflow --profile dbt up -d</code>. Ha nem adsz meg profilt, csak a core service-ek indulnak (course-site, webshop, postgres, adminer).</p>
   </section>
 
   <section class="section card">
