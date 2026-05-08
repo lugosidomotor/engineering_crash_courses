@@ -233,7 +233,10 @@ Workers: 1 alive</pre></div></div>
     volumes:
       - ./dags:/opt/airflow/dags
     environment:
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://admin:secret@postgres/airflow</pre></div><div class="output-area" id="out-7"><div class="output-label">Output:</div><pre>$ docker-compose up airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://admin:secret@postgres/airflow
+    depends_on:
+      spark-master:
+        condition: service_started</pre></div><div class="output-area" id="out-7"><div class="output-label">Output:</div><pre>$ docker-compose up airflow
 airflow | webserver running at 0.0.0.0:8080
 airflow | scheduler started</pre></div></div>
 </div>
@@ -273,6 +276,34 @@ MLflow running on http://localhost:5000</pre></div></div>
       - prometheus</pre></div><div class="output-area" id="out-9"><div class="output-label">Output:</div><pre>$ docker-compose up prometheus grafana
 Prometheus: http://localhost:9090
 Grafana: http://localhost:3000 (admin/admin)</pre></div></div>
+</div>
+<div class="section layer-general" id="s9b">
+  <div class="section-number">Section 09b</div>
+  <h2>Adminer: PostgreSQL webes felület</h2>
+  <div class="md-cell"><p>Az <strong>Adminer</strong> egyetlen PHP fájlból álló, ultrakönnyű adatbázis-kezelő felület — a phpMyAdmin modernebb, karcsúbb alternatívája. Docker-ben az <code>adminer</code> image mindössze ~50 MB, és egyetlen containert indít, amelyen keresztül vizuálisan böngészheted a PostgreSQL adatbázisokat, táblákat, lekérdezéseket futtathatsz, és adatokat módosíthatsz — mindezt egy letisztult webes felületen.</p><p>A data engineeringben az Adminer felbecsülhetetlen segítség a fejlesztés során. Amikor Bronze/Silver/Gold pipeline-t építesz, látnod kell, mi került az adatbázisba. Amikor egy dbt modellezés nem adja a várt eredményt, gyors SELECT-tel ellenőrizheted a nyers adatokat. Amikor seed adatokat töltesz be, vizuálisan ellenőrizheted, hogy a táblák helyesek-e. Mindezt parancssori <code>psql</code> nélkül, kattintgatva.</p><p>A kódblokkban az Adminer konfigurációját látjuk. A <code>image: adminer</code> a hivatalos, mindig naprakész image-t húzza. A <code>ports: '8082:8080'</code> a 8080-as belső portot a host 8082-es portjára mappeli (8080=Spark, 8081=Airflow, 8082=Adminer). A <code>depends_on: postgres</code> biztosítja, hogy csak a PostgreSQL indulása után induljon el. A belépéshez a webes felületen használd: szerver=<code>postgres</code>, felhasználó=<code>admin</code>, jelszó=<code>secret</code>, adatbázis=<code>postgres</code>.</p><p><strong>Pro tipp:</strong> Az Adminer nem csak PostgreSQL-t támogat — MySQL, SQLite, MongoDB, Oracle és MS SQL driver-eket is tartalmaz, így egyetlen containerrel bármilyen adatbázist elérhetsz a platformodon!</p></div><div class="code-cell" id="cell-9b"><div class="code-header"><span class="cell-number">[9b]</span><button class="run-btn" onclick="runCell('9b')">&#9654; Run</button></div><div class="code-body"><pre># docker-compose.yml - Adminer (Postgres UI)
+  adminer:
+    image: adminer
+    ports:
+      - '8082:8080'
+    depends_on:
+      - postgres</pre></div><div class="output-area" id="out-9b"><div class="output-label">Output:</div><pre>$ docker-compose up adminer
+Adminer: http://localhost:8082
+Login: server=postgres, user=admin, password=secret</pre></div></div>
+</div>
+<div class="section layer-general" id="s9c">
+  <div class="section-number">Section 09c</div>
+  <h2>Kafka UI: üzenetsor vizualizáció</h2>
+  <div class="md-cell"><p>A <strong>Provectus Kafka UI</strong> (most már HoloInsight/kafka-ui néven is elérhető) a legnépszerűbb nyílt forráskódú, lightweight felület az Apache Kafka klaszterek kezeléséhez. Egy letisztult webes UI-n keresztül böngészheted a topicokat, consumer csoportokat, üzeneteket, és valós időben láthatod, mi folyik az üzenetsorban — mindent, amit amúgy csak a <code>kafka-topics.sh</code> és <code>kafka-console-consumer.sh</code> parancssori eszközökkel tudnál.</p><p>A data engineeringben a Kafka UI elengedhetetlen a streaming pipelineok fejlesztése során. Amikor egy producer nem küld üzeneteket, a UI-ban azonnal látod, hogy a topic üres. Amikor a consumer lemaradt, a lag grafikonon egyértelműen megjelenik. Amikor sémát módosítasz, vizuálisan ellenőrizheted az üzenetek formátumát. A parancssori Kafka eszközök használata fárasztó és hibaállékony — a UI mindent átláthatóvé tesz.</p><p>A kódblokkban a Kafka UI konfigurációját látjuk. A <code>image: provectuslabs/kafka-ui</code> a legstabilabb, legkönnyebb Kafka UI image. A <code>KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS</code> környezeti változó mondja meg, hol fut a Kafka broker — ha a Kafka is ebben a docker-compose-ban van, akkor egyszerűen <code>kafka:9092</code>. A port <code>8083:8080</code> a host 8083-as portjára mappeli (8080=Spark, 8081=Airflow, 8082=Adminer, 8083=Kafka UI).</p><p><strong>Pro tipp:</strong> Ha a Kafka még nem fut ebben a compose-ban, csak hagyd a <code>KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS</code> változót üresen, és később a Settings-ben is hozzáadhatod a klasztert. A Kafka UI több klasztert is támogat egyidejűleg!</p></div><div class="code-cell" id="cell-9c"><div class="code-header"><span class="cell-number">[9c]</span><button class="run-btn" onclick="runCell('9c')">&#9654; Run</button></div><div class="code-body"><pre># docker-compose.yml - Kafka UI
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - '8083:8080'
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      DYNAMIC_CONFIG_ENABLED: 'true'</pre></div><div class="output-area" id="out-9c"><div class="output-label">Output:</div><pre>$ docker-compose up kafka-ui
+Kafka UI: http://localhost:8083
+Topics: 0 | Consumer Groups: 0</pre></div></div>
 </div>
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
@@ -332,7 +363,7 @@ POSTGRES_PASSWORD=super_secret_123 (from .env)</pre></div></div>
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
   <h2>Teljes data platform docker-compose.yml</h2>
-  <div class="md-cell"><p>Most jön a legizgalmasabb rész: az összes korábban megismert szolgáltatást egyetlen <code>docker-compose.yml</code> fájlba foglaljuk. A <strong>7 szolgáltatás</strong> együtt alkotja a teljes lokális data platformot: <strong>PostgreSQL</strong> (relációs adatbázis, port 5432), <strong>MinIO</strong> (S3 objektumtároló, port 9000/9001), <strong>Spark Master</strong> (cluster koordinátor, port 8080/7077), <strong>Spark Worker</strong> (számítási node), <strong>Airflow</strong> (workflow ütemező, port 8081), <strong>MLflow</strong> (ML kísérkövetés, port 5000), <strong>Prometheus</strong> (metrikagyűjtés, port 9090) és <strong>Grafana</strong> (vizualizáció, port 3000).</p><p>Ez az architektúra a modern data platform "minimum viable" verziója. A valóságban az AWS, GCP vagy Azure hasonló szolgáltatásokat nyújt felügyelt formában (RDS, S3, EMR, MWAA stb.), de lokálisan ez a Docker Compose adja meg ugyanazt a funkcionalitást — ingyen, a saját gépeden. Minden szolgáltatás ugyanazon a Docker hálózaton van, így zökkenőmentesen kommunikálnak egymással.</p><p>A kódblokkban a teljes <code>docker-compose.yml</code> vázlatát látjuk. Minden szolgáltatás port-térképezéssel és volume-mal van konfigurálva. A legfontosabb parancs a <code>docker-compose up -d</code>: ez letölti a szükséges image-eket (első alkalommal), létrehozza a hálózatot és volume-okat, majd elindítja mind a 8 containert. Az output mutatja, ahogy minden szolgáltatás egymás után elindul — a healthcheck-ekkel ellátottak (postgres, minio, airflow) a "healthy" státuszt is elérnek.</p><p><strong>Pro tipp:</strong> Ha valamelyik szolgáltatás nem indul, ne az egészet indítsd újra — használd a <code>docker-compose logs &lt;service_name&gt;</code> parancsot, hogy lásd, mi a hiba, és csak a problémás szolgáltatást indítsd újra!</p></div><div class="code-cell" id="cell-13"><div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('13')">&#9654; Run</button></div><div class="code-body"><pre># Complete docker-compose.yml
+  <div class="md-cell"><p>Most jön a legizgalmasabb rész: az összes korábban megismert szolgáltatást egyetlen <code>docker-compose.yml</code> fájlba foglaljuk. A <strong>10 szolgáltatás</strong> együtt alkotja a teljes lokális data platformot: <strong>PostgreSQL</strong> (relációs adatbázis, port 5432), <strong>MinIO</strong> (S3 objektumtároló, port 9000/9001), <strong>Spark Master</strong> (cluster koordinátor, port 8080/7077), <strong>Spark Worker</strong> (számítási node), <strong>Airflow</strong> (workflow ütemező, port 8081), <strong>MLflow</strong> (ML kísérkövetés, port 5000), <strong>Prometheus</strong> (metrikagyűjtés, port 9090), <strong>Grafana</strong> (vizualizáció, port 3000), <strong>Adminer</strong> (Postgres UI, port 8082) és <strong>Kafka UI</strong> (üzenetsor vizualizáció, port 8083).</p><p>Ez az architektúra a modern data platform "minimum viable" verziója. A valóságban az AWS, GCP vagy Azure hasonló szolgáltatásokat nyújt felügyelt formában (RDS, S3, EMR, MWAA stb.), de lokálisan ez a Docker Compose adja meg ugyanazt a funkcionalitást — ingyen, a saját gépeden. Minden szolgáltatás ugyanazon a Docker hálózaton van, így zökkenőmentesen kommunikálnak egymással.</p><p>A kódblokkban a teljes <code>docker-compose.yml</code> vázlatát látjuk. Minden szolgáltatás port-térképezéssel és volume-mal van konfigurálva. A legfontosabb parancs a <code>docker-compose up -d</code>: ez letölti a szükséges image-eket (első alkalommal), létrehozza a hálózatot és volume-okat, majd elindítja mind a 10 containert. Az output mutatja, ahogy minden szolgáltatás egymás után elindul — a healthcheck-ekkel ellátottak (postgres, minio, airflow) a "healthy" státuszt is elérnek.</p><p><strong>Pro tipp:</strong> Ha valamelyik szolgáltatás nem indul, ne az egészet indítsd újra — használd a <code>docker-compose logs &lt;service_name&gt;</code> parancsot, hogy lásd, mi a hiba, és csak a problémás szolgáltatást indítsd újra!</p></div><div class="code-cell" id="cell-13"><div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('13')">&#9654; Run</button></div><div class="code-body"><pre># Complete docker-compose.yml
 version: '3.8'
 services:
   postgres:  { ... 5432 }
@@ -343,10 +374,12 @@ services:
   mlflow:    { ... 5000 }
   prometheus: { ... 9090 }
   grafana:   { ... 3000 }
+  adminer:   { ... 8082 }
+  kafka-ui:  { ... 8083 }
 
 # One command to rule them all:
 # docker-compose up -d</pre></div><div class="output-area" id="out-13"><div class="output-label">Output:</div><pre>$ docker-compose up -d
-[+] Running 8/8
+[+] Running 10/10
  ✔ Container postgres       Started (healthy)
  ✔ Container minio          Started (healthy)
  ✔ Container spark-master   Started
@@ -355,6 +388,8 @@ services:
  ✔ Container mlflow         Started
  ✔ Container prometheus     Started
  ✔ Container grafana        Started
+ ✔ Container adminer        Started
+ ✔ Container kafka-ui       Started
 
 All services running!</pre></div></div>
 </div>
@@ -389,7 +424,7 @@ Resource usage:
 <div class="section layer-general" id="s15">
   <div class="section-number">Section 15</div>
   <h2>Összefoglalás</h2>
-  <div class="md-cell"><p>Gratulálunk! Felépítetted a teljes lokális data platformot — a Docker alapoktól a 7 szolgáltatásból álló stack-ig. Most már érted, miért használja az iparág a Docker-t: reprodukálhatóság, izoláció, és az a képesség, hogy egyetlen paranccsal felépíts egy teljes infrastruktúrát. Ezek a készségek közvetlenül átülhetők éles környezetbe — a konceptek ugyanazok, csak a futtatókörnyezet változik (Docker Compose helyett Kubernetes, lokális volume-ok helyett felhős tárolók).</p><p>Összegezve, mit tanultunk: Docker image-eket és containereket kezelsz, saját Dockerfile-t írsz, Docker Compose-szal több szolgáltatást koordinálsz, hálózatot és volume-okat konfigurálsz, környezeti változókat menedzselsz, health check-eket és resource limit-eket állítasz be. Mindezt egy valós adatplatform kontextusában: Postgres, MinIO, Spark, Airflow, MLflow, Prometheus és Grafana szolgáltatásokkal.</p><p>A következő kurzusokban ezt a platformot fogjuk használni alapul: a <strong>Delta Table Crash Course</strong>-on Bronze/Silver/Gold adatpipelines-t építünk Spark-pal, az <strong>Airflow Crash Course</strong>-on DAG-okat írunk, amelyek automatizálják a feldolgozást, és a monitoring kurzusban Grafana dashboardokat készítünk a platform állapotának nyomon követésére. A Docker alap, amire mindent építünk — most már szilárd alapokon állsz!</p><p><strong>Következő lépés:</strong> Indítsd el a platformot (<code>docker-compose up -d</code>), nyisd meg a Grafanát (localhost:3000), és nézd meg, ahogy minden szolgáltatás bejelentkezik — aztán jöhet a Delta Table kurzus!</p></div><table><tr><th>Felépítettük</th><th>Következő</th></tr><tr><td>Postgres, MinIO, Spark</td><td>Delta Table Crash Course</td></tr><tr><td>Airflow, MLflow</td><td>Bronze/Silver/Gold pipeline</td></tr><tr><td>Prometheus, Grafana</td><td>Monitoring dashboardek</td></tr><tr><td>Docker networking, volumes</td><td>Production best practices</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Delta Table Crash Course - ahol a platformon építkezünk!</p></div>
+  <div class="md-cell"><p>Gratulálunk! Felépítetted a teljes lokális data platformot — a Docker alapoktól a 10 szolgáltatásból álló stack-ig. Most már érted, miért használja az iparág a Docker-t: reprodukálhatóság, izoláció, és az a képesség, hogy egyetlen paranccsal felépíts egy teljes infrastruktúrát. Ezek a készségek közvetlenül átülhetők éles környezetbe — a konceptek ugyanazok, csak a futtatókörnyezet változik (Docker Compose helyett Kubernetes, lokális volume-ok helyett felhős tárolók).</p><p>Összegezve, mit tanultunk: Docker image-eket és containereket kezelsz, saját Dockerfile-t írsz, Docker Compose-szal több szolgáltatást koordinálsz, hálózatot és volume-okat konfigurálsz, környezeti változókat menedzselsz, health check-eket és resource limit-eket állítasz be. Mindezt egy valós adatplatform kontextusában: Postgres, MinIO, Spark, Airflow, MLflow, Prometheus, Grafana, Adminer és Kafka UI szolgáltatásokkal.</p><p>A következő kurzusokban ezt a platformot fogjuk használni alapul: a <strong>Delta Table Crash Course</strong>-on Bronze/Silver/Gold adatpipelines-t építünk Spark-pal, az <strong>Airflow Crash Course</strong>-on DAG-okat írunk, amelyek automatizálják a feldolgozást, és a monitoring kurzusban Grafana dashboardokat készítünk a platform állapotának nyomon követésére. A Docker alap, amire mindent építünk — most már szilárd alapokon állsz!</p><p><strong>Következő lépés:</strong> Indítsd el a platformot (<code>docker-compose up -d</code>), nyisd meg a Grafanát (localhost:3000), és nézd meg, ahogy minden szolgáltatás bejelentkezik — aztán jöhet a Delta Table kurzus!</p></div><table><tr><th>Felépítettük</th><th>Következő</th></tr><tr><td>Postgres, MinIO, Spark</td><td>Delta Table Crash Course</td></tr><tr><td>Airflow, MLflow</td><td>Bronze/Silver/Gold pipeline</td></tr><tr><td>Prometheus, Grafana</td><td>Monitoring dashboardek</td></tr><tr><td>Adminer (Postgres UI)</td><td>Adatbázis böngészés vizuálisan</td></tr><tr><td>Kafka UI</td><td>Streaming pipeline debug</td></tr><tr><td>Docker networking, volumes</td><td>Production best practices</td></tr></table><div class="callout success"><div class="callout-title">Következő</div><p>Delta Table Crash Course - ahol a platformon építkezünk!</p></div>
 </div>
 
 <div class="quiz-box" data-answer="1">
