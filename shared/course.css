@@ -426,6 +426,8 @@ tr:hover td { background: rgba(0,212,255,.05); }
   .arch-flow { gap: 4px; }
   .arch-step { padding: 6px 10px; min-width: 70px; font-size: .8rem; }
   .quiz-option { font-size: .82rem; padding: 8px 12px; }
+  .cip-project-panel { grid-template-columns:1fr; padding:14px; }
+  .cip-project-shot { display:none; }
 }
 
 @media (max-width: 600px) {
@@ -443,9 +445,7 @@ tr:hover td { background: rgba(0,212,255,.05); }
   .cip-tagline { font-size: .9rem; padding: 10px 12px; }
   .cip-actions { gap: 8px; }
   .cip-action { padding: 9px 14px; font-size: .8rem; flex: 1 1 auto; justify-content: center; }
-  .cip-project-panel { grid-template-columns:1fr; padding:14px; }
   .cip-project-copy dl { grid-template-columns:1fr; }
-  .cip-project-shot { display:none; }
   .cip-block-title { font-size: .78rem; }
   .cip-block-list li { font-size: .83rem; padding: 5px 10px; }
   .fl-topics { grid-template-columns: 1fr; }
