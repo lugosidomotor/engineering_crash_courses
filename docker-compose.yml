@@ -89,6 +89,9 @@ services:
   adminer:
     image: adminer
     container_name: webshop-adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: dracula
     ports:
       - "8082:8080"
     depends_on:
@@ -509,7 +512,7 @@ services:
   # ─── DATABRICKS ────────────────────────────────────────────────
 
   unity-catalog:
-    image: unitycatalog/unitycatalog:latest
+    image: unitycatalog/unitycatalog:0.2.1
     container_name: webshop-unity-catalog
     profiles: ["spark", "databricks", "otf", "all"]
     ports:

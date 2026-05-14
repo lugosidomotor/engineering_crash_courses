@@ -99,6 +99,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -115,7 +118,7 @@
   <div class="md-cell"><p>A relációs adatbázisok az adatokat <strong>táblákban</strong> (tables) tárolják, ahol minden tábla egy adott entitást – például vásárlókat, termékeket vagy rendeléseket – ír le. Minden táblának van egy <strong>sémája</strong> (schema), ami meghatározza, milyen oszlopokból áll és milyen adattípusú értékeket tartalmazhatnak azok. A séma a tervrajz, a sorok (rows) pedig a konkrét adatok.</p>
 <p>A fenti kódrészlet egy <code>customers</code> táblát hoz létre a WebShop Pro rendszerben. A <code>CREATE TABLE</code> utasítás határozza meg a tábla nevét és oszlopait. Minden oszlopnak meg kell adni az adattípust: <code>INT</code> egész számokhoz, <code>VARCHAR(n)</code> szövegekhez, <code>DECIMAL(p,s)</code> pénzértékekhez, <code>TIMESTAMP</code> dátum+idő kombinációkhoz, <code>BOOLEAN</code> pedig igaz/hamis értékekhez. A <code>PRIMARY KEY</code> biztosítja, hogy minden vásárló azonosítója egyedi legyen.</p>
 <p>A <code>NOT NULL</code> megkötés garantálja, hogy a név mező nem maradhat üresen, az <code>UNIQUE</code> pedig megakadályozza, hogy két vásárló ugyanazzal az e-mail címmel regisztráljon. A <code>DEFAULT</code> kulcsszó automatikus értéket rendel: a <code>created_at</code> a rekord létrehozásának időpontját kapja, <code>is_active</code> pedig alapértelmezetten igaz lesz.</p>
-<p><strong>Gyakori hiba:</strong> ne felejts el PRIMARY KEY-t definiálni – enélkül nehéz lesz a táblát más táblákhoz kapcsolni, és az adatbázis sem tudja hatékonyan indexelni a sorokat.</p></div><table><tr><th>Típus</th><th>Leírás</th><th>Példa</th></tr><tr><td>INT</td><td>Egész szám</td><td>customer_id</td></tr><tr><td>VARCHAR(n)</td><td>Szöveg</td><td>name</td></tr><tr><td>DECIMAL(p,s)</td><td>Tizedes szám</td><td>price</td></tr><tr><td>TIMESTAMP</td><td>Dátum és idő</td><td>created_at</td></tr><tr><td>BOOLEAN</td><td>Igaz/hamis érték</td><td>is_active</td></tr></table><div class="code-cell" id="cell-1"><div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('1')">&#9654; Run</button></div><div class="code-body"><pre>-- Create customers table
+<p><strong>Gyakori hiba:</strong> ne felejts el PRIMARY KEY-t definiálni. Az adatbáziskezelő automatikusan létrehoz egy unique indexet a PK oszlopra (PostgreSQL: B-tree index; SQL Server: alapból klaszterezett index). PK nélkül is lehet bármikor saját indexet építeni (<code>CREATE INDEX</code>), de a PRIMARY KEY az egyediség és a referenciális integritás jelzése a sémában — más táblák FOREIGN KEY-jal csak deklarált PK-ra vagy UNIQUE oszlopra hivatkozhatnak.</p></div><table><tr><th>Típus</th><th>Leírás</th><th>Példa</th></tr><tr><td>INT</td><td>Egész szám</td><td>customer_id</td></tr><tr><td>VARCHAR(n)</td><td>Szöveg</td><td>name</td></tr><tr><td>DECIMAL(p,s)</td><td>Tizedes szám</td><td>price</td></tr><tr><td>TIMESTAMP</td><td>Dátum és idő</td><td>created_at</td></tr><tr><td>BOOLEAN</td><td>Igaz/hamis érték</td><td>is_active</td></tr></table><div class="code-cell" id="cell-1"><div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('1')">&#9654; Run</button></div><div class="code-body"><pre>-- Create customers table
 CREATE TABLE customers (
     customer_id   INT PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
@@ -155,8 +158,16 @@ SELECT DISTINCT category FROM products ORDER BY category;</pre></div><div class=
 ----------------+-------
 Laptop Pro 16   | 549.99
 Phone Ultra     | 449.99
+Tablet Air 11   | 329.99
+Headphones X    | 149.99
+Earbuds Lite    |  99.99
 
-Audio, Laptop, Phone, Tablet</pre></div></div>
+category
+---------
+Audio
+Laptop
+Phone
+Tablet</pre></div></div>
 </div>
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
@@ -218,7 +229,7 @@ Kovacs Anna  |    1349.97</pre></div></div>
   <div class="section-number">Section 07</div>
   <h2>Window Functions</h2>
   <div class="md-cell"><p>A <strong>window function</strong> (ablakfüggvény) olyan függvény, amely <strong>soronként eredményt ad</strong>, de a számítás egy kapcsolódó sorhalmazt (az „ablakot") vesz figyelembe – ellentétben a <code>GROUP BY</code>-val, amely a sorokat összevonja egyetlen értékké. Ez azt jelenti, hogy minden sor megmarad az eredményben, de kiegészül egy számított értékkel (pl. futó összeg, sorszám, rangsor).</p>
-<p>A példában a <code>SUM(SUM(total_amount)) OVER (ORDER BY ...)</code> egy <strong>futó összeget</strong> (running total) számol havi bontásban. A belső <code>SUM(total_amount)</code> a <code>GROUP BY</code> miatt havonta összegzi a bevételelt, a külső <code>SUM(...) OVER (...)</code> pedig ezeket a havi összegeket halmozottan összeadja. Januárban a futó összeg megegyezik a havi bevétellel, februárban már a január+február összeg jelenik meg, és így tovább.</p>
+<p>A példában a <code>SUM(SUM(total_amount)) OVER (ORDER BY ...)</code> egy <strong>futó összeget</strong> (running total) számol havi bontásban. Először a <code>GROUP BY</code> létrehozza a havi aggregált sorokat (a belső <code>SUM(total_amount)</code> = havi bevétel), majd ezeken a már aggregált sorokon fut a window function: a külső <code>SUM(...) OVER (ORDER BY hónap)</code> kumulatívan halmozza ezeket. Tehát a két <code>SUM</code> nem ugyanazokon a sorokon dolgozik: a belső a <em>nyers</em> sorokon csoporton belül, a külső pedig a <em>már csoportosított</em> kimeneten. Januárban a futó összeg megegyezik a havi bevétellel, februárban már a január+február összeg jelenik meg, és így tovább.</p>
 <p>Az <code>OVER()</code> határozza meg az ablakot: <code>ORDER BY DATE_TRUNC('month', order_date)</code> mondja meg, hogy milyen sorrendben halmozunk. A <code>DATE_TRUNC('month', ...)</code> függvény a dátumot havi szintre kerekíti, így minden hónap egyetlen csoportot képez. A <code>PARTITION BY</code> kulcsszóval további csoportosítás is lehetséges – például termékkategóriánkénti futó összeg számításához.</p>
 <p><strong>Ablakfüggvények a data engineeringben:</strong> a <code>ROW_NUMBER()</code>, <code>RANK()</code>, <code>LAG()</code>, <code>LEAD()</code> és <code>SUM() OVER</code> mind-mind elengedhetetlenek az analitikai ETL folyamatokban, például a deduplikáció, az SCD Type 2 kezelés vagy a cohort elemzések során.</p></div><div class="code-cell" id="cell-7"><div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('7')">&#9654; Run</button></div><div class="code-body"><pre>SELECT DATE_TRUNC('month', order_date) AS month,
        SUM(total_amount) AS revenue,
@@ -257,6 +268,7 @@ Szabo Kati   |       0.00 | Occasional</pre></div></div>
   <div class="md-cell"><p>A <strong>MERGE</strong> (más néven upsert) a data engineering egyik legfontosabb művelete: <strong>egyetlen utasításban frissít vagy beszúr</strong> sortokat attól függően, hogy már léteznek-e a céltáblában. Ez különösen fontos az ETL folyamatokban, ahol a napi adatbetöltés során az új rekordokat be kell szúrni, a meglévőket pedig frissíteni kell.</p>
 <p>A példa három lépést mutat. Az első az <code>UPDATE</code>, amely az <strong>SCD Type 2</strong> (Slowly Changing Dimension) mintára <strong>lezárja a régi rekordot</strong>: a <code>valid_to</code> mezőt az aktuális dátumra állítja, az <code>is_current</code> flag-et pedig hamisra. A második lépés egy <code>INSERT</code>, amely <strong>új sort szúr be</strong> az új értékekkel (pl. a vásárló új városa: Szeged). Így a dimenziótáblában a vásárlónak két sora lesz – a régi (lezárt) és az új (aktuális) –, és a történeti változások nyomon követhetők.</p>
 <p>A harmadik lépés a <code>MERGE INTO</code> utasítás: a <code>USING</code> határozza meg a forrásadatokat, az <code>ON</code> a kapcsolási feltételt. Ha talál egyezést (<code>WHEN MATCHED</code>), akkor <code>UPDATE</code>-eli a meglévő sort; ha nem talál (<code>WHEN NOT MATCHED</code>), akkor <code>INSERT</code>-tel új sort hoz létre. Ez az „insert or update" logika iparági szabvány a növekményes (incremental) adatbetöltésben.</p>
+<p><strong>Dialektus-figyelmeztetés:</strong> a <code>MERGE</code> SQL standard, de nem minden adatbázisban van: <strong>PostgreSQL 15+</strong>, <strong>SQL Server</strong>, <strong>Oracle</strong>, <strong>Snowflake</strong>, <strong>BigQuery</strong>, <strong>Databricks/Spark SQL</strong> támogatja. A 15-nél régebbi PostgreSQL-en az <code>INSERT ... ON CONFLICT DO UPDATE</code> helyettesíti. MySQL-ben az <code>INSERT ... ON DUPLICATE KEY UPDATE</code>.</p>
 <p><strong>Praktikus tipp:</strong> a <code>MERGE</code> előtt mindig teszteld le egy <code>SELECT</code> utasítással, hány sort fog érinteni – egy rossz <code>ON</code> feltétel miatt az egész táblát felülírhatod!</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre>-- SCD Type 2: Close old + insert new
 UPDATE dim_customer 
 SET valid_to = CURRENT_DATE, is_current = FALSE
@@ -265,29 +277,43 @@ WHERE customer_id = 1 AND is_current = TRUE;
 INSERT INTO dim_customer VALUES
 (101, 1, 'Kovacs Anna', 'Szeged', 'Regular', CURRENT_DATE, '9999-12-31', TRUE);
 
--- MERGE (upsert)
+-- MERGE (upsert) — Postgres 15+, Snowflake, BigQuery, Databricks
 MERGE INTO products AS target
 USING (VALUES (10, 'New Tablet', 'Tablet', 299.99, 50)) AS src (id, name, cat, price, stock)
 ON target.product_id = src.id
 WHEN MATCHED THEN UPDATE SET price = src.price
-WHEN NOT MATCHED THEN INSERT VALUES (src.id, src.name, src.cat, src.price, src.stock);</pre></div><div class="output-area" id="out-9"><div class="output-label">Output:</div><pre>Query OK, 3 rows affected</pre></div></div>
+WHEN NOT MATCHED THEN INSERT (product_id, name, category, price, stock)
+                        VALUES (src.id, src.name, src.cat, src.price, src.stock);</pre></div><div class="output-area" id="out-9"><div class="output-label">Output:</div><pre>MERGE
+INSERT 0 1
+-- 1 új termék beszúrva (a 10-es ID még nem létezett a products táblában)</pre></div></div>
 </div>
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
   <h2>DDL, Indexek, Partitioning</h2>
   <div class="md-cell"><p>A <strong>DDL (Data Definition Language)</strong> a táblaszerkezetet módosító utasítások gyűjtőneve: ide tartozik a <code>CREATE TABLE</code>, <code>ALTER TABLE</code>, <code>DROP TABLE</code> és az <code>CREATE INDEX</code>. Míg a DML (INSERT, UPDATE, SELECT) az adatokkal dolgozik, a DDL magát a <strong>struktúrát</strong> definiálja – ez az adatbázis „alapja", amit az adatbetöltés előtt kell megtervezni.</p>
 <p>Az <strong>indexek</strong> (indexes) jelentősen felgyorsítják a lekérdezéseket azáltal, hogy az adatbázisnak nem kell végigpásztáznia az egész táblát. A <code>CREATE INDEX idx_orders_customer ON orders(customer_id)</code> egy indexet hoz létre a <code>customer_id</code> oszlopra – ettől kezdve a <code>WHERE customer_id = 1</code> jellegű lekérdezések sokkal gyorsabbak lesznek. Hasonlóan, a <code>CREATE INDEX idx_orders_date ON orders(order_date)</code> a dátum alapú szűréseket gyorsítja, ami gyakori az analitikai jelentésekben.</p>
-<p>A <strong>particionálás</strong> (partitioning) nagy táblák esetén elengedhetetlen: a táblát logikai részekre (partíciókra) bontja, például hónap vagy régió szerint. Így a lekérdezések csak az érintett partíciókat olvassák, nem az egész táblát. A példa az <code>information_schema.tables</code> rendszertáblából kérdezi le a táblák méretét – ez hasznos a monitoring során, hogy lásd, melyik tábla fogyasztja a legtöbb tárhelyet.</p>
-<p><strong>Fontos:</strong> az indexek felgyorsítják az olvasást, de <strong>lassítják az írást</strong> (mert minden INSERT/UPDATE/DELETE esetén az indexet is frissíteni kell). Csak ott hozz létre indexet, ahol tényleg gyakori a szűrés!</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre>CREATE INDEX idx_orders_customer ON orders(customer_id);
+<p>A <strong>particionálás</strong> (partitioning) nagy táblák esetén elengedhetetlen: a táblát logikai részekre (partíciókra) bontja, például hónap vagy régió szerint. Így a lekérdezések csak az érintett partíciókat olvassák, nem az egész táblát. A példában a tábla méretét PostgreSQL-specifikus rendszerkatalógus függvényekkel kérdezzük le – ez hasznos a monitoring során, hogy lásd, melyik tábla fogyasztja a legtöbb tárhelyet.</p>
+<p><strong>Fontos:</strong> az indexek felgyorsítják az olvasást, de <strong>lassítják az írást</strong> (mert minden INSERT/UPDATE/DELETE esetén az indexet is frissíteni kell). Csak ott hozz létre indexet, ahol tényleg gyakori a szűrés!</p>
+<p><strong>Dialektus-figyelmeztetés:</strong> a tábla-méret lekérdezés <strong>dialektus-függő</strong>. A példa PostgreSQL-re van írva. MySQL/MariaDB-ben az <code>information_schema.tables</code> tábla <code>table_rows</code> és <code>data_length</code> oszlopait használnánk. Az SQL Server <code>sys.dm_db_partition_stats</code>, az Oracle <code>USER_SEGMENTS</code> nézetet kínál.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre>-- Index létrehozás (univerzális szintaxis)
+CREATE INDEX idx_orders_customer ON orders(customer_id);
 CREATE INDEX idx_orders_date ON orders(order_date);
 
-SELECT table_name, table_rows,
-       ROUND(data_length/1024/1024, 2) AS size_mb
-FROM information_schema.tables
-WHERE table_schema = 'webshop_pro' ORDER BY data_length DESC;</pre></div><div class="output-area" id="out-10"><div class="output-label">Output:</div><pre>table_name  | table_rows | size_mb
-------------+-----------+--------
-orders      |    500000 | 125.50
-order_items |   1850000 | 342.10</pre></div></div>
+-- Tábla méret PostgreSQL-ben
+SELECT
+    schemaname || '.' || tablename AS table_name,
+    n_live_tup AS approx_rows,
+    pg_size_pretty(pg_total_relation_size(schemaname || '.' || tablename)) AS total_size
+FROM pg_stat_user_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname || '.' || tablename) DESC;
+
+-- MySQL/MariaDB ekvivalens:
+-- SELECT table_name, table_rows, ROUND(data_length/1024/1024, 2) AS size_mb
+-- FROM information_schema.tables
+-- WHERE table_schema = 'webshop_pro' ORDER BY data_length DESC;</pre></div><div class="output-area" id="out-10"><div class="output-label">Output:</div><pre>table_name          | approx_rows | total_size
+--------------------+-------------+-----------
+public.order_items  |     1850000 | 342 MB
+public.orders       |      500000 | 125 MB</pre></div></div>
 </div>
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
@@ -343,11 +369,16 @@ CREATE TABLE fact_orders (
     net_amount  DECIMAL(10,2)
 );
 
--- Dimension: dim_customer
+-- Dimension: dim_customer (SCD Type 2)
 CREATE TABLE dim_customer (
-    sk BIGINT PRIMARY KEY, customer_id INT,
-    name VARCHAR(100), city VARCHAR(50),
-    segment VARCHAR(20), is_current BOOLEAN
+    sk          BIGINT PRIMARY KEY,
+    customer_id INT,
+    name        VARCHAR(100),
+    city        VARCHAR(50),
+    segment     VARCHAR(20),
+    valid_from  DATE NOT NULL DEFAULT CURRENT_DATE,
+    valid_to    DATE NOT NULL DEFAULT DATE '9999-12-31',
+    is_current  BOOLEAN NOT NULL DEFAULT TRUE
 );</pre></div><div class="output-area" id="out-14"><div class="output-label">Output:</div><pre>Query OK, 4 tables created</pre></div></div>
 </div>
 <div class="section layer-general" id="s15">

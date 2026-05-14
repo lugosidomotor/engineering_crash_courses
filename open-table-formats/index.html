@@ -99,6 +99,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -224,9 +227,9 @@ print("Iceberg tábla létrehozva rejtett havi particionálással")</pre></div>
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
   <h2>Iceberg metadata fa <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span></h2>
-  <div class="md-cell"><p>Az Iceberg egyik legnagyobb innovációja a <strong>fat-alapú metadata struktúra</strong>, amely lényegesen hatékonyabbá teszi a nagy táblák lekérdezését, mint a hagyományos monolitikus tranzakciós napló megközelítés. A hierarchia négy szintből áll:</p>
+  <div class="md-cell"><p>Az Iceberg egyik legnagyobb innovációja a <strong>fa-alapú (tree-shaped) metadata struktúra</strong>, amely lényegesen hatékonyabbá teszi a nagy táblák lekérdezését, mint a hagyományos monolitikus tranzakciós napló megközelítés. A hierarchia négy szintből áll:</p>
 <p><strong>Szint 1: Metadata file</strong> (<code>v1.metadata.json</code>) — a tábla legfelső szintű metaadata: séma, particionálási specifikáció, sort order, és hivatkozás a jelenlegi snapshot-ra. Ez a belépési pont minden olvasó számára.</p>
-<p><strong>Szint 2: Manifest list</strong> (<code>snap-12345.avro</code>) — egy snapshot (verzió) összes manifest fájljának listája. Tartalmazza az egyes manifestek partíció-tartományát és sorainak számát, így a query engine gyorsan kiszűrheti az irreleváns manifesteket.</p>
+<p><strong>Szint 2: Manifest list</strong> (<code>snap-12345.avro</code>) — egy snapshot (verzió) összes manifest fájljának listája, fájlonként <em>egy bejegyzéssel</em>. Az egyes bejegyzések tartalmazzák a hivatkozott manifest méretét, partíció-tartomány-summary-jét és a sorok hozzávetőleges számát. <strong>A részletes per-fájl statisztikák (min/max, null-count, value-count oszloponként) a 3. szint manifest fájlokban vannak</strong>, nem a manifest list-ben — a manifest list inkább "indexként" működik, hogy mely manifesteket kell egyáltalán megnyitni.</p>
 <p><strong>Szint 3: Manifest file</strong> (<code>manifest-A.avro</code>) — az egyes adatfájlok listája statisztikákkal (sorok száma, oszloponkénti min/max értékek, null értékek száma). Ez a szint teszi lehetővé a <strong>file skipping</strong>-et: ha egy query csak 2024 januári adatokat kér, a motor a manifest statisztikák alapján kihagyhatja a többi hónap fájljait.</p>
 <p><strong>Szint 4: Data files</strong> — maguk a Parquet vagy Avro adatfájlok, amelyekben a tényleges adatok tárolódnak.</p>
 <p><strong>Miért jobb ez, mint a Delta log?</strong> A Delta Lake egyetlen JSON-féle tranzakciós naplót használ, ami nagy tábláknál (több millió fájl) lassú lehet. Az Iceberg többszintű struktúrája lehetővé teszi, hogy egy query csak a releváns manifesteket és adatfájlokat olvassa, jelentősen csökkentve a tervezési időt.</p></div><div class="code-cell" id="cell-s4">
@@ -261,7 +264,7 @@ print("Iceberg metadata fa: metadata.json → manifest list → manifest → dat
 
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>Apache Hudi alapok <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Hudi</span></h2>
+  <h2>Apache Hudi alapok <span class="tool-badge"><img src="../assets/logos/apachehudi.svg">Hudi</span></h2>
   <div class="md-cell"><p>Az Apache Hudi (Hadoop Upserts Deletes and Incrementals) az Uber belső projektje. Fő erőssége a <strong>streaming upsert</strong> és az <strong>inkrementális lekérdezés</strong>.</p>
 <p><strong>WebShop Pro:</strong> Ha valós időben érkeznek rendelés-frissítések (pl. státusz változás: "new" → "shipped" → "delivered"), a Hudi natívan támogatja az upsert-eket.</p>
 <p><a href="https://hudi.apache.org/docs/overview/" target="_blank" rel="noopener">Hudi dokumentáció 📖</a></p></div><div class="code-cell" id="cell-s5">

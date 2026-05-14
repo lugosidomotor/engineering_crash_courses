@@ -99,6 +99,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -300,13 +303,14 @@ Tóth Bence      |   4 orders | $2,199.96</pre></div></div>
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
   <h2>Unit tesztelés: pytest</h2>
-  <div class="md-cell"><p>A <strong>pytest</strong> a Python tesztelés de facto standardja – egyszerű, hatékony, és rendkívül jó hibaüzeneteket ad. A data engineering-ben a tesztelés gyakran elhanyagolt terület, pedig egy rosszul működő transzformáció csendben megronthatja az adatokat, ami aztán helyrehozhatatlan károkat okoz a downstream rendszerekben. A pytest segít megelőzni ezeket a problémákat.</p><p>A kódban egy <code>transform_orders</code> függvényt látunk, amely három lépést végez: <code>dropna(subset=[...])</code> eltávolítja a sort, ha a kritikus mezők hiányoznak; <code>.assign(amount=df['amount'].abs())</code> abszolút értékre alakítja az összeget (negatív összegek nem lehetnek); végül <code>.query('amount &gt; 0')</code> kiszűri a nulla értékűeket. Minden lépést külön tesztfüggvénnyel ellenőrzünk.</p><p>A <code>test_transform_removes_nulls</code> teszt három sort ad meg (egy hiányzó <code>customer_id</code>-vel), és ellenőrzi, hogy az eredmény csak 2 sort tartalmaz. A <code>test_transform_abs_amount</code> egyetlen negatív értékű sort tesztel, és azt nézi, hogy a kimenetben 100 szerepel-e. Ez a minta – kis, fókuszált tesztek, amelyek egy-egy viselkedést ellenőriznek – iparági best practice.</p><p><strong>Tipp:</strong> Írj tesztet az edge case-ekre is: üres DataFrame, mind NULL oszlop, duplikátumok, extrém nagy értékek. A <code>@pytest.fixture</code> dekorátorral közös tesztadatokat hozhatsz létre, amiket több teszt is újrahasznál.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre>import pytest
+  <div class="md-cell"><p>A <strong>pytest</strong> a Python tesztelés de facto standardja – egyszerű, hatékony, és rendkívül jó hibaüzeneteket ad. A data engineering-ben a tesztelés gyakran elhanyagolt terület, pedig egy rosszul működő transzformáció csendben megronthatja az adatokat, ami aztán helyrehozhatatlan károkat okoz a downstream rendszerekben. A pytest segít megelőzni ezeket a problémákat.</p><p>A kódban egy <code>transform_orders</code> függvényt látunk, amely három lépést végez: <code>dropna(subset=[...])</code> eltávolítja a sort, ha a kritikus mezők hiányoznak; <code>.assign(amount=lambda x: x['amount'].abs())</code> abszolút értékre alakítja az összeget (negatív összegek nem lehetnek); végül <code>.query('amount &gt; 0')</code> kiszűri a nulla értékűeket. Minden lépést külön tesztfüggvénnyel ellenőrzünk.</p>
+<p><strong>Klasszikus pandas-buktató</strong>: a <code>.assign(amount=df['amount'].abs())</code> formában a <code>df</code> az <em>eredeti</em> DataFrame-re hivatkozik, nem a <code>dropna()</code> utáni állapotra – emiatt ha index-eltérés van, a NaN értékek visszakerülhetnek. A <code>lambda x: x['amount'].abs()</code> az aktuális (láncolt) DataFrame-en dolgozik, ezért biztonságosabb method chaining-ben.</p><p>A <code>test_transform_removes_nulls</code> teszt három sort ad meg (egy hiányzó <code>customer_id</code>-vel), és ellenőrzi, hogy az eredmény csak 2 sort tartalmaz. A <code>test_transform_abs_amount</code> egyetlen negatív értékű sort tesztel, és azt nézi, hogy a kimenetben 100 szerepel-e. Ez a minta – kis, fókuszált tesztek, amelyek egy-egy viselkedést ellenőriznek – iparági best practice.</p><p><strong>Tipp:</strong> Írj tesztet az edge case-ekre is: üres DataFrame, mind NULL oszlop, duplikátumok, extrém nagy értékek. A <code>@pytest.fixture</code> dekorátorral közös tesztadatokat hozhatsz létre, amiket több teszt is újrahasznál.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre>import pytest
 import pandas as pd
 
 def transform_orders(df: pd.DataFrame) -&gt; pd.DataFrame:
     return (df
         .dropna(subset=['customer_id', 'amount'])
-        .assign(amount=df['amount'].abs())
+        .assign(amount=lambda x: x['amount'].abs())  # lambda x: az AKTUÁLIS DataFrame, nem az eredeti df!
         .query('amount &gt; 0')
     )
 
@@ -373,27 +377,47 @@ Total processed: 30,000 rows</pre></div></div>
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
   <h2>Regex: szövegfeldolgozás</h2>
-  <div class="md-cell"><p>A <strong>reguláris kifejezések</strong> (regex) a szövegfeldolgozás legerősebb eszközei – és egyben leginkább alulértékeltek a data engineering-ben. Valós adatokban a szöveges mezők ritkán tiszták: telefonszámok mindenféle formátumban érkezhetnek (<code>+36-30/123 4567</code>, <code>06301234567</code>, <code>(30) 123-4567</code>), email címek szövegbe ágyazva, nevekben ékezetek és alternatív írásmódok. A regex segít ezeket normalizálni.</p><p>A <code>clean_phone</code> függvény a <code>re.sub(r'\D', '', phone)</code> hívással eltávolít minden nem-szám karaktert – a <code>\D</code> minta minden nem-digit karakterre illeszkedik. Ezután a <code>len(digits) == 11</code> feltétellel ellenőrzi, hogy a szám 11 számjegyből áll-e (magyar formátum), és ha igen, egy szép formátumba önti. A <code>extract_email</code> függvény a <code>re.search()</code> hívással keresi meg az első email-szerű mintát egy tetszőleges szövegben – a <code>[\w.+-]+@[\w-]+\.[\w.]+</code> minta a leggyakoribb email formátumokat fedi le.</p><p>A kimenet láthatóan nem tökéletes: a <code>+36-30/123 4567</code> formázás eredménye <code>+3-630-123-4567</code> lett, mert a kód nem veszi figyelembe a magyar országkód specialitásait. A <code>06301234567</code> pedig <code>None</code>-t ad vissza, mert csak 11 számjegyet vár, de a <code>06</code> előtaggal ez 10 vagy 11 hosszú is lehet. Ez jól mutatja, hogy a regex nem helyettesíti az üzleti logikát – kombinálni kell őket.</p><p><strong>Tipp:</strong> Használd a <code>re.compile()</code> függvényt olyan regex mintákhoz, amiket sokszor használsz – a fordítás csak egyszer történik meg, ami jelentős sebességjavulást hoz nagy adathalmazoknál.</p></div><div class="code-cell" id="cell-13"><div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('13')">&#9654; Run</button></div><div class="code-body"><pre>import re
+  <div class="md-cell"><p>A <strong>reguláris kifejezések</strong> (regex) a szövegfeldolgozás legerősebb eszközei – és egyben leginkább alulértékeltek a data engineering-ben. Valós adatokban a szöveges mezők ritkán tiszták: telefonszámok mindenféle formátumban érkezhetnek (<code>+36-30/123 4567</code>, <code>06301234567</code>, <code>(30) 123-4567</code>), email címek szövegbe ágyazva, nevekben ékezetek és alternatív írásmódok. A regex segít ezeket normalizálni.</p><p>A <code>clean_phone</code> függvény a <code>re.sub(r'\D', '', phone)</code> hívással eltávolít minden nem-szám karaktert – a <code>\D</code> minta minden nem-digit karakterre illeszkedik. Ezután a <code>len(digits) == 11</code> feltétellel ellenőrzi, hogy a szám 11 számjegyből áll-e (magyar formátum), és ha igen, egy szép formátumba önti. A <code>extract_email</code> függvény a <code>re.search()</code> hívással keresi meg az első email-szerű mintát egy tetszőleges szövegben – a <code>[\w.+-]+@[\w-]+\.[\w.]+</code> minta a leggyakoribb email formátumokat fedi le.</p><p>A példa azt mutatja, hogy a regex önmagában nem elég – kombinálni kell <strong>üzleti logikával</strong> (országkód-felismerés). A <code>clean_phone</code> függvény először lestrippeli a nem-számjegy karaktereket, majd az országkód szerint dönt a szám hosszáról és a normalizálásról. Mind a <code>+36-30/123 4567</code>, mind a <code>06301234567</code>, mind a tiszta <code>+36 70 ...</code> alak ugyanazt a kanonikus <code>+36-XX-XXX-XXXX</code> kimenetet adja.</p>
+<p><strong>Production tipp</strong>: ne írj saját telefonszám-validátort. Használd a <code>phonenumbers</code> könyvtárat (Google libphonenumber Python portja), amely 200+ ország szabályait ismeri.</p><p><strong>Tipp:</strong> Használd a <code>re.compile()</code> függvényt olyan regex mintákhoz, amiket sokszor használsz – a fordítás csak egyszer történik meg, ami jelentős sebességjavulást hoz nagy adathalmazoknál.</p></div><div class="code-cell" id="cell-13"><div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('13')">&#9654; Run</button></div><div class="code-body"><pre>import re
 
-def clean_phone(phone):
+def clean_phone(phone: str) -&gt; str | None:
+    """DEMO regex — magyar telefonszám normalizálás +36-30-123-4567 formára.
+
+    FIGYELEM: a 9-jegyű ág bármilyen 9 számjegyet elfogad (nincs körzetkód-validálás).
+    Production-ben használj `phonenumbers` libet (Google libphonenumber Python port),
+    ami 200+ ország szabályait ismeri.
+
+    Elfogad: +36 30 123 4567, +36-30/123 4567, 06 30 123 4567, 06301234567 stb.
+    """
     digits = re.sub(r'\D', '', phone)
-    if len(digits) == 11:
-        return f'+{digits[0]}-{digits[1:4]}-{digits[4:7]}-{digits[7:]}'
-    return None
+    # +36 országkód: 11 jegy (36 + 9), 06 előtag: 11 jegy (06 + 9), nyers 9 jegy is elfogadható
+    if digits.startswith('36') and len(digits) == 11:
+        national = digits[2:]  # 9 számjegy: körzet (2) + szám (7)
+    elif digits.startswith('06') and len(digits) == 11:
+        national = digits[2:]
+    elif len(digits) == 9:
+        national = digits
+    else:
+        return None
+    return f'+36-{national[:2]}-{national[2:5]}-{national[5:]}'
 
-def extract_email(text):
-    match = re.search(r'[\w.+-]+@[\w-]+\.[\w.]+', text)
+def extract_email(text: str) -&gt; str | None:
+    # RFC 5322 egyszerűsített minta — production-ben használj `email-validator` libet
+    match = re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)
     return match.group(0) if match else None
 
-phones = ['+36-30/123 4567', '06301234567', 'invalid']
+phones = ['+36-30/123 4567', '06301234567', '+36 70 1234567', 'invalid']
 emails = ['Contact: anna@email.hu', 'No email here']
 
 for p in phones:
-    print(f'{p} -&gt; {clean_phone(p)}')
+    print(f'{p!r:&lt;25} -&gt; {clean_phone(p)}')
 for e in emails:
-    print(f'{e} -&gt; {extract_email(e)}')</pre></div><div class="output-area" id="out-13"><div class="output-label">Output:</div><pre>+36-30/123 4567 -&gt; +3-630-123-4567
-06301234567 -&gt; None
-Contact: anna@email.hu -&gt; anna@email.hu</pre></div></div>
+    print(f'{e!r:&lt;25} -&gt; {extract_email(e)}')</pre></div><div class="output-area" id="out-13"><div class="output-label">Output:</div><pre>'+36-30/123 4567'         -&gt; +36-30-123-4567
+'06301234567'             -&gt; +36-30-123-4567
+'+36 70 1234567'          -&gt; +36-70-123-4567
+'invalid'                 -&gt; None
+'Contact: anna@email.hu'  -&gt; anna@email.hu
+'No email here'           -&gt; None</pre></div></div>
 </div>
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>

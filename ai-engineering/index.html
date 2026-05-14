@@ -99,6 +99,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main>
 
@@ -203,31 +206,33 @@ client = OpenAI()  <span class="cm"># OPENAI_API_KEY a környezeti változóból
   </div>
 </div>
 
-<!-- ══════════ S4: Responses API ══════════ -->
+<!-- ══════════ S4: Chat Completions API ══════════ -->
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>Responses API alapok <span class="tool-badge"><img src="../assets/logos/openai.svg">Responses API</span></h2>
+  <h2>Chat Completions API alapok <span class="tool-badge"><img src="../assets/logos/openai.svg">Chat Completions API</span></h2>
   <div class="md-cell">
-    <p>Az OpenAI új <strong>Responses API</strong>-ja a javasolt mód LLM hívásokhoz. A régi Chat Completions támogatott, de új projektekhez a Responses API-t használjuk.</p>
+    <p>Az OpenAI Python SDK <strong>Chat Completions API</strong>-ja a standard, széles körben használt mód LLM hívásokhoz. A modell kontextusát egy <code>messages</code> lista hordozza, amelynek elemei <code>role</code> (system / user / assistant) és <code>content</code> mezőkkel azonosítják, ki mit mondott.</p>
     <table>
-      <tr><th>Chat Completions (régi)</th><th>Responses API (új)</th></tr>
-      <tr><td><code>client.chat.completions.create()</code></td><td><code>client.responses.create()</code></td></tr>
-      <tr><td><code>messages=[...]</code></td><td><code>instructions="..."</code> + <code>input="..."</code></td></tr>
-      <tr><td>Nincs beépített tool</td><td>Beépített file_search, code_interpreter</td></tr>
+      <tr><th>Mező</th><th>Mire való</th></tr>
+      <tr><td><code>client.chat.completions.create()</code></td><td>A hívás belépési pontja</td></tr>
+      <tr><td><code>messages=[{"role": "system", ...}, {"role": "user", ...}]</code></td><td>A teljes beszélgetési kontextus</td></tr>
+      <tr><td><code>response.choices[0].message.content</code></td><td>A modell válaszának szövege</td></tr>
     </table>
   </div>
   <div class="code-cell" id="cell-s4">
     <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('s4')">▶ Run</button></div>
-    <div class="code-body"><pre>response = client.responses.create(
+    <div class="code-body"><pre>response = client.chat.completions.create(
     model=<span class="str">"gpt-4o"</span>,
-    instructions=<span class="str">"Te egy webshop ügyfélszolgálati asszisztens vagy. Rövid, pontos válaszokat adj."</span>,
-    input=<span class="str">"Mennyi idő alatt érkezik meg a csomag?"</span>
+    messages=[
+        {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Te egy webshop ügyfélszolgálati asszisztens vagy. Rövid, pontos válaszokat adj."</span>},
+        {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Mennyi idő alatt érkezik meg a csomag?"</span>}
+    ]
 )
 
-<span class="fn">print</span>(response.output_text)</pre></div>
+<span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content)</pre></div>
     <div class="output-area" id="out-s4">
       <div class="output-label">Output:</div>
-      <pre><span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">model=gpt-4o</span>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create()</span> <span class="log-dim">model=gpt-4o</span>
 <span class="log-ok">Response received:</span>
 A szállítási idő a választott módtól függ:
 - Standard: 3-5 munkanap
@@ -237,17 +242,18 @@ A szállítási idő a választott módtól függ:
   </div>
   <div class="callout">
     <div class="callout-title">Gyakori hiba</div>
-    <p>A <code>response.output_text</code> a válasz szövege. Ne keverd a <code>response.choices[0].message.content</code>-tel (az a régi Chat Completions).</p>
+    <p>A válasz szövege a <code>response.choices[0].message.content</code> alatt érhető el. A <code>choices</code> egy lista, mert elvileg több jelölt válasz is kérhető (<code>n</code> paraméter), de RAG-ban szinte mindig csak <code>[0]</code>-t használjuk.</p>
   </div>
 </div>
 
-<!-- ══════════ S5: Instructions vs Input ══════════ -->
+<!-- ══════════ S5: System message vs User message ══════════ -->
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>Instructions vs Input <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>System message vs User message <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
   <div class="md-cell">
-    <p><strong>instructions</strong> — rendszer-szintű, hogyan viselkedjen a modell. Rögzített.<br>
-    <strong>input</strong> — a konkrét kérdés, hívásonként változik.</p>
+    <p><strong>system message</strong> — rendszer-szintű viselkedési szabályok. Rögzített, általában nem változik hívásonként.<br>
+    <strong>user message</strong> — a konkrét felhasználói kérdés, hívásonként változik.</p>
+    <p>Biztonsági szempontból fontos: a két szerepet <strong>külön messages elemekre</strong> kell osztani, nem pedig egyetlen f-stringbe ágyazni. Ha a felhasználói inputot (<code>kerdes</code>) közvetlenül a system promptba interpolálod, az utat nyit a <strong>prompt injection</strong>-nek (a felhasználó beleírhat olyan instrukciót, ami felülírja a rendszerprompt szabályait). A <code>role</code> alapú elválasztás biztonságosabb, mert a modell tudja, melyik üzenet honnan származik.</p>
   </div>
   <div class="code-cell" id="cell-s5">
     <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('s5')">▶ Run</button></div>
@@ -261,15 +267,17 @@ Szabályok:
 """</span>
 
 kerdes = <span class="str">"Vissza tudok küldeni egy 14 napja vásárolt terméket?"</span>
-response = client.responses.create(
+response = client.chat.completions.create(
     model=<span class="str">"gpt-4o"</span>,
-    instructions=SYSTEM_INSTRUCTIONS,
-    input=kerdes
+    messages=[
+        {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: SYSTEM_INSTRUCTIONS},
+        {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: kerdes}
+    ]
 )
-<span class="fn">print</span>(response.output_text)</pre></div>
+<span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content)</pre></div>
     <div class="output-area" id="out-s5">
       <div class="output-label">Output:</div>
-      <pre><span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">with system instructions</span>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create()</span> <span class="log-dim">with system + user messages</span>
 <span class="log-ok">Response received:</span>
 Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted, feltéve ha eredeti állapotú.</pre>
     </div>
@@ -283,6 +291,10 @@ Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted
       <li><strong>Explainable format:</strong> "Formátum: [Forrás] [Érvelés] [Válasz]"</li>
     </ul>
   </div>
+  <div class="callout"><div class="callout-title">Indirect prompt injection — RAG-specifikus veszély</div>
+<p>A direct prompt injection (a felhasználó közvetlen 'Ignore previous' utasítás) ellen a system/user message szétválasztás véd. <strong>RAG rendszerekben</strong> azonban van egy másik támadási vektor: az <strong>indirect prompt injection</strong>. Ha a retrieve-elt dokumentumokba (céges wiki, ügyfél-feltöltés) malicious utasítást rejtenek el, az LLM kontextusában jelenik meg, és <em>úgy fogja olvasni, mintha az lenne az utasítás</em>.</p>
+<p>Védekezés: kontextus sanitizáció (HTML/Markdown escape), strukturális szétválasztás (a kontextus külön role-ban, nem inline), és LLM-output validálás. Részletek a <strong>RAG Evaluation & AI Safety kurzusban</strong>.</p>
+</div>
 </div>
 
 
@@ -292,25 +304,28 @@ Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted
   <h2>Structured outputs: JSON válasz <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
   <div class="md-cell">
     <p>A <strong>structured output</strong> (strukturált kimenet) azt jelenti, hogy az LLM válaszát nem szabad szabad formátumú szövegként kezelnünk, hanem egy előre meghatározott JSON sémának megfelelő objektumként kapjuk vissza. Ez kulcsfontosságú RAG rendszerekben, ahol a válasz mellé forrást, megbízhatósági pontszámot és kategóriát is vissza kell adni a downstream rendszerek számára.</p>
-    <p>A Responses API beépítetten támogatja a <strong>JSON schema</strong> kikényszerítést a <code>text.format</code> paraméterén keresztül. Nem kell kérned az LLM-et, hogy "válaszolj JSON-ban" és remélni a legjobbakat -- az API garantálja, hogy a válasz illeszkedik a megadott sémára. Ez azért forradalmi, mert megszünteti a kimenet parsing hibáit, amelyek a termelési rendszerek egyik leggyakoribb hibaforrásai.</p>
+    <p>A Chat Completions API beépítetten támogatja a <strong>JSON schema</strong> kikényszerítést a <code>response_format</code> paraméterén keresztül. Nem kell kérned az LLM-et, hogy "válaszolj JSON-ban" és remélni a legjobbakat -- a <code>strict: True</code> kapcsoló esetén az API garantálja, hogy a válasz illeszkedik a megadott sémára. Ez azért forradalmi, mert megszünteti a kimenet parsing hibáit, amelyek a termelési rendszerek egyik leggyakoribb hibaforrásai.</p>
     <p>A példában egy <code>support_answer</code> sémát definiálunk három mezővel: <code>answer</code> (a tényleges válaszszöveg), <code>category</code> (enum: szallitas, visszakuldes, garancia, egyeb), és <code>confidence</code> (0-1 közötti szám). A modell mindig ezt a struktúrát adja vissza, így a frontend kód biztonsággal dolgozhatja fel.</p>
     <div class="callout">
       <div class="callout-title">Gyakori hiba</div>
-      <p>Ne keverd a <code>response.output_text</code>-et a <code>response.choices[0].message.content</code>-tel. Előbbi az új Responses API, utóbbi a régi Chat Completions formátum. A structured output esetén az <code>output_text</code> egy JSON string, amit <code>json.loads()</code>-szal kell parse-olni.</p>
+      <p>A válasz továbbra is a <code>response.choices[0].message.content</code> alatt érhető el, viszont JSON schema módban ez egy JSON string lesz, amit <code>json.loads()</code>-szal kell objektummá parse-olni. Strict módban a séma minden propertyje kötelező és <code>additionalProperties: false</code> kell — különben az API hibát dob.</p>
     </div>
   </div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
     <div class="code-body"><pre><span class="kw">import</span> json
 
-response = client.responses.create(
+response = client.chat.completions.create(
     model=<span class="str">"gpt-4o"</span>,
-    instructions=<span class="str">"Válaszolj JSON-ban a megadott sémának megfelelően."</span>,
-    input=<span class="str">"Mennyibe kerül a szállítás?"</span>,
-    text={
-        <span class="str">"format"</span>: {
-            <span class="str">"type"</span>: <span class="str">"json_schema"</span>,
+    messages=[
+        {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Válaszolj JSON-ban a megadott sémának megfelelően."</span>},
+        {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Mennyibe kerül a szállítás?"</span>}
+    ],
+    response_format={
+        <span class="str">"type"</span>: <span class="str">"json_schema"</span>,
+        <span class="str">"json_schema"</span>: {
             <span class="str">"name"</span>: <span class="str">"support_answer"</span>,
+            <span class="str">"strict"</span>: <span class="kw">True</span>,
             <span class="str">"schema"</span>: {
                 <span class="str">"type"</span>: <span class="str">"object"</span>,
                 <span class="str">"properties"</span>: {
@@ -318,17 +333,18 @@ response = client.responses.create(
                     <span class="str">"category"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"enum"</span>: [<span class="str">"szallitas"</span>, <span class="str">"visszakuldes"</span>, <span class="str">"garancia"</span>, <span class="str">"egyeb"</span>]},
                     <span class="str">"confidence"</span>: {<span class="str">"type"</span>: <span class="str">"number"</span>}
                 },
-                <span class="str">"required"</span>: [<span class="str">"answer"</span>, <span class="str">"category"</span>, <span class="str">"confidence"</span>]
+                <span class="str">"required"</span>: [<span class="str">"answer"</span>, <span class="str">"category"</span>, <span class="str">"confidence"</span>],
+                <span class="str">"additionalProperties"</span>: <span class="kw">False</span>
             }
         }
     }
 )
 
-result = json.loads(response.output_text)
+result = json.loads(response.choices[<span class="num">0</span>].message.content)
 <span class="fn">print</span>(json.dumps(result, indent=2, ensure_ascii=<span class="kw">False</span>))</pre></div>
     <div class="output-area" id="out-s6">
       <div class="output-label">Output:</div>
-      <pre><span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">structured output (JSON schema)</span>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create()</span> <span class="log-dim">structured output (JSON schema, strict)</span>
 <span class="log-ok">Parsed JSON response:</span>
 {
   <span class="log-info">"answer"</span>: "A standard szállítás 990 Ft, expressz 2490 Ft.",
@@ -354,6 +370,7 @@ result = json.loads(response.output_text)
     <div class="callout">
       <div class="callout-title">Fontos</div>
       <p>A tool definícióban a <code>description</code> mező kritikus: a modell ebből érti meg, mikor használja az eszközt. Minél pontosabb a leírás, annál kevesebb a téves hívás. Mindig adj magyar nyelvű, egyértelmű leírást.</p>
+      <p>Chat Completions API-ban a tool hívásokat a <code>response.choices[0].message.tool_calls</code> listán kapjuk vissza (nem a <code>content</code>-en). Minden elem tartalmazza a függvény nevét (<code>tc.function.name</code>) és a JSON-stringként szerializált argumentumokat (<code>tc.function.arguments</code>) — ezt <code>json.loads()</code>-szal kell parse-olni. A <code>tool_choice="auto"</code> azt jelenti, hogy a modell maga dönti el, hív-e tool-t, vagy egyenes választ ad.</p>
     </div>
   </div>
   <div class="code-cell" id="cell-s7">
@@ -382,14 +399,25 @@ tools = [{
     }
     <span class="kw">return</span> orders.get(order_id, {<span class="str">"status"</span>: <span class="str">"nem található"</span>})
 
-response = client.responses.create(
+response = client.chat.completions.create(
     model=<span class="str">"gpt-4o"</span>,
-    instructions=<span class="str">"Te a WebShop Pro support bot vagy."</span>,
-    input=<span class="str">"Mi a helyzet a WSP-12345 rendeléssel?"</span>,
-    tools=tools
+    messages=[
+        {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Te a WebShop Pro support bot vagy."</span>},
+        {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Mi a helyzet a WSP-12345 rendeléssel?"</span>}
+    ],
+    tools=tools,
+    tool_choice=<span class="str">"auto"</span>
 )
 
-<span class="fn">print</span>(response.output_text)</pre></div>
+<span class="cm"># Ha a modell tool-t hív, a tool_calls listán kapjuk vissza, content=None</span>
+tool_calls = response.choices[<span class="num">0</span>].message.tool_calls
+<span class="kw">if</span> tool_calls:
+    <span class="kw">for</span> tc <span class="kw">in</span> tool_calls:
+        args = json.loads(tc.function.arguments)
+        result = <span class="fn">get_order_status</span>(**args)
+        <span class="fn">print</span>(<span class="str">f"Tool {tc.function.name} →"</span>, result)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content)</pre></div>
     <div class="output-area" id="out-s7">
       <div class="output-label">Output:</div>
       <pre><span class="log-openai">[openai]</span> <span class="log-step">tool_call: get_order_status(order_id="WSP-12345")</span>
@@ -457,6 +485,7 @@ vec_vissza    = np.array([<span class="num">0.1</span>, <span class="num">0.2</s
     <div class="callout">
       <div class="callout-title">Modell választás</div>
       <p>A <code>text-embedding-3-small</code> olcsó és gyors, a legtöbb RAG használathoz elegendő. Ha maximális pontosság kell, próbáld a <code>text-embedding-3-large</code> modellt (3072 dimenzió, kb. 3x drágább). A dimenziócsökkentés is támogatott az API-ban.</p>
+      <p><strong>Megjegyzés:</strong> A régi <code>text-embedding-ada-002</code> modell deprecated státuszú; új projektekben a <code>text-embedding-3-small</code> / <code>-large</code> család használata javasolt.</p>
     </div>
   </div>
   <div class="code-cell" id="cell-s9">
@@ -546,6 +575,10 @@ results = collection.query(
   <span class="log-dim">[0.234]</span> A visszaküldési határidő 30 nap a vásárlástól számítva.
   <span class="log-dim">[0.567]</span> A garancia 2 év, a számla szükséges hozzá.</pre>
     </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Distance metrika</div>
+    <p>A Chroma alapból <strong>squared L2 distance</strong>-t ad vissza (kisebb = közelebb), nem cosine similarity-t. Cosine-hoz használd <code>metadata={'hnsw:space':'cosine'}</code> collection paramétert létrehozáskor — pl. <code>create_collection(name="...", metadata={"hnsw:space": "cosine"})</code>. Ekkor a <code>distances</code> 0 (azonos) és 2 (ellentétes) között mozog, ami <code>1 - cosine_similarity</code>.</p>
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
@@ -709,7 +742,7 @@ rag_collection.add(
   <div class="md-cell">
     <p>A <strong>vektoros keresés</strong> (vector search) a RAG rendszer szíve: a felhasználói kérdést embedding-gé alakítjuk, majd a ChromaDB megkeresi a hozzá legközelebbi vektorokat a vektortérben. Ez a <strong>retrieval</strong> (visszakeresés) lépés -- a RAG rövidítés első betűje. Minél relevánsabb chunkokat találunk, annál jobb választ tud generálni az LLM.</p>
     <p>A <code>retrieve()</code> függvény a ChromaDB <code>query()</code> metódusát használja: elküldi a kérdés szövegét, és a ChromaDB automatikusan embedding-gé alakítja, majd koszinusz-hasonlóság alapján megkeresi a <code>n_results</code> darab legközelebbi chunkot. Az eredmény tartalmazza a dokumentum szövegét, a metaadatokat (forrás) és a távolságot -- minél kisebb a távolság, annál relevánsabb a találat.</p>
-    <p>A példában a "Mennyibe kerül a szállítás?" kérdésre a rendszer a szállítási dokumentum chunkjait találja meg a legkisebb távolsággal. A távolság értékek tipikusan 0 és 2 között mozognak, ahol a 0 tökéletes egyezést jelent. Éles környezetben érdemes beállítani egy távolság-küszöböt: ha a legjobb találat is túl messze van, a rendszer jelezheti, hogy nem talál releváns információt.</p>
+    <p>A példában a "Mennyibe kerül a szállítás?" kérdésre a rendszer a szállítási dokumentum chunkjait találja meg a legkisebb távolsággal. A távolság értelmezése függ a használt metrikától: a Chroma alapértelmezetten <strong>squared L2 distance</strong>-t használ (kisebb = közelebb, 0 = azonos vektor, nincs felső korlát). Ha cosine-t szeretnél (0 = azonos, 2 = teljesen ellentétes), állítsd be a collection-t <code>metadata={'hnsw:space':'cosine'}</code>-szal. Éles környezetben érdemes beállítani egy távolság-küszöböt: ha a legjobb találat is túl messze van, a rendszer jelezheti, hogy nem talál releváns információt.</p>
     <div class="callout">
       <div class="callout-title">Hibrid keresés</div>
       <p>A sima vektoros keresés négyzetesen rossz lehet kulcsszó-pontos lekérdezéseknél (pl. "WSP-12345 rendelés"). Éles környezetben érdemes <strong>hibrid keresést</strong> használni: a vektoros keresés eredményeit kombinálja kulcsszavas kereséssel (BM25), így mind a szemantikai, mind a lexikai pontosság megmarad.</p>
@@ -769,21 +802,26 @@ results = <span class="fn">retrieve</span>(<span class="str">"Mennyibe kerül a 
     retrieved = <span class="fn">retrieve</span>(question, n_results=n_results)
     context = <span class="str">"\n\n"</span>.join([doc <span class="kw">for</span> doc, _, _ <span class="kw">in</span> retrieved])
 
-    <span class="cm"># 2. AUGMENT</span>
-    augmented_input = <span class="str">f"""Kérdés: {question}
+    <span class="cm"># 2. AUGMENT — a kontextust a system message-be tesszük,</span>
+    <span class="cm">#    a felhasználó kérdését pedig külön user message-be.</span>
+    <span class="cm">#    Ez biztonságosabb, mint egyetlen f-stringbe ágyazni</span>
+    <span class="cm">#    (kevésbé vulnerable prompt injection-re).</span>
+    system_msg = <span class="str">f"""</span>{SYSTEM_INSTRUCTIONS}
 
-Tudásbázis:
+<span class="str">Tudásbázis (csak ebből válaszolj):
 {context}
 
-Válaszolj a kérdésre a tudásbázis alapján. Ha nincs benne, mondd: "Ezt a kérdést továbbítom a csapatnak."""</span>
+Ha a kérdés nem szerepel a tudásbázisban, mondd: "Ezt a kérdést továbbítom a csapatnak."""</span>
 
     <span class="cm"># 3. GENERATE</span>
-    response = client.responses.create(
+    response = client.chat.completions.create(
         model=<span class="str">"gpt-4o"</span>,
-        instructions=SYSTEM_INSTRUCTIONS,
-        input=augmented_input
+        messages=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: system_msg},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: question}
+        ]
     )
-    <span class="kw">return</span> response.output_text
+    <span class="kw">return</span> response.choices[<span class="num">0</span>].message.content
 
 <span class="cm"># Teszteljük!</span>
 <span class="kw">for</span> q <span class="kw">in</span> [<span class="str">"Mennyibe kerül a szállítás?"</span>, <span class="str">"Meddig garanciás a telefon?"</span>]:
@@ -793,12 +831,12 @@ Válaszolj a kérdésre a tudásbázis alapján. Ha nincs benne, mondd: "Ezt a k
     <div class="output-area" id="out-s15">
       <div class="output-label">Output:</div>
       <pre><span class="log-chroma">[chroma]</span> <span class="log-step">retrieve()</span> <span class="log-dim">→ context gathered</span>
-<span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">→ generating answer...</span>
+<span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create()</span> <span class="log-dim">→ generating answer...</span>
 <span class="log-ok">Q:</span> Mennyibe kerül a szállítás?
 <span class="log-ok">A:</span> A standard szállítás 990 Ft (3-5 munkanap), az expressz 2490 Ft (1-2 munkanap), az aznapi 3990 Ft. 15000 Ft felett ingyenes.
 
 <span class="log-chroma">[chroma]</span> <span class="log-step">retrieve()</span> <span class="log-dim">→ context gathered</span>
-<span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-dim">→ generating answer...</span>
+<span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create()</span> <span class="log-dim">→ generating answer...</span>
 <span class="log-ok">Q:</span> Meddig garanciás a telefon?
 <span class="log-ok">A:</span> Elektromos termékekre 2 év garancia érvényes. A számla szükséges hozzá. 14 napon belül csere vagy javítás.</pre>
     </div>
@@ -831,25 +869,30 @@ Válaszolj a kérdésre a tudásbázis alapján. Ha nincs benne, mondd: "Ezt a k
     <div class="code-header"><span class="cell-number">[15]</span><button class="run-btn" onclick="runCell('s16')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># Egyszerű eval: LLM-as-judge</span>
 <span class="kw">def</span> <span class="fn">evaluate_answer</span>(question, answer, context):
-    eval_response = client.responses.create(
+    eval_response = client.chat.completions.create(
         model=<span class="str">"gpt-4o"</span>,
-        instructions=<span class="str">"""Értékeld a válasz minőségét.
+        messages=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"""Értékeld a válasz minőségét.
 Adj 0-1 közötti pontszámot:
 - faithfulness: a válasz a kontextusból származik-e
 - relevance: a válasz releváns-e a kérdésre
-Válaszolj JSON-ban."""</span>,
-        input=<span class="str">f"""Kérdés: {question}
+Válaszolj JSON-ban."""</span>},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">f"""Kérdés: {question}
 Válasz: {answer}
-Kontextus: {context}"""</span>,
-        text={<span class="str">"format"</span>: {<span class="str">"type"</span>: <span class="str">"json_schema"</span>, <span class="str">"name"</span>: <span class="str">"eval"</span>,
+Kontextus: {context}"""</span>}
+        ],
+        response_format={<span class="str">"type"</span>: <span class="str">"json_schema"</span>, <span class="str">"json_schema"</span>: {
+            <span class="str">"name"</span>: <span class="str">"eval"</span>,
+            <span class="str">"strict"</span>: <span class="kw">True</span>,
             <span class="str">"schema"</span>: {<span class="str">"type"</span>: <span class="str">"object"</span>,
                 <span class="str">"properties"</span>: {
                     <span class="str">"faithfulness"</span>: {<span class="str">"type"</span>: <span class="str">"number"</span>},
                     <span class="str">"relevance"</span>: {<span class="str">"type"</span>: <span class="str">"number"</span>},
                     <span class="str">"reasoning"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>}},
-                <span class="str">"required"</span>: [<span class="str">"faithfulness"</span>, <span class="str">"relevance"</span>, <span class="str">"reasoning"</span>]}}}
+                <span class="str">"required"</span>: [<span class="str">"faithfulness"</span>, <span class="str">"relevance"</span>, <span class="str">"reasoning"</span>],
+                <span class="str">"additionalProperties"</span>: <span class="kw">False</span>}}}
     )
-    <span class="kw">return</span> json.loads(eval_response.output_text)
+    <span class="kw">return</span> json.loads(eval_response.choices[<span class="num">0</span>].message.content)
 
 <span class="cm"># Eval teszt</span>
 q = <span class="str">"Mennyibe kerül a szállítás?"</span>
@@ -883,6 +926,17 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
       <div class="callout-title">Optimalizálási tippek</div>
       <p>A költség csökkentésére: (1) használj kisebb modellt (GPT-4o-mini) egyszerű kérdéseknél, (2) cache-eld a gyakori kérdések válaszait, (3) korlátozd a kontextus hosszát. A válaszidő javítására: (4) használj streaming választ, (5) párhuzamosítsd a retrieval-t, (6) válassz gyorsabb embedding modellt.</p>
     </div>
+    <div class="callout"><div class="callout-title">TTFB ≠ total latency</div>
+<p>A <code>stream=True</code> az LLM válaszában <strong>time-to-first-byte</strong>-ot (TTFB) javítja: a felhasználó az első token megjelenésekor látja, hogy "valami történik". A <strong>teljes válasz latency</strong> azonban változatlan vagy minimálisan rosszabb (a streamed encoding overhead miatt). Tehát: jobb UX-érzet, de a system throughput nem nő. Batch inferenciánál (pl. tömeges dokumentum-feldolgozás) nincs előnye — ott a sima request-response a hatékonyabb.</p>
+</div>
+    <div class="callout"><div class="callout-title">Production tipp — prompt caching (2024+)</div>
+<p>RAG kontextusoknál a system message + dokumentum-kontextus gyakran ismétlődik. Mind az <strong>Anthropic</strong>, mind az <strong>OpenAI</strong> támogat natív prompt caching-et:</p>
+<ul style="margin-left:20px;list-style:disc">
+<li><strong>Anthropic</strong>: explicit <code>cache_control={"type": "ephemeral"}</code> markert teszünk a prompt statikus részére. Cache hit: input token költség <strong>10%</strong> (90% megtakarítás). 5 perces TTL.</li>
+<li><strong>OpenAI</strong>: automatikus, 1024+ tokenes prompt prefix esetén. Cache hit: input költség <strong>50%</strong>.</li>
+</ul>
+<p>RAG/agentic workflow-knál ez a 2024-2025 LLMOps egyik fő költségredukciós technikája. Részletek és példák: <strong>LLMOps kurzus, Section 11</strong>.</p>
+</div>
   </div>
   <div class="code-cell" id="cell-s17">
     <div class="code-header"><span class="cell-number">[16]</span><button class="run-btn" onclick="runCell('s17')">▶ Run</button></div>
@@ -896,27 +950,34 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 
     <span class="cm"># LLM hívás (API, lassú)</span>
     llm_start = time.time()
-    response = client.responses.create(
+    response = client.chat.completions.create(
         model=<span class="str">"gpt-4o"</span>,
-        instructions=SYSTEM_INSTRUCTIONS,
-        input=<span class="str">f"Kérdés: {question}\n\nTudásbázis:\n{context}"</span>
+        messages=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">f"</span>{SYSTEM_INSTRUCTIONS}<span class="str">\n\nTudásbázis:\n{context}"</span>},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: question}
+        ]
     )
     llm_time = time.time() - llm_start
 
     total_time = time.time() - start
 
     <span class="cm"># GPT-4o pricing: $2.50/1M input, $10/1M output</span>
-    <span class="cm"># A response.usage tartalmazza a token számot</span>
+    <span class="cm"># A response.usage tartalmazza a token számot:</span>
+    <span class="cm">#   prompt_tokens, completion_tokens, total_tokens</span>
+    usage = response.usage
+    in_cost = usage.prompt_tokens * <span class="num">2.50</span> / <span class="num">1_000_000</span>
+    out_cost = usage.completion_tokens * <span class="num">10</span> / <span class="num">1_000_000</span>
     <span class="fn">print</span>(<span class="str">f"Retrieval: {(total_time - llm_time)*1000:.0f}ms"</span>)
     <span class="fn">print</span>(<span class="str">f"LLM: {llm_time*1000:.0f}ms"</span>)
     <span class="fn">print</span>(<span class="str">f"Total: {total_time*1000:.0f}ms"</span>)
-    <span class="kw">return</span> response.output_text
+    <span class="fn">print</span>(<span class="str">f"Tokens: {usage.prompt_tokens} in / {usage.completion_tokens} out — ${in_cost+out_cost:.5f}"</span>)
+    <span class="kw">return</span> response.choices[<span class="num">0</span>].message.content
 
 <span class="fn">print</span>(<span class="fn">rag_query_tracked</span>(<span class="str">"Mennyi a szállítás?"</span>))</pre></div>
     <div class="output-area" id="out-s17">
       <div class="output-label">Output:</div>
       <pre><span class="log-chroma">[chroma]</span> <span class="log-step">retrieve()</span> <span class="log-time">12ms</span>
-<span class="log-openai">[openai]</span> <span class="log-step">responses.create()</span> <span class="log-time">834ms</span>
+<span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create()</span> <span class="log-time">834ms</span>
 <span class="log-ok">Total:</span> <span class="log-time">846ms</span>
 <span class="log-ok">Answer:</span> A standard szállítás 990 Ft (3-5 munkanap), expressz 2490 Ft (1-2 munkanap). 15000 Ft felett ingyenes.</pre>
     </div>
@@ -987,18 +1048,18 @@ st.title(<span class="str">"WebShop Pro Support Bot"</span>)
       <div class="callout-title">Mit építettünk?</div>
       <p>Egy teljes RAG chatbot rendszer:</p>
       <ul>
-        <li>✅ OpenAI Responses API (nem Chat Completions)</li>
-        <li>✅ Instructions + Input szétválasztás</li>
-        <li>✅ Structured outputs (JSON schema)</li>
-        <li>✅ Tool calling (függvény hívás)</li>
-        <li>✅ Embedding fogalmak + OpenAI Embeddings API</li>
-        <li>✅ ChromaDB vektoradatbázis</li>
+        <li>✅ OpenAI Chat Completions API (<code>client.chat.completions.create</code>)</li>
+        <li>✅ System message + User message szétválasztás (prompt injection védelem)</li>
+        <li>✅ Structured outputs (<code>response_format</code> + JSON schema, strict mode)</li>
+        <li>✅ Tool calling (<code>tools=[{"type":"function",...}]</code>, <code>tool_calls</code> kiolvasás)</li>
+        <li>✅ Embedding fogalmak + OpenAI Embeddings API (<code>text-embedding-3-small</code>)</li>
+        <li>✅ ChromaDB vektoradatbázis (squared L2 vs cosine distance)</li>
         <li>✅ Chunking stratégiák</li>
         <li>✅ Dokumentumbetöltés + indexelés</li>
         <li>✅ Vektoros keresés (retrieval)</li>
         <li>✅ RAG pipeline (retrieve → augment → generate)</li>
         <li>✅ LLM-as-judge evaluáció</li>
-        <li>✅ Cost és latency tracking</li>
+        <li>✅ Cost és latency tracking (<code>response.usage</code>)</li>
         <li>✅ Streamlit chat UI</li>
       </ul>
     </div>
@@ -1051,7 +1112,7 @@ st.title(<span class="str">"WebShop Pro Support Bot"</span>)
 <script>
 window.COURSE_CONFIG = {
   slug: 'ai-engineering',
-  toc: [{"id": "s0", "num": "00", "label": "Intro - RAG chatbot projekt"}, {"id": "s1", "num": "01", "label": "Fogalmi térkép"}, {"id": "s2", "num": "02", "label": "Architektúra-térkép"}, {"id": "s3", "num": "03", "label": "Környezet előkészítése"}, {"id": "s4", "num": "04", "label": "Responses API alapok"}, {"id": "s5", "num": "05", "label": "Instructions vs Input"}, {"id": "s6", "num": "06", "label": "Structured outputs"}, {"id": "s7", "num": "07", "label": "Tool calling"}, {"id": "s8", "num": "08", "label": "Embedding fogalmak"}, {"id": "s9", "num": "09", "label": "OpenAI Embeddings"}, {"id": "s10", "num": "10", "label": "ChromaDB alapok"}, {"id": "s11", "num": "11", "label": "Chunking stratégiák"}, {"id": "s12", "num": "12", "label": "Dokumentumok betöltése"}, {"id": "s13", "num": "13", "label": "Indexelés ChromaDB-be"}, {"id": "s14", "num": "14", "label": "Vektoros keresés"}, {"id": "s15", "num": "15", "label": "RAG pipeline"}, {"id": "s16", "num": "16", "label": "Evaluáció"}, {"id": "s17", "num": "17", "label": "Cost és latency"}, {"id": "s18", "num": "18", "label": "Streamlit UI"}, {"id": "s19", "num": "19", "label": "Összefoglalás"}]
+  toc: [{"id": "s0", "num": "00", "label": "Intro - RAG chatbot projekt"}, {"id": "s1", "num": "01", "label": "Fogalmi térkép"}, {"id": "s2", "num": "02", "label": "Architektúra-térkép"}, {"id": "s3", "num": "03", "label": "Környezet előkészítése"}, {"id": "s4", "num": "04", "label": "Chat Completions API alapok"}, {"id": "s5", "num": "05", "label": "System vs User message"}, {"id": "s6", "num": "06", "label": "Structured outputs"}, {"id": "s7", "num": "07", "label": "Tool calling"}, {"id": "s8", "num": "08", "label": "Embedding fogalmak"}, {"id": "s9", "num": "09", "label": "OpenAI Embeddings"}, {"id": "s10", "num": "10", "label": "ChromaDB alapok"}, {"id": "s11", "num": "11", "label": "Chunking stratégiák"}, {"id": "s12", "num": "12", "label": "Dokumentumok betöltése"}, {"id": "s13", "num": "13", "label": "Indexelés ChromaDB-be"}, {"id": "s14", "num": "14", "label": "Vektoros keresés"}, {"id": "s15", "num": "15", "label": "RAG pipeline"}, {"id": "s16", "num": "16", "label": "Evaluáció"}, {"id": "s17", "num": "17", "label": "Cost és latency"}, {"id": "s18", "num": "18", "label": "Streamlit UI"}, {"id": "s19", "num": "19", "label": "Összefoglalás"}]
 };
 </script>
 <script src="../assets/webshop-case-study.js?v=webshop-pro"></script>

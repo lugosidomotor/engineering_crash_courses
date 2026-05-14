@@ -99,6 +99,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -313,10 +316,13 @@ Winner: Variant B (+15% satisfaction)</pre></div></div>
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
   <h2>Fallback model strategy</h2>
-  <div class="md-cell"><p>A <strong>fallback model stratégia</strong> biztosítja a szolgáltatás folytonosságát, ha a primer LLM nem elérhető vagy túl lassú. A modellek láncba vannak szervezve: ha az első (legtöbbet tudó, de legdrágább) modell timeout-ot vagy API hibát ad, automatikusan a következő (gyorsabb, olcsóbb) modell próbálkozik.</p><p><strong>Miért szükséges?</strong> Az LLM API-k nem 100%-ban megbízhatóak: rate limit, szerver leállás, hálózati problémák bármikor előfordulhatnak. Fallback nélkül a teljes chatbot leáll, ami üzleti szempontból elfogadhatatlan. A fallback stratégia biztosítja, hogy a felhasználók mindig kapjanak valamilyen választ.</p><p><strong>A folyamat:</strong> A kódban három modell van sorba rendezve: gpt-4o (legjobb minőség, 3s limit), gpt-4o-mini (jó minőség, 2s limit), gpt-3.5-turbo (alapvető, 1s limit). A <code>chat_with_fallback</code> függvény végigmegy a listán, és az első sikeresen válaszoló modellt használja. Ha minden modell elbukik, egy előre definiált hibaüzenetet ad vissza.</p><p><strong>Tip:</strong> A fallback modellek válaszait külön naplózd (MLflow-ban), és heti szinten elemezd, milyen gyakran aktiválódik a fallback. Ha túl gyakran, az arra utal, hogy a primer modell SLA-ját javítani kell.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre>models = [
-    {'name': 'gpt-4o', 'max_latency': 3.0, 'max_cost': 0.03},
-    {'name': 'gpt-4o-mini', 'max_latency': 2.0, 'max_cost': 0.005},
-    {'name': 'gpt-3.5-turbo', 'max_latency': 1.0, 'max_cost': 0.001},
+  <div class="md-cell"><p>A <strong>fallback model stratégia</strong> biztosítja a szolgáltatás folytonosságát, ha a primer LLM nem elérhető vagy túl lassú. A modellek láncba vannak szervezve: ha az első (legtöbbet tudó, de legdrágább) modell timeout-ot vagy API hibát ad, automatikusan a következő (gyorsabb, olcsóbb) modell próbálkozik.</p><p><strong>Miért szükséges?</strong> Az LLM API-k nem 100%-ban megbízhatóak: rate limit, szerver leállás, hálózati problémák bármikor előfordulhatnak. Fallback nélkül a teljes chatbot leáll, ami üzleti szempontból elfogadhatatlan. A fallback stratégia biztosítja, hogy a felhasználók mindig kapjanak valamilyen választ.</p><p><strong>A folyamat:</strong> A kódban három modell van sorba rendezve: gpt-4o (legjobb minőség, 3s limit), gpt-4o-mini (jó minőség, 2s limit), gpt-3.5-turbo (alapvető, 1s limit). A <code>chat_with_fallback</code> függvény végigmegy a listán, és az első sikeresen válaszoló modellt használja. Ha minden modell elbukik, egy előre definiált hibaüzenetet ad vissza.</p><p><strong>Tip:</strong> A fallback modellek válaszait külön naplózd (MLflow-ban), és heti szinten elemezd, milyen gyakran aktiválódik a fallback. Ha túl gyakran, az arra utal, hogy a primer modell SLA-ját javítani kell.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre># Megj: 2024-2025-ben az LLM arak per 1M tokenben szamolnak, nem per 1K.
+# A max_cost_per_req egy felso becsles atlagos kerdes-valasz hosszra
+# (input+output token szam x egysegar / 1M).
+models = [
+    {'name': 'gpt-4o',        'max_latency': 3.0, 'max_cost_per_req': 0.015},   # ~$2.50/1M in, $10/1M out
+    {'name': 'gpt-4o-mini',   'max_latency': 2.0, 'max_cost_per_req': 0.0008},  # ~$0.15/1M in, $0.60/1M out
+    {'name': 'gpt-3.5-turbo', 'max_latency': 1.0, 'max_cost_per_req': 0.0005},  # ~$0.50/1M in, $1.50/1M out
 ]
 
 def chat_with_fallback(question, context):
@@ -333,7 +339,7 @@ Using fallback model: gpt-4o-mini</pre></div></div>
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
   <h2>Streaming responses</h2>
-  <div class="md-cell"><p>A <strong>streaming responses</strong> (token-by-token streamelés) technika lényege, hogy a szerver nem várja meg, amíg a teljes válasz elkészül, hanem azonnal, tokenenként küldi az adatot a kliensnek. Ez drasztikusan javítja a felhasználói élményt: a felhasználó az első token megjelenésétől (Time To First Byte, TTFB) kezdve látja a válasz épülését.</p><p><strong>Miért fontos?</strong> Egy tipikus LLM válasz 1-5 másodperc alatt generálódik teljes egészében. Ha a felhasználó ennyi ideig egy üres képernyőt lát, az frusztráló. Streamelés esetén a TTFB 200-300 ms, és a válasz fokozatosan épül fel — hasonlóan a ChatGPT felhasználói élményhez.</p><p><strong>A folyamat:</strong> A kódban FastAPI <code>StreamingResponse</code>-t használunk, amely egy aszinkron generátor függvényből kapja az adatot. Az OpenAI API <code>stream=True</code> paraméterrel hívjuk, és a <code>async for chunk</code> ciklussal minden generált tokent azonnal továbbítjuk a kliensnek.</p><p><strong>Tip:</strong> A streamelés során is naplózd a teljes válaszidőt és a TTFB-t. Élesben fontos, hogy a hálózati buffering minimalizálva legyen — használj <code>media_type='text/event-stream'</code> formátumot SSE (Server-Sent Events) implementációhoz.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre>from fastapi import FastAPI
+  <div class="md-cell"><p>A <strong>streaming responses</strong> (token-by-token streamelés) technika lényege, hogy a szerver nem várja meg, amíg a teljes válasz elkészül, hanem azonnal, tokenenként küldi az adatot a kliensnek. Ez drasztikusan javítja a felhasználói élményt: a felhasználó az első token megjelenésétől (Time To First Byte, TTFB) kezdve látja a válasz épülését.</p><p><strong>Miért fontos?</strong> Egy tipikus LLM válasz 1-5 másodperc alatt generálódik teljes egészében. Ha a felhasználó ennyi ideig egy üres képernyőt lát, az frusztráló. Streamelés esetén a TTFB 200-300 ms, és a válasz fokozatosan épül fel — hasonlóan a ChatGPT felhasználói élményhez.</p><p><strong>A folyamat:</strong> A kódban FastAPI <code>StreamingResponse</code>-t használunk, amely egy aszinkron generátor függvényből kapja az adatot. Az OpenAI API <code>stream=True</code> paraméterrel hívjuk, és a <code>async for chunk</code> ciklussal minden generált tokent azonnal továbbítjuk a kliensnek.</p><p><strong>Fontos:</strong> a streaming a <strong>time-to-first-byte (TTFB)</strong> percepcióját javítja, de a <strong>teljes válasz latency</strong> ugyanaz marad (vagy minimálisan rosszabb a streamed encoding overhead miatt). Tehát a UX érzete jobb, de a system throughput nem nő — egy chatbot user várása alatt jól, de batch inferenciánál nincs előnye.</p><p><strong>Tip:</strong> A streamelés során is naplózd a teljes válaszidőt és a TTFB-t. Élesben fontos, hogy a hálózati buffering minimalizálva legyen — használj <code>media_type='text/event-stream'</code> formátumot SSE (Server-Sent Events) implementációhoz.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('10')">&#9654; Run</button></div><div class="code-body"><pre>from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 
 app = FastAPI()
@@ -357,50 +363,75 @@ TTFB: 0.3s, Total: 1.5s</pre></div></div>
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
   <h2>Cost optimization</h2>
-  <div class="md-cell"><p>A <strong>költségoptimalizálás</strong> az LLM üzemeltetés egyik legfontosabb aspektusa: egy production chatbot havi százezres kéréseivel a költségek gyorsan elfuthatnak. A fő stratégiák: <strong>semantic caching</strong> (hasonló kérdésekre cache-elt válasz), <strong>kisebb modell választása</strong> (ahol a minőség elfogadható), <strong>Batch API</strong> használata és <strong>prompt optimalizálás</strong> (rövidebb prompt = kevesebb token = kevesebb költség).</p><p><strong>Miért fontos?</strong> A GPT-4o egyetlen lekérdezése ~$0.03, ami 100 000 kérésnél már havi $3000. Ha a lekérdezések 70%-ára elég a GPT-4o-mini ($0.002/kérés), a megtakarítás drámai. A semantic caching tovább csökkentheti a költségeket azáltal, hogy az ismétlődő vagy nagyon hasonló kérdéseket nem küldi el az LLM-nek.</p><p><strong>A folyamat:</strong> A kódban egy egyszerű cache implementációt mutatunk be, amely a kérdés hash-elt változatával keresi a korábbi válaszokat. A táblázat összefoglalja a négy fő stratégiát és azok várható megtakarítását. A modell routing (melyik kérdés melyik modellhez kerül) intelligens kialakítása a legnagyobb hatású optimalizálás.</p><p><strong>Tip:</strong> Kövesd naponta a token-fogyasztást és a költséget modellenként. Állíts be alertet, ha a napi költség meghaladja a budget 120%-át. A cache hit rate-et is monitorozd: ha 60% alatt van, érdemes a cache stratégia finomításán gondolkodni.</p></div><table><tr><th>Stratégia</th><th>Megtakarítás</th></tr><tr><td>Semantic caching</td><td>60-80% request csökkentés</td></tr><tr><td>GPT-4o-mini (ha elég)</td><td>90% költség csökkentés</td></tr><tr><td>Batch API</td><td>50% olcsóbb</td></tr><tr><td>Prompt rövidítés</td><td>30% token csökkentés</td></tr></table><div class="code-cell" id="cell-11"><div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('11')">&#9654; Run</button></div><div class="code-body"><pre># Semantic cache implementation
+  <div class="md-cell"><p>A <strong>költségoptimalizálás</strong> az LLM üzemeltetés egyik legfontosabb aspektusa: egy production chatbot havi százezres kéréseivel a költségek gyorsan elfuthatnak. A fő stratégiák: <strong>exact-match / semantic caching</strong> (hasonló vagy azonos kérdésekre cache-elt válasz), <strong>provider-szintű prompt caching</strong> (Anthropic/OpenAI natív), <strong>kisebb modell választása</strong> (ahol a minőség elfogadható), <strong>Batch API</strong> használata és <strong>prompt optimalizálás</strong> (rövidebb prompt = kevesebb token = kevesebb költség).</p><p><strong>Miért fontos?</strong> A GPT-4o ára 2024-2025-ben kb. <strong>$2.50 / 1M input token</strong> és <strong>$10 / 1M output token</strong>; a GPT-4o-mini kb. <strong>$0.15 / 1M input</strong> és <strong>$0.60 / 1M output</strong>. Egy átlagos chat lekérdezés (1-2k input + 0.5k output token) költsége így GPT-4o-n cents-nagyságrend, GPT-4o-mini-n nagyságrendileg ~10x olcsóbb. Ha a lekérdezések 70%-ára elég a mini, a megtakarítás drámai. A caching tovább csökkentheti a költségeket azáltal, hogy az ismétlődő kérdéseket nem küldi el az LLM-nek.</p><p><strong>Prompt caching (Anthropic, OpenAI 2024+)</strong>: Mindkét provider natív prompt caching-et kínál. Az <strong>Anthropic</strong> API-ban <code>cache_control: {type: 'ephemeral'}</code> markert teszünk a prompt statikus részére (pl. system prompt + RAG context); az első hit után 5 percig cache-elt, a hit-ek 10%-on számoznak (90% megtakarítás), a write 25%-kal drágább. <strong>OpenAI</strong> automatikus: 1024+ tokenes prompt prefixek 50% kedvezménnyel cache-eltek. RAG/agentic workflow-knál ez 2-5x költségredukció — nem kell semmit kódolni, csak a prompt prefixet stabilan tartani.</p><p><strong>A folyamat:</strong> A kódban egy egyszerű <em>exact-match</em> cache implementációt mutatunk be (lásd lentebb a megkülönböztetést a valódi semantic cache-től). A táblázat összefoglalja a fő stratégiákat és azok várható megtakarítását. A modell routing (melyik kérdés melyik modellhez kerül) intelligens kialakítása a legnagyobb hatású optimalizálás.</p><p><strong>Tip:</strong> Kövesd naponta a token-fogyasztást és a költséget modellenként. Állíts be alertet, ha a napi költség meghaladja a budget 120%-át. A cache hit rate-et is monitorozd: ha 60% alatt van, érdemes a cache stratégia finomításán gondolkodni.</p></div><table><tr><th>Stratégia</th><th>Megtakarítás</th></tr><tr><td>Exact-match / semantic caching</td><td>60-80% request csökkentés</td></tr><tr><td>Anthropic / OpenAI prompt caching</td><td>50-90% input token költség csökkentés (cache hit-en)</td></tr><tr><td>GPT-4o-mini (ha elég)</td><td>~90% költség csökkentés</td></tr><tr><td>Batch API</td><td>50% olcsóbb</td></tr><tr><td>Prompt rövidítés</td><td>30% token csökkentés</td></tr></table><div class="code-cell" id="cell-11"><div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('11')">&#9654; Run</button></div><div class="code-body"><pre># Exact-match prompt cache (NEM semantic!)
 from langchain.cache import InMemoryCache
 import hashlib
 
-class SemanticCache:
-    def __init__(self, threshold=0.95):
+class ExactMatchCache:
+    def __init__(self):
         self.cache = {}
-        self.threshold = threshold
-    
+
     def lookup(self, question):
-        # Check if semantically similar question was asked before
+        # Csak akkor talál, ha a kerdes szorol szora azonos (lowercase utan)
         q_hash = hashlib.md5(question.lower().encode()).hexdigest()
         return self.cache.get(q_hash)
-    
+
     def store(self, question, answer):
         q_hash = hashlib.md5(question.lower().encode()).hexdigest()
         self.cache[q_hash] = answer
 
-cache = SemanticCache()
-print(f'Cache hit rate: 65% (saved ${420}/month)')</pre></div><div class="output-area" id="out-11"><div class="output-label">Output:</div><pre>Cost optimization results:
-Semantic cache: 65% hit rate, $420/month saved
-Model routing: gpt-4o-mini for 70% of queries
-Total savings: $680/month (45% reduction)</pre></div></div>
+cache = ExactMatchCache()
+# Tipikus 1000 query/nap eseten ~$X/ho megtakaritas,
+# az aktualis modellar es cache-hit aranyszama fuggvenyeben.
+print('Exact-match cache active. Saját költségbecsléshez használd a provider cost calculator-t.')</pre></div><div class="output-area" id="out-11"><div class="output-label">Output:</div><pre>Exact-match cache active.
+Tipikus cache hit rate: 30-50% FAQ-jellegű forgalomnál.
+Saját számoláshoz: OpenAI / Anthropic cost calculator.</pre></div><div class="callout"><div class="callout-title">Exact-match vs. valódi semantic cache</div><p>A fenti kód <strong>exact-match cache</strong>: csak akkor talál, ha a kérdés szóról szóra azonos (lowercase után). <strong>Valódi semantic cache</strong> működés: a kérdést embedding-be konvertáljuk, és cosine similarity threshold (pl. &gt;0.95) felett talált korábbi kérdés válaszát adjuk vissza. Eszközök: <strong>GPTCache</strong>, <strong>Redis Stack vector search</strong>, vagy egyszerű <code>sentence-transformers</code> + ChromaDB lokális megoldás.</p></div></div>
 </div>
 <div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
   <h2>RAG eval: RAGAS framework</h2>
   <div class="md-cell"><p>A <strong>RAGAS framework</strong> (Retrieval Augmented Generation Assessment) a RAG rendszerek minőségének ipari szabványos mérőeszköze. Három kulcsmetrikát mér: <strong>faithfulness</strong> (a válasz hűsége a kontextushoz), <strong>answer relevancy</strong> (a válasz relevanciája a kérdéshez) és <strong>context precision</strong> (a visszakeresett dokumentumok relevanciája).</p><p><strong>Miért fontos?</strong> Egy RAG rendszer teljesítménye több tényezőtől függ: jó dokumentumokat keres-e vissza, jól használja-e a kontextust, és releváns választ generál-e. A RAGAS ezeket a dimenziókat külön-külön méri, így pontosan azonosítható, hol van probléma a pipeline-ban.</p><p><strong>A folyamat:</strong> A kódban az eval dataset-et és a három metrikát átadjuk a <code>evaluate</code> függvénynek, amely minden kérdésre kiszámolja a metrikákat és átlagolja az eredményt. A cél: minden metrika > 0.85. Ha bármelyik ez alá esik, a pipeline megfelelő pontján kell optimalizálni.</p><p><strong>Tip:</strong> A RAGAS eredményeket ne csak egyszer futtasd le, hanem integráld a CI/CD pipeline-ba. Minden prompt vagy modell változtatás után automatikusan fusson le, és hasonlítsa össze az előző eredményekkel. Ha bármelyik metrika romlik, a deployment automatikusan leáll.</p></div><div class="code-cell" id="cell-12"><div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('12')">&#9654; Run</button></div><div class="code-body"><pre>from ragas import evaluate
-from ragas.metrics import faithfulness, answer_relevancy, context_precision
+from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+from datasets import Dataset
+import pandas as pd
 
-# Eval results
-results = evaluate(
-    dataset=eval_dataset,
-    metrics=[faithfulness, answer_relevancy, context_precision]
+# Eval dataset készítése (kérdés, generált válasz, retrieve-elt kontextus, ground truth)
+eval_data = pd.DataFrame({
+    "question": [
+        "Mennyibe kerül a szállítás Budapestre?",
+        "Mi a visszaküldési határidő?",
+    ],
+    "answer": [
+        "A szállítás Budapestre 2 munkanap.",
+        "14 napon belül lehet visszaküldeni.",
+    ],
+    "contexts": [
+        ["A standard szállítási idő Budapesten 2 munkanap, vidéken 3 munkanap."],
+        ["Az elállás 14 napon belül jelezhető. A terméknek sérülésmentesnek kell lennie."],
+    ],
+    "ground_truth": [
+        "2 munkanap Budapesten",
+        "14 nap",
+    ],
+})
+
+dataset = Dataset.from_pandas(eval_data)
+
+# RAGAS metrikák (LLM-as-judge alapú; OPENAI_API_KEY szükséges)
+result = evaluate(
+    dataset=dataset,
+    metrics=[
+        faithfulness,        # válasz a kontextuson alapul-e
+        answer_relevancy,    # válasz releváns-e a kérdésre
+        context_precision,   # a kontextus része-e a ground truth-nak
+        context_recall,      # a ground truth ott van-e a kontextusban
+    ],
 )
 
-print('RAG Evaluation Results:')
-for metric, score in results.items():
-    print(f'  {metric}: {score:.3f}')</pre></div><div class="output-area" id="out-12"><div class="output-label">Output:</div><pre>RAG Evaluation Results:
-  faithfulness:      0.912
-  answer_relevancy:  0.876
-  context_precision: 0.834
+print(result)
+# {'faithfulness': 0.95, 'answer_relevancy': 0.92, 'context_precision': 0.88, 'context_recall': 0.90}</pre></div><div class="output-area" id="out-12"><div class="output-label">Output:</div><pre>{'faithfulness': 0.95, 'answer_relevancy': 0.92, 'context_precision': 0.88, 'context_recall': 0.90}
 
-Target: all &gt; 0.85</pre></div></div>
+Target: minden metrika &gt; 0.85</pre></div></div>
 </div>
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>

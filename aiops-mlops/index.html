@@ -99,6 +99,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main>
 
@@ -119,6 +122,10 @@
       <div class="callout-title">Learning outcome</div>
       <p>A kurzus végére felépítesz egy ML pipeline-t kísérletkövetéssel, modellregisztrációval, FastAPI szolgáltatással, Docker konténerizációval és monitoringgal.</p>
     </div>
+    <div class="callout">
+      <div class="callout-title">Megjegyzés a névhasználathoz: AIOps vs MLOps</div>
+      <p>Az <strong>AIOps</strong> eredeti definíciója szerint <em>IT Operations + AI</em> (Gartner, 2017) — például log anomaly detection, incident prediction, alert correlation. Ez a kurzus elsősorban <strong>MLOps</strong>-ra fókuszál (ML modellek életciklusa: tréning, registry, deployment, monitoring), az AIOps módszerek (pl. Prometheus alert priorizálás ML-lel) érintőlegesen jelennek meg.</p>
+    </div>
   </div>
 </div>
 
@@ -131,7 +138,7 @@
       <tr><th>Fogalom</th><th>Magyarázat</th></tr>
       <tr><td><strong>MLOps</strong></td><td>ML modellek teljes élettartam-ciklusának kezelése: tanítás, deployment, monitoring</td></tr>
       <tr><td><strong>Experiment tracking</strong></td><td>Kísérletek naplózása: paraméterek, metrikák, modellek</td></tr>
-      <tr><td><strong>Model Registry</strong></td><td>Modell verziókezelés: staging, production, archived</td></tr>
+      <tr><td><strong>Model Registry</strong></td><td>Modell verziókezelés aliasokkal: <code>@staging</code>, <code>@production</code>, <code>@champion</code>, <code>@challenger</code> (a régi Stages deprecated)</td></tr>
       <tr><td><strong>CI/CD</strong></td><td>Continuous Integration/Deployment: automatizált tesztelés és kiszolgálás</td></tr>
       <tr><td><strong>Drift</strong></td><td>Adateltolódás: ha az új adatok eltérnek a tanító adatoktól</td></tr>
       <tr><td><strong>A/B testing</strong></td><td>Két modell verzió párhuzamos tesztelése</td></tr>
@@ -291,10 +298,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
   <div class="section-number">Section 06</div>
   <h2>Model Registry: modellverziózás <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
   <div class="md-cell">
-    <p>A <strong>Model Registry</strong> az MLflow központi modelltára, ahol a betanított modellek verziózva, életciklus-állapotokkal ellátva tárolódnak. A modellek státusza négy fázison halad keresztül: <strong>None</strong> (regisztrálva, de még nem értékelve) → <strong>Staging</strong> (tesztelés alatt) → <strong>Production</strong> (élesben szolgáltatva) → <strong>Archived</strong> (visszavonva, archiválva).</p>
-    <p><strong>Miért kritikus?</strong> Productionben nem elég, hogy van egy jól teljesítő modellünk — tudnunk kell, melyik verzió fut éppen, szükség esetén vissza tudjunk állni egy korábbi verzióra (rollback), és a változtatások nyomon követhetőek legyenek. A Model Registry pontosan ezt a governance-t biztosítja.</p>
-    <p><strong>A folyamat:</strong> A kódban először a <code>search_runs</code> segítségével megkeressük a legjobb F1 score-ral rendelkező futást, majd <code>register_model</code> hívással regisztráljuk a modellt. Ezután az <code>MlflowClient.transition_model_version_stage</code> metódussal a modellt Production státuszba emeljük. Minden új regisztráció automatikusan új verziót hoz létre.</p>
-    <p><strong>Tip:</strong> Élesben a Staging → Production lépést ne manuálisan végezd, hanem automatizáld: CI/CD pipeline validálja a modellt, és ha átmeneti teszteken is sikeres, automatikusan léptesse Production-be. Így elkerülhető az emberi hiba.</p>
+    <p>A <strong>Model Registry</strong> az MLflow központi modelltára, ahol a betanított modellek verziózva, <strong>aliasokkal</strong> (pl. <code>@production</code>, <code>@staging</code>, <code>@champion</code>, <code>@challenger</code>) ellátva tárolódnak. Az aliasok rugalmas címkék: tetszőleges nevet adhatsz nekik, és bármikor másik verzióra mutathatnak.</p>
+    <div class="callout warn">
+      <div class="callout-title">Figyelem: Stages deprecated</div>
+      <p>A <code>Stages</code> (Staging/Production/Archived) MLflow 2.9+ óta <strong>deprecated</strong>. Az aktuális ajánlás a Model Registry <strong>aliases</strong> használata, mert rugalmasabbak és jobban illeszkednek a modern deployment patternekhez (champion/challenger, A/B, canary). A <code>transition_model_version_stage</code> hívás helyett használd a <code>set_registered_model_alias</code> metódust.</p>
+    </div>
+    <p><strong>Miért kritikus?</strong> Productionben nem elég, hogy van egy jól teljesítő modellünk — tudnunk kell, melyik verzió fut éppen (<code>@production</code> alias), szükség esetén vissza tudjunk állni egy korábbi verzióra (rollback: az aliast átmozgatjuk egy régebbi verzióra), és a változtatások nyomon követhetőek legyenek. A Model Registry pontosan ezt a governance-t biztosítja.</p>
+    <p><strong>A folyamat:</strong> A kódban először a <code>search_runs</code> segítségével megkeressük a legjobb F1 score-ral rendelkező futást, majd <code>register_model</code> hívással regisztráljuk a modellt. Ezután az <code>MlflowClient.set_registered_model_alias</code> metódussal a modellhez hozzárendeljük a <code>production</code> aliast. Minden új regisztráció automatikusan új verziót hoz létre, az alias pedig egyetlen verzióra mutat.</p>
+    <p><strong>Tip:</strong> Élesben a <code>@staging</code> → <code>@production</code> alias átmozgatást ne manuálisan végezd, hanem automatizáld: CI/CD pipeline validálja a modellt, és ha átmeneti teszteken is sikeres, automatikusan állítsa át az aliast. Így elkerülhető az emberi hiba. Bevett pattern: <code>@champion</code> a jelenlegi production modell, <code>@challenger</code> az A/B tesztelt új jelölt.</p>
   </div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
@@ -307,32 +318,37 @@ best_run = mlflow.search_runs(
 model_uri = <span class="str">f"runs:/{best_run.run_id}/model"</span>
 
 <span class="cm"># Regisztráció</span>
-mlflow.register_model(
+mv = mlflow.register_model(
     model_uri=model_uri,
     name=<span class="str">"webshop-churn-classifier"</span>
 )
 
 <span class="fn">print</span>(<span class="str">f"Regisztrált modell: {best_run.run_id[:8]}"</span>)
+<span class="fn">print</span>(<span class="str">f"Verzió: {mv.version}"</span>)
 <span class="fn">print</span>(<span class="str">f"F1 score: {best_run['metrics.f1_score']:.3f}"</span>)
 
-<span class="cm"># Staging -> Production promotion</span>
+<span class="cm"># Modern alias-alapú promotion (MLflow 2.9+ ajánlott)</span>
 client = mlflow.tracking.MlflowClient()
-client.transition_model_version_stage(
+client.set_registered_model_alias(
     name=<span class="str">"webshop-churn-classifier"</span>,
-    version=<span class="num">1</span>,
-    stage=<span class="str">"Production"</span>
+    alias=<span class="str">"production"</span>,
+    version=mv.version
 )
-<span class="fn">print</span>(<span class="str">"Modell Production stage-re állítva!"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">"Modellhez @production alias rendelve!"</span>)
+
+<span class="cm"># Betöltés alias-szal:</span>
+<span class="cm"># model = mlflow.pyfunc.load_model("models:/webshop-churn-classifier@production")</span></pre></div>
     <div class="output-area" id="out-s6">
       <div class="output-label">Output:</div>
       <pre><span class="log-mlflow">[mlflow]</span> <span class="log-ok">Regisztrált modell:</span> <span class="log-info">a3f7c2e1</span>
+<span class="log-mlflow">[mlflow]</span> Verzió: <span class="log-info">1</span>
 <span class="log-mlflow">[mlflow]</span> F1 score: <span class="log-info">0.875</span>
-<span class="log-mlflow">[mlflow]</span> <span class="log-ok">Modell Production stage-re állítva!</span></pre>
+<span class="log-mlflow">[mlflow]</span> <span class="log-ok">Modellhez @production alias rendelve!</span></pre>
     </div>
   </div>
   <div class="callout">
-    <div class="callout-title">Verzió kezelés</div>
-    <p>Minden regisztráció új verziót hoz létre. A production modell mindig egy specifikus verzió, amit bármikor vissza lehet állítani.</p>
+    <div class="callout-title">Verzió kezelés aliasokkal</div>
+    <p>Minden regisztráció új verziót hoz létre. Az aliasok (<code>@production</code>, <code>@staging</code>, <code>@champion</code>, <code>@challenger</code>) rugalmas címkék, amelyek bármikor másik verzióra mozgathatók — így a rollback egyszerűen csak az alias átállítása. A modell betöltése aliasszal: <code>mlflow.pyfunc.load_model("models:/webshop-churn-classifier@production")</code>.</p>
   </div>
 </div>
 
@@ -470,8 +486,8 @@ validation = <span class="fn">validate_model</span>(model, X_test, y_test, THRES
 
 app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 
-<span class="cm"># Modell betöltése MLflow-bol</span>
-<span class="cm"># model = mlflow.sklearn.load_model("models:/webshop-churn-classifier/Production")</span>
+<span class="cm"># Modell betöltése MLflow-bol (alias-alapú, MLflow 2.9+ ajánlott)</span>
+<span class="cm"># model = mlflow.pyfunc.load_model("models:/webshop-churn-classifier@production")</span>
 
 <span class="kw">class</span> <span class="fn">CustomerData</span>(BaseModel):
     age: <span class="kw">int</span>
@@ -560,30 +576,36 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
   <div class="md-cell">
     <p>A <strong>CI/CD</strong> (Continuous Integration / Continuous Deployment) automatizálja a szoftverfejlesztés kritikus lépéseit: a kód módosítás után automatikusan lefutnak a tesztek, ha azok átmegyünk, elkészül a Docker image, és ha az is valid, automatikusan deployolásra kerül a production környezetbe. Minden <code>git push</code> aktiválja a pipeline-t.</p>
     <p><strong>Miért fontos ML-nél?</strong> ML rendszereknél nemcsak a kód változik, hanem az adatok és a modell is. A CI/CD pipeline kiterjeszthető úgy, hogy modell validációt és drift ellenőrzést is tartalmazzon. Így garantálható, hogy egy hibás modell sosem kerül élesbe, és minden változtatás nyomon követhető.</p>
-    <p><strong>A folyamat:</strong> A GitHub Actions workflow két job-ból áll: a <code>test</code> job futtatja a pytest teszteket és a modell validációt, a <code>deploy</code> job pedig (ha a tesztek átmentek) buildeli a Docker image-t és pusholja a registry-be. A két job közötti függőséget a <code>needs: test</code> biztosítja.</p>
+    <p><strong>A folyamat:</strong> A GitHub Actions workflow két job-ból áll: a <code>train</code> job lefuttatja a tanítást (<code>train.py</code>) és a modell validációt (<code>validate_model.py</code>), a <code>deploy</code> job pedig (ha a validáció átment) buildeli a Docker image-t és pusholja a registry-be. A két job közötti függőséget a <code>needs: train</code> biztosítja.</p>
+    <p><strong>Megjegyzés:</strong> A <code>validate_model.py</code> egy külön script, amelyet ebben a kurzusban nem definiálunk explicit fájlban — tipikusan a Section 08-ban látott <code>validate_model</code> függvényt csomagolja CLI-vé: betölti a frissen tanított modellt, lefuttatja a threshold-ellenőrzéseket (min accuracy, min F1), és nem-nulla exit kóddal kilép, ha a modell nem felel meg a kritériumoknak. Így a CI pipeline automatikusan elbukik, és nem deployol rossz modellt.</p>
     <p><strong>Tip:</strong> Valós projektekben a deploy job tartalmazzon canary deployment-et (először csak 1-5% forgalom az új verzióra), automatikus rollback lehetőséget és Slack/email értesítést a csapat számára. Emellett a modell artifact verziókat is számon kell tartani az MLflow Model Registry-ben.</p>
   </div>
   <div class="code-cell" id="cell-s11">
     <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('s11')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># .github/workflows/deploy.yml</span>
 <span class="cm"># name: ML Pipeline</span>
-<span class="cm"># on: push</span>
+<span class="cm"># on: [push]</span>
 <span class="cm"># jobs:</span>
-<span class="cm">#   test:</span>
+<span class="cm">#   train:</span>
 <span class="cm">#     runs-on: ubuntu-latest</span>
 <span class="cm">#     steps:</span>
 <span class="cm">#       - uses: actions/checkout@v4</span>
+<span class="cm">#       - uses: actions/setup-python@v5</span>
+<span class="cm">#         with:</span>
+<span class="cm">#           python-version: '3.11'</span>
 <span class="cm">#       - run: pip install -r requirements.txt</span>
-<span class="cm">#       - run: pytest tests/</span>
+<span class="cm">#       - run: python train.py</span>
 <span class="cm">#       - run: python validate_model.py</span>
 <span class="cm">#   deploy:</span>
-<span class="cm">#     needs: test</span>
+<span class="cm">#     needs: train</span>
+<span class="cm">#     runs-on: ubuntu-latest</span>
 <span class="cm">#     steps:</span>
+<span class="cm">#       - uses: actions/checkout@v4</span>
 <span class="cm">#       - run: docker build -t churn-api .</span>
 <span class="cm">#       - run: docker push registry/churn-api:latest</span>
 
 <span class="fn">print</span>(<span class="str">"CI/CD pipeline konfigurálva!"</span>)
-<span class="fn">print</span>(<span class="str">"Minden push → teszt → validáció → deploy"</span>)</pre></div>
+<span class="fn">print</span>(<span class="str">"Minden push → train → validáció → deploy"</span>)</pre></div>
     <div class="output-area" id="out-s11">
       <div class="output-label">Output:</div>
       <pre><span class="log-gh">[ci]</span> <span class="log-ok">CI/CD pipeline konfigurálva!</span>
@@ -651,6 +673,18 @@ drift, alerts = <span class="fn">detect_drift</span>(X_train, new_data)
     <div class="callout-title">Demo vs Production</div>
     <p><strong>Demoban:</strong> egyszerű átlag összehasonlítás. <strong>Productionben:</strong> KS-test, PSI (Population Stability Index), Evidently AI, Prometheus metrikák, Grafana dashboard, auto-retrain trigger.</p>
   </div>
+  <div class="callout warn">
+    <div class="callout-title">Drift detection productionben — részletesebben</div>
+    <p>A példa egyszerűsített: production-ben különbséget teszünk <strong>data drift</strong> (input feature eloszlás megváltozott — pl. új vásárlói korosztály érkezik) és <strong>concept drift</strong> (input-output kapcsolat megváltozott — pl. ugyanaz az ügyfélprofil ma már nem churn, mint régen; ezt csak ground truth labelekkel tudjuk észlelni) között.</p>
+    <p><strong>Statisztikai módszerek:</strong></p>
+    <ul>
+      <li><strong>PSI (Population Stability Index)</strong> — kategorikus + numerikus változókhoz; általános ipari ökölszabály: PSI &lt; 0.1 stabil, 0.1–0.25 enyhe drift, &gt; 0.25 jelentős drift.</li>
+      <li><strong>KS-test (Kolmogorov–Smirnov)</strong> — folytonos numerikus változókhoz; két eloszlás CDF-jének maximális különbsége.</li>
+      <li><strong>chi-square test</strong> — kategorikus változókhoz; a megfigyelt és a várt gyakoriságok eltérését méri.</li>
+      <li><strong>Wasserstein distance</strong> (Earth Mover's Distance) — eloszlások közötti transzport-költség, robusztus mérőszám folytonos változókhoz.</li>
+    </ul>
+    <p><strong>Eszközök:</strong> <a href="https://github.com/evidentlyai/evidently">Evidently</a> (drift report HTML-ben), <a href="https://github.com/NannyML/nannyml">NannyML</a> (concept drift label nélkül is), <a href="https://github.com/SeldonIO/alibi-detect">Alibi Detect</a> (Seldon, mély tanulási modellekhez is).</p>
+  </div>
 </div>
 
 <!-- S13: A/B tesztelés -->
@@ -714,7 +748,7 @@ improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span cla
       <p>Egy teljes ML pipeline-t a tanítástól a monitoringig:</p>
       <ul>
         <li>✅ MLflow kísérletkövetés (paraméterek, metrikák, modellek)</li>
-        <li>✅ Model Registry (verziózás, staging → production)</li>
+        <li>✅ Model Registry (verziózás, alias-alapú promóció: <code>@staging</code> → <code>@production</code>)</li>
         <li>✅ Churn modell építése feature engineering-gel</li>
         <li>✅ Automatizált modellvalidáció</li>
         <li>✅ FastAPI REST API szolgáltatás</li>

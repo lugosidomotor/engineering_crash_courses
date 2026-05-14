@@ -102,6 +102,9 @@
   </div>
 </header>
 
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -471,7 +474,8 @@ ranked.show()</pre></div>
   <div class="md-cell"><p>A Spark teljesítményoptimalizálás <strong>három pillérre</strong> épül: <strong>partitioning</strong> (az adatok megfelelő felosztása a clusterön), <strong>caching</strong> (gyakran használt adatok memóriában tartása), és a <strong>shuffle minimalizálás</strong> (az adatmozgatás csökkentése a node-ok között). Ezek közül a shuffle a legdrágább művelet, mert hálózati I/O-t és lemezírást igényel – egyetlen felesleges groupBy vagy join komplett shuffle-t válthat ki, ami percekkel növelheti a futási időt.</p>
 <p><strong>A kódrészlet bemutatása:</strong> A repartition() hash-alapú újraosztást végez, ami shuffle-t vált ki, de utána a kulcs alapú műveletek (join, groupBy) lokálisak maradnak. A coalesce() ellentétben nem vált ki shuffle-t – csak összevonja a meglévő partition-ket, ami ideális a kimenet csökkentésére (pl. 200 partition-ről 10-re egy fájlba írás előtt). A cache() és persist() memóriában tartja az adatokat, de figyelj: csak akkor érdemes használni, ha ugyanazt a DataFrame-et legalább 2-szer használod. A broadcast() egy kis táblát minden node-ra másol, elkerülve a shuffle-join-t – ez az egyik leghatékonyabb optimalizálás.</p>
 <p><strong>Az explain() megértése:</strong> Az explain(True) kilistázza a teljes végrehajtási tervet: Parsed Logical Plan → Analyzed → Optimized → Physical Plan. A Physical Plan mutatja meg a valós végrehajtást: milyen join stratégiát használ (BroadcastHashJoin, SortMergeJoin), hol van filter, project, aggregate. Ha a tervben sok Exchange lépést látsz, az shuffle-t jelent – ezeket érdemes minimalizálni.</p>
-<p><strong>Gyakorlati tippek:</strong> Alapszabály: 128MB adat partition-onként. Túl sok kis partition = sok scheduler overhead. Túl kevés nagy partition = nem használja ki a párhuzamosságot. Használd a spark.sql.shuffle.partitions beállítást (alapértelmezett 200) a munkaterhelésnek megfelelően. A Spark UI "SQL" tabján látod a tényleges végrehajtási tervet minden lekérdezésnél – ezt érdemes vizsgálni, ha lassú a pipeline.</p></div>
+<p><strong>Gyakorlati tippek:</strong> Alapszabály: 128MB adat partition-onként. Túl sok kis partition = sok scheduler overhead. Túl kevés nagy partition = nem használja ki a párhuzamosságot. Használd a <code>spark.sql.shuffle.partitions</code> beállítást (alapértelmezett 200) a munkaterhelésnek megfelelően. A Spark UI "SQL" tabján látod a tényleges végrehajtási tervet minden lekérdezésnél – ezt érdemes vizsgálni, ha lassú a pipeline.</p>
+<p><strong>Adaptive Query Execution (AQE) — Spark 3.0+:</strong> a Spark 3.2 óta <code>spark.sql.adaptive.enabled=true</code> az alapértelmezés. Az AQE futás közben optimalizál: dinamikusan összevonja a kis shuffle partíciókat (<code>coalescePartitions</code>), átírja a sort-merge join-okat broadcast joinra (<code>localShuffleReader</code>), és kezeli a skew-t (<code>skewJoin</code>). A modern Spark teljesítmény-hangolás <strong>elsőszámú</strong> eszköze – győződj meg róla, hogy be van kapcsolva, és nézd a Spark UI "SQL" tabján az "AQE optimization" lépéseket.</p></div>
   <div class="code-cell" id="cell-s10">
     <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('s10')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># Repartition</span>
@@ -481,8 +485,14 @@ df_repartitioned = df.repartition(<span class="num">200</span>, <span class="str
 df_coalesced = df.coalesce(<span class="num">10</span>)
 
 <span class="cm"># Cache</span>
-df.cache()
+<span class="kw">from</span> pyspark <span class="kw">import</span> StorageLevel  <span class="cm"># StorageLevel kell az import!</span>
+df.cache()  <span class="cm"># == persist(MEMORY_AND_DISK)</span>
 df.persist(StorageLevel.MEMORY_AND_DISK)
+
+<span class="cm"># AQE bekapcsolása (Spark 3.2+ óta default true)</span>
+spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.adaptive.enabled"</span>, <span class="str">"true"</span>)
+spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.adaptive.coalescePartitions.enabled"</span>, <span class="str">"true"</span>)
+spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.adaptive.skewJoin.enabled"</span>, <span class="str">"true"</span>)
 
 <span class="cm"># Broadcast join (small table)</span>
 <span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
@@ -620,7 +630,7 @@ auc = evaluator.evaluate(predictions)
   <div class="md-cell"><p>A <strong>Catalyst</strong> a Spark SQL lekérdezés-optimalizáló motorja, amely automatikusan átalakítja a felhasználó által írt logikai lekérdezést a leghatékonyabb fizikai végrehajtási tervvé. A Catalyst négy fázisban dolgozik: <strong>Analysis</strong> (feloldja a hivatkozásokat, ellenőrzi a típusokat), <strong>Logical Optimization</strong> (alkalmazza a szabályalapú optimalizálásokat: predicate pushdown, constant folding, column pruning), <strong>Physical Planning</strong> (több fizikai tervet generál és kiválasztja a legjobbat, pl. BroadcastHashJoin vs. SortMergeJoin), és <strong>Code Generation</strong> (Tungsten által JIT-re fordítja a tervet Java bytekódra).</p>
 <p><strong>Miért fontos?</strong> A Catalyst teszi lehetővé, hogy a Spark DataFrame API-ja versenyezzen a kézzel optimalizált kóddal. Amikor írsz egy df.filter().join().groupBy() láncot, a Catalyst automatikusan átszervezi: a filter-t a join elé tolja (így kevesebb soron kell join-olni), eldobja a felesleges oszlopokat, és kiválasztja a megfelelő join stratégiát. Ehhez nem kell semmit tenned – a Catalyst a DataFrame sémáját és a logikai tervet használja ezekhez az optimalizálásokhoz.</p>
 <p><strong>A kódrészlet bemutatása:</strong> Az explain(True) parancs megmutatja a teljes optimalizálási folyamatot. A Parsed Logical Plan a nyers lekérdezés, az Analyzed Plan ellenőrzi a típusokat, az Optimized Plan mutatja az átszervezett tervet (filter pushdown, column pruning), a Physical Plan pedig a végső végrehajtási tervet. A példában a filter az age > 30 feltétellel a join elé kerül, a BroadcastHashJoin a kis tábla miatt, és csak a szükséges oszlopok (department, salary) maradnak.</p>
-<p><strong>Tippek:</strong> Mindig futtasd az explain()-t lassú lekérdezéseknél – a legtöbb probléma azonnal láthatóvá válik. Ha SortMergeJoin-t látsz ott, ahol BroadcastHashJoin jobb lenne, próbáld meg a spark.sql.autoBroadcastJoinThreshold beállítást növelni. Ha sok Exchange lépés van, ott shuffle történik – érdemes megnézni, lehet-e elkerülni partition-on belüli műveletekkel. A WholeStageCodegen jelzi, hogy a Spark egyben fordítja le az egymás utáni operátorokat – ez nagyon jó teljesítményszempontból.</p></div>
+<p><strong>Tippek:</strong> Mindig futtasd az <code>explain()</code>-t lassú lekérdezéseknél – a legtöbb probléma azonnal láthatóvá válik. Ha SortMergeJoin-t látsz ott, ahol BroadcastHashJoin jobb lenne, két jó megoldás van: (1) <strong>explicit hint</strong>: <code>from pyspark.sql.functions import broadcast; df.join(broadcast(small_df), "id")</code>, vagy (2) ha a kis tábla mérete néha túllépi a 10 MB-os alapértelmezést, <strong>óvatosan</strong> emelheted a <code>spark.sql.autoBroadcastJoinThreshold</code>-ot — de tudd, hogy ez memóriát fogyaszt minden executoron, és túl nagy érték OOM-hoz vezet. <strong>Soha</strong> ne állítsd 100 MB fölé production-ben gondos tesztelés nélkül. Ha sok Exchange lépés van, ott shuffle történik – érdemes megnézni, lehet-e elkerülni partition-on belüli műveletekkel. A WholeStageCodegen jelzi, hogy a Spark egyben fordítja le az egymás utáni operátorokat – ez nagyon jó teljesítményszempontból.</p></div>
   <div class="code-cell" id="cell-s13">
     <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('s13')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># Explain plan</span>
@@ -674,7 +684,7 @@ delta_df = spark.read.format(<span class="str">"delta"</span>).load(<span class=
 
 <span class="cm"># Time travel</span>
 yesterday = spark.read.format(<span class="str">"delta"</span>) \
-    .option(<span class="str">"versionAsOf"</span>, <span class="num">5</span>) \
+    .option(<span class="str">"versionAsOf"</span>, <span class="str">"5"</span>) \  <span class="cm"># string típus szükséges, nem int</span>
     .load(<span class="str">"/delta/users"</span>)
 
 <span class="cm"># MERGE (upsert)</span>

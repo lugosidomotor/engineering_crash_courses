@@ -4,6 +4,14 @@ Magyar nyelvű Data Engineering és AI kurzusok — interaktív webes tananyag, 
 
 **Élő oldal:** [dataengineer.hu](https://dataengineer.hu)
 
+> 📅 **Utoljára szakmailag felülvizsgálva: 2026-05-14**
+>
+> - Gyors indítás: [`QUICKSTART.md`](QUICKSTART.md)
+> - Csomag- és image-verziók: [`VERSIONS.md`](VERSIONS.md)
+> - Egyesített Python függőségek: [`requirements.txt`](requirements.txt)
+> - Bootstrap (venv + Jupyter kernel): [`bootstrap.sh`](bootstrap.sh) (Linux/macOS) · [`bootstrap.ps1`](bootstrap.ps1) (Windows)
+> - Smoke test: [`smoke_test.py`](smoke_test.py)
+
 ## Kurzusok
 
 | # | Kurzus | Téma |
@@ -47,10 +55,28 @@ Source (orders.json, events.json, catalog.json)
 ```
 .
 ├── index.html                    # Főoldal — kurzus lista
+├── courses.json                  # Kurzus metaadat (sectionCount, status, stb.)
+├── QUICKSTART.md                 # 5-perces telepítési útmutató
+├── VERSIONS.md                   # Csomag/image-verzió mátrix
+├── requirements.txt              # Egyesített Python függőségek
+├── bootstrap.sh / bootstrap.ps1  # venv + kernel telepítő
+├── smoke_test.py                 # Importálhatóság-ellenőrző
+├── docker-compose.yml            # Profilrendszerű lab stack
 ├── sql-data-modeling/            # Kurzus aloldalak (15 db)
 ├── python-data-engineering/
 ├── docker-local-data-platform/
-├── ...
+├── delta-table-crash-course/
+├── open-table-formats/
+├── spark-crash-course/
+├── airflow-orchestration/
+├── dbt-analytics-engineering/
+├── databricks-lakehouse/
+├── streaming-engineering/
+├── ai-data-engineer/
+├── ai-engineering/
+├── rag-evaluation-ai-safety/
+├── llmops-genai-production/
+├── aiops-mlops/
 ├── webshop-pro/                  # Interaktív webshop demo
 │   ├── index.html
 │   ├── app.js

@@ -99,6 +99,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -311,11 +314,19 @@ select order_id
 from {{ ref('stg_orders') }}
 where amount &lt; 0
 
--- tests/assert_recent_orders.sql  
-select count(*) as cnt
-from {{ ref('stg_orders') }}
-where ordered_at &gt;= dateadd('day', -7, current_timestamp)
-having count(*) &lt; 1</pre></div><div class="output-area" id="out-8"><div class="output-label">Output:</div><pre>$ dbt test
+-- tests/assert_recent_orders.sql
+-- A dbt singular test akkor BUKIK, ha legalább 1 sor visszajön.
+-- Tehát olyan lekérdezést írunk, ami HIBÁS állapotot ad vissza:
+-- ha az utóbbi 7 napban NEM volt rendelés, ez a lekérdezés visszaad 1 sort, és a teszt failel.
+-- Adapter-független dátumaritmetika: dbt_utils.dateadd makró használata.
+select 'no recent orders' as failure_reason
+where (
+  select count(*) from {{ ref('stg_orders') }}
+  where ordered_at &gt;= {{ dbt.dateadd('day', -7, 'current_timestamp') }}
+) = 0
+-- Megjegyzés: a `dateadd` SQL Server / Snowflake / BigQuery natív; PostgreSQL-ben
+-- `current_timestamp - interval '7 days'`. A dbt `{{ dbt.dateadd(...) }}` makró
+-- (vagy `dbt_utils.dateadd`) automatikusan a célplatform szintaxisát adja.</pre></div><div class="output-area" id="out-8"><div class="output-label">Output:</div><pre>$ dbt test
 PASS: assert_positive_revenue (0 failures)
 PASS: assert_recent_orders (0 failures)</pre></div></div>
 </div>
@@ -325,7 +336,16 @@ PASS: assert_recent_orders (0 failures)</pre></div></div>
   <div class="md-cell"><p>Az incremental modellek a dbt teljesítményoptimalizálásának kulcsa: ahelyett, hogy minden futáskor az összes historikus adatot újra feldolgoznák, csak az új vagy módosított sorokat adják hozzá a már meglévő táblához. Ez különösen fontos nagy adatmennyiség esetén — ha millió soros rendeléstörténetünk van, felesleges minden nap újra feldolgozni az összes múltbeli rendelést, amikor csak a napi újak érkeztek.</p>
 <p>A példában a config(materialized='incremental', unique_key='order_id') beállítás mondja meg a dbt-nek, hogy ez egy incremental modell, és az order_id alapján azonosítja az egyedi sorokat. Az is_incremental() Jinja függvény feltételes logikát biztosít: az első futáskor (amikor még nincs tábla) az összes adatot betölti, a későbbi futásokon pedig csak azokat, amelyek ordered_at értéke nagyobb, mint a táblában lévő maximum. A {{ this }} a jelenlegi modell táblanév-referenciáját helyettesíti.</p>
 <p>A unique_key kritikus fontosságú: ha ugyanaz az order_id ismét megjelenik a forrásban (pl. frissített státusz), a dbt az insert helyett update műveletet hajt végre. Ez biztosítja az idempotenciát — bármennyiszer is futtatjuk a modellt, az eredmény mindig konzisztens. A merge stratégia (ami a háttérben történik) a forrásadatokat a cél táblával összehasonlítja, és csak a különbségeket alkalmazza.</p>
-<p>Tip: Mindig adj meg unique_key-t incremental modellekhez! Enélkül a dbt nem tudja, mely sorokat kell frissíteni, és duplikációk keletkezhetnek. Ha nincs természetes egyedi kulcsod, generálj egyet surrogate key-ből (lásd a Macros szekciót).</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre>-- models/marts/fct_orders_incremental.sql
+<p>Tip: Mindig adj meg <code>unique_key</code>-t incremental modellekhez! Enélkül a dbt nem tudja, mely sorokat kell frissíteni, és duplikációk keletkezhetnek. Ha nincs természetes egyedi kulcsod, generálj egyet surrogate key-ből (lásd a Macros szekciót).</p>
+<p><strong>Incremental stratégiák</strong> (adapter-függő): a <code>config(incremental_strategy='...')</code> paraméterrel választható.</p>
+<table>
+<tr><th>Stratégia</th><th>Működés</th><th>Tipikus adapter</th></tr>
+<tr><td><code>append</code></td><td>Csak új sorokat szúr be — nincs upsert. <strong>unique_key nélkül ez az alapértelmezett, és duplikálhat!</strong></td><td>Postgres, Snowflake, BigQuery, Spark</td></tr>
+<tr><td><code>merge</code></td><td>Upsert <code>unique_key</code> alapján: meglévő sort UPDATE-eli, újat INSERT-eli. Ha <code>unique_key</code> meg van adva, ez a default a legtöbb adapternél.</td><td>Snowflake, BigQuery, Databricks, Postgres 15+</td></tr>
+<tr><td><code>delete+insert</code></td><td>Először töröl egy partícióban a <code>unique_key</code> alapján, majd inszertál. Tranzakcionális, de költségesebb.</td><td>Postgres, Redshift</td></tr>
+<tr><td><code>insert_overwrite</code></td><td>Egész partíciót felülír <code>partition_by</code> alapján. Idempotens partíciókon.</td><td>BigQuery, Spark, Databricks</td></tr>
+</table>
+<p><strong>dbt 1.8+ unit tests</strong>: a <code>tests/</code> alatti SQL alapú "data tests" mellett már van valódi <strong>unit test</strong> framework is (a YAML-ben <code>unit_tests:</code> kulcs alatt), ahol a model logikát mock input/output párokkal validálod — futás nélkül, percek alatt. Production dbt projektekben mindkét szintet érdemes használni: data tests az adatállapotra, unit tests a transzformációs logikára.</p></div><div class="code-cell" id="cell-9"><div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('9')">&#9654; Run</button></div><div class="code-body"><pre>-- models/marts/fct_orders_incremental.sql
 {{ config(materialized='incremental', unique_key='order_id') }}
 
 with orders as (

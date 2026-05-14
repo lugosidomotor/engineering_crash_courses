@@ -101,7 +101,9 @@
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
-
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -157,22 +159,36 @@ df["age_bucket"] = pd.cut(df.age, bins=[0,30,40,100], labels=["young","mid","sen
     <p>A <strong>Feast</strong> (Feature Store) egy nyílt forráskódú feature store keretrendszer, amelynek fő célja a tanítási és kiszolgálási (train/serve) konzisztencia biztosítása. Ez azt jelenti, hogy ugyanazok a feature-ök, ugyanazzal a számítási logikával állnak rendelkezésre mind a modell tanításakor (offline), mind a modell kiszolgálásakor (online, valós időben).</p>
     <p>A Feast-ben a feature-öket <code>FeatureView</code> objektumokként definiálod, amelyek meghatározzák a feature nevét, típusát, a hozzá tartozó entitást (pl. user_id), és az érvényességi időt (TTL). A példában egy <code>user_stats</code> feature view-t látunk, amely három feature-t tartalmaz: age, income és purchase_count_30d. A TTL 24 órára van állítva, ami azt jelenti, hogy ha egy feature értéke 24 óránál régebbi, a Feast frissíteni fogja.</p>
     <p>A Feast két tárolóréteget használ: az <strong>offline store</strong> (pl. Delta Lake, BigQuery) nagy mennyiségű történelmi adatot tárol a modell tanításához, míg az <strong>online store</strong> (pl. Redis, DynamoDB) alacsony késleltetésű (10ms alatt) hozzáférést biztosít a szolgáltatás (serving) idején. Ez a kettős architektúra oldja fel a train/serve skew problémát.</p>
-  </div><div class="code-cell" id="cell-s6"><div class="code-header"><span class="cell-number">[s6]</span><button class="run-btn" onclick="runCell('s6')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Feast feature definitions</span>
-user = Entity(name=<span class="str">"user_id"</span>, value_type=ValueType.INT64)
-user_features = FeatureView(
-    name=<span class="str">"user_stats"</span>,
-    entities=[<span class="str">"user_id"</span>],
-    features=[
-        Feature(<span class="str">"age"</span>, Float),
-        Feature(<span class="str">"income"</span>, Float),
-        Feature(<span class="str">"purchase_count_30d"</span>, Int64),
+    <p><strong>Point-in-Time correctness (PIT join) -- a Feature Store legfontosabb ígérete</strong>: amikor historical training data-t generálsz egy adott <code>event_timestamp</code> listára, a Feast biztosítja, hogy minden feature érték <strong>az adott timestamp-előtti</strong> legutóbbi (de nem TTL-en kívüli) értékkel kerüljön a training setbe. Így elkerüljük a <strong>leakage</strong>-et: nem fordulhat elő, hogy a 2024-01-01-i jóslásnál egy 2024-01-02-i feature érték bekerüljön. Hívás: <code>store.get_historical_features(entity_df, features=[...]).to_df()</code>. Online retrieval ugyanezzel a logikával jár (latest valid feature).</p>
+    <p><strong>On-demand Feature View</strong> (Feast 0.20+): runtime-ban számított feature, amely a request-data-ból + más FV-kből transzformációval áll elő. Pl. <code>total_basket_value = sum(item_prices) * (1 - discount_pct)</code> runtime, embedding-számítás kérési időben. Dekorátor: <code>@on_demand_feature_view(sources=[customer_features], schema=[Field(name='value_tier', dtype=String)])</code> -- a dekorált függvény pandas DataFrame-et kap és ad vissza, így bármilyen Python-logika beépíthető a feature-ek számításába futási időben.</p>
+  </div><div class="code-cell" id="cell-s6"><div class="code-header"><span class="cell-number">[s6]</span><button class="run-btn" onclick="runCell('s6')">&#9654; Run</button></div><div class="code-body"><pre><span class="cm"># Feast 0.30+ feature definitions (modern API)</span>
+<span class="kw">from</span> datetime <span class="kw">import</span> timedelta
+<span class="kw">from</span> feast <span class="kw">import</span> Entity, FeatureView, Field, FileSource
+<span class="kw">from</span> feast.types <span class="kw">import</span> Float32, Int64, String, UnixTimestamp
+
+customer = Entity(name=<span class="str">"customer"</span>, join_keys=[<span class="str">"customer_id"</span>])
+
+customer_source = FileSource(
+    name=<span class="str">"customer_features_source"</span>,
+    path=<span class="str">"/output/gold/customer_features/part-000.parquet"</span>,
+    timestamp_field=<span class="str">"last_order_at"</span>,
+)
+
+customer_features = FeatureView(
+    name=<span class="str">"customer_features"</span>,
+    entities=[customer],
+    ttl=timedelta(days=<span class="num">30</span>),
+    schema=[
+        Field(name=<span class="str">"customer_id"</span>, dtype=String),
+        Field(name=<span class="str">"paid_order_count"</span>, dtype=Int64),
+        Field(name=<span class="str">"lifetime_value"</span>, dtype=Float32),
+        Field(name=<span class="str">"last_order_at"</span>, dtype=UnixTimestamp),
     ],
-    online=<span class="num">True</span>,
-    ttl=timedelta(hours=<span class="num">24</span>),
-)</pre></div><div class="output-area" id="out-s6"><div class="output-label">Output:</div><pre><span class="log-ok">Registered:</span> <span class="log-info">user_stats</span>
+    source=customer_source,
+)</pre></div><div class="output-area" id="out-s6"><div class="output-label">Output:</div><pre><span class="log-ok">Registered:</span> <span class="log-info">customer_features</span>
   <span class="log-dim">Offline:</span> <span class="log-delta">Delta Lake</span>
   <span class="log-dim">Online:</span> <span class="log-info">Redis</span>
-  <span class="log-time">TTL: 24h</span></pre></div></div>
+  <span class="log-time">TTL: 30d</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s7">
   <div class="section-number">Section 07</div>
@@ -209,13 +225,83 @@ producer.send(<span class="str">"purchases"</span>, json.dumps(event).encode())
 <div class="section layer-intro" id="s9">
   <div class="section-number">Section 09</div>
   <h2>Kafka Consumer: feature frissítés</h2>
-  <div class="code-cell" id="cell-s9"><div class="code-header"><span class="cell-number">[s9]</span><button class="run-btn" onclick="runCell('s9')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> kafka <span class="kw">import</span> KafkaConsumer
-consumer = KafkaConsumer(<span class="str">"purchases"</span>,bootstrap_servers=[<span class="str">"localhost:9092"</span>])
+  <div class="md-cell">
+    <p>A Feast modern <strong>push API</strong> a megfelelő módja az online store frissítésének streaming forrásból: a <code>store.push("source_name", df)</code> hívás egyszerre frissíti az online store-t és (opcionálisan) az offline store-t is, így a tanítási és kiszolgálási adatok konzisztensek maradnak. Alternatívaként a <code>store.write_to_online_store("feature_view_name", df)</code> csak az online store-t frissíti.</p>
+    <p><strong>Production note</strong>: az egyszerű <code>for msg in consumer:</code> loop nem skálázódik és nem ad exactly-once garanciát. Production-ben <strong>Spark Structured Streaming</strong> (<code>readStream.format('kafka')</code>) + <strong>Delta Lake idempotent sink</strong> + <strong>Feast push API</strong>: a stream Delta-ba ír, majd egy batch / micro-batch hívás <code>store.push()</code>-sal frissíti az online store-t. Alternatíva: <strong>Faust</strong> vagy <strong>Bytewax</strong> (Python-native streaming).</p>
+    <div class="callout warning"><div class="callout-title">push_sources deklarálása szükséges</div>
+<p>A <code>store.push()</code> csak akkor működik, ha a Feature Store yaml-ben (vagy Python definícióban) regisztráltunk egy push source-t. Példa:</p>
+<pre><code># features.py
+from feast import PushSource, FeatureView, Field, Entity, FileSource
+from feast.types import Float32, Int64, String, UnixTimestamp
+from datetime import timedelta
+
+customer = Entity(name="customer", join_keys=["customer_id"])
+
+# Eredeti batch source (offline)
+batch_source = FileSource(
+    name="customer_features_batch_source",
+    path="/output/gold/customer_features/part-000.parquet",
+    timestamp_field="last_order_at",
+)
+
+# PushSource — ezen keresztül lehet runtime-ban értéket beírni
+push_source = PushSource(
+    name="customer_features_push_source",
+    batch_source=batch_source,
+)
+
+customer_features = FeatureView(
+    name="customer_features",
+    entities=[customer],
+    ttl=timedelta(days=30),
+    schema=[
+        Field(name="paid_order_count", dtype=Int64),
+        Field(name="lifetime_value", dtype=Float32),
+        Field(name="last_order_at", dtype=UnixTimestamp),
+    ],
+    source=push_source,  # itt a PushSource-t használjuk
+)
+</code></pre>
+<p>Ezután: <code>feast apply</code> CLI parancs regisztrálja a push source-t, és csak utána fog a <code>store.push("customer_features_push_source", df)</code> működni.</p>
+</div>
+  </div><div class="code-cell" id="cell-9-pushsource"><div class="code-header"><span class="cell-number">[9a]</span><button class="run-btn" onclick="runCell('9-pushsource')">&#9654; Run</button></div><div class="code-body"><pre>from feast import PushSource
+from datetime import timedelta
+
+# A FeatureView source-jának a PushSource-t adjuk meg, hogy runtime értékeket
+# is be lehessen írni a store.push()-on keresztül.
+push_source = PushSource(
+    name="customer_features_push_source",
+    batch_source=customer_source,  # az eredeti FileSource
+)
+
+# A FeatureView-t újra deklaráljuk, push_source-szal
+customer_features_streaming = FeatureView(
+    name="customer_features_streaming",
+    entities=[customer],
+    ttl=timedelta(days=1),
+    schema=[
+        Field(name="paid_order_count", dtype=Int64),
+        Field(name="lifetime_value", dtype=Float32),
+    ],
+    source=push_source,
+)
+
+# CLI-ből: feast apply  -- ez regisztrálja a push source-t
+print("PushSource és FeatureView regisztrálva.")</pre></div><div class="output-area" id="out-9-pushsource"><div class="output-label">Output:</div><pre>PushSource és FeatureView regisztrálva.</pre></div></div><div class="code-cell" id="cell-s9"><div class="code-header"><span class="cell-number">[s9]</span><button class="run-btn" onclick="runCell('s9')">&#9654; Run</button></div><div class="code-body"><pre><span class="kw">from</span> kafka <span class="kw">import</span> KafkaConsumer
+<span class="kw">from</span> feast <span class="kw">import</span> FeatureStore
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+store = FeatureStore(repo_path=<span class="str">"."</span>)
+consumer = KafkaConsumer(<span class="str">"purchases"</span>, bootstrap_servers=[<span class="str">"localhost:9092"</span>])
+
 <span class="kw">for</span> msg <span class="kw">in</span> consumer:
     event = json.loads(msg.value)
-    update_feature(event[<span class="str">"user_id"</span>],{<span class="str">"last"</span>:event[<span class="str">"amount"</span>]})
-    <span class="fn">print</span>(<span class="str">f"Updated user {event['user_id']}"</span>)</pre></div><div class="output-area" id="out-s9"><div class="output-label">Output:</div><pre><span class="log-kafka">[kafka]</span> <span class="log-ok">Updated user 42</span>
-<span class="log-kafka">[kafka]</span> <span class="log-ok">Updated user 17</span>
+    df = pd.DataFrame([event])
+    <span class="cm"># Modern Feast push API (frissíti az online store-t)</span>
+    store.push(<span class="str">"customer_features_push_source"</span>, df)
+    <span class="cm"># Alternatíva: store.write_to_online_store("customer_features", df)</span>
+    <span class="fn">print</span>(<span class="str">f"Pushed customer {event['customer_id']}"</span>)</pre></div><div class="output-area" id="out-s9"><div class="output-label">Output:</div><pre><span class="log-kafka">[kafka]</span> <span class="log-ok">Pushed customer 42</span>
+<span class="log-kafka">[kafka]</span> <span class="log-ok">Pushed customer 17</span>
 <span class="log-kafka">[kafka]</span> <span class="log-time">1.2k events/sec, 8ms avg</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s10">

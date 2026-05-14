@@ -94,11 +94,14 @@
   <a href="../index.html" class="back-btn">&#8592;</a>
   <h1>&lt;/&gt; Streaming Engineering</h1>
   <div class="header-actions">
-    <span id="progress-text">0 / 16 section completed</span>
+    <span id="progress-text">0 / 17 section completed</span>
     <button class="btn btn-run-all" onclick="runAll()">Run All</button>
     <button class="btn btn-reset" onclick="resetAll()">Reset</button>
   </div>
 </header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 <div class="section layer-intro" id="s0">
@@ -134,7 +137,7 @@
 <li><strong>Subscribe</strong> — consumerek feliratkoznak és feldolgozzák</li>
 </ol>
 <p><span class="glossary-term" data-def="Kafka szerver node, ami az eseményeket tárolja és kiszolgálja">Broker</span> · <span class="glossary-term" data-def="Kafka metaadat-kezelő (KRaft az új, Zookeeper a régi)">Zookeeper/KRaft</span></p>
-<p><a href="https://developer.confluent.io/quickstart/kafka-docker/" target="_blank" rel="noopener">Kafka Docker quickstart 🚀</a></p></div><div class="code-cell" id="cell-s2">
+<p><a href="https://developer.confluent.io/quickstart/kafka-docker/" target="_blank" rel="noopener">Kafka Docker quickstart 🚀</a></p><div class="callout warning"><div class="callout-title">KRaft vs ZooKeeper</div><p>Kafka 3.3+ óta a <strong>KRaft mode</strong> (Kafka Raft) production-ready, és <strong>Kafka 4.0 (2025) óta mandatory</strong> — a ZooKeeper deprecated. A KRaft a metadata-kezelést a brokereken belül oldja meg, egyszerűbb operáció, gyorsabb leader election. A repo <code>docker-compose.yml</code>-jében használt <code>apache/kafka:3.9.1</code> már KRaft alapú (lásd: <code>KAFKA_PROCESS_ROLES: 'broker,controller'</code>).</p></div></div><div class="code-cell" id="cell-s2">
     <div class="code-header">
       <span class="cell-number">[2]</span>
       <button class="run-btn" onclick="runCell('s2')">&#9654; Run</button>
@@ -351,7 +354,26 @@ for msg in consumer:
 <li><strong>At-least-once</strong> — a producer újrapróbálkozik, amíg meg nem kapja a visszaigazolást. Ha hiba történik, az üzenet újraküldésre kerül. Ez garantálja, hogy egyetlen üzenet sem vész el, de duplikátumok előfordulhatnak. A consumer oldalon idempotens feldolgozással (pl. deduplikáció event_id alapján) kezelhető a probléma.</li>
 <li><strong>Exactly-once</strong> — az üzenet pontosan egyszer kerül kézbesítésre, sem el nem veszik, sem nem duplikálódik. Ez a legerősebb garancia, de a legdrágább: tranzakciós protokollt és kételyes koordinációt igényel a producer, a broker és a consumer között. A Kafka <code>enable.idempotence=true</code> és tranzakciós API-ja biztosítja ezt.</li>
 </ul>
-<p><strong>WebShop Pro stratégia:</strong> A rendelések (<code>webshop.purchases</code>) exactly-once garanciát kapnak, mert pénzügyi tranzakciók — egy duplikált rendelés komoly ügyféligénylési problémát okozna. A page view események at-least-once garanciával működnek, mert az aggregált metrikák idempotensek (egy extra page view minimális torzítást okoz).</p></div><table><tr><th>Garancia</th><th>Elveszhet?</th><th>Duplikálódhat?</th><th>Teljesítmény</th><th>Használat</th></tr><tr><td>At-most-once</td><td>Igen</td><td>Nem</td><td>Legjobb</td><td>Metrikák, logok</td></tr><tr><td>At-least-once</td><td>Nem</td><td>Igen</td><td>Jó</td><td>Idempotens feldolgozás</td></tr><tr><td>Exactly-once</td><td>Nem</td><td>Nem</td><td>Lassabb</td><td>Pénzügyi tranzakciók</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: exactly-once (pénzügyi). Page views: at-least-once (idempotens aggregálás).</p></div>
+<p><strong>WebShop Pro stratégia:</strong> A rendelések (<code>webshop.purchases</code>) exactly-once garanciát kapnak, mert pénzügyi tranzakciók — egy duplikált rendelés komoly ügyféligénylési problémát okozna. A page view események at-least-once garanciával működnek, mert az aggregált metrikák idempotensek (egy extra page view minimális torzítást okoz).</p>
+<div class="callout warning"><div class="callout-title">Exactly-once Spark Structured Streamingben</div><p><strong>Spark Structured Streaming-ben</strong> az exactly-once garancia nem önmagában a Kafka producer config-ból (<code>acks=all</code>, idempotence) jön. A Spark-oldali exactly-once <strong>három feltétele</strong>:</p>
+<ol>
+<li><strong>Replayable source</strong> (Kafka offset alapú olvasás)</li>
+<li><strong>Idempotent sink</strong> (Delta Lake <code>MERGE</code>, JDBC upsert kulccsal, vagy idempotent file-write)</li>
+<li><strong>Checkpoint location</strong> (állapot + offset perzisztálás stabil tárolón, pl. S3/HDFS)</li>
+</ol>
+<p>Egyszerű <code>df.writeStream.format('parquet').start()</code> <strong>NEM</strong> exactly-once — append-mode mellett duplikálhat újraindításkor. A Delta sink + Trigger.AvailableNow + checkpoint együttese ad valódi exactly-once-ot.</p></div></div><table><tr><th>Garancia</th><th>Elveszhet?</th><th>Duplikálódhat?</th><th>Teljesítmény</th><th>Használat</th></tr><tr><td>At-most-once</td><td>Igen</td><td>Nem</td><td>Legjobb</td><td>Metrikák, logok</td></tr><tr><td>At-least-once</td><td>Nem</td><td>Igen</td><td>Jó</td><td>Idempotens feldolgozás</td></tr><tr><td>Exactly-once</td><td>Nem</td><td>Nem</td><td>Lassabb</td><td>Pénzügyi tranzakciók</td></tr></table><div class="callout success"><div class="callout-title">WebShop Pro</div><p>Rendelések: exactly-once (pénzügyi). Page views: at-least-once (idempotens aggregálás).</p></div>
+  <div class="callout"><div class="callout-title">Trigger.AvailableNow (Spark 3.3+) - modern batch-szerű streaming</div>
+<p>A <code>processingTime("30 seconds")</code> trigger folyamatos micro-batch-eket fut. Ha viszont egy kötegben akarod feldolgozni az összes elérhető adatot (pl. napi cron-ban), a <code>Trigger.AvailableNow()</code> a megoldás:</p>
+<pre><code>from pyspark.sql.streaming import Trigger
+
+(stream_df
+   .writeStream
+   .trigger(availableNow=True)  # vagy: Trigger.AvailableNow() Scala-ban
+   .option("checkpointLocation", "/checkpoints/orders")
+   .toTable("silver.orders"))
+</code></pre>
+<p>Előny a sima batch-hez képest: <strong>state és checkpoint megőrződik</strong>, így a következő futás onnan folytatja, ahol abbamaradt. Modern lakehouse pattern: óránként/naponta cron + <code>Trigger.AvailableNow</code> = exactly-once micro-batch incremental load.</p>
+</div>
 </div>
 
 <div class="section layer-general" id="s8">
@@ -415,7 +437,13 @@ Sent to DLQ: Missing product_id</pre>
   <div class="md-cell"><p>A <strong>Spark Structured Streaming</strong> az Apache Spark deklaratív streaming API-ja, amely a batch DataFrame API-t terjeszti ki folyamatos adatfeldolgozásra. A lényeg: nem kell külön streaming koncepciókat megtanulnod — ugyanazok a transzformációk (<code>select</code>, <code>filter</code>, <code>groupBy</code>, <code>join</code>) működnek, mint batch módban, de a motor a háttérben folyamatosan futtatja őket.</p>
 <p>A motor <em>micro-batch</em> módban működik alapértelmezetten: a bejövő adatfolyamot kis, fix időközönként (pl. 500ms vagy 5s) batch-ekre bontja, majd mindegyiket egy-egy Spark job-ként dolgozza fel. Létezik <em>continuous processing</em> mód is, ami milliszekendumos késleltetést biztosít, de korlátozottabb operátorokkal.</p>
 <p><strong>Miért Spark és nem sima Python consumer?</strong> Mert a Spark automatikusan kezeli a fault tolerance-t (checkpointing), a state-kezelést (aggregációk, window-ok), és skálázható több node-ra. Egy sima Python consumer nem tud amortizálni egy rebalance-t, nem tud nagy state-et tartani memóriában, és nem tud pontosan egyszer szematikusan dolgozni.</p>
-<p><span class="glossary-term" data-def="A streaming feldolgozás kis batch-ekben történik, pl. 500ms vagy 1s időablakokban">Micro-batch</span> · <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="noopener">Spark Streaming docs 📖</a></p></div><div class="code-cell" id="cell-s9">
+<p><span class="glossary-term" data-def="A streaming feldolgozás kis batch-ekben történik, pl. 500ms vagy 1s időablakokban">Micro-batch</span> · <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="noopener">Spark Streaming docs 📖</a></p>
+<div class="callout warning"><div class="callout-title">Hibás JSON kezelése a from_json-ben</div><p>A <code>from_json</code> alapból <code>mode='PERMISSIVE'</code> (a hibás mezőket null-ra teszi, és a teljes rekordot a <code>_corrupt_record</code> oszlopba menti). Alternatívák:</p>
+<ul>
+<li><code>mode='FAILFAST'</code> — első hibás rekordnál crash (production-ben kerülendő)</li>
+<li><code>mode='DROPMALFORMED'</code> — csendben eldobja a rosszakat (audit-veszteség)</li>
+</ul>
+<p>A javasolt minta: PERMISSIVE + külön <code>_corrupt_record</code> oszlop loggolása egy DLQ (dead letter queue) Delta táblába.</p></div></div><div class="code-cell" id="cell-s9">
     <div class="code-header">
       <span class="cell-number">[9]</span>
       <button class="run-btn" onclick="runCell('s9')">&#9654; Run</button>
@@ -464,7 +492,8 @@ print("Streaming query definiálva (micro-batch, 5s trigger)")</pre></div>
   <div class="md-cell"><p>A <strong>watermark</strong> a Spark Structured Streaming egyik legfontosabb mechanizmusa, amely meghatározza, meddig várjon a motor a későn érkező (late) eseményekre, mielőtt lezár egy időablakot. Megadja a maximális késleltetést, amit az engine tolerál — ezen túl érkező adatokat eldobja vagy külön kezeli.</p>
 <p><strong>Hogyan működik?</strong> A Spark folyamatosan nyomon követi a legfrissebb esemény-időt minden partitionön. Ha egy új esemény érkezik, az esemény időpontja alapján frissíti a watermarket: <code>watermark = max(event_time) - maxDelay</code>. Bármely ablak, amelynek a vége a watermark előtt van, lezárul és kimenetre kerül. A későn érkező, de még a watermark ablakon belüli események frissítik a korábbi ablak eredményét.</p>
 <p><strong>WebShop Pro:</strong> Ha egy felhasználó mobilon kosárba tesz valamit, de a hálózat miatt 2 perc múlva érkezik meg a Kafka-hoz, a 2 perces watermark ezt még kezeli. Ha viszont 10 percet késik, a Spark eldobja, mert a watermark már túlhaladt az adott ablakon. Ez egy ésszerű kompromisszum a valós idejű feldolgozás pontossága és teljesítménye között.</p>
-<p><strong>Tip:</strong> A watermark beállítása kritikus egyensúly: túl kis érték → sok late data elvész; túl nagy érték → az ablakok lassan zárulnak, nő a memória-használat és a késleltetés. Kezdd a várható hálózati késleltetés 2-3-szorosával, és monitorozd a late data arányt.</p></div><div class="code-cell" id="cell-s10">
+<p><strong>Tip:</strong> A watermark beállítása kritikus egyensúly: túl kis érték → sok late data elvész; túl nagy érték → az ablakok lassan zárulnak, nő a memória-használat és a késleltetés. Kezdd a várható hálózati késleltetés 2-3-szorosával, és monitorozd a late data arányt.</p>
+<div class="callout warning"><div class="callout-title">Vigyázat — state explosion</div><p>A watermark hossza közvetlenül arányos a state mérettel. Ha 1 órás window + 30 perces watermark, a Spark a beállított ablakok aggregátumait <strong>1.5 óráig</strong> tárolja a state store-ban. <code>outputMode='complete'</code> + nagy windowing + hosszú watermark = OOM veszély. Monitorozd: <code>query.lastProgress.stateOperators[0].numRowsTotal</code>. Production-ben RocksDB state store + state TTL ajánlott.</p></div></div><div class="code-cell" id="cell-s10">
     <div class="code-header">
       <span class="cell-number">[10]</span>
       <button class="run-btn" onclick="runCell('s10')">&#9654; Run</button>
@@ -640,6 +669,12 @@ for topic, cfg in pipeline_topics.items():
   </div>
 </div>
 
+<div class="section layer-general" id="s14b">
+  <div class="section-number">Section 14b</div>
+  <h2>Spark Structured Streaming vs Apache Flink <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span></h2>
+  <div class="md-cell"><p>A streaming engineering két meghatározó motorja az <strong>Apache Spark Structured Streaming</strong> és az <strong>Apache Flink</strong>. Bár mindkettő képes valós idejű adatfeldolgozásra, a tervezési filozófiájuk és a tipikus use case-eik markánsan eltérnek.</p></div><table><tr><th>Szempont</th><th>Spark Structured Streaming</th><th>Apache Flink</th></tr><tr><td>Modell</td><td>Micro-batch (Continuous: kísérleti)</td><td>True streaming (eseményenként)</td></tr><tr><td>Tipikus latency</td><td>100ms — 1s</td><td>10ms — 100ms</td></tr><tr><td>State backend</td><td>HDFS, RocksDB</td><td>RocksDB, heap</td></tr><tr><td>Erősség</td><td>Batch + streaming egy API; Spark ökoszisztéma</td><td>Komplex CEP, low-latency, eseményidő</td></tr><tr><td>Tipikus use case</td><td>ETL streaming, lakehouse ingest</td><td>Fraud detection, HFT, IoT alerting</td></tr></table><div class="callout"><div class="callout-title">A választás</div><p>Ha a meglévő Spark-stack megvan és &lt;1s latency elég → <strong>Spark</strong>. Ha valódi sub-100ms és komplex stateful logika kell → <strong>Flink</strong>.</p></div>
+</div>
+
 <div class="section layer-general" id="s15">
   <div class="section-number">Section 15</div>
   <h2>Összefoglalás </h2>
@@ -665,7 +700,7 @@ for topic, cfg in pipeline_topics.items():
 <script>
 window.COURSE_CONFIG = {
   slug: 'streaming-engineering',
-  toc: [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Event-driven architektúra"}, {"id": "s2", "num": "02", "label": "Kafka alapok"}, {"id": "s3", "num": "03", "label": "Topic, partition, consumer group"}, {"id": "s4", "num": "04", "label": "Event schema"}, {"id": "s5", "num": "05", "label": "Producer"}, {"id": "s6", "num": "06", "label": "Consumer"}, {"id": "s7", "num": "07", "label": "Exactly-once vs at-least-once"}, {"id": "s8", "num": "08", "label": "Dead letter queue"}, {"id": "s9", "num": "09", "label": "Spark Structured Streaming"}, {"id": "s10", "num": "10", "label": "Watermarking"}, {"id": "s11", "num": "11", "label": "Late arriving data"}, {"id": "s12", "num": "12", "label": "Stream-to-Delta"}, {"id": "s13", "num": "13", "label": "Real-time feature update"}, {"id": "s14", "num": "14", "label": "WebShop Pro streaming pipeline"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}]
+  toc: [{"id": "s0", "num": "00", "label": "Intro"}, {"id": "s1", "num": "01", "label": "Event-driven architektúra"}, {"id": "s2", "num": "02", "label": "Kafka alapok"}, {"id": "s3", "num": "03", "label": "Topic, partition, consumer group"}, {"id": "s4", "num": "04", "label": "Event schema"}, {"id": "s5", "num": "05", "label": "Producer"}, {"id": "s6", "num": "06", "label": "Consumer"}, {"id": "s7", "num": "07", "label": "Exactly-once vs at-least-once"}, {"id": "s8", "num": "08", "label": "Dead letter queue"}, {"id": "s9", "num": "09", "label": "Spark Structured Streaming"}, {"id": "s10", "num": "10", "label": "Watermarking"}, {"id": "s11", "num": "11", "label": "Late arriving data"}, {"id": "s12", "num": "12", "label": "Stream-to-Delta"}, {"id": "s13", "num": "13", "label": "Real-time feature update"}, {"id": "s14", "num": "14", "label": "WebShop Pro streaming pipeline"}, {"id": "s14b", "num": "14b", "label": "Spark vs Flink"}, {"id": "s15", "num": "15", "label": "Összefoglalás"}]
 };
 </script>
 <script src="../assets/webshop-case-study.js?v=webshop-pro"></script>
