@@ -295,15 +295,16 @@ button{font-family:inherit}
 .platform-item h4{font-size:.88rem;font-weight:600;margin-bottom:4px}
 .platform-item p{font-size:.78rem;color:#8b949e;line-height:1.4}
 
-.flow-diagram{margin:30px 0;padding:24px;background:rgba(13,17,23,.5);border:1px solid rgba(48,54,61,.4);border-radius:12px;overflow-x:auto;max-width:100%;contain:layout paint}
+.flow-diagram{margin:30px 0;padding:24px;background:rgba(13,17,23,.5);border:1px solid rgba(48,54,61,.4);border-radius:12px;overflow:hidden;max-width:100%;contain:layout paint}
 .flow-diagram-title{font-size:.85rem;color:#8b949e;margin-bottom:16px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
-.flow-chain{display:flex;align-items:center;gap:8px;min-width:max-content}
-.flow-node{padding:10px 16px;background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:8px;font-size:.82rem;color:#e6edf3;font-weight:500;white-space:nowrap;min-width:120px;text-align:center}
+.flow-chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));align-items:stretch;gap:12px;min-width:0}
+.flow-node{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:70px;padding:10px 12px;background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:8px;font-size:.82rem;color:#e6edf3;font-weight:500;white-space:normal;overflow-wrap:anywhere;text-align:center}
 .flow-node.bronze{border-color:rgba(205,127,50,.5);color:#cd7f32}
 .flow-node.silver{border-color:rgba(192,192,192,.5);color:#c0c0c0}
 .flow-node.gold{border-color:rgba(255,215,0,.5);color:#ffd700}
 .flow-node.ai{border-color:rgba(188,140,255,.5);color:#bc8cff}
-.flow-arrow{color:#6e7681;font-size:1.2rem;flex-shrink:0}
+.flow-node small{margin-top:2px;line-height:1.25}
+.flow-arrow{display:none}
 
 /* ── Stack showcase ── */
 .stack-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
@@ -428,8 +429,8 @@ button{font-family:inherit}
   .filter-chips{min-width:0;width:100%;max-width:100%}
   .filter-chips::-webkit-scrollbar{height:2px}
   .chip{flex-shrink:0;white-space:nowrap}
-  .flow-diagram{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
-  .flow-chain{max-width:max-content}
+  .flow-diagram{max-width:100%;overflow:hidden}
+  .flow-chain{grid-template-columns:repeat(auto-fit,minmax(112px,1fr))}
   .platform-diagram{grid-template-columns:repeat(2,1fr);gap:10px}
   .platform-item{padding:12px}
   .stats-bar{grid-template-columns:repeat(2,1fr);padding:16px;gap:10px}
@@ -448,8 +449,8 @@ button{font-family:inherit}
   .modal-body{padding:18px}
   .modal-footer{padding:14px 18px 18px;flex-direction:column}
   .modal-footer .btn{width:100%}
-  .flow-chain{gap:4px}
-  .flow-node{min-width:90px;padding:8px 10px;font-size:.72rem}
+  .flow-chain{gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flow-node{min-width:0;min-height:64px;padding:8px 10px;font-size:.72rem}
   .flow-node small{display:block;font-size:.65rem}
   .flow-arrow{font-size:.9rem}
   .for-whom-grid{grid-template-columns:1fr 1fr;gap:12px}
