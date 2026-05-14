@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced RAG &amp; Vector Databases (Pinecone) kurzus magyarul | DataEngineer.hu</title>
+<meta name="description" content="Production RAG mintáik: Pinecone vektor adatbázis, hybrid search, reranking, multi-vector retrieval, agentic RAG, evaluation, scaling.">
+<meta name="keywords" content="Advanced RAG, Pinecone, Vector Database, hybrid search, reranking, agentic RAG, data engineering magyarul, crash course">
+<meta name="author" content="Lugosi Dömötör">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0d1117">
+<link rel="canonical" href="https://dataengineer.hu/advanced-rag-vector-db/">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Advanced RAG &amp; Vector Databases (Pinecone) kurzus magyarul | DataEngineer.hu">
+<meta property="og:description" content="Production RAG mintáik: Pinecone vektor adatbázis, hybrid search, reranking, multi-vector retrieval, agentic RAG, evaluation, scaling.">
+<meta property="og:url" content="https://dataengineer.hu/advanced-rag-vector-db/">
+<meta property="og:site_name" content="Engineering Crash Courses">
+<meta property="og:locale" content="hu_HU">
+<meta property="og:image" content="https://dataengineer.hu/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Advanced RAG &amp; Vector Databases (Pinecone)">
+<meta name="twitter:description" content="Production RAG mintáik: Pinecone vektor adatbázis, hybrid search, reranking, multi-vector retrieval, agentic RAG, evaluation, scaling.">
+<meta name="twitter:image" content="https://dataengineer.hu/assets/og-image.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Advanced RAG & Vector Databases (Pinecone)",
+  "description": "Production RAG mintáik: Pinecone vektor adatbázis, hybrid search, reranking, multi-vector retrieval, agentic RAG, evaluation, scaling.",
+  "url": "https://dataengineer.hu/advanced-rag-vector-db/",
+  "inLanguage": "hu",
+  "provider": {
+    "@type": "Organization",
+    "name": "Engineering Crash Courses",
+    "url": "https://dataengineer.hu/",
+    "sameAs": "https://github.com/lugosidomotor/engineering_crash_courses"
+  },
+  "educationalLevel": "Haladó",
+  "timeRequired": "PT4H",
+  "numberOfCredits": 18,
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "HUF",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": {
+    "@type": "CourseInstance",
+    "courseMode": "online",
+    "inLanguage": "hu"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Főoldal",
+      "item": "https://dataengineer.hu/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kurzusok",
+      "item": "https://dataengineer.hu/#courses"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Advanced RAG & Vector Databases (Pinecone)",
+      "item": "https://dataengineer.hu/advanced-rag-vector-db/"
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="../shared/course.css?v=2025may2">
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn" title="Vissza">&#8592;</a>
+  <h1>&lt;/&gt; Advanced RAG &amp; Vector DB</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 18 section completed</span>
+    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+<div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+</div>
+<nav id="side-nav"></nav>
+<main>
+
+<!-- ══════════ S0: Intro ══════════ -->
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Intro</div>
+  <h2>Production RAG: a naive RAG-on túl
+    <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span>
+    <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span>
+  </h2>
+  <div class="md-cell">
+    <p>Az <strong>AI Engineering kurzusban</strong> megépítettünk egy alap RAG chatbotot ChromaDB-vel és OpenAI-jal, néhány tucat dokumentumon. Ez kiválóan működik <em>demo</em>-ban és kis prototípusokban, de amikor egy ügyfél megjelenik 50 000 termékkel, 5 000 PDF dokumentummal, 200 párhuzamos felhasználóval és multi-tenant elvárással, a "naive RAG" pipeline elkezd recsegni-ropogni: a latency 3-5 másodperc fölé kúszik, a recall ingadozik, a memory blow-up megöli a workert, és a felhasználói visszajelzések egyre több hallucinált választ jeleznek.</p>
+    <p>A <strong>production RAG</strong> ettől különbözik abban, hogy nem egy retrieve+generate pipeline, hanem egy <em>több rétegű retrieval rendszer</em>: dedikált vektor adatbázis (Pinecone, Weaviate, Qdrant, Milvus), hybrid search (dense + sparse), reranking, query transformation, caching layer, evaluation harness és observability. Ebben a kurzusban a <strong>Pinecone</strong> serverless platformra fókuszálunk, mert ez a legszélesebb körben használt managed vector DB, de a tanult minták (hybrid, rerank, query transform) átültethetők bármelyik másik rendszerre.</p>
+    <p>A vezérprojekt végig a <strong>WebShop Pro Support Bot</strong> egy olyan változata lesz, ami elég nagy ahhoz, hogy az in-process megoldások (Chroma, FAISS) ne legyenek elegendők. 50 000 termékkatalógus-tétel, 5 000 dokumentum (visszaküldés, garancia, FAQ, blog), namespace-enként elszeparált tenantok (pl. külön HU és DE üzlet), 1 millió havi query, p95 < 500 ms latency cél. A gyakorlatban ezeket a számokat fogod tervezni, mérni és optimalizálni a kurzus során.</p>
+    <div class="callout">
+      <div class="callout-title">Projekt: WebShop Pro — Production-grade Support Bot</div>
+      <p><strong>Bemenet:</strong> 50 000 termék (név, leírás, specifikáció, ár, kategória), 5 000 dokumentum (PDF, Markdown, HTML), multi-tenant (HU/DE/EN namespace).</p>
+      <p><strong>Kimenet:</strong> Pinecone alapú retrieval rendszer hybrid search + reranker + query transformation + cache layer mögött, FastAPI service-ként deployolva.</p>
+      <p><strong>Cél:</strong> p95 latency &lt; 500 ms, recall@5 &gt; 0.85, költség &lt; 200 USD/hó, 100 párhuzamos request kiszolgálva.</p>
+    </div>
+    <div class="callout success">
+      <div class="callout-title">Learning outcome</div>
+      <p>A kurzus végére fel tudsz építeni egy production-ready RAG pipeline-t Pinecone-nal: serverless index design, hybrid search, reranking, agentic retrieval, evaluation, caching és deployment. Tudni fogod, mikor melyik vector DB-t választani, és hogyan számolni a költséget skálán.</p>
+    </div>
+    <p><strong>Naive RAG vs Production RAG architektúra:</strong></p>
+    <div class="arch-flow">
+      <div class="arch-step">❓ Query</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🔢 Embed</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🗄️ Pinecone</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🎯 Rerank</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🧠 LLM</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ S1: Vector DB tájkép ══════════ -->
+<div class="section layer-general" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Vector DB tájkép: melyiket válaszd? <span class="tool-badge"><img src="../assets/logos/chroma.svg">Chroma</span></h2>
+  <div class="md-cell">
+    <p>A vektor adatbázisok piacán nincs egyetlen "győztes" — különböző use case-ekhez különböző eszközök illenek. A választást három tengely mentén érdemes mérlegelni: <strong>scale</strong> (mennyi vektor, mennyi query/sec), <strong>deployment model</strong> (managed SaaS vs self-hosted), és <strong>feature set</strong> (hybrid search, multi-tenant, filtering, GPU). A WebShop Pro use case-ben (50 000 termék + 5 000 dokumentum + multi-tenant) a Pinecone serverless egy kényelmes default, de például egy strict on-prem GDPR környezetben Qdrant vagy Weaviate self-hosted lenne a választás.</p>
+    <p>A <strong>managed SaaS</strong> oldalon a Pinecone a piacvezető: serverless billing modellel (write/read units + storage), erős multi-tenant támogatással (namespace-ek), és agresszíven egyszerű API-val. A Weaviate Cloud Service hasonló kategória, viszont built-in hybrid search BM25 + vector kombinációval. Az AWS OpenSearch szintén kínál vector engine-t, és ha már AWS-en vagy, kényelmes integráció. A <strong>self-hosted</strong> oldalon a Qdrant (Rust, gyors) és a Milvus (Apache, distributed, GPU support) a két legnagyobb név, illetve a Postgres-be ültethető <code>pgvector</code> extension lett az utóbbi években a "default boring choice" minden Postgres-alapú stacknek.</p>
+    <p>Az <strong>in-process</strong> kategóriát nem szabad lebecsülni: a ChromaDB és a FAISS adatkincset jelentenek, ha a use case kicsi (&lt; 100 000 vektor), egyetlen process keretein belül fut, és nincs multi-tenant elvárás. Például egy Streamlit demo, egy notebook prototípus vagy egy egyszemélyes belső tool számára a ChromaDB egyszerűbb és olcsóbb, mint egy Pinecone account. Ahogy nő a méret és bonyolódik a deployment, válaszd a megfelelő managed vagy self-hosted opciót — soha ne erőltesd egyik kategóriát se a másik helyén.</p>
+    <table>
+      <tr><th>Vector DB</th><th>Deployment</th><th>Skála</th><th>Hybrid search</th><th>Multi-tenant</th><th>Költség (relatív)</th></tr>
+      <tr><td><strong>Pinecone</strong></td><td>Managed SaaS (serverless / pod)</td><td>Milliárd vektor</td><td>Igen (sparse-dense)</td><td>Namespace-ek</td><td>$$$ (managed)</td></tr>
+      <tr><td><strong>Weaviate</strong></td><td>Managed + self-hosted</td><td>10M+ vektor</td><td>Igen, beépített BM25</td><td>Tenant-ek</td><td>$$ (cloud) / $ (self)</td></tr>
+      <tr><td><strong>Qdrant</strong></td><td>Self-hosted (Rust) + cloud</td><td>100M+ vektor</td><td>Sparse-dense</td><td>Collection-szintű</td><td>$ (self) / $$ (cloud)</td></tr>
+      <tr><td><strong>Milvus</strong></td><td>Self-hosted (Apache)</td><td>Milliárd, GPU support</td><td>Igen</td><td>Partition</td><td>$ (self, ops költséggel)</td></tr>
+      <tr><td><strong>pgvector</strong></td><td>Postgres extension</td><td>1-10M vektor</td><td>Korlátozott</td><td>SQL row-level</td><td>$ (Postgres-szel)</td></tr>
+      <tr><td><strong>ChromaDB</strong></td><td>In-process (Python)</td><td>&lt; 100K vektor</td><td>Nincs</td><td>Collection</td><td>$ (csak storage)</td></tr>
+      <tr><td><strong>FAISS</strong></td><td>In-process (C++/Python)</td><td>1M+ vektor RAM-ban</td><td>Nincs</td><td>Manuális</td><td>$ (free, ops nélkül)</td></tr>
+    </table>
+    <div class="callout">
+      <div class="callout-title">Mentális döntéshozatal</div>
+      <p><strong>Prototípus vagy notebook:</strong> ChromaDB / FAISS — semmi infra, csak <code>pip install</code>.</p>
+      <p><strong>Egy product, &lt; 1M vektor, Postgres már él:</strong> pgvector — egyetlen DB, egyszerű ops.</p>
+      <p><strong>Multi-tenant SaaS, &gt; 1M vektor, nincs ops kapacitás:</strong> Pinecone serverless.</p>
+      <p><strong>Self-hosted hybrid search, on-prem:</strong> Weaviate vagy Qdrant.</p>
+      <p><strong>Hyper-scale, GPU, AI labor:</strong> Milvus.</p>
+    </div>
+    <div class="callout"><div class="callout-title">WebShop Pro döntés</div><p>50 000 termék × 1536 dim × 4 byte = ~300 MB nyers vektoradat, plusz 5 000 dokumentum chunkokra bontva (~50 000 chunk) = még 300 MB. Ez nem extrém méret, de a multi-tenant (HU/DE/EN namespace) és a managed deployment iránti igény miatt <strong>Pinecone serverless</strong> a választásunk. Ha lenne 10 millió termék, akkor Milvus vagy Qdrant lenne a következő lépés.</p></div>
+  </div>
+</div>
+
+<!-- ══════════ S2: Pinecone setup ══════════ -->
+<div class="section layer-bronze" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Pinecone setup: account, index, kliens <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A Pinecone-ban dolgozni két lépésben kezdődik: <strong>account setup</strong> (app.pinecone.io, free tier ad neked egy serverless indexet és pár ezer write/read unitot) és <strong>API key generálás</strong> (Settings → API keys). Az API kulcsot soha ne commitold gitre — tárold <code>.env</code> fájlban vagy a CI/CD secret-ekben (GitHub Actions secret, AWS Secrets Manager, Azure Key Vault). A free tier elegendő ehhez a kurzushoz, de production esetén a Standard plan $0/hó-tól indul használat-alapú számlázással.</p>
+    <p>A Pinecone két index típust kínál: <strong>serverless</strong> és <strong>pod-based</strong>. A serverless a default új projektekhez — automatikusan skálázódik, csak a tárolás és a query-k után fizetsz, nincs előre lekötött kapacitás. A pod-based a régebbi modell, ahol előre megveszel egy "pod"-ot (p1.x1, s1.x1) fix kapacitással és előre fizetsz havonta. WebShop Pro-hoz <strong>serverless</strong>-t használunk, mert változó terhelésű (peak órákban 100 RPS, éjjel 1 RPS). A region választás (<code>us-east-1</code>, <code>eu-west-1</code>) fontos: legyen ott, ahol a legtöbb felhasználód van, és ahol a többi service-ed fut, hogy a latency minimális legyen.</p>
+    <p>A Python kliens telepítése: <code>pip install pinecone&gt;=5.0</code>. <strong>Fontos:</strong> a 2024-es nagy refactor után a csomag neve <code>pinecone</code> (régen <code>pinecone-client</code> volt), és az API teljesen átalakult. A példáinkban végig a v5+ szintaxist használjuk: <code>from pinecone import Pinecone, ServerlessSpec</code>, majd <code>pc = Pinecone(api_key=...)</code> instanciálja a klienst, és minden további művelet (<code>pc.create_index</code>, <code>pc.Index</code>) ezen keresztül megy.</p>
+    <div class="callout">
+      <div class="callout-title">Telepítés és környezet</div>
+      <p>Futtasd: <code>pip install "pinecone>=5.0" "openai>=1.59" python-dotenv</code>. Hozz létre egy <code>.env</code> fájlt a következő tartalommal:</p>
+      <pre>OPENAI_API_KEY=sk-...
+PINECONE_API_KEY=pcsk_...</pre>
+      <p>Az index neve csak kisbetűt, számot és kötőjelet tartalmazhat (DNS-kompatibilis), és a project-ed scope-jában egyedi.</p>
+    </div>
+  </div>
+  <div class="code-cell" id="cell-s2">
+    <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s2')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># pip install "pinecone>=5.0" "openai>=1.59" python-dotenv</span>
+<span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+<span class="kw">from</span> pinecone <span class="kw">import</span> Pinecone, ServerlessSpec
+
+load_dotenv()
+
+pc = Pinecone(api_key=os.getenv(<span class="str">"PINECONE_API_KEY"</span>))
+
+INDEX_NAME = <span class="str">"webshop-products"</span>
+
+<span class="cm"># Index létrehozása ha még nem létezik</span>
+<span class="kw">if</span> INDEX_NAME <span class="kw">not in</span> [i[<span class="str">"name"</span>] <span class="kw">for</span> i <span class="kw">in</span> pc.list_indexes()]:
+    pc.create_index(
+        name=INDEX_NAME,
+        dimension=<span class="num">1536</span>,           <span class="cm"># text-embedding-3-small</span>
+        metric=<span class="str">"cosine"</span>,         <span class="cm"># cosine / dotproduct / euclidean</span>
+        spec=ServerlessSpec(cloud=<span class="str">"aws"</span>, region=<span class="str">"us-east-1"</span>),
+    )
+
+index = pc.Index(INDEX_NAME)
+<span class="fn">print</span>(<span class="str">"Index ready:"</span>, index.describe_index_stats())</pre></div>
+    <div class="output-area" id="out-s2">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">create_index(name=webshop-products)</span> <span class="log-dim">dim=1536, metric=cosine, serverless aws/us-east-1</span>
+<span class="log-ok">Index ready:</span> {'dimension': 1536, 'index_fullness': 0.0, 'namespaces': {}, 'total_vector_count': 0}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ S3: Embedding stratégia ══════════ -->
+<div class="section layer-bronze" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Embedding stratégia: melyik modell, milyen dimenzió? <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell">
+    <p>A <strong>retrieval minőségét</strong> az embedding modell minősége szabja meg — ha rossz embedding-et használsz, hiába van egy csodás Pinecone setup-od, a top-k találatok irrelevánsak lesznek. A 2024-25 körül az iparág defaultja az OpenAI <code>text-embedding-3-small</code> (1536 dim, $0.02/1M token) volt egyszerűsége és ár-érték aránya miatt, de ha angol nyelvű, hosszú dokumentumokon kell maximális minőség, a <code>text-embedding-3-large</code> (3072 dim, $0.13/1M token) érzékelhetően jobb. Mindkettő támogatja a <strong>Matryoshka</strong> stílusú dimenzió-csökkentést a <code>dimensions</code> paraméteren keresztül — ez azt jelenti, hogy egy 3072-es vektort le tudsz csonkítani 1024-re, és csak ~3-5% recall-t veszítesz.</p>
+    <p>Magyar és más nem-angol nyelvű dokumentumokra a <strong>multilingual</strong> modellek javasoltak. A Cohere <code>embed-multilingual-v3.0</code> (1024 dim) az ipari standard managed multilingual embeddinghez, és kifejezetten erős kelet-európai nyelveken. Self-hosted alternatíva a <strong>BGE-M3</strong> (BAAI/bge-m3, 1024 dim, multilingual + multi-functional dense+sparse+colbert egyszerre), és az <strong>E5-multilingual-large</strong> (1024 dim). Sentence-transformers könyvtárral pár sorban betöltheted ezeket lokálisan, és nincs API költség — viszont GPU kell az ipari sebességhez.</p>
+    <p>A <strong>WebShop Pro</strong> esetében a termékleírások és FAQ-k magyar nyelvűek, ezért két lehetőség van: (1) <code>text-embedding-3-small</code> 1536 dim, mert az OpenAI 3-as embedding család elég jó multilingual benchmarkokon és nagy ökoszisztémája van, vagy (2) Cohere <code>embed-multilingual-v3.0</code>, ami minőségében jobb magyaron. A kurzusban az egyszerűség és az AI Engineering kurzussal való folytonosság miatt az OpenAI 3-small-t használjuk 1536-os dimenzióval, ami kompatibilis a Pinecone index <code>dimension=1536</code> beállításával.</p>
+    <table>
+      <tr><th>Modell</th><th>Dim</th><th>Multilingual</th><th>Költség / 1M token</th><th>Mire jó</th></tr>
+      <tr><td><code>text-embedding-3-small</code></td><td>1536 (csonkolható)</td><td>Közepes</td><td>$0.02</td><td>Default, ár-érték</td></tr>
+      <tr><td><code>text-embedding-3-large</code></td><td>3072 (csonkolható)</td><td>Jó</td><td>$0.13</td><td>Maximum minőség EN-en</td></tr>
+      <tr><td><code>cohere/embed-v3.0</code></td><td>1024</td><td>Erős</td><td>$0.10</td><td>EN-only legjobb</td></tr>
+      <tr><td><code>cohere/embed-multilingual-v3.0</code></td><td>1024</td><td>Kiváló</td><td>$0.10</td><td>Nem-angol nyelvek</td></tr>
+      <tr><td><code>BAAI/bge-m3</code></td><td>1024</td><td>Kiváló</td><td>0 (self-hosted)</td><td>Multilingual + sparse</td></tr>
+      <tr><td><code>intfloat/e5-multilingual-large</code></td><td>1024</td><td>Erős</td><td>0 (self-hosted)</td><td>Open-source default</td></tr>
+    </table>
+  </div>
+  <div class="code-cell" id="cell-s3">
+    <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('s3')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client = OpenAI()  <span class="cm"># OPENAI_API_KEY env-ből</span>
+
+texts = [
+    <span class="str">"Lenovo ThinkPad X1 Carbon Gen 12, 16 GB RAM, 1 TB SSD, magyar billentyűzet"</span>,
+    <span class="str">"A visszaküldés a vásárlástól számított 30 napon belül lehetséges"</span>,
+]
+
+resp = client.embeddings.create(
+    model=<span class="str">"text-embedding-3-small"</span>,
+    input=texts,
+    dimensions=<span class="num">1536</span>,        <span class="cm"># Matryoshka: csonkolhatnánk pl. 512-re is</span>
+)
+
+<span class="kw">for</span> i, item <span class="kw">in</span> <span class="fn">enumerate</span>(resp.data):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Vektor {i}: dim={</span><span class="fn">len</span>(item.embedding)<span class="str">}, első 5 érték={item.embedding[:5]}"</span>)
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Token usage: {resp.usage.total_tokens}"</span>)</pre></div>
+    <div class="output-area" id="out-s3">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">embeddings.create()</span> <span class="log-dim">model=text-embedding-3-small dim=1536</span>
+Vektor 0: dim=1536, első 5 érték=[-0.0142, 0.0331, -0.0089, 0.0217, -0.0405]
+Vektor 1: dim=1536, első 5 érték=[0.0073, -0.0192, 0.0456, -0.0118, 0.0265]
+<span class="log-ok">Token usage: 38</span></pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Matryoshka tip</div>
+    <p>A <code>dimensions=512</code> paraméter 1/3 helyet és ~1/3 query latency-t hoz, miközben a recall@10 csak ~2-3%-kal csökken sok benchmarkban. Production-ben érdemes A/B tesztelni 1536 vs 1024 vs 512 dimenziók között, és a legkisebbet választani, ami még megfelel a minőségi célnak.</p>
+  </div>
+</div>
+
+<!-- ══════════ S4: Pinecone upsert + query ══════════ -->
+<div class="section layer-bronze" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>Pinecone upsert + query: első end-to-end <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A Pinecone alapfolyamata egyszerű: <strong>upsert</strong> (vektor + metaadat beírása vagy felülírása), <strong>query</strong> (top-k hasonló vektor visszakérése), <strong>delete</strong> (törlés id vagy filter alapján), és <strong>fetch</strong> (egy konkrét id lekérése). Az "upsert" az "update or insert" rövidítése — ha az adott id már létezik, felülírja, ha nem, beírja. Nincs külön "create" parancs, ami a development workflow-t leegyszerűsíti.</p>
+    <p>Az <strong>upsert batch limit</strong> alapesetben 1000 vektor egy hívásban, de a hivatalos guideline a 100-as batch méret a hálózati overhead és a memóriahasználat optimumáért. Ha 50 000 termékvektort töltesz be, akkor 500 batch HTTP hívást jelent, ami ~30-60 másodperc szekvenciálisan. Async vagy thread pool segítségével párhuzamosítható: 8 worker-rel ~5-8 másodperc alá viheted.</p>
+    <p>A <strong>query</strong> mindig egy vektorral indul (a kérdés embeddingje), és visszaadja a <code>top_k</code> legközelebbi vektor idejét, score-ját, és opcionálisan a metaadatát. A három fontos paraméter: <code>top_k</code> (általában 5-20, RAG-ban tipikusan 5 a végső, de retrieval+rerank pipeline-ban 50-100 előretrievelünk), <code>namespace</code> (a multi-tenant izoláció kulcsa, lásd S11), és <code>filter</code> (metadata-alapú hard szűrő, pl. <code>{"category": {"$eq": "laptop"}}</code>). A <code>filter</code> a query előtt fut, így gyors és olcsó — használd ki, ha tudod a kategóriát vagy más metaadatot.</p>
+  </div>
+  <div class="code-cell" id="cell-s4a">
+    <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('s4a')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Upsert: 3 termékvektor metaadatokkal</span>
+<span class="kw">def</span> <span class="fn">embed_texts</span>(texts):
+    resp = client.embeddings.create(
+        model=<span class="str">"text-embedding-3-small"</span>,
+        input=texts, dimensions=<span class="num">1536</span>,
+    )
+    <span class="kw">return</span> [d.embedding <span class="kw">for</span> d <span class="kw">in</span> resp.data]
+
+products = [
+    {<span class="str">"id"</span>: <span class="str">"prod-1001"</span>, <span class="str">"text"</span>: <span class="str">"Lenovo ThinkPad X1, 16GB RAM, 1TB SSD"</span>,
+     <span class="str">"meta"</span>: {<span class="str">"category"</span>: <span class="str">"laptop"</span>, <span class="str">"price"</span>: <span class="num">899000</span>, <span class="str">"brand"</span>: <span class="str">"Lenovo"</span>}},
+    {<span class="str">"id"</span>: <span class="str">"prod-1002"</span>, <span class="str">"text"</span>: <span class="str">"Apple MacBook Air M3, 16GB RAM, 512GB SSD"</span>,
+     <span class="str">"meta"</span>: {<span class="str">"category"</span>: <span class="str">"laptop"</span>, <span class="str">"price"</span>: <span class="num">699000</span>, <span class="str">"brand"</span>: <span class="str">"Apple"</span>}},
+    {<span class="str">"id"</span>: <span class="str">"prod-1003"</span>, <span class="str">"text"</span>: <span class="str">"Sony WH-1000XM5 zajszűrős fejhallgató"</span>,
+     <span class="str">"meta"</span>: {<span class="str">"category"</span>: <span class="str">"audio"</span>, <span class="str">"price"</span>: <span class="num">149000</span>, <span class="str">"brand"</span>: <span class="str">"Sony"</span>}},
+]
+
+vectors = <span class="fn">embed_texts</span>([p[<span class="str">"text"</span>] <span class="kw">for</span> p <span class="kw">in</span> products])
+
+index.upsert(
+    vectors=[
+        {<span class="str">"id"</span>: p[<span class="str">"id"</span>], <span class="str">"values"</span>: v, <span class="str">"metadata"</span>: {**p[<span class="str">"meta"</span>], <span class="str">"text"</span>: p[<span class="str">"text"</span>]}}
+        <span class="kw">for</span> p, v <span class="kw">in</span> <span class="fn">zip</span>(products, vectors)
+    ],
+    namespace=<span class="str">"hu-products"</span>,
+)
+<span class="fn">print</span>(<span class="str">"Upsert kész:"</span>, index.describe_index_stats())</pre></div>
+    <div class="output-area" id="out-s4a">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">upsert(3 vectors, ns=hu-products)</span>
+<span class="log-ok">Upsert kész:</span> {'dimension': 1536, 'namespaces': {'hu-products': {'vector_count': 3}}, 'total_vector_count': 3}</pre>
+    </div>
+  </div>
+  <div class="code-cell" id="cell-s4b">
+    <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s4b')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Query: laptop &lt; 800 000 Ft alatt</span>
+query_text = <span class="str">"Milyen laptop van olcsó áron?"</span>
+qvec = <span class="fn">embed_texts</span>([query_text])[<span class="num">0</span>]
+
+results = index.query(
+    vector=qvec,
+    top_k=<span class="num">5</span>,
+    namespace=<span class="str">"hu-products"</span>,
+    filter={<span class="str">"category"</span>: {<span class="str">"$eq"</span>: <span class="str">"laptop"</span>}, <span class="str">"price"</span>: {<span class="str">"$lte"</span>: <span class="num">800000</span>}},
+    include_metadata=<span class="kw">True</span>,
+)
+
+<span class="kw">for</span> match <span class="kw">in</span> results.matches:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"id={match.id}  score={match.score:.4f}  text={match.metadata['text']}"</span>)</pre></div>
+    <div class="output-area" id="out-s4b">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">query(top_k=5, filter={category:laptop, price:&lt;=800000})</span>
+id=prod-1002  score=0.8123  text=Apple MacBook Air M3, 16GB RAM, 512GB SSD
+<span class="log-dim">(prod-1001 kiszűrve: price=899000 > 800000)</span>
+<span class="log-dim">(prod-1003 kiszűrve: category=audio)</span></pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Batch upsert pattern</div>
+    <p>Nagy mennyiségű upsert-hez (50 000 termék): <code>chunked = [vectors[i:i+100] for i in range(0, len(vectors), 100)]</code>, majd loop-ban <code>index.upsert(vectors=chunk, namespace=ns)</code>. Async esetén <code>asyncio.gather</code> 8 párhuzamos batch-csel.</p>
+  </div>
+</div>
+
+<!-- ══════════ S5: Chunking stratégiák ══════════ -->
+<div class="section layer-silver" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>Chunking stratégiák haladóknak <span class="tool-badge"><img src="../assets/logos/langchain.svg">LangChain</span></h2>
+  <div class="md-cell">
+    <p>A <strong>chunking</strong> az a lépés, amelyben a hosszú dokumentumokat (PDF, HTML, Markdown, plain text) annyira kis darabokra szabdaljuk, hogy egyetlen chunk beleférjen az embedding modell kontextusába (8 192 token a 3-small esetén) és értelmes egységet képezzen a retrieval szempontjából. Egy túl nagy chunk "felhígítja" az embeddinget — ha egy 2 000 szavas chunkban csak egy mondat releváns a kérdésre, a vektor maga csak gyengén lesz hasonló a query embeddingéhez. Egy túl kicsi chunk viszont elveszti a kontextust — ha egy mondatot embeddelsz névmással ("ez a termék"), nem lehet tudni, mire utal.</p>
+    <p>A <strong>fixed-size chunking</strong> a legegyszerűbb: minden N karakter (tipikusan 500-1500), N*0.1-N*0.2 átfedéssel (overlap, hogy a határos információk ne vesszenek el). Ez gyors, deterministic, de "vakon" vág — egy mondat vagy bekezdés közepén is. A <strong>recursive chunking</strong> (LangChain <code>RecursiveCharacterTextSplitter</code>) okosabb: hierarchikus separator listát próbál (<code>["\n\n", "\n", ". ", " "]</code>), és először a "soft" határokon vág. Ez a default ipari recept, és általában jó eredményt ad ~10 perc alatt beállítva.</p>
+    <p>A <strong>semantic chunking</strong> még tovább megy: minden mondatot embedeli, majd ott vág, ahol az egymás utáni embeddingek közötti hasonlóság hirtelen leesik (azaz a téma vált). Ez szebben tagol bonyolult dokumentumokat (pl. egy hosszú jogi szöveg), de drágább (extra embedding hívások) és lassabb. A <strong>document-aware chunking</strong> a strukturális metaadatot használja: Markdown header-ek alapján bont (LangChain <code>MarkdownHeaderTextSplitter</code>), HTML <code>&lt;section&gt;</code>-ök, vagy PDF heading-ek mentén. Az <strong>agentic chunking</strong> az új generáció: egy LLM-et kérünk meg, hogy szakértő módon tagolja a dokumentumot ("bontsd fel ezt logikai részekre, mindegyikhez adj egy summary-t"). Drága, de a minősége legjobb.</p>
+    <table>
+      <tr><th>Stratégia</th><th>Költség</th><th>Minőség</th><th>Mire ajánlott</th></tr>
+      <tr><td>Fixed-size</td><td>Olcsó (CPU only)</td><td>Alacsony</td><td>Homogén, sima szöveg</td></tr>
+      <tr><td>Recursive</td><td>Olcsó</td><td>Közepes (default)</td><td>Általános dokumentumok</td></tr>
+      <tr><td>Semantic</td><td>Drága (embeddings)</td><td>Magas</td><td>Hosszú, témaváltó dokumentumok</td></tr>
+      <tr><td>Document-aware (Markdown/HTML)</td><td>Olcsó</td><td>Magas</td><td>Strukturált formátumok</td></tr>
+      <tr><td>Agentic (LLM-based)</td><td>Nagyon drága</td><td>Legmagasabb</td><td>Kritikus, lassan változó tudásbázis</td></tr>
+    </table>
+  </div>
+  <div class="code-cell" id="cell-s5">
+    <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('s5')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># pip install langchain-text-splitters</span>
+<span class="kw">from</span> langchain_text_splitters <span class="kw">import</span> RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
+
+doc = <span class="str">"""# Visszaküldési szabályzat
+
+A WebShop Pro 30 napos visszaküldési garanciát biztosít minden termékre.
+
+## Feltételek
+
+- A termék eredeti csomagolásban legyen
+- Sérülésmentes állapot
+- Vásárlási bizonylat csatolva
+
+## Költségek
+
+A visszaküldés költsége 1 990 Ft, kivéve hibás termék esetén.
+"""</span>
+
+<span class="cm"># 1) Recursive chunking — 200 char chunk, 30 char overlap</span>
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=<span class="num">200</span>, chunk_overlap=<span class="num">30</span>,
+    separators=[<span class="str">"\n\n"</span>, <span class="str">"\n"</span>, <span class="str">". "</span>, <span class="str">" "</span>],
+)
+chunks_recursive = splitter.split_text(doc)
+
+<span class="cm"># 2) Markdown header-aware chunking</span>
+md_splitter = MarkdownHeaderTextSplitter(
+    headers_to_split_on=[(<span class="str">"#"</span>, <span class="str">"h1"</span>), (<span class="str">"##"</span>, <span class="str">"h2"</span>)],
+)
+chunks_md = md_splitter.split_text(doc)
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Recursive: {</span><span class="fn">len</span>(chunks_recursive)<span class="str">} chunks"</span>)
+<span class="kw">for</span> i, c <span class="kw">in</span> <span class="fn">enumerate</span>(chunks_recursive):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  [{i}] {c[:60]}..."</span>)
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"\nMarkdown: {</span><span class="fn">len</span>(chunks_md)<span class="str">} chunks"</span>)
+<span class="kw">for</span> c <span class="kw">in</span> chunks_md:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  meta={c.metadata} content={c.page_content[:50]}..."</span>)</pre></div>
+    <div class="output-area" id="out-s5">
+      <div class="output-label">Output:</div>
+      <pre>Recursive: 3 chunks
+  [0] # Visszaküldési szabályzat\n\nA WebShop Pro 30 napos vissz...
+  [1] ## Feltételek\n- A termék eredeti csomagolásban legyen\n- Sé...
+  [2] ## Költségek\nA visszaküldés költsége 1 990 Ft, kivéve hibá...
+
+Markdown: 3 chunks
+  meta={'h1': 'Visszaküldési szabályzat'} content=A WebShop Pro 30 napos visszaküldési garanci...
+  meta={'h1': 'Visszaküldési szabályzat', 'h2': 'Feltételek'} content=- A termék eredeti csomagolásban legyen...
+  meta={'h1': 'Visszaküldési szabályzat', 'h2': 'Költségek'} content=A visszaküldés költsége 1 990 Ft, kivéve hibás...</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Token vs character</div>
+    <p>A <code>chunk_size=200</code> karakterekben mér. Token-pontos chunkinghoz használd a <code>RecursiveCharacterTextSplitter.from_tiktoken_encoder</code>-t, amely a tényleges OpenAI token számot számolja. Magyar nyelvű szövegnél a karakter ↔ token arány ~3-4:1 (kínaiban 1:1, angolban 4:1).</p>
+  </div>
+</div>
+
+<!-- ══════════ S6: Hybrid search ══════════ -->
+<div class="section layer-silver" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Hybrid search: dense + sparse együtt <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A pure dense vector search (csak embedding-alapú) elképesztően jó szemantikus értésben, de van egy gyengéje: a <strong>ritka, specifikus termék-kódok, SKU-k, számozott azonosítók</strong> esetén megakad. Ha valaki rákeres a "P-3344-A" kódra, a dense embedding nem fog rátalálni a "P-3344-A SSD modul Lenovo laptop" termékre, mert a vektor-tér nem tartja számon a karakter szintű egyezést. Ezt a problémát oldja meg a <strong>hybrid search</strong>: kombináljuk a dense semantic search-öt egy sparse lexical search-csel (BM25 vagy SPLADE).</p>
+    <p>A <strong>BM25</strong> (Best Matching 25) a klasszikus IR algoritmus: term frequency × inverse document frequency, hossz-normalizálással. Egy lexikai mátrix-szal dolgozik, ahol a sorok dokumentumok, az oszlopok szavak, és minden cella a szó relevanciáját mutatja a dokumentumban. A BM25 erős a pontos szóegyezésnél (SKU, jogi kifejezés, márkanév), de gyenge a szemantikai szinonimáknál ("autó" vs "kocsi"). A dense embedding pont fordítva: jó szinonimáknál, gyenge ritka tokeneknél. A kettő kombinációja a sweet spot.</p>
+    <p>A Pinecone <strong>natív hybrid index</strong>-szel támogatja ezt: az indexet <code>metric="dotproduct"</code>-tal hozod létre, és minden vektorhoz fűzhetsz egy <strong>sparse_values</strong> mezőt is. A query során is elküldesz mind dense, mind sparse vektort, és Pinecone a "convex combination" alapján rangsorol: <code>score = α × dense + (1−α) × sparse</code>. Az <strong>α</strong> (alpha) tipikusan 0.5-0.7 a dense felé tolva. Alternatíva a <strong>Reciprocal Rank Fusion</strong> (RRF): külön futtatsz egy dense és egy BM25 keresést, majd a két ranking listát kombinálod a <code>1/(k+rank)</code> formulával.</p>
+  </div>
+  <div class="code-cell" id="cell-s6">
+    <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># pip install pinecone-text  (BM25 sparse encoder)</span>
+<span class="kw">from</span> pinecone_text.sparse <span class="kw">import</span> BM25Encoder
+
+<span class="cm"># BM25 fit a corpuson (egyszer kell)</span>
+corpus = [p[<span class="str">"text"</span>] <span class="kw">for</span> p <span class="kw">in</span> products]
+bm25 = BM25Encoder()
+bm25.fit(corpus)
+
+<span class="cm"># Egy query: "Lenovo ThinkPad" -- specifikus márka+modell, BM25 erős</span>
+query = <span class="str">"Lenovo ThinkPad X1 16GB"</span>
+dense_vec = <span class="fn">embed_texts</span>([query])[<span class="num">0</span>]
+sparse_vec = bm25.encode_queries([query])[<span class="num">0</span>]   <span class="cm"># {indices: [...], values: [...]}</span>
+
+<span class="cm"># Hybrid query: dense + sparse alpha=0.6</span>
+<span class="kw">def</span> <span class="fn">hybrid_score</span>(dense, sparse, alpha=<span class="num">0.6</span>):
+    <span class="kw">return</span> {
+        <span class="str">"values"</span>: [v * alpha <span class="kw">for</span> v <span class="kw">in</span> dense],
+        <span class="str">"sparse_values"</span>: {
+            <span class="str">"indices"</span>: sparse[<span class="str">"indices"</span>],
+            <span class="str">"values"</span>: [v * (<span class="num">1</span> - alpha) <span class="kw">for</span> v <span class="kw">in</span> sparse[<span class="str">"values"</span>]],
+        },
+    }
+
+scaled = <span class="fn">hybrid_score</span>(dense_vec, sparse_vec, alpha=<span class="num">0.6</span>)
+
+results = index.query(
+    vector=scaled[<span class="str">"values"</span>],
+    sparse_vector=scaled[<span class="str">"sparse_values"</span>],
+    top_k=<span class="num">5</span>,
+    namespace=<span class="str">"hu-products"</span>,
+    include_metadata=<span class="kw">True</span>,
+)
+
+<span class="kw">for</span> m <span class="kw">in</span> results.matches:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"id={m.id}  hybrid_score={m.score:.4f}  text={m.metadata['text']}"</span>)</pre></div>
+    <div class="output-area" id="out-s6">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">hybrid query alpha=0.6</span> <span class="log-dim">dense + sparse merged</span>
+id=prod-1001  hybrid_score=0.8521  text=Lenovo ThinkPad X1, 16GB RAM, 1TB SSD
+id=prod-1002  hybrid_score=0.4188  text=Apple MacBook Air M3, 16GB RAM, 512GB SSD
+id=prod-1003  hybrid_score=0.1024  text=Sony WH-1000XM5 zajszűrős fejhallgató</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Mikor segít leginkább a hybrid?</div>
+    <p>A hybrid search nyeresége akkor a legnagyobb, ha a corpus tartalmaz <strong>specifikus tokeneket</strong>: termékkódok, modellnevek, jogi paragrafusok, kémiai vegyületek nevei. Pure prózán (pl. blog cikkek, általános FAQ) a dense egyedül is általában elég, és a hybrid csak 1-2% recall-t hoz a komplexitás árán.</p>
+  </div>
+</div>
+
+<!-- ══════════ S7: Reranking ══════════ -->
+<div class="section layer-silver" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Reranking: top-50 → top-5 minőségi szűrés <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A <strong>reranking</strong> egy második menet a retrieval pipeline-ban: a vector DB visszaad pl. top-50 jelöltet, ezeket egy <strong>cross-encoder</strong> modell pontosan átskálázza, és csak a legjobb 5-öt adjuk át az LLM-nek a kontextusba. A logika: a vector search egy "first-pass" gyors szűrő (cosine similarity 1536 dim-en, ami jó, de zajos), míg a cross-encoder egy "second-pass" lassú-de-pontos osztályozó, ami a query+document párt egyszerre nézi és egy 0-1 közötti relevancia score-t ad.</p>
+    <p>A különbség kritikus: a <strong>bi-encoder</strong> (a vector search-ben használt embedding modell) külön-külön embedeli a query-t és a dokumentumot, majd vektor-hasonlóságot számol — ez gyors (előre embedeled mindent), de elveszti a finom interakciót. A <strong>cross-encoder</strong> (reranker) a query-t és a dokumentumot egyszerre adja át a transformer modellnek (egy hosszú prompt formájában), így a self-attention rétegek látják a kapcsolatokat. Lassabb (futás-időben kell minden query-document párra hívni), de pontosabb. Tipikusan 5-10× recall@5 javulás.</p>
+    <p>A piacvezető rerankerek: <strong>Cohere rerank-v3.0</strong> (managed API, $2/1k search, multilingual, kiváló minőség), <strong>BGE-reranker-v2-m3</strong> (open-source, BAAI, multilingual, self-hosted), <strong>Jina Reranker v2</strong> (managed, gyors, multilingual). A <strong>WebShop Pro</strong> esetében a Cohere rerankert használjuk a managed kényelemért és a multilingual minőségért. A pipeline: Pinecone top_k=50 → Cohere rerank → top_k=5 → LLM. A latency overhead ~100-200 ms, ami sokat hoz a recall-ban.</p>
+  </div>
+  <div class="code-cell" id="cell-s7">
+    <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('s7')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># pip install cohere</span>
+<span class="kw">import</span> cohere
+
+co = cohere.ClientV2(api_key=os.getenv(<span class="str">"COHERE_API_KEY"</span>))
+
+query = <span class="str">"Olcsó laptop irodai munkára"</span>
+
+<span class="cm"># 1) Pinecone first-pass: top_k=50</span>
+qvec = <span class="fn">embed_texts</span>([query])[<span class="num">0</span>]
+first_pass = index.query(
+    vector=qvec, top_k=<span class="num">50</span>,
+    namespace=<span class="str">"hu-products"</span>,
+    include_metadata=<span class="kw">True</span>,
+)
+
+candidates = [m.metadata[<span class="str">"text"</span>] <span class="kw">for</span> m <span class="kw">in</span> first_pass.matches]
+
+<span class="cm"># 2) Cohere rerank: top_k=5</span>
+rerank_resp = co.rerank(
+    model=<span class="str">"rerank-multilingual-v3.0"</span>,
+    query=query,
+    documents=candidates,
+    top_n=<span class="num">5</span>,
+)
+
+<span class="kw">for</span> r <span class="kw">in</span> rerank_resp.results:
+    original_match = first_pass.matches[r.index]
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"rerank_score={r.relevance_score:.4f}  pinecone_score={original_match.score:.4f}  text={candidates[r.index][:60]}"</span>)</pre></div>
+    <div class="output-area" id="out-s7">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">first-pass top_k=50</span>
+<span class="log-cohere">[cohere]</span> <span class="log-step">rerank-multilingual-v3.0</span> <span class="log-dim">documents=50, top_n=5</span>
+rerank_score=0.9412  pinecone_score=0.7821  text=Apple MacBook Air M3, 16GB RAM, 512GB SSD
+rerank_score=0.8731  pinecone_score=0.7654  text=Lenovo ThinkPad X1, 16GB RAM, 1TB SSD
+rerank_score=0.7102  pinecone_score=0.7503  text=HP EliteBook 840, 8GB RAM, 256GB SSD
+rerank_score=0.6845  pinecone_score=0.7402  text=Dell Latitude 5440, 16GB RAM, 512GB SSD
+rerank_score=0.5921  pinecone_score=0.7321  text=Acer Aspire 5, 8GB RAM, 256GB SSD</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Latency vs minőség</div>
+    <p>Top_k=50 + Cohere rerank ~150 ms overhead, recall@5 +15-25%. Top_k=100 + rerank ~250 ms overhead, recall@5 +20-30% (csökkenő hozadék). Top_k=200+ már nem éri meg, mert a Cohere API rate limitje és latency-je megnő, és a recall growth lapossá válik.</p>
+  </div>
+</div>
+
+<!-- ══════════ S8: Multi-vector retrieval ══════════ -->
+<div class="section layer-silver" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>Multi-vector retrieval: parent-child + ColBERT <span class="tool-badge"><img src="../assets/logos/chroma.svg">Chroma</span></h2>
+  <div class="md-cell">
+    <p>A <strong>multi-vector retrieval</strong> azt jelenti, hogy egy logikai dokumentumhoz több embedding tartozik, és a retrieval ezekből összevontan keres. Két fő pattern van: a <strong>parent-child</strong> minta és a <strong>late interaction</strong> (ColBERT) minta. Mindkettő ugyanazt a problémát oldja meg: ha egy nagy dokumentumhoz egyetlen embedding tartozik, a vektor "összemossa" az összes témát; ha viszont sok kis chunkra bontod, elvész a kontextus a generálásnál.</p>
+    <p>A <strong>parent-child</strong> minta: a dokumentumot kis chunkokra bontod (mondat- vagy bekezdésszintű), és ezekre embeddinget gyártasz. Viszont az indexben minden chunkhoz megőrzöd a <strong>parent_id</strong>-t (a teljes dokumentum vagy nagyobb szekció id-ja). A retrieval során a chunk-szintű vektorokon keresel (jó precízió), majd a top találatok parent_id-ja alapján visszanyered a teljes dokumentumot, és AZT adod át kontextusként az LLM-nek (jó recall, jó kontextus). A LangChain <code>ParentDocumentRetriever</code> ezt a mintát implementálja.</p>
+    <p>A <strong>ColBERT</strong> (Contextualized Late Interaction over BERT) egy másik megközelítés: minden dokumentumhoz nem egy 1536-dimenziós vektor tartozik, hanem <em>token-szintű</em> vektorok mátrixa (pl. egy 100 szavas dokumentumhoz 100 × 128 dim mátrix). A query-ből is token-szintű vektorokat kapunk, és a "late interaction" így zajlik: minden query token a legközelebbi dokumentum tokent találja meg, és ezek átlagát vesszük. Ez sokkal pontosabb, mint a single-vector cosine, de drasztikusan több storage-ot igényel. Pinecone még nem támogatja natívan, de a <strong>Vespa</strong>, <strong>Qdrant</strong> (multi-vector mode), és a <strong>RAGatouille</strong> open-source library igen.</p>
+  </div>
+  <div class="code-cell" id="cell-s8">
+    <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('s8')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Parent-child minta Pinecone-on: chunk-szintű embedding, parent_id metaadatban</span>
+<span class="kw">def</span> <span class="fn">store_with_parent</span>(parent_id, parent_text, chunks):
+    vectors_to_upsert = []
+    chunk_embeds = <span class="fn">embed_texts</span>([c[<span class="str">"text"</span>] <span class="kw">for</span> c <span class="kw">in</span> chunks])
+    <span class="kw">for</span> i, (chunk, vec) <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">zip</span>(chunks, chunk_embeds)):
+        vectors_to_upsert.append({
+            <span class="str">"id"</span>: <span class="fn">f</span><span class="str">"{parent_id}::chunk-{i}"</span>,
+            <span class="str">"values"</span>: vec,
+            <span class="str">"metadata"</span>: {
+                <span class="str">"parent_id"</span>: parent_id,
+                <span class="str">"chunk_index"</span>: i,
+                <span class="str">"chunk_text"</span>: chunk[<span class="str">"text"</span>],
+                <span class="str">"parent_text"</span>: parent_text[:<span class="num">2000</span>],   <span class="cm"># truncate Pinecone 40KB limit miatt</span>
+            },
+        })
+    index.upsert(vectors=vectors_to_upsert, namespace=<span class="str">"hu-docs"</span>)
+
+doc_id = <span class="str">"doc-policy-001"</span>
+doc_full = <span class="str">"A WebShop Pro 30 napos visszaküldési garanciát biztosít. Feltétel: eredeti csomagolás. Költség: 1990 Ft."</span>
+doc_chunks = [
+    {<span class="str">"text"</span>: <span class="str">"30 napos visszaküldési garancia minden termékre"</span>},
+    {<span class="str">"text"</span>: <span class="str">"Feltétel: eredeti csomagolásban legyen a termék"</span>},
+    {<span class="str">"text"</span>: <span class="str">"Visszaküldés költsége 1990 Ft kivéve hibás termék esetén"</span>},
+]
+<span class="fn">store_with_parent</span>(doc_id, doc_full, doc_chunks)
+
+<span class="cm"># Query: chunk-szinten keres, de parent-tel kontextusként visszaad</span>
+query = <span class="str">"Mennyibe kerül a visszaküldés?"</span>
+qvec = <span class="fn">embed_texts</span>([query])[<span class="num">0</span>]
+results = index.query(vector=qvec, top_k=<span class="num">3</span>, namespace=<span class="str">"hu-docs"</span>, include_metadata=<span class="kw">True</span>)
+
+<span class="cm"># Aggregáljuk parent szerint, deduplikálva</span>
+seen_parents = <span class="fn">set</span>()
+<span class="kw">for</span> m <span class="kw">in</span> results.matches:
+    pid = m.metadata[<span class="str">"parent_id"</span>]
+    <span class="kw">if</span> pid <span class="kw">in</span> seen_parents:
+        <span class="kw">continue</span>
+    seen_parents.add(pid)
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"parent_id={pid}  best_chunk_score={m.score:.4f}"</span>)
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  matched chunk: {m.metadata['chunk_text']}"</span>)
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  full parent context: {m.metadata['parent_text']}"</span>)</pre></div>
+    <div class="output-area" id="out-s8">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">upsert(3 chunks, parent_id=doc-policy-001)</span>
+<span class="log-pinecone">[pinecone]</span> <span class="log-step">query parent-child</span>
+parent_id=doc-policy-001  best_chunk_score=0.8821
+  matched chunk: Visszaküldés költsége 1990 Ft kivéve hibás termék esetén
+  full parent context: A WebShop Pro 30 napos visszaküldési garanciát biztosít. Feltétel: eredeti csomagolás. Költség: 1990 Ft.</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">ColBERT helyett</div>
+    <p>Pinecone-ban nincs natív ColBERT, de a <strong>parent-child + Cohere rerank</strong> kombináció (S07 + S08) a gyakorlatban hasonló minőséget ad — a chunk-szintű precízió + a parent kontextus + a cross-encoder finomhangolás. Pure ColBERT-hez használj <strong>RAGatouille</strong>-t és Vespa/Qdrant backendet.</p>
+  </div>
+</div>
+
+<!-- ══════════ S9: Query transformation ══════════ -->
+<div class="section layer-silver" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Query transformation: HyDE, expansion, decomposition <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell">
+    <p>A felhasználói kérdések ritkán optimálisak retrieval szempontból. Egy kérdés ("Tudtok ide szállítani holnap reggelre?") rövid, kontextus-szegény, és a vector embedding-je nem feltétlenül passzol a tudásbázisbeli "Sürgős kiszállítás 24 órán belül országosan, 4 990 Ft" mondat embedding-jéhez. A <strong>query transformation</strong> egy LLM-alapú előfeldolgozási lépés, amely a query-t egy retrieval-barát formára hozza. Négy fő technika létezik.</p>
+    <p>A <strong>HyDE (Hypothetical Document Embeddings)</strong>: az LLM-et megkérjük, hogy generáljon egy <em>hipotetikus választ</em> a kérdésre, AZT embeddeljük, és AZ embeddinggel keresünk. A logika: a tudásbázisban lévő dokumentumok stílusa és vokabulárja közelebb áll egy "válasz" stílusához, mint egy "kérdés" stílusához, így a hipotetikus válasz embeddingje jobban lesi a megfelelő dokumentumokat. A <strong>query expansion</strong>: az LLM-et megkérjük, hogy generáljon 3-5 alternatív megfogalmazást ugyanarra a kérdésre, mindegyikkel külön keresünk, és a top találatokat egyesítjük (RRF-fel vagy egyszerű union-nal).</p>
+    <p>A <strong>step-back prompting</strong>: az LLM-et megkérjük, hogy egy "magasabb absztrakciós szintű" verziót adjon a kérdésnek ("Mi a kiszállítás szabályai?" helyett "Milyen kiszállítási opciók vannak?"). Ezt használjuk retrieval-re, és a top dokumentumokból válaszolunk az eredeti kérdésre. A <strong>query decomposition</strong>: a komplex kérdést részkérdésekre bontjuk ("Tudtok holnap reggelre szállítani Debrecenbe és mennyibe kerül?" → "Mikor érkezik holnapi rendelés Debrecenbe?" + "Mennyibe kerül az expressz kiszállítás?"), külön-külön retrieve-elünk, és az eredményeket konkatenáljuk.</p>
+  </div>
+  <div class="code-cell" id="cell-s9">
+    <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('s9')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># HyDE: hipotetikus dokumentum generálás, AZT embedeljük</span>
+<span class="kw">def</span> <span class="fn">hyde_search</span>(question, top_k=<span class="num">5</span>):
+    <span class="cm"># 1) LLM generál egy hipotetikus választ</span>
+    hyp_resp = client.chat.completions.create(
+        model=<span class="str">"gpt-4o-mini"</span>,
+        messages=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Adj egy rövid, faktuális választ webshop témában. Ne írd, hogy nem tudod -- találgass plauzibilisen."</span>},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: question},
+        ],
+        max_tokens=<span class="num">150</span>,
+    )
+    hypothetical_doc = hyp_resp.choices[<span class="num">0</span>].message.content
+
+    <span class="cm"># 2) A hipotetikus választ embedeljük (NEM a kérdést)</span>
+    hyp_vec = <span class="fn">embed_texts</span>([hypothetical_doc])[<span class="num">0</span>]
+
+    <span class="cm"># 3) Pinecone search a hipotetikus embeddinggel</span>
+    results = index.query(
+        vector=hyp_vec, top_k=top_k,
+        namespace=<span class="str">"hu-docs"</span>, include_metadata=<span class="kw">True</span>,
+    )
+    <span class="kw">return</span> hypothetical_doc, results.matches
+
+question = <span class="str">"Tudtok ide szállítani holnap reggelre?"</span>
+hyp_doc, matches = <span class="fn">hyde_search</span>(question)
+
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Hipotetikus dokumentum: {hyp_doc}\n"</span>)
+<span class="kw">for</span> m <span class="kw">in</span> matches:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  score={m.score:.4f}  text={m.metadata.get('chunk_text', '')[:80]}"</span>)</pre></div>
+    <div class="output-area" id="out-s9">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create gpt-4o-mini (hipotetikus válasz)</span>
+Hipotetikus dokumentum: Igen, a WebShop Pro expressz kiszállítást biztosít aznapi vagy másnapi reggeli kézbesítéssel...
+
+<span class="log-pinecone">[pinecone]</span> <span class="log-step">query (HyDE embedding)</span>
+  score=0.8723  text=Sürgős kiszállítás 24 órán belül országosan, 4990 Ft - reggeli kézbesítés...
+  score=0.7901  text=Standard kiszállítás 3-5 munkanap, 1490 Ft GLS futárszolgálattal...</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Mikor melyik?</div>
+    <p><strong>HyDE:</strong> rövid, kontextus-szegény user query-knél (chat).<br>
+    <strong>Query expansion:</strong> ha sok módon meg lehet fogalmazni ugyanazt a dolgot (szinonimák).<br>
+    <strong>Step-back:</strong> nagyon specifikus kérdéseknél, ahol az általánosabb dokumentum is releváns.<br>
+    <strong>Decomposition:</strong> multi-hop kérdéseknél, ahol több tényt kell összekapcsolni.</p>
+  </div>
+</div>
+
+<!-- ══════════ S10: Metadata filtering ══════════ -->
+<div class="section layer-gold" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Metadata filtering: operátorok és index-design <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A Pinecone <strong>metadata filtering</strong> a vector search egyik legértékesebb képessége: a <code>filter</code> paraméter <em>előbb</em> fut, mint a vektor-keresés, így gyors és olcsó. Ha tudod, hogy "csak laptop kategóriát szeretnék" vagy "csak az utolsó 30 nap dokumentumait", akkor egy hard filterrel a kereső tér lecsökken, a query latency javul, és a retrieved eredmények pontosabbak. Helytelen filter-design viszont sokat ronthat: ha minden vektorhoz 50 metaadat mező van, és mindegyikre filterezel, a Pinecone backend lassul.</p>
+    <p>A <strong>támogatott operátorok</strong>: <code>$eq</code> (equal), <code>$ne</code> (not equal), <code>$in</code> (egyik a listában), <code>$nin</code> (egyik sem), <code>$gt</code>, <code>$gte</code>, <code>$lt</code>, <code>$lte</code> (numerikus összehasonlítás), <code>$exists</code> (mező létezik vagy sem). Logikai kombinálás: <code>$and</code>, <code>$or</code>. Beágyazható: <code>{"$or": [{"category": {"$eq": "laptop"}}, {"$and": [{"price": {"$lte": 100000}}, {"brand": {"$in": ["HP", "Lenovo"]}}]}]}</code>. A Pinecone NEM támogatja a regex-et, az aggregációt (group by), és a join-okat — ha ezek kellenek, akkor secondary store-ral (Postgres) kell kombinálni.</p>
+    <p>Az <strong>index-design szempontok</strong>: (1) Pinecone metadata limit <strong>40 KB / vektor</strong>, ezért a hosszú szöveget (full document) NE pakold metaadatba — csak az id-t, és a teljes szöveget tárold külső store-ban (Postgres, S3). (2) Csak azokat a mezőket vedd a metaadatba, amelyekre <em>filterezni</em> akarsz vagy <em>visszakapni</em> akarsz a query-ben. (3) High-cardinality mezőkre (pl. <code>user_id</code> milliós választékkal) a namespace jobb választás, mint a metadata filter (lásd S11). (4) A timestamp-ot Unix epoch-ban (integer) tárold, ne ISO stringben — gyorsabb a numerikus filter.</p>
+  </div>
+  <div class="code-cell" id="cell-s10">
+    <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('s10')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Komplex metadata filter: laptop VAGY (audio + Sony + 100k-200k Ft)</span>
+query = <span class="str">"Jó hangzású termék"</span>
+qvec = <span class="fn">embed_texts</span>([query])[<span class="num">0</span>]
+
+complex_filter = {
+    <span class="str">"$or"</span>: [
+        {<span class="str">"category"</span>: {<span class="str">"$eq"</span>: <span class="str">"laptop"</span>}},
+        {<span class="str">"$and"</span>: [
+            {<span class="str">"category"</span>: {<span class="str">"$eq"</span>: <span class="str">"audio"</span>}},
+            {<span class="str">"brand"</span>: {<span class="str">"$in"</span>: [<span class="str">"Sony"</span>, <span class="str">"Bose"</span>, <span class="str">"Sennheiser"</span>]}},
+            {<span class="str">"price"</span>: {<span class="str">"$gte"</span>: <span class="num">100000</span>, <span class="str">"$lte"</span>: <span class="num">200000</span>}},
+        ]},
+    ],
+}
+
+results = index.query(
+    vector=qvec, top_k=<span class="num">5</span>,
+    namespace=<span class="str">"hu-products"</span>,
+    filter=complex_filter,
+    include_metadata=<span class="kw">True</span>,
+)
+
+<span class="kw">for</span> m <span class="kw">in</span> results.matches:
+    md = m.metadata
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"id={m.id}  category={md['category']}  brand={md['brand']}  price={md['price']}  score={m.score:.3f}"</span>)</pre></div>
+    <div class="output-area" id="out-s10">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">query with $or/$and/$in/$gte/$lte filter</span>
+id=prod-1003  category=audio  brand=Sony  price=149000  score=0.821
+id=prod-1002  category=laptop  brand=Apple  price=699000  score=0.712
+id=prod-1001  category=laptop  brand=Lenovo  price=899000  score=0.689</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">40 KB tipikus tévedés</div>
+    <p>Ha 50 000 termék van és mindegyikhez beraktad a teljes leírást metaadatba (átlag 5 KB), akkor 250 MB metadata-storage halmozódik fel — ez gyorsabb storage költséget jelent és lassabb query-t. Helyette: tárold csak a kategóriát, brand-et, árat, és a teljes leírást egy <strong>Postgres / S3</strong> tárban a vector ID-val mint kulccsal.</p>
+  </div>
+</div>
+
+<!-- ══════════ S11: Namespace és multi-tenant ══════════ -->
+<div class="section layer-gold" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Namespace és multi-tenant izoláció <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A Pinecone <strong>namespace</strong> egy logikai partíció egyetlen indexen belül. Minden upsert és query egy konkrét namespace-be megy (vagy ha nem adsz meg, az alapértelmezett <code>""</code> üres namespace-be). A namespace-ek között teljes az izoláció: egy <code>customer-A</code> namespace query-je SOHA nem kap találatot a <code>customer-B</code> namespace vektoraiból. Ez egy szerver-oldali garancia, nem csak konvenció — ezért használhatod multi-tenant biztonsági modellként.</p>
+    <p>A multi-tenant SaaS RAG-szolgáltatás (pl. egy customer support bot, amit több ügyfél-cég használ) tipikus mintája: <strong>egy index, sok namespace</strong>. Minden tenant (ügyfél) saját namespace-t kap (pl. <code>tenant-acmecorp</code>, <code>tenant-globaltech</code>), és az alkalmazás-réteg gondoskodik arról, hogy a query mindig csak a jó tenant namespace-ét hívja. Ez egyszerűbb deployment (egy index admin szempontjából), kisebb költség (közös storage és compute), és tiszta izoláció (nem keveredhet a vektor a tenantok között).</p>
+    <p>A namespace-ek nem korlátlanok: a Pinecone serverless plan-en a <strong>10 000 namespace / index</strong> egy tipikus limit, ami a legtöbb SaaS use case-hez bőven elég. Performance-ban a namespace-eknek csekély overhead-jük van (külön Bloom filter-rel és index-szegmenssel dolgoznak), de ha 100 000+ tenanttal van dolgod, érdemes <strong>tenant-shardingot</strong> használni: tenanto-kat csoportosítasz közös namespace-be, és a query-ben metadata filterrel (<code>{"tenant_id": {"$eq": "..."}}</code>) szűröd. Ez a "namespace per tenant" vs "metadata-filter per tenant" trade-off egy klasszikus multi-tenant database tervezési kérdés.</p>
+  </div>
+  <div class="code-cell" id="cell-s11">
+    <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('s11')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Multi-tenant minta: WebShop Pro HU/DE/EN üzletek külön namespace-ben</span>
+TENANTS = {
+    <span class="str">"hu"</span>: <span class="str">"WebShop Pro Magyarország"</span>,
+    <span class="str">"de"</span>: <span class="str">"WebShop Pro Deutschland"</span>,
+    <span class="str">"en"</span>: <span class="str">"WebShop Pro UK"</span>,
+}
+
+<span class="kw">def</span> <span class="fn">tenant_namespace</span>(tenant_id):
+    <span class="kw">return</span> <span class="fn">f</span><span class="str">"tenant-{tenant_id}"</span>
+
+<span class="cm"># Upsert tenant-szerinti namespace-be</span>
+hu_text = <span class="str">"30 napos visszaküldési garancia minden termékre"</span>
+de_text = <span class="str">"14 Tage Rückgaberecht für alle Produkte"</span>
+
+index.upsert(
+    vectors=[{<span class="str">"id"</span>: <span class="str">"policy-1"</span>, <span class="str">"values"</span>: <span class="fn">embed_texts</span>([hu_text])[<span class="num">0</span>],
+              <span class="str">"metadata"</span>: {<span class="str">"text"</span>: hu_text, <span class="str">"lang"</span>: <span class="str">"hu"</span>}}],
+    namespace=<span class="fn">tenant_namespace</span>(<span class="str">"hu"</span>),
+)
+index.upsert(
+    vectors=[{<span class="str">"id"</span>: <span class="str">"policy-1"</span>, <span class="str">"values"</span>: <span class="fn">embed_texts</span>([de_text])[<span class="num">0</span>],
+              <span class="str">"metadata"</span>: {<span class="str">"text"</span>: de_text, <span class="str">"lang"</span>: <span class="str">"de"</span>}}],
+    namespace=<span class="fn">tenant_namespace</span>(<span class="str">"de"</span>),
+)
+
+<span class="cm"># Query egy adott tenanthez -- csak az ő vektorait látja</span>
+<span class="kw">def</span> <span class="fn">tenant_search</span>(tenant_id, query, top_k=<span class="num">3</span>):
+    qvec = <span class="fn">embed_texts</span>([query])[<span class="num">0</span>]
+    <span class="kw">return</span> index.query(
+        vector=qvec, top_k=top_k,
+        namespace=<span class="fn">tenant_namespace</span>(tenant_id),
+        include_metadata=<span class="kw">True</span>,
+    )
+
+<span class="cm"># HU tenant query: csak HU dokumentumot lát</span>
+hu_results = <span class="fn">tenant_search</span>(<span class="str">"hu"</span>, <span class="str">"Mennyi a visszaküldési idő?"</span>)
+<span class="fn">print</span>(<span class="str">"HU tenant:"</span>, [m.metadata[<span class="str">"text"</span>] <span class="kw">for</span> m <span class="kw">in</span> hu_results.matches])
+
+<span class="cm"># DE tenant query: csak DE dokumentumot lát</span>
+de_results = <span class="fn">tenant_search</span>(<span class="str">"de"</span>, <span class="str">"Wie lange ist die Rückgabe?"</span>)
+<span class="fn">print</span>(<span class="str">"DE tenant:"</span>, [m.metadata[<span class="str">"text"</span>] <span class="kw">for</span> m <span class="kw">in</span> de_results.matches])
+
+<span class="fn">print</span>(<span class="str">"Stats per namespace:"</span>, index.describe_index_stats()[<span class="str">"namespaces"</span>])</pre></div>
+    <div class="output-area" id="out-s11">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">upsert ns=tenant-hu, tenant-de</span>
+HU tenant: ['30 napos visszaküldési garancia minden termékre']
+DE tenant: ['14 Tage Rückgaberecht für alle Produkte']
+Stats per namespace: {'tenant-hu': {'vector_count': 1}, 'tenant-de': {'vector_count': 1}, 'hu-products': {'vector_count': 3}, 'hu-docs': {'vector_count': 3}}</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Namespace vs metadata filter</div>
+    <p><strong>Namespace előny:</strong> server-side izoláció (nem kerülhet ki tenant adat), gyorsabb query (kisebb keresési tér), egyszerűbb GDPR delete (törölheted az egész namespace-t egy paranccsal). <strong>Metadata filter előny:</strong> nincs namespace limit, könnyebb cross-tenant aggregálás, ha kell. <strong>Default választás:</strong> per-tenant namespace, ha &lt; 10 000 tenant.</p>
+  </div>
+</div>
+
+<!-- ══════════ S12: Agentic RAG ══════════ -->
+<div class="section layer-gold" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Agentic RAG: az LLM dönt, mikor kell retrieve <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/langchain.svg">LangChain</span></h2>
+  <div class="md-cell">
+    <p>A <strong>naive RAG</strong> minden query-re lefuttat egy retrieval-t, akár van rá szükség, akár nincs. Ha a felhasználó azt mondja "Köszi, ez nagyon segített!", a rendszer akkor is fog vector search-ölni — fölösleges latency, fölösleges költség, fölösleges zaj a kontextusban. Az <strong>agentic RAG</strong> abban különbözik, hogy az LLM-et hagyjuk eldönteni: kell-e most retrieve-elni, és ha igen, MILYEN paraméterekkel. Ezt OpenAI <strong>tool calling</strong>-gal valósítjuk meg, amelyet az AI Engineering kurzusban már láttál.</p>
+    <p>A pattern: regisztráljunk egy <code>retrieve_documents</code> tool-t, aminek a paramétere a query string. Az LLM a beszélgetés állapota alapján dönti el, hogy a választáshoz kell-e információt keresni. Ha igen, kibocsát egy <code>tool_calls</code>-t, mi azt elvégezzük (Pinecone query), visszaadjuk az eredményt mint <code>tool</code> role message, és az LLM ezzel válaszol. Ha az LLM úgy ítéli, hogy nem kell retrieve, csak válaszol egyenesen. Ez a "decide-and-retrieve" minta intelligensebbé teszi a chatbotot, és csökkenti a fölösleges költséget.</p>
+    <p>Az <strong>iteratív agentic RAG</strong> még tovább megy: az LLM <em>több retrieve hívást is kibocsáthat egymás után</em>. Például: "Milyen laptopot ajánlsz egy programozónak 500 000 Ft alatt, ami fut Linuxon?" → első retrieve "olcsó laptop programozóknak" → másodi retrieve "laptop Linux kompatibilitás" → harmadik retrieve "laptop ár 500000 alatt" → válasz. Ez a <strong>multi-step retrieval</strong>, és a LangGraph vagy CrewAI keretrendszerek erre építenek state machine-eket. A kompromisszum: drága (sok LLM hívás + sok Pinecone query), lassú (több round-trip), de a komplex kérdéseken sokkal jobb minőség.</p>
+  </div>
+  <div class="code-cell" id="cell-s12">
+    <div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('s12')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Agentic RAG: tool calling minta</span>
+<span class="kw">import</span> json
+
+<span class="kw">def</span> <span class="fn">retrieve_documents</span>(query, namespace=<span class="str">"hu-products"</span>, top_k=<span class="num">5</span>):
+    qvec = <span class="fn">embed_texts</span>([query])[<span class="num">0</span>]
+    res = index.query(vector=qvec, top_k=top_k, namespace=namespace, include_metadata=<span class="kw">True</span>)
+    <span class="kw">return</span> [m.metadata.get(<span class="str">"text"</span>, <span class="str">""</span>) <span class="kw">for</span> m <span class="kw">in</span> res.matches]
+
+tools = [{
+    <span class="str">"type"</span>: <span class="str">"function"</span>,
+    <span class="str">"function"</span>: {
+        <span class="str">"name"</span>: <span class="str">"retrieve_documents"</span>,
+        <span class="str">"description"</span>: <span class="str">"Releváns dokumentumokat keres a WebShop Pro tudásbázisban. Csak akkor használd, ha a kérdés faktuális és tudásbázisra van szükség."</span>,
+        <span class="str">"parameters"</span>: {
+            <span class="str">"type"</span>: <span class="str">"object"</span>,
+            <span class="str">"properties"</span>: {
+                <span class="str">"query"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"description"</span>: <span class="str">"A keresési query"</span>},
+                <span class="str">"namespace"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"enum"</span>: [<span class="str">"hu-products"</span>, <span class="str">"hu-docs"</span>]},
+            },
+            <span class="str">"required"</span>: [<span class="str">"query"</span>],
+            <span class="str">"additionalProperties"</span>: <span class="kw">False</span>,
+        },
+    },
+}]
+
+messages = [
+    {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Te a WebShop Pro support botja vagy. Csak akkor hívd a retrieve_documents tool-t, ha tudásbázis kell."</span>},
+    {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Mennyibe kerül egy MacBook Air?"</span>},
+]
+
+resp = client.chat.completions.create(model=<span class="str">"gpt-4o"</span>, messages=messages, tools=tools)
+msg = resp.choices[<span class="num">0</span>].message
+
+<span class="kw">if</span> msg.tool_calls:
+    <span class="kw">for</span> call <span class="kw">in</span> msg.tool_calls:
+        args = json.loads(call.function.arguments)
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"LLM döntés: retrieve hívás args={args}"</span>)
+        retrieved = <span class="fn">retrieve_documents</span>(**args)
+        messages.append(msg)
+        messages.append({
+            <span class="str">"role"</span>: <span class="str">"tool"</span>,
+            <span class="str">"tool_call_id"</span>: call.id,
+            <span class="str">"content"</span>: json.dumps(retrieved, ensure_ascii=<span class="kw">False</span>),
+        })
+    <span class="cm"># Második hívás: az LLM most már a retrieved kontextussal válaszol</span>
+    final = client.chat.completions.create(model=<span class="str">"gpt-4o"</span>, messages=messages, tools=tools)
+    <span class="fn">print</span>(<span class="str">"Végső válasz:"</span>, final.choices[<span class="num">0</span>].message.content)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"Nincs retrieve, közvetlen válasz:"</span>, msg.content)</pre></div>
+    <div class="output-area" id="out-s12">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create gpt-4o (tool calling)</span>
+LLM döntés: retrieve hívás args={'query': 'MacBook Air ár', 'namespace': 'hu-products'}
+<span class="log-pinecone">[pinecone]</span> <span class="log-step">query top_k=5 ns=hu-products</span>
+<span class="log-openai">[openai]</span> <span class="log-step">chat.completions.create gpt-4o (final)</span>
+Végső válasz: Az Apple MacBook Air M3 (16GB RAM, 512GB SSD) jelenlegi ára 699 000 Ft a WebShop Pro-ban.</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Iteratív / multi-hop</div>
+    <p>Ha a kérdés komplex (több tényt össze kell kötni), engedd meg az LLM-nek, hogy <strong>több round</strong> tool-call-t is kibocsásson. A LangGraph <code>StateGraph</code> ezt deklaratívan kezeli "agent → tool → agent" loop-pal, max iteráció limittel (általában 5-10).</p>
+  </div>
+</div>
+
+<!-- ══════════ S13: Evaluation Pinecone-specifikusan ══════════ -->
+<div class="section layer-gold" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Evaluation: recall@k, latency, A/B teszt <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A production RAG egyik leggyakoribb hibája, hogy a fejlesztő érzésre dönt: "ez most jól néz ki, deployolom". Pár hét múlva kiderül, hogy a felhasználók fele rossz választ kap, mert a retrieval recall@5 csak 0.6 — vagyis a queries 40%-ánál a helyes dokumentum nincs benne a top 5-ben. Az evaluation egy <em>folyamatos</em> mérési diszciplína, és minden architektúra-változtatás (új embedding modell, új reranker, új chunking) előtt és után meg kell mérni.</p>
+    <p>A <strong>retrieval-szintű metrikák</strong>: <strong>recall@k</strong> = (a top-k-ban lévő releváns dokumentumok száma) / (összes releváns), <strong>precision@k</strong> = (top-k-ban lévő releváns dokumentumok) / k, <strong>MRR</strong> (Mean Reciprocal Rank) = a helyes dokumentum első találati pozíciójának reciproka. Ezekhez kell egy <strong>ground truth dataset</strong>: 50-200 query, mindegyikhez kézzel jegyzett "ez a helyes dokumentum-id" annotáció. A WebShop Pro esetében ezt a customer support csapat heti 1-2 órájával lehet összeállítani, ahogy logoljuk a produkciós kérdéseket.</p>
+    <p>A <strong>generation-szintű metrikák</strong>: <strong>RAGAS context_precision</strong> (a retrieved kontextus mennyire releváns), <strong>context_recall</strong> (a ground truth válasz hány állítása lefedett a kontextusban), <strong>faithfulness</strong> (a végső válasz mennyire alapszik a kontextuson, nem hallucinált). Ezekhez nem kell ground truth, csak referencia válasz — egy LLM-as-judge méri. Részletesebben a <strong>RAG Evaluation & AI Safety</strong> kurzusban. A <strong>latency-szintű metrikák</strong>: p50, p95, p99 a teljes query latency-re, külön-külön az embedding API, Pinecone query, reranker, és LLM hívásokra. SLO példa: p95 &lt; 500 ms a teljes RAG pipeline-on.</p>
+  </div>
+  <div class="code-cell" id="cell-s13">
+    <div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('s13')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Recall@k mérés ground truth dataset ellen</span>
+ground_truth = [
+    {<span class="str">"query"</span>: <span class="str">"30 napos visszaküldés feltételei"</span>, <span class="str">"correct_id"</span>: <span class="str">"doc-policy-001::chunk-0"</span>},
+    {<span class="str">"query"</span>: <span class="str">"Visszaküldés költsége"</span>, <span class="str">"correct_id"</span>: <span class="str">"doc-policy-001::chunk-2"</span>},
+    {<span class="str">"query"</span>: <span class="str">"Eredeti csomagolás visszaküldéshez"</span>, <span class="str">"correct_id"</span>: <span class="str">"doc-policy-001::chunk-1"</span>},
+]
+
+<span class="kw">import</span> time
+
+<span class="kw">def</span> <span class="fn">recall_at_k</span>(k=<span class="num">5</span>, namespace=<span class="str">"hu-docs"</span>):
+    hits, latencies = <span class="num">0</span>, []
+    <span class="kw">for</span> item <span class="kw">in</span> ground_truth:
+        t0 = time.perf_counter()
+        qvec = <span class="fn">embed_texts</span>([item[<span class="str">"query"</span>]])[<span class="num">0</span>]
+        res = index.query(vector=qvec, top_k=k, namespace=namespace, include_metadata=<span class="kw">False</span>)
+        latencies.append((time.perf_counter() - t0) * <span class="num">1000</span>)
+        retrieved_ids = [m.id <span class="kw">for</span> m <span class="kw">in</span> res.matches]
+        <span class="kw">if</span> item[<span class="str">"correct_id"</span>] <span class="kw">in</span> retrieved_ids:
+            hits += <span class="num">1</span>
+    recall = hits / <span class="fn">len</span>(ground_truth)
+    p50 = <span class="fn">sorted</span>(latencies)[<span class="fn">len</span>(latencies) // <span class="num">2</span>]
+    p95 = <span class="fn">sorted</span>(latencies)[<span class="fn">int</span>(<span class="fn">len</span>(latencies) * <span class="num">0.95</span>)]
+    <span class="kw">return</span> recall, p50, p95
+
+<span class="cm"># Baseline: pure dense, no rerank</span>
+recall, p50, p95 = <span class="fn">recall_at_k</span>(k=<span class="num">5</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"Baseline (dense top_k=5):  recall@5={recall:.2%}  p50={p50:.0f}ms  p95={p95:.0f}ms"</span>)
+
+<span class="cm"># A/B: top_k=20 + Cohere rerank top_n=5  (lásd S07)</span>
+<span class="fn">print</span>(<span class="str">"A/B teszt: top_k=20 + rerank vs top_k=5 dense — futtasd a saját adataidon"</span>)</pre></div>
+    <div class="output-area" id="out-s13">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-pinecone">[pinecone]</span> <span class="log-step">3 query × top_k=5</span>
+Baseline (dense top_k=5):  recall@5=66.67%  p50=42ms  p95=68ms
+A/B teszt: top_k=20 + rerank vs top_k=5 dense — futtasd a saját adataidon</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Production observability</div>
+    <p>Ne csak a fejlesztés alatt mérj — production-ben is loggolj <strong>minden query-t</strong>: query string, embedding latency, Pinecone latency, top-5 ID, rerank score, LLM latency, total latency, user feedback (thumbs up/down). Ezek alapján heti riport: melyik queries kaptak lefelé hüvelykjelzést, mi a recall@k, hol van regresszió.</p>
+  </div>
+</div>
+
+<!-- ══════════ S14: Caching layer ══════════ -->
+<div class="section layer-gold" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Caching layer: embedding és semantic cache <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A RAG pipeline három pénzbe kerülő komponensből áll: embedding API hívás (~$0.02 / 1M token), Pinecone query (~$0.001 / 1k query), LLM hívás (~$2.50 / 1M output token GPT-4o-val). Egy átlagos chat session 5-10 query, mindegyikhez 1-2 embedding hívás és 1 LLM hívás. 10 000 napi user × 8 query × $0.005 átlagos query költség = $400/nap = $12 000/hó. Ennek 30-50%-át <em>cache layer</em>-rel le tudod faragni, ha okosan csinálod.</p>
+    <p>Az <strong>embedding cache</strong> a legegyszerűbb: ha ugyanaz a string érkezik (akár felhasználói query, akár indexelendő dokumentum), nem hívod újra az OpenAI API-t, hanem visszaadod a cachelt vektort. Egy Redis (vagy lokális dict prototípusra) <code>SHA256(text) → vector_blob</code> mapping. Egy átlagos chatben sok query ismétlődik (top 100 query a forgalom 30-50%-át adja), így a hit rate 40-60% lehet. Költség-megtakarítás: ~$0.01 / 1k token, plusz a latency 200-500 ms-ról 1-5 ms-ra esik.</p>
+    <p>A <strong>semantic cache</strong> okosabb: nem pontos string-egyezés, hanem <em>szemantikus hasonlóság</em>. Eltároljuk a cachelt query-k embeddingjét, és új query-nél megnézzük, van-e olyan cachelt query, ami &gt; 0.95 cosine similarity-jú. Ha igen, visszaadjuk a cachelt választ — még ha a felhasználó megfogalmazása kicsit más is. Pl. "Mikor érkezik a csomag?" és "Mennyi a kiszállítás ideje?" ugyanazt a választ kapja. Veszélye: false positive (két hasonló, de eltérő kérdés ugyanazt kapja). Threshold-ot körültekintően kell beállítani, és A/B tesztelni. Tooling: <strong>GPTCache</strong>, <strong>LangChain RedisSemanticCache</strong>.</p>
+  </div>
+  <div class="code-cell" id="cell-s14">
+    <div class="code-header"><span class="cell-number">[14]</span><button class="run-btn" onclick="runCell('s14')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># Egyszerű in-memory embedding cache + semantic cache</span>
+<span class="kw">import</span> hashlib
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+embedding_cache = {}     <span class="cm"># {sha256(text): vector}</span>
+answer_cache = []        <span class="cm"># [(query_vector, query_text, answer)]</span>
+
+<span class="kw">def</span> <span class="fn">embed_with_cache</span>(text):
+    key = hashlib.sha256(text.encode()).hexdigest()
+    <span class="kw">if</span> key <span class="kw">in</span> embedding_cache:
+        <span class="kw">return</span> embedding_cache[key], <span class="str">"hit"</span>
+    vec = <span class="fn">embed_texts</span>([text])[<span class="num">0</span>]
+    embedding_cache[key] = vec
+    <span class="kw">return</span> vec, <span class="str">"miss"</span>
+
+<span class="kw">def</span> <span class="fn">cosine</span>(a, b):
+    a, b = np.array(a), np.array(b)
+    <span class="kw">return</span> <span class="fn">float</span>(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+<span class="kw">def</span> <span class="fn">semantic_lookup</span>(query, threshold=<span class="num">0.95</span>):
+    qvec, _ = <span class="fn">embed_with_cache</span>(query)
+    <span class="kw">for</span> cached_vec, cached_q, cached_ans <span class="kw">in</span> answer_cache:
+        sim = <span class="fn">cosine</span>(qvec, cached_vec)
+        <span class="kw">if</span> sim > threshold:
+            <span class="kw">return</span> cached_ans, <span class="fn">f</span><span class="str">"hit (sim={sim:.3f}, original='{cached_q}')"</span>
+    <span class="kw">return</span> <span class="kw">None</span>, <span class="str">"miss"</span>
+
+<span class="cm"># Pl. egy első query: nincs cache, válaszolunk és mentjük</span>
+q1 = <span class="str">"Mikor érkezik a csomag?"</span>
+ans1 = <span class="str">"3-5 munkanap a standard kiszállítás."</span>
+v1, _ = <span class="fn">embed_with_cache</span>(q1)
+answer_cache.append((v1, q1, ans1))
+
+<span class="cm"># Második, hasonló query: semantic cache hit</span>
+q2 = <span class="str">"Mennyi idő alatt jön a kiszállítás?"</span>
+ans, status = <span class="fn">semantic_lookup</span>(q2)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"q2='{q2}'  cache_status={status}"</span>)
+<span class="fn">print</span>(<span class="fn">f</span><span class="str">"cached answer: {ans}"</span>)</pre></div>
+    <div class="output-area" id="out-s14">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-openai">[openai]</span> <span class="log-step">embed q1 (cache miss)</span>
+<span class="log-openai">[openai]</span> <span class="log-step">embed q2 (cache miss for embed)</span>
+q2='Mennyi idő alatt jön a kiszállítás?'  cache_status=hit (sim=0.962, original='Mikor érkezik a csomag?')
+cached answer: 3-5 munkanap a standard kiszállítás.</pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Cache invalidálás</div>
+    <p>Ha a tudásbázis változik (új termék, új policy), a semantic cache <strong>elavul</strong>. Megoldás: TTL (pl. 1 óra), vagy explicit invalidate, amikor új upsert történik a kapcsolódó namespace-be. A LangChain <code>RedisSemanticCache</code> támogatja a TTL-t, és Redis-en futtatva multi-instance kompatibilis.</p>
+  </div>
+</div>
+
+<!-- ══════════ S15: Cost & scaling ══════════ -->
+<div class="section layer-general" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Cost &amp; scaling: Pinecone serverless árazás <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell">
+    <p>A Pinecone serverless árazás három tételen alapul: <strong>storage</strong> ($0.33 / GB / hó), <strong>write units</strong> ($4 / 1M WU; egy upsert vektorára ~1-3 WU), <strong>read units</strong> ($16 / 1M RU; egy query ~5-15 RU a top_k és metadata mérettől függően). Ezek a 2025-ös listaárak, és van free tier (1 GB storage, 5M WU, 5M RU havonta), ami egy középméretű prototípushoz elegendő. A pod-based modell egy fix havi díj a kapacitásra (p1.x1 ~$70/hó), de a serverless kicsi-közepes use case-eknél jobb.</p>
+    <p>A <strong>WebShop Pro költségszámítás</strong>: 50 000 termék × 1536 dim × 4 byte = ~300 MB nyers vektor, plusz 50 000 chunk × 5 KB metadata = 250 MB metadata. Összesen ~550 MB tárolás → ~$0.18 / hó. Egyszeri upsert 50 000 vektorra ~150 000 WU = $0.60. Napi 10 000 query × 30 nap = 300 000 query/hó × 10 RU = 3M RU = $48 / hó. Embedding API hívások (300 000 query × ~50 token avg = 15M token) × $0.02/1M = $0.30. <strong>Összesen Pinecone + embedding: ~$50 / hó</strong>. Ehhez jön az LLM költség (lásd alább).</p>
+    <p>A <strong>self-hosted alternatíva breakeven point</strong>: ha a havi Pinecone számla &gt; $300-500, érdemes számolni az ön-hostolt Qdrant-tal vagy Weaviate-tel. Egy közepes Hetzner CCX23 instance (~$30/hó, 16 GB RAM, 4 vCPU) elbír 5-10 millió vektort, és a TCO (Total Cost of Ownership) belefér havi $100-150-be DevOps idővel együtt. Cserébe veszítesz a managed kényelemből, és vállalod a backup, monitoring, scaling ops-t. A döntést mindig a teljes cost-of-ownership alapján kell meghozni, nem csak a license-fee alapján.</p>
+    <table>
+      <tr><th>Tétel</th><th>WebShop Pro tipikus</th><th>Havi költség</th></tr>
+      <tr><td>Pinecone storage</td><td>550 MB</td><td>$0.18</td></tr>
+      <tr><td>Pinecone read units</td><td>3M RU (300k query)</td><td>$48</td></tr>
+      <tr><td>Pinecone write units</td><td>1M WU (havi reindex)</td><td>$4</td></tr>
+      <tr><td>OpenAI embeddings</td><td>15M token</td><td>$0.30</td></tr>
+      <tr><td>OpenAI gpt-4o LLM</td><td>300k × 1k token</td><td>$~150</td></tr>
+      <tr><td>Cohere reranker</td><td>300k search</td><td>$~600 (vagy self-host BGE)</td></tr>
+      <tr><td><strong>Összesen</strong></td><td></td><td><strong>~$200-800 / hó</strong></td></tr>
+    </table>
+    <div class="callout">
+      <div class="callout-title">Mit lehet faragni?</div>
+      <p>(1) <strong>Cache layer</strong> (S14) — 30-50% LLM és embedding költség lefaragható. (2) <strong>gpt-4o-mini</strong> egyszerű kérdésekre — 10× olcsóbb, mint gpt-4o. (3) <strong>Self-hosted reranker</strong> (BGE-reranker) — Cohere helyett, de GPU instance kell. (4) <strong>Matryoshka embedding</strong> 512 dim-en — 3× kisebb storage és gyorsabb query.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ S16: Production deployment ══════════ -->
+<div class="section layer-general" id="s16">
+  <div class="section-number">Section 16</div>
+  <h2>Production deployment: FastAPI + Pinecone + cache <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <div class="md-cell">
+    <p>A production RAG endpoint egy <strong>HTTP service</strong>, amit a frontend hív. A WebShop Pro architektúrája: a felhasználó beír egy kérdést a chatbot widget-be → JS POST /api/chat → FastAPI endpoint → cache check → embedding → Pinecone query → reranker → LLM → válasz. A teljes round-trip cél &lt; 1.5 másodperc. A <strong>FastAPI</strong> ideális választás: async natívan, OpenAPI auto-doc, Pydantic validation, könnyen tesztelhető és deployolható.</p>
+    <p>Az async fontos: a Pinecone, OpenAI és Cohere API-k mind hálózati hívások, és a synchronous Python esetén a worker blokkol a válaszra várva. <code>async def</code> handler-ben <code>await</code>-tel ezek a hívások konkurensen futnak, és egy uvicorn worker 100+ concurrent request-et tud kiszolgálni. A <strong>rate limiting</strong> kritikus: az OpenAI és Cohere mind RPM (requests per minute) limittel rendelkezik, túllépéskor 429 jön vissza. Használj <code>slowapi</code>-t vagy egy Redis-alapú rate limit pattern-t a downstream API hívások limitálásához.</p>
+    <p>A <strong>monitoring</strong> production-ben elengedhetetlen: minden /api/chat hívás logolja a query-t, latency-t, hit/miss cache statust, retrieved IDs-t, end user feedback-et. Tooling: <strong>Prometheus</strong> + <strong>Grafana</strong> a latency p50/p95/p99 dashboardhoz, <strong>OpenTelemetry</strong> a distributed tracing-hez (request végigkövetése a stack-en), <strong>Sentry</strong> a hibajelzéshez. A <strong>health endpoint</strong> (<code>/health</code>) ellenőrzi a Pinecone, OpenAI, Cohere, Redis kapcsolatot — ezt a Kubernetes liveness/readiness probe használja.</p>
+    <p><strong>Architektúra ASCII art:</strong></p>
+    <pre>
+    [Frontend] -- POST /api/chat -->  [FastAPI Worker]
+                                            |
+                                            +-- [Redis Cache] (semantic + embedding)
+                                            |
+                                            +-- [OpenAI Embeddings API]
+                                            |
+                                            +-- [Pinecone Index] (top_k=50)
+                                            |
+                                            +-- [Cohere Rerank] (top_n=5)
+                                            |
+                                            +-- [OpenAI gpt-4o] (answer)
+                                            |
+                                            +-- [Prometheus metrics]
+    </pre>
+  </div>
+  <div class="code-cell" id="cell-s16">
+    <div class="code-header"><span class="cell-number">[15]</span><button class="run-btn" onclick="runCell('s16')">▶ Run</button></div>
+    <div class="code-body"><pre><span class="cm"># pip install fastapi uvicorn slowapi</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Request
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> slowapi <span class="kw">import</span> Limiter
+<span class="kw">from</span> slowapi.util <span class="kw">import</span> get_remote_address
+
+app = FastAPI(title=<span class="str">"WebShop Pro RAG API"</span>)
+limiter = Limiter(key_func=get_remote_address)
+
+<span class="kw">class</span> ChatRequest(BaseModel):
+    query: <span class="fn">str</span>
+    tenant: <span class="fn">str</span> = <span class="str">"hu"</span>
+    top_k: <span class="fn">int</span> = <span class="num">5</span>
+
+<span class="kw">class</span> ChatResponse(BaseModel):
+    answer: <span class="fn">str</span>
+    sources: <span class="fn">list</span>[<span class="fn">str</span>]
+    latency_ms: <span class="fn">int</span>
+    cached: <span class="fn">bool</span>
+
+<span class="kw">@app.post</span>(<span class="str">"/api/chat"</span>, response_model=ChatResponse)
+<span class="kw">@limiter.limit</span>(<span class="str">"30/minute"</span>)
+<span class="kw">async def</span> <span class="fn">chat</span>(request: Request, body: ChatRequest):
+    t0 = time.perf_counter()
+    ns = <span class="fn">f</span><span class="str">"tenant-{body.tenant}"</span>
+
+    <span class="cm"># 1) Semantic cache</span>
+    cached, _ = <span class="fn">semantic_lookup</span>(body.query)
+    <span class="kw">if</span> cached:
+        <span class="kw">return</span> ChatResponse(answer=cached, sources=[], cached=<span class="kw">True</span>,
+                            latency_ms=<span class="fn">int</span>((time.perf_counter() - t0) * <span class="num">1000</span>))
+
+    <span class="cm"># 2) Embedding + Pinecone first-pass</span>
+    qvec, _ = <span class="fn">embed_with_cache</span>(body.query)
+    first_pass = index.query(vector=qvec, top_k=<span class="num">50</span>, namespace=ns, include_metadata=<span class="kw">True</span>)
+
+    <span class="cm"># 3) Cohere rerank</span>
+    docs = [m.metadata[<span class="str">"text"</span>] <span class="kw">for</span> m <span class="kw">in</span> first_pass.matches]
+    rer = co.rerank(model=<span class="str">"rerank-multilingual-v3.0"</span>, query=body.query, documents=docs, top_n=body.top_k)
+    top_docs = [docs[r.index] <span class="kw">for</span> r <span class="kw">in</span> rer.results]
+
+    <span class="cm"># 4) LLM</span>
+    ctx = <span class="str">"\n\n"</span>.join(top_docs)
+    resp = client.chat.completions.create(
+        model=<span class="str">"gpt-4o-mini"</span>,
+        messages=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="str">"Válaszolj kizárólag a megadott kontextus alapján."</span>},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="fn">f</span><span class="str">"Kontextus:\n{ctx}\n\nKérdés: {body.query}"</span>},
+        ],
+    )
+    answer = resp.choices[<span class="num">0</span>].message.content
+    answer_cache.append((qvec, body.query, answer))
+
+    <span class="kw">return</span> ChatResponse(answer=answer, sources=top_docs, cached=<span class="kw">False</span>,
+                        latency_ms=<span class="fn">int</span>((time.perf_counter() - t0) * <span class="num">1000</span>))
+
+<span class="kw">@app.get</span>(<span class="str">"/health"</span>)
+<span class="kw">async def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"ok"</span>, <span class="str">"pinecone_vectors"</span>: index.describe_index_stats()[<span class="str">"total_vector_count"</span>]}
+
+<span class="cm"># Futtatás: uvicorn app:app --workers 4 --host 0.0.0.0 --port 8000</span></pre></div>
+    <div class="output-area" id="out-s16">
+      <div class="output-label">Output:</div>
+      <pre><span class="log-cmd">$ uvicorn app:app --workers 4 --host 0.0.0.0 --port 8000</span>
+<span class="log-info">INFO:     Started server process [12345]</span>
+<span class="log-info">INFO:     Uvicorn running on http://0.0.0.0:8000</span>
+<span class="log-ok">POST /api/chat 200 OK  latency=412ms cached=False  query="Mennyibe kerül a MacBook?"</span>
+<span class="log-ok">POST /api/chat 200 OK  latency=8ms   cached=True   query="Mennyit kóstál a MacBook?"  (semantic hit)</span>
+<span class="log-ok">GET  /health    200 OK  pinecone_vectors=50000</span></pre>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="callout-title">Deployment opciók</div>
+    <p><strong>Docker</strong> + <strong>Kubernetes</strong> (Deployment + Service + HPA), <strong>AWS Fargate</strong> (serverless container), <strong>Google Cloud Run</strong> (request-based autoscale), <strong>Azure Container Apps</strong>. A FastAPI Pythonban szerencsére bármelyikbe egyszerűen csomagolható egy 5-soros <code>Dockerfile</code>-lal.</p>
+  </div>
+</div>
+
+<!-- ══════════ S17: Összefoglalás ══════════ -->
+<div class="section layer-intro" id="s17">
+  <div class="section-number">Section 17</div>
+  <h2>Összefoglalás: production RAG checklist <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <div class="md-cell">
+    <div class="callout success">
+      <div class="callout-title">Mit építettünk?</div>
+      <p>Egy production-grade RAG rendszer Pinecone-nal, multi-tenant, hybrid search, reranking, agentic, cached, és FastAPI deployment mellett:</p>
+      <ul>
+        <li>Pinecone serverless index, dimension=1536, cosine, AWS us-east-1</li>
+        <li>OpenAI text-embedding-3-small, Matryoshka opció 512-1536 dim között</li>
+        <li>Recursive + Markdown header-aware chunking (LangChain)</li>
+        <li>Hybrid search: dense + BM25 sparse, alpha=0.6</li>
+        <li>Cohere rerank-multilingual-v3.0, top_k=50 → top_n=5</li>
+        <li>Multi-vector parent-child pattern (chunk-szintű precízió + parent kontextus)</li>
+        <li>Query transformation: HyDE, expansion, decomposition</li>
+        <li>Metadata filtering: $eq, $in, $gte, $or, $and, 40 KB limit-figyelem</li>
+        <li>Multi-tenant via namespace per tenant (HU/DE/EN)</li>
+        <li>Agentic RAG: OpenAI tool calling retrieve_documents tool-lal</li>
+        <li>Evaluation: recall@k, p50/p95/p99 latency, ground truth dataset</li>
+        <li>Caching: embedding cache (SHA256) + semantic cache (cosine 0.95)</li>
+        <li>Cost számítás: ~$200-800/hó WebShop Pro skálán</li>
+        <li>FastAPI async deployment, slowapi rate limiting, /health endpoint</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Production checklist a deployment előtt</div>
+      <ul>
+        <li>API kulcsok secret managerben, NEM commitolva</li>
+        <li>Pinecone régió kompatibilis a többi service-szel (alacsony latency)</li>
+        <li>Recall@k és latency baseline mérve, mentve verziókövetésbe</li>
+        <li>Rate limit beállítva (downstream API-k védelme)</li>
+        <li>Health endpoint monitorozva (Kubernetes liveness/readiness)</li>
+        <li>Logging: minden query + latency + retrieved IDs + user feedback</li>
+        <li>Cost dashboard: napi Pinecone, OpenAI, Cohere költség</li>
+        <li>Cache invalidation stratégia tudásbázis-frissítéskor</li>
+        <li>GDPR delete: namespace alapú tenant törlés tesztelve</li>
+        <li>Disaster recovery: tervezz a Pinecone outage-re (fallback to cache + degraded mode)</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Következő lépések</div>
+      <ul>
+        <li><strong>LLMOps kurzus:</strong> deployment patterns, monitoring, drift detection, prompt versioning, model rollout</li>
+        <li><strong>RAG Evaluation &amp; AI Safety:</strong> RAGAS deep-dive, prompt injection védelem, jailbreak detection, hallucination scoring</li>
+        <li><strong>AI Data Engineer:</strong> feature store, real-time vector pipeline, Kafka → Pinecone CDC</li>
+      </ul>
+    </div>
+    <p><strong>Production RAG architektúra recap:</strong></p>
+    <div class="arch-flow">
+      <div class="arch-step">❓ Query</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">⚡ Cache</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🔢 Embed</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🗄️ Pinecone</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🎯 Rerank</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">🧠 LLM</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">📊 Metrics</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout success"><div class="callout-title">Szójegyzék</div><p><span class="glossary-term" data-def="Logikai partíció Pinecone indexen belül multi-tenant izolációhoz">Namespace</span> · <span class="glossary-term" data-def="Hipotetikus dokumentum-embedding query transformation">HyDE</span> · <span class="glossary-term" data-def="Cross-encoder modell ami query-document párokra finom relevance score-t ad">Reranker</span> · <span class="glossary-term" data-def="Dense + sparse vektorok kombinálása BM25-tel és embeddinggel">Hybrid search</span> · <span class="glossary-term" data-def="Embedding modell csonkolható-dimenziós tulajdonsága">Matryoshka</span></p></div>
+
+<div class="quiz-box" data-answer="1">
+<h3>Quiz: Mit jelent a HyDE retrieval?</h3>
+<button class="quiz-option">Hibrid search dense és sparse vektorokkal</button>
+<button class="quiz-option">LLM generál hipotetikus választ, AZT embeddeli</button>
+<button class="quiz-option">Hashed encoding tárolási optimalizálás</button>
+<button class="quiz-option">Header-based chunking strukturált dokumentumokra</button>
+<div class="quiz-feedback"></div>
+</div>
+<div class="quiz-box" data-answer="1">
+<h3>Quiz: Mi a Pinecone namespace célja?</h3>
+<button class="quiz-option">Régió kiválasztása az indexhez</button>
+<button class="quiz-option">Multi-tenant izoláció egy indexen belül</button>
+<button class="quiz-option">Backup tárolás snapshot-okhoz</button>
+<button class="quiz-option">Embedding modell típusának megadása</button>
+<div class="quiz-feedback"></div>
+</div>
+</main>
+<script>
+window.COURSE_CONFIG = {
+  slug: 'advanced-rag-vector-db',
+  toc: [{"id": "s0", "num": "00", "label": "Intro - Production RAG"}, {"id": "s1", "num": "01", "label": "Vector DB tájkép"}, {"id": "s2", "num": "02", "label": "Pinecone setup"}, {"id": "s3", "num": "03", "label": "Embedding stratégia"}, {"id": "s4", "num": "04", "label": "Pinecone upsert + query"}, {"id": "s5", "num": "05", "label": "Chunking stratégiák"}, {"id": "s6", "num": "06", "label": "Hybrid search"}, {"id": "s7", "num": "07", "label": "Reranking"}, {"id": "s8", "num": "08", "label": "Multi-vector retrieval"}, {"id": "s9", "num": "09", "label": "Query transformation"}, {"id": "s10", "num": "10", "label": "Metadata filtering"}, {"id": "s11", "num": "11", "label": "Namespace + multi-tenant"}, {"id": "s12", "num": "12", "label": "Agentic RAG"}, {"id": "s13", "num": "13", "label": "Evaluation"}, {"id": "s14", "num": "14", "label": "Caching layer"}, {"id": "s15", "num": "15", "label": "Cost & scaling"}, {"id": "s16", "num": "16", "label": "Production deployment"}, {"id": "s17", "num": "17", "label": "Összefoglalás"}]
+};
+</script>
+<script src="../assets/webshop-case-study.js?v=webshop-pro"></script>
+<script src="../assets/courses-detail.js"></script>
+<script src="../shared/course.js?v=2025may2"></script>
+</body>
+</html>
