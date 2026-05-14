@@ -28,6 +28,7 @@ jobs:
               'airflow-orchestration','dbt-analytics-engineering','databricks-lakehouse',
               'streaming-engineering','ai-data-engineer','ai-engineering',
               'rag-evaluation-ai-safety','llmops-genai-production','aiops-mlops',
+              'data-mesh','data-governance','agentic-ai',
           ]
           fails = []
           for c in courses:

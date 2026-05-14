@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- AUTO-SEO-INJECTED -->
 <title>Agentic AI kurzus magyarul | DataEngineer.hu</title>
-<meta name="description" content="Agentic AI mintáik: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.">
+<meta name="description" content="Agentic AI minták: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.">
 <meta name="keywords" content="Agentic AI, ReAct, LangGraph, CrewAI, tool calling, multi-agent, MCP, agent eval, magyarul, projektalapú">
 <meta name="author" content="Lugosi Dömötör">
 <meta name="robots" content="index, follow, max-image-preview:large">
@@ -15,7 +15,7 @@
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agentic AI kurzus magyarul | DataEngineer.hu">
-<meta property="og:description" content="Agentic AI mintáik: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.">
+<meta property="og:description" content="Agentic AI minták: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.">
 <meta property="og:url" content="https://dataengineer.hu/agentic-ai/">
 <meta property="og:site_name" content="Engineering Crash Courses">
 <meta property="og:locale" content="hu_HU">
@@ -25,7 +25,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Agentic AI">
-<meta name="twitter:description" content="Agentic AI mintáik: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.">
+<meta name="twitter:description" content="Agentic AI minták: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.">
 <meta name="twitter:image" content="https://dataengineer.hu/assets/og-image.png">
 
 <script type="application/ld+json">
@@ -33,7 +33,7 @@
   "@context": "https://schema.org",
   "@type": "Course",
   "name": "Agentic AI",
-  "description": "Agentic AI mintáik: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.",
+  "description": "Agentic AI minták: ReAct loop, tool calling, multi-agent kollaboráció, LangGraph, CrewAI, planning, memory, self-correction, eval és production deployment.",
   "url": "https://dataengineer.hu/agentic-ai/",
   "inLanguage": "hu",
   "provider": {
@@ -116,7 +116,7 @@
   <div class="md-cell">
     <p>Ebben a kurzusban egy <strong>WebShop Pro ügyfél-rendelés-utánkövető agent</strong>-et építünk lépésről lépésre. A végén lesz egy működő, tool-okat hívó, planning-et végző, memóriával rendelkező, többágenses rendszered, amit FastAPI-n keresztül production-ben is tudsz hostolni. A mintaprojekt valós use case-en alapul: az ügyfél írja, hogy "Hol van a 12345 rendelésem, és ha nem érkezik meg holnapig, vissza tudom-e küldeni?", és az agent magától végrehajtja a szállítási státusz lekérdezést, a visszaküldési szabályzat ellenőrzését, és a raktárkészlet vizsgálatát.</p>
     <p>Az "agentic" jelző azt jelenti, hogy az LLM nem csak válaszol egy kérdésre, hanem <em>cselekszik</em>: tool-okat hív, döntéseket hoz, iterál a saját outputján, és szükség esetén több al-agentet is összehangol. Az Anthropic 2024-ben publikált "Building Effective Agents" cikke világosan különbséget tesz az egyszerű <strong>workflow</strong> (rögzített lépéssor) és az <strong>agent</strong> (dinamikus, LLM-vezérelt döntés) között — a kurzus első felében ezt a megkülönböztetést tanuljuk meg.</p>
-    <p>A kurzus három pillérre épül: (1) az alapminták — ReAct loop, tool calling, memory, planning — Python + OpenAI Chat Completions API-val, (2) az ipari frameworkök — LangGraph state machine alapú agentekhez és CrewAI multi-agent kollaborációhoz, (3) a production szempontok — eval, observability, biztonság, deployment. A példák minden szakaszban a WebShop Pro use case-re épülnek, így folyamatosan látod, hogyan illeszkednek össze a részek egy valós rendszerré.</p>
+    <p>A kurzus három pillérre épül: (1) az alapminták — ReAct loop, tool calling, memory, planning — Python + OpenAI tool callinggal, (2) az ipari frameworkök — LangGraph state machine alapú agentekhez és CrewAI multi-agent kollaborációhoz, (3) a production szempontok — eval, observability, biztonság, deployment. A példák Chat Completions-kompatibilis formában szerepelnek, miközben az új OpenAI Responses API is ugyanazt a tool-schema gondolkodást követi. A példák minden szakaszban a WebShop Pro use case-re épülnek, így folyamatosan látod, hogyan illeszkednek össze a részek egy valós rendszerré.</p>
     <div class="callout">
       <div class="callout-title">Projekt: WebShop Pro Customer Order Agent</div>
       <p>A <strong>WebShop Pro</strong> egy fiktív webshop. Az agent három tool-on keresztül éri el a backend rendszereket: <code>get_order_status</code> (szállítási státusz), <code>check_return_policy</code> (visszaküldési szabályzat lekérdezés), <code>check_stock</code> (raktárkészlet ellenőrzés). A kurzus végén ezeket egy LangGraph state machine-ben kötjük össze, human-in-the-loop approval-lel az érzékeny műveletekhez (pl. visszaküldés indítása).</p>
@@ -172,7 +172,7 @@
   <h2>ReAct loop: Reasoning + Acting <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
   <div class="md-cell">
     <p>A <strong>ReAct</strong> (Yao et al., 2022) az "agentic" minták atyja: a modell explicit módon felváltva <strong>gondolkodik</strong> (Thought), <strong>cselekszik</strong> (Action — tool hívás), és <strong>megfigyel</strong> (Observation — a tool eredménye). Ez a Thought → Action → Observation → Thought ciklus addig fut, amíg a modell úgy dönti, hogy elérte a végcélt, és Final Answer-t ad. A módszer erőssége, hogy az LLM a "gondolataival" külsőleg is láthatóvá teszi, miért választott egy tool-t — debug és audit szempontból ez aranyat ér.</p>
-    <p>A modern OpenAI Chat Completions API-val a ReAct nagyrészt "alulról" implicit lett: a modell maga kezeli a Thought-ot belül, mi csak a tool_calls-okat látjuk. Mégis fontos megérteni a mintát, mert a LangChain ReAct agent-je, a CrewAI és sok más framework explicit módon ezt a ciklust valósítja meg. Az alábbi kódminta egy minimális ReAct loop-ot mutat OpenAI-val: maximum 5 iteráció, 3 tool, és minden iterációban kiírja a modell gondolatmenetét.</p>
+    <p>A modern OpenAI tool calling API-kban a ReAct nagyrészt "alulról" implicit lett: a modell maga kezeli a Thought-ot belül, mi csak a tool_calls-okat látjuk. Mégis fontos megérteni a mintát, mert a LangChain ReAct agent-je, a CrewAI és sok más framework explicit módon ezt a ciklust valósítja meg. Az alábbi kódminta egy minimális ReAct loop-ot mutat OpenAI-val: maximum 5 iteráció, 3 tool, és minden iterációban kiírja a modell gondolatmenetét.</p>
     <p>WebShop Pro példa: a felhasználó azt kérdezi, "Hol van a WSP-12345 rendelésem, és ha nem érkezik meg holnap, vissza tudom küldeni?". Az agent (1) lekérdezi a rendelés státuszát, (2) a status alapján eldönti, hogy a visszaküldési szabályzat releváns-e, (3) ha igen, lekérdezi azt is, (4) konszolidált választ ad. A loop pontosan 3 vagy 4 fordulóban zárul — a modell maga dönti el, mikor van elég információja.</p>
     <div class="callout">
       <div class="callout-title">ReAct vs sima tool calling</div>
@@ -182,7 +182,7 @@
   <div class="code-cell" id="cell-s2">
     <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s2')">▶ Run</button></div>
     <div class="code-body"><pre><span class="cm"># pip install openai>=1.59</span>
-<span class="cm"># Minimal ReAct loop OpenAI Chat Completions API-val</span>
+<span class="cm"># Minimal ReAct loop OpenAI tool callinggal (Chat Completions-kompatibilis minta)</span>
 <span class="kw">import</span> json
 <span class="kw">from</span> openai <span class="kw">import</span> OpenAI
 
@@ -270,7 +270,7 @@ tools = [
   <div class="section-number">Section 03</div>
   <h2>Tool calling alapok: tools paraméter és JSON schema <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
   <div class="md-cell">
-    <p>A <strong>tool calling</strong> az agentic rendszerek alapja: a modell képes felismerni, hogy egy adott felhasználói kérdéshez egy külső függvényt kell hívnia, és visszaadja a függvény nevét + paramétereit JSON-ban. Az OpenAI Chat Completions API ezt a <code>tools</code> paraméteren keresztül támogatja, ahol egy lista-elemenként egy tool-t definiálunk: <code>type: "function"</code>, <code>function.name</code>, <code>function.description</code> és <code>function.parameters</code> (JSON schema).</p>
+    <p>A <strong>tool calling</strong> az agentic rendszerek alapja: a modell képes felismerni, hogy egy adott felhasználói kérdéshez egy külső függvényt kell hívnia, és visszaadja a függvény nevét + paramétereit JSON-ban. Az OpenAI API ezt a <code>tools</code> paraméteren keresztül támogatja, ahol egy lista-elemenként egy tool-t definiálunk: <code>type: "function"</code>, <code>function.name</code>, <code>function.description</code> és <code>function.parameters</code> (JSON schema). Új projektnél a Responses API-t, meglévő Chat Completions kódnál ugyanezt a tool definíciós mintát érdemes használni.</p>
     <p>A <code>tool_choice</code> paraméter szabályozza, hogyan dönt a modell a tool-hívásról: <code>"auto"</code> esetén magától választ (ezt használjuk leggyakrabban), <code>"none"</code> esetén nem hív tool-t, és megadhatunk konkrét tool-nevet is, ha kötelezően azt akarjuk hívatni. A <code>parallel_tool_calls</code> (alapértelmezetten <code>True</code>) lehetővé teszi, hogy egyetlen API hívásban a modell <em>több tool-t is hívjon egyszerre</em> — pl. szállítási státusz + raktárkészlet párhuzamosan, ha mindkettőt kérdezte a felhasználó.</p>
     <p>A <strong>strict mode</strong> (<code>strict: True</code> a function-ön belül) kötelezővé teszi, hogy az API outputja pontosan illeszkedjen a JSON schema-ra: minden mező <code>required</code>, <code>additionalProperties: false</code>, és nincs JSON parse hiba. Ez kritikus production-ben: schema validáció helyett az API már garantálja a struktúrát. Cserébe a schema-nak is szigorúbbnak kell lennie — minden property required, és az enum / pattern megszorítások is érvényesülnek.</p>
     <div class="callout">

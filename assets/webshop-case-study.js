@@ -28,7 +28,7 @@ window.WEBSHOP_CASE_STUDY = {
   },
   overview: [
     "Egy dummy e-commerce rendszer termékkatalógussal, rendelésekkel és clickstream eseményekkel.",
-    "Ugyanaz az adat megy végig a source -> bronze -> silver -> gold -> AI -> ops rétegeken.",
+    "Ugyanaz az adat megy végig a source -> bronze -> silver -> gold -> governance -> data product -> AI -> ops rétegeken.",
     "Minden kurzus egy konkrét platformréteget épít hozzá, nem elszigetelt tutorialt."
   ],
   artifacts: [
@@ -43,7 +43,8 @@ window.WEBSHOP_CASE_STUDY = {
     "Apache Spark", "Apache Kafka", "Airflow", "dbt", "Databricks", "Unity Catalog",
     "Apache Iceberg", "Apache Hudi", "Feast", "Great Expectations", "MLflow",
     "FastAPI", "Grafana", "Prometheus", "OpenAI", "ChromaDB", "Streamlit",
-    "Kubernetes"
+    "Kubernetes", "DataHub", "OpenLineage", "OPA", "Presidio", "LangGraph",
+    "CrewAI", "Anthropic"
   ],
   courses: {
     "sql-data-modeling": {
@@ -109,6 +110,20 @@ window.WEBSHOP_CASE_STUDY = {
       labServices: ["databricks-local", "unity-catalog", "spark-master", "mlflow"],
       dailyUse: "Megérted, hogyan néz ki ugyanez céges, enterprise környezetben."
     },
+    "data-governance": {
+      role: "A WebShop Pro adatait osztályozod, PII-t redaktálsz, hozzáférést szabályozol és auditálhatóvá teszed.",
+      artifact: "Governance blueprint: PII detection, RLS policy, lineage eventek, audit log és retention policy.",
+      tools: ["Presidio", "Unity Catalog", "OpenLineage", "SQL"],
+      labServices: ["postgres", "unity-catalog", "lab-runner", "grafana"],
+      dailyUse: "A platform nem csak működik, hanem bizonyíthatóan biztonságos, visszakövethető és compliance-kész."
+    },
+    "data-mesh": {
+      role: "A WebShop Pro doménjeit data productokra bontod marketing, sales, support és fulfillment felelősséggel.",
+      artifact: "Domain-owned data product térkép: output portok, SLA-k, data contractok és catalog discovery.",
+      tools: ["dbt", "Unity Catalog", "DataHub", "OPA"],
+      labServices: ["dbt", "unity-catalog", "postgres", "lab-runner"],
+      dailyUse: "A központi bottleneck helyett skálázható, domain-tulajdonú adatplatformban gondolkodsz."
+    },
     "streaming-engineering": {
       role: "A clickstream és checkout eseményeket Kafka topicokból dolgozod fel.",
       artifact: "events topic -> streaming silver table -> realtime KPI.",
@@ -143,6 +158,13 @@ window.WEBSHOP_CASE_STUDY = {
       tools: ["MLflow", "Grafana", "OpenAI", "Docker"],
       labServices: ["mlflow", "prometheus", "grafana", "api"],
       dailyUse: "Az LLM app nem demo marad, hanem követhető költségű és stabil szolgáltatás lesz."
+    },
+    "agentic-ai": {
+      role: "A support botot tool-hívó, memóriával és döntési gráffal rendelkező ügyfél-agentté bővíted.",
+      artifact: "Customer Order Agent: ReAct loop, LangGraph state machine, multi-agent handoff és streaming API.",
+      tools: ["OpenAI", "LangGraph", "CrewAI", "Anthropic"],
+      labServices: ["api", "streamlit", "postgres", "prometheus"],
+      dailyUse: "Megtanulod, mikor indokolt agentet építeni, hogyan kontrolláld a tool-hívásokat és hogyan mérd a futásokat."
     },
     "aiops-mlops": {
       role: "A webshop churn modellt kiszolgálod API-n és monitorozod.",

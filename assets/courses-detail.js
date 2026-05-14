@@ -463,7 +463,7 @@ window.COURSE_DETAILS = {
       { title: "Databricks Lakehouse Platform Tour", channel: "Databricks", url: "https://www.youtube.com/@Databricks" },
       { title: "Unity Catalog Deep Dive", channel: "Advancing Analytics", url: "https://www.youtube.com/@AdvancingAnalytics" }
     ],
-    related: ["spark-crash-course", "delta-table-crash-course", "dbt-analytics-engineering"]
+    related: ["spark-crash-course", "delta-table-crash-course", "data-governance", "dbt-analytics-engineering"]
   },
 
   "streaming-engineering": {
@@ -615,7 +615,7 @@ window.COURSE_DETAILS = {
       { title: "Feature Stores Explained", channel: "Chip Huyen", url: "https://www.youtube.com/results?search_query=feature+store+chip+huyen" },
       { title: "Data Quality at Scale", channel: "Monte Carlo Data", url: "https://www.youtube.com/@MonteCarloData" }
     ],
-    related: ["delta-table-crash-course", "streaming-engineering", "aiops-mlops"]
+    related: ["delta-table-crash-course", "streaming-engineering", "data-governance", "aiops-mlops"]
   },
 
   "ai-engineering": {
@@ -673,7 +673,7 @@ window.COURSE_DETAILS = {
         <path class="arr" d="M520,230 L558,230"/>
         <rect class="llm" x="560" y="200" width="220" height="60" rx="8"/>
         <text class="h" x="670" y="225" text-anchor="middle">🤖 LLM generáció</text>
-        <text class="s" x="670" y="242" text-anchor="middle">GPT-4o + kontextus → válasz</text>
+        <text class="s" x="670" y="242" text-anchor="middle">LLM + kontextus → válasz</text>
         <path class="arr-user" d="M140,230 L178,230"/>
 
         <!-- Response -->
@@ -713,7 +713,7 @@ window.COURSE_DETAILS = {
       { title: "RAG from Scratch", channel: "LangChain", url: "https://www.youtube.com/playlist?list=PLfaIDFEXuae2LXbO1_PKyVJiQ23ZztA0x" },
       { title: "Building RAG Applications", channel: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/" }
     ],
-    related: ["python-data-engineering", "rag-evaluation-ai-safety", "llmops-genai-production"]
+    related: ["python-data-engineering", "rag-evaluation-ai-safety", "agentic-ai", "llmops-genai-production"]
   },
 
   "rag-evaluation-ai-safety": {
@@ -749,7 +749,7 @@ window.COURSE_DETAILS = {
       { title: "Evaluating RAG Applications", channel: "Jason Liu", url: "https://www.youtube.com/results?search_query=rag+evaluation+jason+liu" },
       { title: "LLM Red Teaming", channel: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/" }
     ],
-    related: ["ai-engineering", "llmops-genai-production", "aiops-mlops"]
+    related: ["ai-engineering", "agentic-ai", "llmops-genai-production", "aiops-mlops"]
   },
 
   "llmops-genai-production": {
@@ -786,7 +786,7 @@ window.COURSE_DETAILS = {
       { title: "LLMOps: Production ML for LLMs", channel: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/" },
       { title: "Monitoring LLM Applications", channel: "Arize AI", url: "https://www.youtube.com/@arizeai" }
     ],
-    related: ["ai-engineering", "rag-evaluation-ai-safety", "aiops-mlops"]
+    related: ["ai-engineering", "rag-evaluation-ai-safety", "agentic-ai", "aiops-mlops"]
   },
 
   "aiops-mlops": {
@@ -889,6 +889,115 @@ window.COURSE_DETAILS = {
       { title: "MLOps Zoomcamp (ingyenes)", channel: "DataTalksClub", url: "https://github.com/DataTalksClub/mlops-zoomcamp" },
       { title: "ML in Production", channel: "Made With ML", url: "https://madewithml.com/" }
     ],
-    related: ["ai-data-engineer", "llmops-genai-production", "docker-local-data-platform"]
+    related: ["ai-data-engineer", "llmops-genai-production", "data-governance", "docker-local-data-platform"]
+  },
+
+  "data-mesh": {
+    tagline: "Nem még egy data lake buzzword: szervezeti és technikai modell, ahol a domainek saját data productokat publikálnak.",
+    prerequisites: [
+      "Data engineering alapok: SQL, dbt vagy Spark workflow-k",
+      "Lakehouse és catalog fogalmak ismerete előny",
+      "Érdeklődés szervezeti architektúra és platform engineering iránt"
+    ],
+    outcomes: [
+      "A négy Data Mesh alapelv gyakorlati értelmezése",
+      "Domain boundary és bounded context felismerése adatrendszerekben",
+      "Data product specifikáció és output port tervezése",
+      "Data Contract és schema compatibility stratégia kialakítása",
+      "Federated computational governance policy-as-code szemlélettel",
+      "Reális migrációs terv készítése centralizált data teamről mesh felé"
+    ],
+    keyTopics: [
+      { title: "Domain ownership", desc: "Ki felel a sales, marketing, support és fulfillment adattermékeiért" },
+      { title: "Data as a product", desc: "Discoverability, SLA, owner, schema és fogyasztói élmény" },
+      { title: "Self-serve platform", desc: "Platform team mint enablement, nem központi ETL gyár" },
+      { title: "Federated governance", desc: "Globális szabályok kódban, lokális döntések domain-szinten" },
+      { title: "Data Contracts", desc: "Producer-consumer szerződés, verziózás, breaking change kezelés" },
+      { title: "Conway's law", desc: "Hogyan tükrözi az adatarchitektúra a szervezetet" }
+    ],
+    resources: [
+      { type: "article", title: "How to Move Beyond a Monolithic Data Lake to a Distributed Data Mesh", url: "https://www.martinfowler.com/articles/data-monolith-to-mesh.html" },
+      { type: "book", title: "Data Mesh (Zhamak Dehghani)", url: "https://www.oreilly.com/library/view/data-mesh/9781492092384/" },
+      { type: "doc", title: "Open Data Product Standard", url: "https://bitol-io.github.io/open-data-product-standard/v1.0.0/" },
+      { type: "doc", title: "Data Contract Specification", url: "https://github.com/datacontract/datacontract-specification" }
+    ],
+    videos: [
+      { title: "Data Mesh Explained", channel: "Thoughtworks", url: "https://www.youtube.com/results?search_query=Zhamak+Dehghani+Data+Mesh" },
+      { title: "Data Contracts in Practice", channel: "Data Council / community talks", url: "https://www.youtube.com/results?search_query=data+contracts+data+mesh" }
+    ],
+    related: ["data-governance", "dbt-analytics-engineering", "databricks-lakehouse", "open-table-formats"]
+  },
+
+  "data-governance": {
+    tagline: "Governance mérnöki oldalról: PII, lineage, quality, access control és audit bizonyítékok kódban.",
+    prerequisites: [
+      "SQL és Python alapok",
+      "Adatpipeline vagy lakehouse alapismeret",
+      "Hasznos, ha láttál már RBAC/ABAC vagy catalog fogalmakat"
+    ],
+    outcomes: [
+      "PII/PHI/PCI és belső adatosztályozás megkülönböztetése",
+      "GDPR right-to-erasure és retention logika tervezése lakehouse környezetben",
+      "Presidio-alapú PII detection és redaction pipeline megértése",
+      "RBAC, ABAC, row-level security és masking policy összehasonlítása",
+      "OpenLineage/DataHub/Unity Catalog szerepének értése",
+      "Audit log és compliance evidence előállítása mérnöki workflow-ban"
+    ],
+    keyTopics: [
+      { title: "Data classification", desc: "Public, internal, confidential, restricted és PII tagging" },
+      { title: "Privacy engineering", desc: "Anonimizálás, pszeudonimizálás, tokenizálás és retention" },
+      { title: "Access control", desc: "RBAC, ABAC, RLS, masking, least privilege" },
+      { title: "Lineage", desc: "Dataset- és column-level lineage, impact analysis" },
+      { title: "Data quality", desc: "Completeness, validity, freshness, consistency és monitoring" },
+      { title: "Audit", desc: "Ki, mikor, milyen adatot olvasott és milyen change ment ki" }
+    ],
+    resources: [
+      { type: "doc", title: "EU Data Protection overview", url: "https://commission.europa.eu/law/law-topic/data-protection/data-protection-eu_en" },
+      { type: "doc", title: "Microsoft Presidio Docs", url: "https://microsoft.github.io/presidio/" },
+      { type: "doc", title: "OpenLineage Docs", url: "https://openlineage.io/docs/" },
+      { type: "doc", title: "DataHub Docs", url: "https://datahubproject.io/docs/" }
+    ],
+    videos: [
+      { title: "Data Governance Fundamentals", channel: "DAMA / community", url: "https://www.youtube.com/results?search_query=data+governance+fundamentals" },
+      { title: "OpenLineage and DataHub", channel: "Open source data talks", url: "https://www.youtube.com/results?search_query=OpenLineage+DataHub+lineage" }
+    ],
+    related: ["data-mesh", "databricks-lakehouse", "ai-data-engineer", "rag-evaluation-ai-safety"]
+  },
+
+  "agentic-ai": {
+    tagline: "Tool-hívó, memóriával dolgozó, mérhető AI agenteket építesz — nem chatbot-varázslatot, hanem kontrollált workflow-t.",
+    prerequisites: [
+      "Python alapok és API-hívások ismerete",
+      "AI Engineering vagy hasonló RAG/LLM tapasztalat",
+      "Production szemlélet: logging, rate limit, error handling előny"
+    ],
+    outcomes: [
+      "Eldöntöd, mikor agent, workflow vagy sima LLM-call a jó megoldás",
+      "OpenAI tool calling és strict schema használata",
+      "ReAct loop és tool execution kontrollált implementálása",
+      "Short-term és long-term memory minták értése",
+      "LangGraph state machine és human-in-the-loop pontok tervezése",
+      "Multi-agent handoff, eval, observability és prompt injection védelem"
+    ],
+    keyTopics: [
+      { title: "Agent vs workflow", desc: "A flexibilitás ára: token, latency, kontroll és hibahatás" },
+      { title: "Tool calling", desc: "Függvény séma, argument validáció, parallel tool call és retry" },
+      { title: "ReAct", desc: "Thought-Action-Observation ciklus modern API-kban" },
+      { title: "LangGraph", desc: "State, node, edge, conditional routing, cycles és checkpoint" },
+      { title: "Multi-agent", desc: "Supervisor, specialist agentek, handoff és felelősségi határok" },
+      { title: "Production safety", desc: "Eval, tracing, cost cap, prompt injection és permission check" }
+    ],
+    resources: [
+      { type: "article", title: "Anthropic: Building Effective Agents", url: "https://www.anthropic.com/engineering/building-effective-agents" },
+      { type: "doc", title: "OpenAI Function Calling", url: "https://platform.openai.com/docs/guides/function-calling" },
+      { type: "doc", title: "LangGraph Docs", url: "https://langchain-ai.github.io/langgraph/" },
+      { type: "doc", title: "Model Context Protocol", url: "https://modelcontextprotocol.io/" },
+      { type: "tool", title: "Langfuse Tracing", url: "https://langfuse.com/docs/tracing" }
+    ],
+    videos: [
+      { title: "LangGraph Agent Workflows", channel: "LangChain", url: "https://www.youtube.com/results?search_query=LangGraph+agent+workflow" },
+      { title: "AI Agents in Production", channel: "DeepLearning.AI / community", url: "https://www.youtube.com/results?search_query=AI+agents+production+tool+calling" }
+    ],
+    related: ["ai-engineering", "rag-evaluation-ai-safety", "llmops-genai-production", "aiops-mlops"]
   }
 };
