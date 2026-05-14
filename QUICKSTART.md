@@ -61,6 +61,9 @@ docker compose config --profiles
 | `--profile dbt` | Core + dbt | ~1 GB |
 | `--profile ai-eng` | Core + ChromaDB + Streamlit + FastAPI + MLflow | ~2 GB |
 | `--profile aiops` | Core + MLflow + FastAPI + Prometheus + Grafana | ~2 GB |
+| `--profile governance` | Core + Unity Catalog + lab-runner + MinIO + monitoring | ~2.5 GB |
+| `--profile mesh` | Core + dbt + Unity Catalog + lab-runner + MinIO | ~2 GB |
+| `--profile agentic` | Core + FastAPI + Streamlit + ChromaDB + lab-runner + monitoring | ~3 GB |
 | `--profile all` | **MINDEN** szolgáltatás | ~7 GB |
 
 ### Indítás

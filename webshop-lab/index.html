@@ -171,6 +171,9 @@ docker compose --profile all up -d --build</code></pre>
         <tr><td><code>aiops</code></td><td><code>--profile aiops</code></td><td>core + mlflow, api, monitoring</td><td>~2 GB</td></tr>
         <tr><td><code>llmops</code></td><td><code>--profile llmops</code></td><td>core + mlflow, api, monitoring</td><td>~2 GB</td></tr>
         <tr><td><code>rag</code></td><td><code>--profile rag</code></td><td>core + chroma, lab-runner, mlflow</td><td>~2 GB</td></tr>
+        <tr><td><code>governance</code></td><td><code>--profile governance</code></td><td>core + unity, lab-runner, minio, monitoring</td><td>~2.5 GB</td></tr>
+        <tr><td><code>mesh</code></td><td><code>--profile mesh</code></td><td>core + dbt, unity, lab-runner, minio</td><td>~2 GB</td></tr>
+        <tr><td><code>agentic</code></td><td><code>--profile agentic</code></td><td>core + api, streamlit, chroma, lab-runner, monitoring</td><td>~3 GB</td></tr>
         <tr class="highlight"><td><code>all</code></td><td><code>--profile all</code></td><td>MINDEN service</td><td>~7 GB</td></tr>
       </tbody>
     </table>
@@ -275,8 +278,11 @@ docker compose logs -f api airflow dbt</code></pre>
         <tr><td>Spark</td><td>spark-master, spark-worker</td><td><code>webshop_spark_etl.py</code>, silver/gold Parquet kimenetek</td></tr>
         <tr><td>Airflow</td><td>airflow, spark-master, spark-worker</td><td><code>webshop_daily_etl</code> DAG, amely Spark ETL-t is submitol</td></tr>
         <tr><td>dbt</td><td>dbt, postgres</td><td>staging és marts modellek, dbt docs</td></tr>
+        <tr><td>Data Governance</td><td>postgres, unity-catalog, lab-runner, minio, prometheus, grafana</td><td>PII/governance blueprint, auditálható policy és lineage gyakorlóanyag</td></tr>
+        <tr><td>Data Mesh</td><td>dbt, unity-catalog, postgres, lab-runner, minio</td><td>domain data product térkép, contract/SLA és catalog discovery minta</td></tr>
         <tr><td>Streaming</td><td>kafka, event-producer</td><td>folyamatos clickstream események</td></tr>
         <tr><td>AI/RAG</td><td>chroma, streamlit, api</td><td>support policy és kurzusösszefoglaló dokumentumok ChromaDB-ben</td></tr>
+        <tr><td>Agentic AI</td><td>api, streamlit, chroma, lab-runner, prometheus, grafana</td><td>tool-calling agent gyakorlóanyag, runtime endpointok és monitoring hely</td></tr>
         <tr><td>MLOps/LLMOps</td><td>mlflow, api, prometheus, grafana</td><td>MLflow demo run, FastAPI /predict, Grafana dashboard</td></tr>
       </tbody>
     </table>

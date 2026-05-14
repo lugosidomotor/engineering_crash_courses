@@ -114,14 +114,14 @@ window.WEBSHOP_CASE_STUDY = {
       role: "A WebShop Pro adatait osztályozod, PII-t redaktálsz, hozzáférést szabályozol és auditálhatóvá teszed.",
       artifact: "Governance blueprint: PII detection, RLS policy, lineage eventek, audit log és retention policy.",
       tools: ["Presidio", "Unity Catalog", "OpenLineage", "SQL"],
-      labServices: ["postgres", "unity-catalog", "lab-runner", "grafana"],
+      labServices: ["postgres", "unity-catalog", "lab-runner", "minio", "prometheus", "grafana"],
       dailyUse: "A platform nem csak működik, hanem bizonyíthatóan biztonságos, visszakövethető és compliance-kész."
     },
     "data-mesh": {
       role: "A WebShop Pro doménjeit data productokra bontod marketing, sales, support és fulfillment felelősséggel.",
       artifact: "Domain-owned data product térkép: output portok, SLA-k, data contractok és catalog discovery.",
       tools: ["dbt", "Unity Catalog", "DataHub", "OPA"],
-      labServices: ["dbt", "unity-catalog", "postgres", "lab-runner"],
+      labServices: ["dbt", "unity-catalog", "postgres", "lab-runner", "minio"],
       dailyUse: "A központi bottleneck helyett skálázható, domain-tulajdonú adatplatformban gondolkodsz."
     },
     "streaming-engineering": {
@@ -163,7 +163,7 @@ window.WEBSHOP_CASE_STUDY = {
       role: "A support botot tool-hívó, memóriával és döntési gráffal rendelkező ügyfél-agentté bővíted.",
       artifact: "Customer Order Agent: ReAct loop, LangGraph state machine, multi-agent handoff és streaming API.",
       tools: ["OpenAI", "LangGraph", "CrewAI", "Anthropic"],
-      labServices: ["api", "streamlit", "postgres", "prometheus"],
+      labServices: ["api", "streamlit", "chroma", "postgres", "lab-runner", "prometheus", "grafana"],
       dailyUse: "Megtanulod, mikor indokolt agentet építeni, hogyan kontrolláld a tool-hívásokat és hogyan mérd a futásokat."
     },
     "aiops-mlops": {

@@ -9,7 +9,7 @@ API_URL = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
 
 st.set_page_config(page_title="WebShop Pro AI Support", page_icon="🛒", layout="wide")
 st.title("WebShop Pro AI Support & Churn Lab")
-st.caption("Streamlit felület az AI Engineering, RAG és MLOps kurzusokhoz.")
+st.caption("Streamlit felület az AI Engineering, RAG, Agentic AI és MLOps kurzusokhoz.")
 
 
 def get_json(path):

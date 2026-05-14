@@ -5,14 +5,17 @@
     "Melyik csatorna hozza a legtöbb bevételt?",
     "Melyik terméknél fogy el hamar a készlet?",
     "Melyik ügyfél valószínűleg lemorzsolódik?",
-    "Milyen választ adjon az AI ügyfélszolgálat a webshop szabályzata alapján?"
+    "Milyen választ adjon az AI ügyfélszolgálat a webshop szabályzata alapján?",
+    "Mely adatok tartalmaznak PII-t, ki férhet hozzájuk, és melyik domén felel értük?"
   ],
   "layers": [
     {"layer": "source", "examples": ["orders.json", "events.json", "catalog.json"]},
     {"layer": "bronze", "examples": ["nyers rendelések", "nyers clickstream"]},
     {"layer": "silver", "examples": ["tisztított rendelés", "validált termékkatalógus"]},
     {"layer": "gold", "examples": ["napi KPI", "ügyfél feature tábla", "termék teljesítmény"]},
-    {"layer": "ai", "examples": ["RAG support bot", "churn score", "prompt eval"]},
+    {"layer": "governance", "examples": ["PII osztályozás", "lineage", "audit policy"]},
+    {"layer": "data-product", "examples": ["sales mart", "support dataset", "domain SLA"]},
+    {"layer": "ai", "examples": ["RAG support bot", "agentic support flow", "churn score", "prompt eval"]},
     {"layer": "ops", "examples": ["Airflow DAG", "MLflow run", "Grafana dashboard"]}
   ],
   "docker_lab": {

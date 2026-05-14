@@ -30,6 +30,24 @@ COURSE_MATERIALS = [
         "summary": "A fixture JSON adatokbol Bronze/Silver/Gold Parquet kimenetek keszulnek a /output kotetbe.",
     },
     {
+        "id": "docker-local-data-platform",
+        "title": "Docker & Local Data Platform",
+        "service": "course-site, webshop, postgres, minio, prometheus, grafana",
+        "summary": "A teljes WebShop Pro lab egy compose stackben indul, service cimkekkel es reprodukalhato lokalis runtime-mal.",
+    },
+    {
+        "id": "delta-table-crash-course",
+        "title": "Delta Table Crash Course",
+        "service": "lab-runner, spark-master, minio",
+        "summary": "A webshop rendeleseibol Bronze/Silver/Gold Delta es Parquet retegek keszulnek verziozhato lakehouse mintakent.",
+    },
+    {
+        "id": "open-table-formats",
+        "title": "Open Table Formats",
+        "service": "lab-runner, minio, unity-catalog",
+        "summary": "A Delta, Iceberg es Hudi dontesi szempontjai ugyanazon webshop adatuton hasonlithatoak ossze.",
+    },
+    {
         "id": "spark-crash-course",
         "title": "Apache Spark Crash Course",
         "service": "spark-master",
@@ -48,10 +66,58 @@ COURSE_MATERIALS = [
         "summary": "A staging es mart modellek a webshop riportreteget dokumentalt, tesztelt SQL projektta alakitjak.",
     },
     {
+        "id": "databricks-lakehouse",
+        "title": "Databricks Lakehouse",
+        "service": "databricks-local, unity-catalog, spark-master, mlflow",
+        "summary": "A lokalis JupyterLab, Spark, MLflow es Unity Catalog OSS kombinacio managed lakehouse mental modellt ad.",
+    },
+    {
+        "id": "data-governance",
+        "title": "Data Governance",
+        "service": "postgres, unity-catalog, lab-runner, minio, prometheus, grafana",
+        "summary": "PII felismeres, hozzaferesi policy, lineage es audit gondolkodas kapcsolodik a WebShop Pro adatokhoz.",
+    },
+    {
+        "id": "data-mesh",
+        "title": "Data Mesh",
+        "service": "dbt, unity-catalog, postgres, lab-runner, minio",
+        "summary": "A webshop domenjei data productokra, contractokra, SLA-kra es catalog discovery mintakra bonthatoak.",
+    },
+    {
+        "id": "streaming-engineering",
+        "title": "Streaming Engineering",
+        "service": "kafka, event-producer, spark-master",
+        "summary": "A clickstream es checkout esemenyek Kafka topicokbol dolgozhatoak fel kozel valos idoben.",
+    },
+    {
+        "id": "ai-data-engineer",
+        "title": "AI Data Engineer",
+        "service": "lab-runner, dbt, kafka, postgres",
+        "summary": "A webshop customer es product feature retegei AI-ready formaba kerulnek data quality ellenorzessel.",
+    },
+    {
         "id": "ai-engineering",
         "title": "AI Engineering",
         "service": "chroma, streamlit, api",
         "summary": "A webshop support szabalyzatok ChromaDB-be kerulnek, a Streamlit UI pedig bemutatja a RAG felhasznaloi utat.",
+    },
+    {
+        "id": "rag-evaluation-ai-safety",
+        "title": "RAG Evaluation & AI Safety",
+        "service": "lab-runner, chroma, api",
+        "summary": "Golden dataset, retrieval metrikak es hallucination regression suite helye a support bot minosegmeresehez.",
+    },
+    {
+        "id": "llmops-genai-production",
+        "title": "LLMOps / GenAI Production",
+        "service": "mlflow, api, prometheus, grafana",
+        "summary": "Prompt verziozas, koltseg/latency kovetes es production fallback gondolkodas kapcsolodik az LLM apphoz.",
+    },
+    {
+        "id": "agentic-ai",
+        "title": "Agentic AI",
+        "service": "api, streamlit, chroma, lab-runner, prometheus, grafana",
+        "summary": "Tool-calling ugyfel-agent, LangGraph/CrewAI mental modell, runtime endpointok es monitoring hely.",
     },
     {
         "id": "aiops-mlops",

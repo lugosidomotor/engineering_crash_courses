@@ -32,11 +32,14 @@
     "airflow-orchestration": ["airflow", "spark-master", "spark-worker"],
     "dbt-analytics-engineering": ["dbt", "postgres"],
     "databricks-lakehouse": ["databricks-local", "unity-catalog", "spark-master", "mlflow"],
+    "data-governance": ["postgres", "unity-catalog", "lab-runner", "minio", "prometheus", "grafana"],
+    "data-mesh": ["dbt", "unity-catalog", "postgres", "lab-runner", "minio"],
     "streaming-engineering": ["kafka", "event-producer", "spark-master"],
     "ai-data-engineer": ["lab-runner", "kafka", "dbt", "postgres"],
     "ai-engineering": ["chroma", "streamlit", "api"],
     "rag-evaluation-ai-safety": ["lab-runner", "chroma", "api"],
     "llmops-genai-production": ["mlflow", "grafana", "prometheus", "api"],
+    "agentic-ai": ["api", "streamlit", "chroma", "lab-runner", "prometheus", "grafana"],
     "aiops-mlops": ["mlflow", "api", "prometheus", "grafana"]
   },
   "preloaded_materials": {

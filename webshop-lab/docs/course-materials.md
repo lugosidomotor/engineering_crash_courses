@@ -19,10 +19,13 @@ Ez a dokumentum kerül be a lab több rétegébe:
 | Apache Spark Crash Course | spark-master, spark-worker | `webshop_spark_etl.py`, silver/gold Parquet kimenetek |
 | Airflow & Orchestration | airflow, spark-master, spark-worker | `webshop_daily_etl` DAG, amely Spark ETL-t submitol |
 | dbt Analytics Engineering | dbt, postgres | staging és mart modellek |
+| Data Governance | postgres, unity-catalog, lab-runner, minio, prometheus, grafana | PII/governance blueprint, audit policy és lineage minta |
+| Data Mesh | dbt, unity-catalog, postgres, lab-runner, minio | domain data product térkép és contract/SLA minta |
 | Streaming Engineering | kafka, event-producer | clickstream topicok |
 | AI Data Engineer | lab-runner, dbt, kafka | feature store és data quality minta |
 | AI Engineering | chroma, streamlit, api | support RAG dokumentumok |
 | RAG Evaluation & AI Safety | lab-runner, chroma, api | golden dataset és evaluációs hely |
 | LLMOps / GenAI Production | mlflow, prometheus, grafana, api | prompt/model monitoring hely |
+| Agentic AI | api, streamlit, chroma, lab-runner, prometheus, grafana | tool-calling agent gyakorlóanyag és runtime monitoring |
 | AIOps & MLOps | mlflow, api, prometheus, grafana | `/predict`, MLflow run, Grafana dashboard |
 | Databricks Lakehouse | databricks-local, unity-catalog, spark-master | notebook workspace és governance minta |

@@ -19,6 +19,9 @@ name: webshop-pro-lab
 # ║  docker compose --profile aiops up -d         → core + mlflow, api, monitoring  ║
 # ║  docker compose --profile llmops up -d        → core + mlflow, api, monitoring  ║
 # ║  docker compose --profile rag up -d           → core + chroma, lab, mlflow   ║
+# ║  docker compose --profile governance up -d    → core + unity, lab, monitoring ║
+# ║  docker compose --profile mesh up -d          → core + dbt, unity, lab, minio ║
+# ║  docker compose --profile agentic up -d       → core + api, streamlit, monitoring ║
 # ║  docker compose --profile all up -d           → MINDEN (~7 GB)              ║
 # ╚════════════════════════════════════════════════════════════════════╝
 
@@ -110,7 +113,7 @@ services:
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     container_name: webshop-minio
-    profiles: ["docker", "delta", "otf", "ai-de", "all"]
+    profiles: ["docker", "delta", "otf", "ai-de", "governance", "mesh", "all"]
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -125,13 +128,13 @@ services:
         limits:
           memory: 256M
     labels:
-      webshop.course: "docker-local-data-platform,delta-table-crash-course,open-table-formats"
+      webshop.course: "docker-local-data-platform,delta-table-crash-course,open-table-formats,data-governance,data-mesh"
       webshop.role: "S3-compatible object storage for bronze/silver/gold layers"
 
   minio-init:
     image: minio/mc:RELEASE.2025-04-16T18-13-26Z
     container_name: webshop-minio-init
-    profiles: ["docker", "delta", "otf", "ai-de", "all"]
+    profiles: ["docker", "delta", "otf", "ai-de", "governance", "mesh", "all"]
     depends_on:
       minio:
         condition: service_started
@@ -336,7 +339,7 @@ services:
   dbt:
     image: ghcr.io/dbt-labs/dbt-postgres:1.9.latest
     container_name: webshop-dbt
-    profiles: ["dbt", "all"]
+    profiles: ["dbt", "mesh", "all"]
     working_dir: /usr/app
     entrypoint: ["/bin/bash", "-lc"]
     command: >
@@ -357,7 +360,7 @@ services:
         limits:
           memory: 512M
     labels:
-      webshop.course: "dbt-analytics-engineering,ai-data-engineer"
+      webshop.course: "dbt-analytics-engineering,ai-data-engineer,data-mesh"
       webshop.role: "Analytics engineering models and docs"
 
   # ─── ML / MONITORING ───────────────────────────────────────────
@@ -365,7 +368,7 @@ services:
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.20.3
     container_name: webshop-mlflow
-    profiles: ["spark", "databricks", "ai-eng", "ai-de", "aiops", "llmops", "rag", "all"]
+    profiles: ["spark", "databricks", "ai-eng", "ai-de", "aiops", "llmops", "rag", "agentic", "all"]
     command: >
       mlflow server
       --backend-store-uri sqlite:////mlflow/mlflow.db
@@ -381,14 +384,14 @@ services:
         limits:
           memory: 512M
     labels:
-      webshop.course: "aiops-mlops,llmops-genai-production,databricks-lakehouse"
+      webshop.course: "aiops-mlops,llmops-genai-production,databricks-lakehouse,agentic-ai"
       webshop.role: "Experiment tracking, model registry and prompt/version metadata"
 
   api:
     build:
       context: ./webshop-lab/api
     container_name: webshop-fastapi
-    profiles: ["ai-eng", "ai-de", "aiops", "llmops", "all"]
+    profiles: ["ai-eng", "ai-de", "aiops", "llmops", "agentic", "all"]
     environment:
       DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop
       MLFLOW_TRACKING_URI: http://mlflow:5000
@@ -412,13 +415,13 @@ services:
         limits:
           memory: 256M
     labels:
-      webshop.course: "aiops-mlops,llmops-genai-production"
+      webshop.course: "aiops-mlops,llmops-genai-production,agentic-ai"
       webshop.role: "FastAPI serving layer for webshop app and churn prediction"
 
   prometheus:
     image: prom/prometheus:v2.55.1
     container_name: webshop-prometheus
-    profiles: ["docker", "aiops", "llmops", "all"]
+    profiles: ["docker", "aiops", "llmops", "governance", "agentic", "all"]
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -436,13 +439,13 @@ services:
         limits:
           memory: 256M
     labels:
-      webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production"
+      webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production,data-governance,agentic-ai"
       webshop.role: "Metrics collection"
 
   grafana:
     image: grafana/grafana:11.2.2
     container_name: webshop-grafana
-    profiles: ["docker", "aiops", "llmops", "all"]
+    profiles: ["docker", "aiops", "llmops", "governance", "agentic", "all"]
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
@@ -461,7 +464,7 @@ services:
         limits:
           memory: 256M
     labels:
-      webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production"
+      webshop.course: "docker-local-data-platform,aiops-mlops,llmops-genai-production,data-governance,agentic-ai"
       webshop.role: "Dashboards for business, API and model health"
 
   # ─── AI ────────────────────────────────────────────────────────
@@ -469,7 +472,7 @@ services:
   chroma:
     image: chromadb/chroma:0.5.23
     container_name: webshop-chroma
-    profiles: ["ai-eng", "rag", "all"]
+    profiles: ["ai-eng", "rag", "agentic", "all"]
     environment:
       IS_PERSISTENT: "TRUE"
       PERSIST_DIRECTORY: /chroma/chroma
@@ -483,14 +486,14 @@ services:
         limits:
           memory: 512M
     labels:
-      webshop.course: "ai-engineering,rag-evaluation-ai-safety"
+      webshop.course: "ai-engineering,rag-evaluation-ai-safety,agentic-ai"
       webshop.role: "Vector database for support-policy retrieval"
 
   streamlit:
     build:
       context: ./webshop-lab/streamlit
     container_name: webshop-streamlit
-    profiles: ["ai-eng", "all"]
+    profiles: ["ai-eng", "agentic", "all"]
     environment:
       API_URL: http://api:8000
       CHROMA_URL: http://chroma:8000
@@ -506,7 +509,7 @@ services:
         limits:
           memory: 256M
     labels:
-      webshop.course: "ai-engineering"
+      webshop.course: "ai-engineering,agentic-ai"
       webshop.role: "RAG/support demo UI"
 
   # ─── DATABRICKS ────────────────────────────────────────────────
@@ -514,7 +517,7 @@ services:
   unity-catalog:
     image: unitycatalog/unitycatalog:0.2.1
     container_name: webshop-unity-catalog
-    profiles: ["spark", "databricks", "otf", "all"]
+    profiles: ["spark", "databricks", "otf", "governance", "mesh", "all"]
     ports:
       - "8089:8080"
     volumes:
@@ -524,7 +527,7 @@ services:
         limits:
           memory: 512M
     labels:
-      webshop.course: "databricks-lakehouse,open-table-formats"
+      webshop.course: "databricks-lakehouse,open-table-formats,data-governance,data-mesh"
       webshop.role: "OSS Unity Catalog server for local governance practice"
 
   databricks-local:
@@ -564,7 +567,7 @@ services:
     build:
       context: ./webshop-lab/runner
     container_name: webshop-lab-runner
-    profiles: ["python", "delta", "otf", "ai-de", "rag", "all"]
+    profiles: ["python", "delta", "otf", "ai-de", "rag", "governance", "mesh", "agentic", "all"]
     command: tail -f /dev/null
     environment:
       DATABASE_URL: postgresql://webshop:webshop@postgres:5432/webshop
@@ -602,7 +605,7 @@ services:
         limits:
           memory: 512M
     labels:
-      webshop.course: "python-data-engineering,delta-table-crash-course,open-table-formats,ai-data-engineer,rag-evaluation-ai-safety"
+      webshop.course: "python-data-engineering,delta-table-crash-course,open-table-formats,ai-data-engineer,rag-evaluation-ai-safety,data-governance,data-mesh,agentic-ai"
       webshop.role: "Python/pandas/Parquet/Delta/Iceberg/GE/Feast/RAGAS playground"
 
   event-producer:

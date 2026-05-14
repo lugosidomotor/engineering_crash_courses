@@ -3,7 +3,7 @@
 Ez a mappa a kurzusok közös, lokálisan futtatható tanulóplatformja. A cél nem egy production-grade webshop, hanem egy olyan projektalap, ahol ugyanazt az adatutat látod végig:
 
 ```text
-dummy webshop -> PostgreSQL/Kafka -> bronze/silver/gold -> dbt/Spark/Airflow -> AI/RAG/MLOps -> monitoring
+dummy webshop -> PostgreSQL/Kafka -> bronze/silver/gold -> dbt/Spark/Airflow -> governance/data products -> AI/RAG/agents -> monitoring
 ```
 
 ## Előfeltételek
@@ -150,6 +150,9 @@ docker compose down --volumes --remove-orphans
 | AI Data Engineer | lab-runner, feast, kafka | feature engineering, data quality |
 | AI Engineering | chroma, streamlit, api | RAG support asszisztens |
 | RAG Evaluation | lab-runner, chroma | RAGAS metrikák, golden dataset |
+| Data Governance | postgres, unity-catalog, lab-runner, minio, prometheus, grafana | PII/governance blueprint, audit policy és lineage minta |
+| Data Mesh | dbt, unity-catalog, postgres, lab-runner, minio | domain data product térkép, contract/SLA és catalog discovery minta |
+| Agentic AI | api, streamlit, chroma, lab-runner, prometheus, grafana | tool-calling agent gyakorlóanyag és runtime monitoring |
 | MLOps/LLMOps | mlflow, api, prometheus, grafana | model serving, tracking, monitoring |
 | Databricks | databricks-local, unity-catalog, mlflow | managed lakehouse workflow |
 | Kubernetes | kubernetes/ manifest | deployment mental modell |
