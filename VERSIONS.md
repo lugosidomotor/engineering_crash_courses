@@ -54,7 +54,7 @@ Ez a fájl rögzíti, melyik kurzus milyen verziókkal lett tesztelve. A kódmin
 |--------|--------|------------|
 | `chromadb` | 0.5.23 | Alapból squared L2 distance — cosine-hoz `metadata={'hnsw:space':'cosine'}` |
 | `sentence-transformers` | 3.3.1 | Open-source embeddings |
-| `openai` | 1.59.7 | **Chat Completions API** (`client.chat.completions.create()`) — a régi `Responses API` minta nem létezik |
+| `openai` | 1.59.7 | A régebbi kurzusminták Chat Completions kompatibilisek (`client.chat.completions.create()`); új OpenAI projektekhez a Responses API az ajánlott irány. |
 | `anthropic` | 0.42.0 | Claude API, prompt caching támogatott |
 | `ragas` | 0.2.10 | RAG evaluation; **v0.0.x deprecated** |
 
@@ -68,7 +68,7 @@ Ez a fájl rögzíti, melyik kurzus milyen verziókkal lett tesztelve. A kódmin
 
 ## Verziófrissítés szabályai
 
-- **OpenAI/Anthropic API**: ezek nagyon gyakran változnak; ha a kódminta nem fut, először nézd meg a hivatalos dokumentációt.
+- **OpenAI/Anthropic API**: ezek nagyon gyakran változnak; ha a kódminta nem fut, először nézd meg a hivatalos dokumentációt. OpenAI-nál a Chat Completions továbbra is támogatott, de új fejlesztésnél a Responses API-t érdemes előnyben részesíteni.
 - **Spark**: 3.5.x → 4.0 váltáskor a `pyspark` API-k továbbra is kompatibilisek, de a Java 17 → Java 21 váltás előfordulhat.
 - **Airflow 2.x → 3.0**: `catchup` default `False` lesz, `schedule_interval` eltávolítva, XCom serialization változik.
 - **Delta Lake**: 3.0+ óta sok korábbi Databricks-only feature OSS-ben is elérhető (Liquid Clustering, deletion vectors).

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
@@ -97,12 +97,12 @@
   <h1>&lt;/&gt; Delta Table Crash Course</h1>
   <div class="header-actions">
     <span id="progress-text">0 / 26 section completed</span>
-    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
-    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
+    <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
 </header>
 <div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
-  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="Az Output gomb az előre megírt eredményt mutatja a böngészőben; valódi futtatáshoz használd a saját Python/Spark környezetedet vagy a Local Docker Labot.">ℹ️ Output info</span>
 </div>
 
 <nav id="side-nav"></nav>
@@ -113,7 +113,7 @@
 <div class="section layer-intro" id="s0">
   <div class="section-number">Intro</div>
   <h2>Delta table lokálisan, Databricks és Synapse nélkül
-    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg" alt="" aria-hidden="true">Delta Lake</span>
   </h2>
   <div class="md-cell">
     <p>Ez a notebook azt mutatja meg, hogy egy <strong>Delta table</strong> nem feltétlenül Databricksben vagy Synapse-ban jön létre.
@@ -200,7 +200,7 @@ Data Warehouse rész: fact/dimension és gold réteg, vagyis riportbarát modell
 <div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
   <h2>Notebook bootstrap: virtuális környezet és csomagok
-    <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span>
+    <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span>
   </h2>
   <div class="md-cell">
     <p>Ez a notebook teljesen bootstrapelt: a projekt gyökerében lévő <code>bootstrap.ps1</code> vagy <code>bootstrap.sh</code> létrehozza a <code>.venv</code> virtuális környezetet, telepíti a <code>requirements.txt</code> csomagjait, és regisztrálja a Jupyter kernelt. Ez biztosítja, hogy mindenki ugyanabban a környezetben futtatja a kódot, függetlenül attól, hogy milyen operációs rendszert használ.</p>
@@ -211,7 +211,7 @@ Data Warehouse rész: fact/dimension és gold réteg, vagyis riportbarát modell
   <div class="code-cell" id="cell-s3">
     <div class="code-header">
       <span class="cell-number">[3]</span>
-      <button class="run-btn" onclick="runCell('s3')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s3')">Output</button>
     </div>
     <div class="code-body"><pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
 <span class="kw">import</span> os, subprocess, sys
@@ -249,9 +249,9 @@ subprocess.check_call(bootstrap_cmd, cwd=project_dir)
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
   <h2>Környezet ellenőrzése
-    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">deltalake</span>
-    <span class="tool-badge"><img src="../assets/logos/pandas.svg">pandas</span>
-    <span class="tool-badge"><img src="../assets/logos/arrow.svg">pyarrow</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg" alt="" aria-hidden="true">deltalake</span>
+    <span class="tool-badge"><img src="../assets/logos/pandas.svg" alt="" aria-hidden="true">pandas</span>
+    <span class="tool-badge"><img src="../assets/logos/arrow.svg" alt="" aria-hidden="true">pyarrow</span>
   </h2>
   <div class="md-cell">
     <p>A példához a <code>deltalake</code> Python csomagot használjuk. Ez a delta-rs projekt Python bindingja, és <strong>Spark nélkül</strong> is tud Delta táblát írni/olvasni. A delta-rs egy Rust nyelven írt, nagy teljesítményű Delta Lake implementáció, amely lehetővé teszi, hogy nem csak JVM-alapú rendszerekben (pl. Spark) használjuk a Delta formátumot, hanem tiszta Python környezetben is.</p>
@@ -262,7 +262,7 @@ subprocess.check_call(bootstrap_cmd, cwd=project_dir)
   <div class="code-cell" id="cell-s4">
     <div class="code-header">
       <span class="cell-number">[4]</span>
-      <button class="run-btn" onclick="runCell('s4')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s4')">Output</button>
     </div>
     <div class="code-body"><pre><span class="kw">import</span> sys
 <span class="kw">import</span> deltalake
@@ -297,7 +297,7 @@ subprocess.check_call(bootstrap_cmd, cwd=project_dir)
   <div class="code-cell" id="cell-s5">
     <div class="code-header">
       <span class="cell-number">[5]</span>
-      <button class="run-btn" onclick="runCell('s5')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s5')">Output</button>
     </div>
     <div class="code-body"><pre><span class="kw">from</span> pathlib <span class="kw">import</span> Path
 <span class="kw">import</span> json, shutil
@@ -325,7 +325,7 @@ table_path</pre></div>
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
   <h2>Forrásadat: egy sima Pandas DataFrame
-    <span class="tool-badge"><img src="../assets/logos/pandas.svg">pandas</span>
+    <span class="tool-badge"><img src="../assets/logos/pandas.svg" alt="" aria-hidden="true">pandas</span>
   </h2>
   <div class="md-cell">
     <p>Ez lehetne CSV-ből, API-ból vagy adatbázisból jövő adat is. Most kézzel készítünk egy kis táblát, amely rendelési adatokat tartalmaz. A DataFrame négy rendelést mutat be, mindegyikhez rendelésszám (<code>order_id</code>), vásárló azonosító (<code>customer_id</code>), összeg (<code>amount</code>), dátum (<code>order_date</code>) és forrásrendszer (<code>source_system</code>) tartozik.</p>
@@ -336,7 +336,7 @@ table_path</pre></div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header">
       <span class="cell-number">[6]</span>
-      <button class="run-btn" onclick="runCell('s6')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s6')">Output</button>
     </div>
     <div class="code-body"><pre>sales_df = pd.DataFrame({
     <span class="str">"order_id"</span>: [<span class="num">1001</span>, <span class="num">1002</span>, <span class="num">1003</span>, <span class="num">1004</span>],
@@ -366,7 +366,7 @@ sales_df</pre></div>
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
   <h2>Delta table létrehozása lokálisan
-    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg" alt="" aria-hidden="true">Delta Lake</span>
   </h2>
   <div class="md-cell">
     <p>Itt történik a lényeg. A <code>write_deltalake(...)</code> létrehozza a Delta table-t a megadott mappában. Ez az a pont, amikor egy egyszerű pandas DataFrame-ből egy verziózott, ACID tranzakciókat támogató táblává válik az adat. A függvény a háttérben Parquet fájlokat hoz létre az adatoknak, és egy <code>_delta_log</code> könyvtárat a metaadatoknak.</p>
@@ -377,7 +377,7 @@ sales_df</pre></div>
   <div class="code-cell" id="cell-s7">
     <div class="code-header">
       <span class="cell-number">[7]</span>
-      <button class="run-btn" onclick="runCell('s7')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s7')">Output</button>
     </div>
     <div class="code-body"><pre><span class="fn">write_deltalake</span>(<span class="fn">str</span>(table_path), sales_df)
 
@@ -394,7 +394,7 @@ sales_df</pre></div>
 <div class="section layer-general" id="s8">
   <div class="section-number">Section 08</div>
   <h2>Nézzük meg, mi jött létre a fájlrendszerben
-    <span class="tool-badge"><img src="../assets/logos/parquet.svg">Parquet</span>
+    <span class="tool-badge"><img src="../assets/logos/parquet.svg" alt="" aria-hidden="true">Parquet</span>
   </h2>
   <div class="md-cell">
     <p>A Delta table mappájában Parquet fájlokat és egy <code>_delta_log</code> mappát kell látnod. A kódcella a <code>rglob("*")</code> segítségével rekurzívan listázza ki a tartalmat, és megjelöli, hogy mi könyvtár (<code>[DIR]</code>) és mi fájl (<code>[FILE]</code>).</p>
@@ -405,7 +405,7 @@ sales_df</pre></div>
   <div class="code-cell" id="cell-s8">
     <div class="code-header">
       <span class="cell-number">[8]</span>
-      <button class="run-btn" onclick="runCell('s8')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s8')">Output</button>
     </div>
     <div class="code-body"><pre><span class="kw">for</span> path <span class="kw">in</span> <span class="fn">sorted</span>(table_path.rglob(<span class="str">"*"</span>)):
     relative = path.relative_to(table_path)
@@ -432,7 +432,7 @@ sales_df</pre></div>
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
   <h2>A <code>_delta_log</code> tartalma
-    <span class="tool-badge"><img src="../assets/logos/json.svg">JSON</span>
+    <span class="tool-badge"><img src="../assets/logos/json.svg" alt="" aria-hidden="true">JSON</span>
   </h2>
   <div class="md-cell">
     <p>A <code>_delta_log</code> JSON fájlok írják le a tábla tranzakcióit. Itt van például a schema és az, hogy mely Parquet fájlok tartoznak a táblához. Minden Delta log fájl egy-egy verziót (commitot) képvisel: a <code>00000000000000000000.json</code> a 0. verzió, a <code>00000000000000000001.json</code> az 1. verzió, és így tovább.</p>
@@ -443,7 +443,7 @@ sales_df</pre></div>
   <div class="code-cell" id="cell-s9">
     <div class="code-header">
       <span class="cell-number">[9a]</span>
-      <button class="run-btn" onclick="runCell('s9')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9')">Output</button>
     </div>
     <div class="code-body"><pre>log_files = <span class="fn">sorted</span>((table_path / <span class="str">"_delta_log"</span>).glob(<span class="str">"*.json"</span>))
 log_files</pre></div>
@@ -455,7 +455,7 @@ log_files</pre></div>
   <div class="code-cell" id="cell-s9b">
     <div class="code-header">
       <span class="cell-number">[9b]</span>
-      <button class="run-btn" onclick="runCell('s9b')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9b')">Output</button>
     </div>
     <div class="code-body"><pre>first_log = log_files[<span class="num">0</span>]
 
@@ -529,7 +529,7 @@ log_files</pre></div>
   <div class="code-cell" id="cell-s10">
     <div class="code-header">
       <span class="cell-number">[10]</span>
-      <button class="run-btn" onclick="runCell('s10')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10')">Output</button>
     </div>
     <div class="code-body"><pre>dt = DeltaTable(<span class="fn">str</span>(table_path))
 dt.to_pandas()</pre></div>
@@ -561,7 +561,7 @@ dt.to_pandas()</pre></div>
   <div class="code-cell" id="cell-s11">
     <div class="code-header">
       <span class="cell-number">[11]</span>
-      <button class="run-btn" onclick="runCell('s11')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s11')">Output</button>
     </div>
     <div class="code-body"><pre><span class="fn">print</span>(dt.schema().json())</pre></div>
     <div class="output-area" id="out-s11">
@@ -602,7 +602,7 @@ Delta table schema</code></pre>
   <div class="code-cell" id="cell-s12">
     <div class="code-header">
       <span class="cell-number">[12]</span>
-      <button class="run-btn" onclick="runCell('s12')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s12')">Output</button>
     </div>
     <div class="code-body"><pre>new_sales_df = pd.DataFrame({
     <span class="str">"order_id"</span>: [<span class="num">1005</span>, <span class="num">1006</span>],
@@ -636,7 +636,7 @@ dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
   <h2>Verziók és time travel
-    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Lake</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg" alt="" aria-hidden="true">Delta Lake</span>
   </h2>
   <div class="md-cell">
     <p>A Delta log miatt a tábla <strong>verziózott</strong>. Az első írás volt a 0. verzió, az append után létrejött az 1. verzió. A kód első cellája kilistázza a <code>_delta_log</code> mappában lévő JSON fájlokat, a második cella pedig bemutatja a <strong>time travel</strong> funkciót: a <code>DeltaTable(path, version=N)</code> paraméterrel bármelyik korábbi verziót be tudod tölteni.</p>
@@ -647,7 +647,7 @@ dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
   <div class="code-cell" id="cell-s13">
     <div class="code-header">
       <span class="cell-number">[13a]</span>
-      <button class="run-btn" onclick="runCell('s13')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s13')">Output</button>
     </div>
     <div class="code-body"><pre><span class="kw">for</span> log_file <span class="kw">in</span> <span class="fn">sorted</span>((table_path / <span class="str">"_delta_log"</span>).glob(<span class="str">"*.json"</span>)):
     <span class="fn">print</span>(log_file.name)</pre></div>
@@ -661,7 +661,7 @@ dt.to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
   <div class="code-cell" id="cell-s13b">
     <div class="code-header">
       <span class="cell-number">[13b]</span>
-      <button class="run-btn" onclick="runCell('s13b')">▶ Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s13b')">Output</button>
     </div>
     <div class="code-body"><pre>version_0 = DeltaTable(<span class="fn">str</span>(table_path), version=<span class="num">0</span>)
 version_1 = DeltaTable(<span class="fn">str</span>(table_path), version=<span class="num">1</span>)
@@ -687,9 +687,9 @@ version_1 = DeltaTable(<span class="fn">str</span>(table_path), version=<span cl
 <div class="section layer-intro" id="s14">
   <div class="section-number">Section 14-15</div>
   <h2>Hol van itt a metastore? + Path vs Metastore + Azure
-    <span class="tool-badge"><img src="../assets/logos/apachehive.svg">Hive</span>
-    <span class="tool-badge"><img src="../assets/logos/microsoftazure.svg">Azure</span>
-    <span class="tool-badge"><img src="../assets/logos/databricks.svg">Databricks</span>
+    <span class="tool-badge"><img src="../assets/logos/apachehive.svg" alt="" aria-hidden="true">Hive</span>
+    <span class="tool-badge"><img src="../assets/logos/microsoftazure.svg" alt="" aria-hidden="true">Azure</span>
+    <span class="tool-badge"><img src="../assets/logos/databricks.svg" alt="" aria-hidden="true">Databricks</span>
   </h2>
   <div class="md-cell">
     <p>Ebben a notebookban <strong>nincs metastore</strong>. Csak egy Delta table van egy lokális path-on. A metastore akkor jön képbe, amikor ehhez a path-hoz <strong>táblanevet akarsz rendelni</strong>. A metastore (metaadat-tároló) lényegében egy névkönyv: egy logikai nevet (pl. <code>silver.sales</code>) rendel egy fizikai útvonalhoz (pl. <code>/path/to/sales_delta</code>), és tárolja a sémát, a jogosultságokat és egyéb metaadatokat.</p>
@@ -728,8 +728,8 @@ df.write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwr
 <div class="section layer-general" id="s16">
   <div class="section-number">Section 16-17</div>
   <h2>ETL és ELT ugyanazzal a lokális Delta gondolkodással
-    <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark</span>
-    <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span>
+    <span class="tool-badge"><img src="../assets/logos/apachespark.svg" alt="" aria-hidden="true">Spark</span>
+    <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span>
   </h2>
   <div class="md-cell">
     <p>Az ETL és az ELT nem fájlformátum, nem Databricks feature. Inkább arról szól, hogy <strong>mikor történik a transzformáció</strong>. Az ETL (Extract-Transform-Load) esetén az adatot már a betöltés előtt megtisztítod, típusozod és üzleti logikával látod el, és csak a kész eredményt töltöd be a célrendszerbe. Az ELT (Extract-Load-Transform) esetén viszont a nyers adatot gyorsan betöltöd a célrendszerbe, és csak utána transzformálod.</p>
@@ -755,7 +755,7 @@ ELT = Extract → Load → Transform</code></pre>
     <p><strong>Tip:</strong> Az ETL minta hátránya, hogy ha a transzformációs logika változik, a teljes folyamatot újra kell futtatni -- a nyers adat már nincs sehol tárolva ebben a megközelítésben.</p></div>
 
   <div class="code-cell" id="cell-s17a">
-    <div class="code-header"><span class="cell-number">[17a]</span><button class="run-btn" onclick="runCell('s17a')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[17a]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s17a')">Output</button></div>
     <div class="code-body"><pre>etl_source_df = pd.DataFrame({
     <span class="str">"order_id"</span>: [<span class="str">"2001"</span>, <span class="str">"2002"</span>, <span class="str">"2003"</span>, <span class="str">"2004"</span>],
     <span class="str">"customer_id"</span>: [<span class="str">"C-010"</span>, <span class="str">"C-011"</span>, <span class="str">"C-010"</span>, <span class="str">"C-012"</span>],
@@ -779,7 +779,7 @@ etl_source_df</pre></div>
   </div>
 
   <div class="code-cell" id="cell-s17b">
-    <div class="code-header"><span class="cell-number">[17b]</span><button class="run-btn" onclick="runCell('s17b')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[17b]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s17b')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Transform lépés: tisztítás és üzleti logika</span>
 etl_clean_df = etl_source_df.copy()
 etl_clean_df[<span class="str">"gross_amount_huf"</span>] = etl_clean_df[<span class="str">"gross_amount_huf"</span>].str.replace(<span class="str">" "</span>, <span class="str">""</span>).astype(<span class="str">"int64"</span>)
@@ -800,7 +800,7 @@ etl_clean_df</pre></div>
   </div>
 
   <div class="code-cell" id="cell-s17c">
-    <div class="code-header"><span class="cell-number">[17c]</span><button class="run-btn" onclick="runCell('s17c')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[17c]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s17c')">Output</button></div>
     <div class="code-body"><pre>etl_table_path = base_dir / <span class="str">"sales_etl_curated_delta"</span>
 <span class="fn">write_deltalake</span>(<span class="fn">str</span>(etl_table_path), etl_clean_df, mode=<span class="str">"overwrite"</span>)
 <span class="fn">print</span>(<span class="str">f"ETL output Delta table: {etl_table_path.resolve()}"</span>)
@@ -837,7 +837,7 @@ DeltaTable(<span class="fn">str</span>(etl_table_path)).to_pandas().sort_values(
   </div>
 
   <div class="code-cell" id="cell-s18a">
-    <div class="code-header"><span class="cell-number">[18a]</span><button class="run-btn" onclick="runCell('s18a')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[18a]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s18a')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Load: nyers adat → bronze Delta tábla</span>
 elt_raw_table_path = base_dir / <span class="str">"sales_elt_bronze_raw_delta"</span>
 <span class="fn">write_deltalake</span>(<span class="fn">str</span>(elt_raw_table_path), etl_source_df, mode=<span class="str">"overwrite"</span>)
@@ -857,7 +857,7 @@ DeltaTable(<span class="fn">str</span>(elt_raw_table_path)).to_pandas()</pre></d
   </div>
 
   <div class="code-cell" id="cell-s18b">
-    <div class="code-header"><span class="cell-number">[18b]</span><button class="run-btn" onclick="runCell('s18b')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[18b]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s18b')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Transform: bronze → silver</span>
 elt_silver_table_path = base_dir / <span class="str">"sales_elt_silver_delta"</span>
 bronze_df = DeltaTable(<span class="fn">str</span>(elt_raw_table_path)).to_pandas()
@@ -887,7 +887,7 @@ DeltaTable(<span class="fn">str</span>(elt_silver_table_path)).to_pandas()</pre>
   </div>
 
   <div class="code-cell" id="cell-s19">
-    <div class="code-header"><span class="cell-number">[19]</span><button class="run-btn" onclick="runCell('s19')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[19]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s19')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># ETL vs ELT összehasonlítás</span>
 demo_tables = {
     <span class="str">"ETL curated"</span>: etl_table_path,
@@ -951,12 +951,12 @@ demo_tables = {
 <div class="section layer-bronze" id="s21">
   <div class="section-number">Section 21</div>
   <h2>Landing → Bronze → Silver → Gold demo
-    <span class="tool-badge"><img src="../assets/logos/csv.svg">CSV</span>
-    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta</span>
+    <span class="tool-badge"><img src="../assets/logos/csv.svg" alt="" aria-hidden="true">CSV</span>
+    <span class="tool-badge"><img src="../assets/logos/delta-lake.svg" alt="" aria-hidden="true">Delta</span>
   </h2>
 
   <div class="code-cell" id="cell-s21a">
-    <div class="code-header"><span class="cell-number">[21a]</span><button class="run-btn" onclick="runCell('s21a')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[21a]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s21a')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Landing: két nyers CSV fájl létrehozása</span>
 landing_dir = base_dir / <span class="str">"landing"</span> / <span class="str">"orders"</span>
 landing_batch_1 = pd.DataFrame({
@@ -986,7 +986,7 @@ landing_batch_2.to_csv(landing_dir / <span class="str">"orders_2026_05_06.csv"</
   </div>
 
   <div class="code-cell" id="cell-s21b">
-    <div class="code-header"><span class="cell-number">[21b]</span> <span class="layer-badge bronze">Bronze</span><button class="run-btn" onclick="runCell('s21b')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[21b]</span> <span class="layer-badge bronze">Bronze</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s21b')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Landing → Bronze: CSV beolvasás + ingestion meta</span>
 bronze_frames = []
 <span class="kw">for</span> source_file <span class="kw">in</span> <span class="fn">sorted</span>(landing_dir.glob(<span class="str">"*.csv"</span>)):
@@ -1013,7 +1013,7 @@ DeltaTable(<span class="fn">str</span>(bronze_orders_path)).to_pandas().sort_val
   </div>
 
   <div class="code-cell" id="cell-s21c">
-    <div class="code-header"><span class="cell-number">[21c]</span> <span class="layer-badge silver">Silver</span><button class="run-btn" onclick="runCell('s21c')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[21c]</span> <span class="layer-badge silver">Silver</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s21c')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Bronze → Silver: típusozás, tisztítás, deduplikáció</span>
 bronze_orders_read_df = DeltaTable(<span class="fn">str</span>(bronze_orders_path)).to_pandas()
 silver_orders_df = bronze_orders_read_df.copy()
@@ -1038,7 +1038,7 @@ DeltaTable(<span class="fn">str</span>(silver_orders_path)).to_pandas().sort_val
   </div>
 
   <div class="code-cell" id="cell-s21d">
-    <div class="code-header"><span class="cell-number">[21d]</span> <span class="layer-badge gold">Gold</span><button class="run-btn" onclick="runCell('s21d')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[21d]</span> <span class="layer-badge gold">Gold</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s21d')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Silver → Gold: napi csatorna szerinti KPI</span>
 gold_daily_sales_df = (
     silver_orders_df
@@ -1098,7 +1098,7 @@ Dimension = leíró entitások (vásárló, csatorna, dátum)</code></pre>
 
 
   <div class="code-cell" id="cell-s23a">
-    <div class="code-header"><span class="cell-number">[23a]</span> dim_customer<button class="run-btn" onclick="runCell('s23a')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[23a]</span> dim_customer<button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s23a')">Output</button></div>
     <div class="code-body"><pre>customer_names = {<span class="str">"C-020"</span>: <span class="str">"Kovacs Anna"</span>, <span class="str">"C-021"</span>: <span class="str">"Nagy Bela"</span>, <span class="str">"C-022"</span>: <span class="str">"Toth Csilla"</span>, <span class="str">"C-023"</span>: <span class="str">"Szabo David"</span>}
 dim_customer_df = silver_for_model_df[[<span class="str">"customer_id"</span>]].drop_duplicates().sort_values(<span class="str">"customer_id"</span>)
 dim_customer_df[<span class="str">"customer_name"</span>] = dim_customer_df[<span class="str">"customer_id"</span>].map(customer_names)
@@ -1115,7 +1115,7 @@ dim_customer_df</pre></div>
   </div>
 
   <div class="code-cell" id="cell-s23b">
-    <div class="code-header"><span class="cell-number">[23b]</span> dim_channel<button class="run-btn" onclick="runCell('s23b')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[23b]</span> dim_channel<button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s23b')">Output</button></div>
     <div class="code-body"><pre>channel_labels = {<span class="str">"webshop"</span>: <span class="str">"Online webshop"</span>, <span class="str">"partner"</span>: <span class="str">"Partner sales"</span>, <span class="str">"pos"</span>: <span class="str">"Physical store"</span>}
 dim_channel_df = silver_for_model_df[[<span class="str">"channel"</span>]].drop_duplicates().sort_values(<span class="str">"channel"</span>)
 dim_channel_df[<span class="str">"channel_name"</span>] = dim_channel_df[<span class="str">"channel"</span>].map(channel_labels)
@@ -1131,7 +1131,7 @@ dim_channel_df</pre></div>
   </div>
 
   <div class="code-cell" id="cell-s23c">
-    <div class="code-header"><span class="cell-number">[23c]</span> dim_date<button class="run-btn" onclick="runCell('s23c')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[23c]</span> dim_date<button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s23c')">Output</button></div>
     <div class="code-body"><pre>dim_date_df = silver_for_model_df[[<span class="str">"order_date"</span>]].drop_duplicates().sort_values(<span class="str">"order_date"</span>)
 dim_date_df[<span class="str">"date_id"</span>] = dim_date_df[<span class="str">"order_date"</span>].dt.strftime(<span class="str">"%Y%m%d"</span>).astype(<span class="str">"int64"</span>)
 dim_date_df[<span class="str">"year"</span>] = dim_date_df[<span class="str">"order_date"</span>].dt.year
@@ -1149,7 +1149,7 @@ dim_date_df[[<span class="str">"date_id"</span>, <span class="str">"order_date"<
   </div>
 
   <div class="code-cell" id="cell-s23d">
-    <div class="code-header"><span class="cell-number">[23d]</span> fact_sales<button class="run-btn" onclick="runCell('s23d')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[23d]</span> fact_sales<button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s23d')">Output</button></div>
     <div class="code-body"><pre>fact_sales_df = silver_for_model_df.merge(dim_date_df[[<span class="str">"date_id"</span>,<span class="str">"order_date"</span>]], on=<span class="str">"order_date"</span>, how=<span class="str">"left"</span>)
 fact_sales_df = fact_sales_df[[<span class="str">"order_id"</span>,<span class="str">"customer_id"</span>,<span class="str">"channel"</span>,<span class="str">"date_id"</span>,<span class="str">"gross_amount_huf"</span>,<span class="str">"discount_pct"</span>,<span class="str">"net_amount_huf"</span>,<span class="str">"is_online"</span>]].sort_values(<span class="str">"order_id"</span>)
 <span class="fn">write_deltalake</span>(<span class="fn">str</span>(dim_customer_path), dim_customer_df, mode=<span class="str">"overwrite"</span>)
@@ -1172,7 +1172,7 @@ fact_sales_df</pre></div>
   </div>
 
   <div class="code-cell" id="cell-s23e">
-    <div class="code-header"><span class="cell-number">[23e]</span> Sales Mart (joined)<button class="run-btn" onclick="runCell('s23e')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[23e]</span> Sales Mart (joined)<button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s23e')">Output</button></div>
     <div class="code-body"><pre>sales_mart_df = (fact_sales_df
     .merge(dim_customer_df, on=<span class="str">"customer_id"</span>, how=<span class="str">"left"</span>)
     .merge(dim_channel_df, on=<span class="str">"channel"</span>, how=<span class="str">"left"</span>)
@@ -1193,7 +1193,7 @@ sales_mart_df[[<span class="str">"order_id"</span>, <span class="str">"customer_
   </div>
 
   <div class="code-cell" id="cell-s23f">
-    <div class="code-header"><span class="cell-number">[23f]</span> Customer KPI<button class="run-btn" onclick="runCell('s23f')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[23f]</span> Customer KPI<button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s23f')">Output</button></div>
     <div class="code-body"><pre>customer_kpi_df = (sales_mart_df
     .groupby(<span class="str">"customer_name"</span>, as_index=<span class="kw">False</span>)
     .agg(order_count=(<span class="str">"order_id"</span>, <span class="str">"count"</span>), total_net_amount_huf=(<span class="str">"net_amount_huf"</span>, <span class="str">"sum"</span>))
@@ -1225,7 +1225,7 @@ customer_kpi_df</pre></div>
     <p><strong>Tip:</strong> A batch pipelineok tervezésénél érdemes az idempotenciára törekedni: azaz a többszori futtatás ugyanazt az eredményt adja, nem duplikál adatot, és nem okoz mellékhatást.</p>
   </div>
   <div class="code-cell" id="cell-s24">
-    <div class="code-header"><span class="cell-number">[24]</span><button class="run-btn" onclick="runCell('s24')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[24]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s24')">Output</button></div>
     <div class="code-body"><pre>batch_summary = pd.DataFrame({
     <span class="str">"step"</span>: [<span class="str">"extract"</span>, <span class="str">"load bronze"</span>, <span class="str">"transform silver"</span>, <span class="str">"aggregate gold"</span>],
     <span class="str">"input"</span>: [<span class="str">"landing CSV files"</span>, <span class="str">"landing DataFrame"</span>, <span class="str">"bronze Delta"</span>, <span class="str">"silver Delta"</span>],
@@ -1252,9 +1252,9 @@ batch_summary</pre></div>
 <div class="section layer-general" id="s25">
   <div class="section-number">Section 25</div>
   <h2>Streaming és micro-batch gondolkodás
-    <span class="tool-badge"><img src="../assets/logos/apachekafka.svg">Kafka</span>
-    <span class="tool-badge"><img src="../assets/logos/apacheflink.svg">Flink</span>
-    <span class="tool-badge"><img src="../assets/logos/apachespark.svg">Spark Streaming</span>
+    <span class="tool-badge"><img src="../assets/logos/apachekafka.svg" alt="" aria-hidden="true">Kafka</span>
+    <span class="tool-badge"><img src="../assets/logos/apacheflink.svg" alt="" aria-hidden="true">Flink</span>
+    <span class="tool-badge"><img src="../assets/logos/apachespark.svg" alt="" aria-hidden="true">Spark Streaming</span>
   </h2>
   <div class="md-cell">
     <p>Valódi streaminghez Spark Structured Streaming, Flink, Kafka kell. Itt <strong>micro-batch szimulációt</strong> csinálunk, amely bemutatja a streaming gondolkodásmód alapjait anélkül, hogy valódi streaming infrastruktúrára lenne szükség. A micro-batch lényegében kicsi, gyakran ismétlődő batch-ek sorozata -- a legtöbb "streaming" rendszer (beleértve a Spark Structured Streaming-et is) valójában így működik a színfalak mögött.</p>
@@ -1264,7 +1264,7 @@ batch_summary</pre></div>
   </div>
 
   <div class="code-cell" id="cell-s25a">
-    <div class="code-header"><span class="cell-number">[25a]</span><button class="run-btn" onclick="runCell('s25a')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[25a]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s25a')">Output</button></div>
     <div class="code-body"><pre>stream_bronze_path = base_dir / <span class="str">"bronze/orders_stream_delta"</span>
 stream_silver_path = base_dir / <span class="str">"silver/orders_stream_delta"</span>
 stream_gold_path = base_dir / <span class="str">"gold/orders_stream_kpi_delta"</span>
@@ -1293,7 +1293,7 @@ stream_batches = [
   </div>
 
   <div class="code-cell" id="cell-s25b">
-    <div class="code-header"><span class="cell-number">[25b]</span><button class="run-btn" onclick="runCell('s25b')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[25b]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s25b')">Output</button></div>
     <div class="code-body"><pre><span class="fn">print</span>(<span class="str">"Bronze stream tábla:"</span>)
 DeltaTable(<span class="fn">str</span>(stream_bronze_path)).to_pandas().sort_values(<span class="str">"order_id"</span>)</pre></div>
     <div class="output-area" id="out-s25b">
@@ -1310,7 +1310,7 @@ DeltaTable(<span class="fn">str</span>(stream_bronze_path)).to_pandas().sort_val
   </div>
 
   <div class="code-cell" id="cell-s25c">
-    <div class="code-header"><span class="cell-number">[25c]</span><button class="run-btn" onclick="runCell('s25c')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[25c]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s25c')">Output</button></div>
     <div class="code-body"><pre><span class="fn">print</span>(<span class="str">"Gold stream KPI tábla:"</span>)
 DeltaTable(<span class="fn">str</span>(stream_gold_path)).to_pandas()</pre></div>
     <div class="output-area" id="out-s25c">
@@ -1352,12 +1352,12 @@ DeltaTable(<span class="fn">str</span>(stream_gold_path)).to_pandas()</pre></div
 <div class="section layer-intro" id="s27">
   <div class="section-number">Section 27</div>
   <h2>Open source metastore/catalog toolok kipróbáláshoz
-    <span class="tool-badge"><img src="../assets/logos/apachehive.svg">Hive</span>
-    <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span>
-    <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg">Iceberg</span>
-    <span class="tool-badge"><img src="../assets/logos/nessie.svg">Nessie</span>
-    <span class="tool-badge"><img src="../assets/logos/polaris.svg">Polaris</span>
-    <span class="tool-badge"><img src="../assets/logos/gravitino.svg">Gravitino</span>
+    <span class="tool-badge"><img src="../assets/logos/apachehive.svg" alt="" aria-hidden="true">Hive</span>
+    <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg" alt="" aria-hidden="true">Unity Catalog</span>
+    <span class="tool-badge"><img src="../assets/logos/apacheiceberg.svg" alt="" aria-hidden="true">Iceberg</span>
+    <span class="tool-badge"><img src="../assets/logos/nessie.svg" alt="" aria-hidden="true">Nessie</span>
+    <span class="tool-badge"><img src="../assets/logos/polaris.svg" alt="" aria-hidden="true">Polaris</span>
+    <span class="tool-badge"><img src="../assets/logos/gravitino.svg" alt="" aria-hidden="true">Gravitino</span>
   </h2>
   <table>
     <tr><th>Tool</th><th>Mit ad hozzá?</th><th>Formátum fókusz</th><th>Mire jó?</th></tr>

@@ -1149,279 +1149,56 @@ button{font-family:inherit}
 <script src="./assets/webshop-case-study.js?v=webshop-pro"></script>
 <script src="./assets/courses-detail.js"></script>
 <script>
-// Course data (embedded)
-const COURSES = [
-  {
-    "slug": "delta-table-crash-course",
-    "image": "./assets/images/delta-table-crash-course.jpg",
-    "title": "Delta Table Crash Course",
-    "description": "Tanuld meg a Delta Lake alapjait a nulláról: Bronze/Silver/Gold lakehouse adatmodell építése, ACID tranzakciók, time travel, séma verziózás és adatminőség garantálása lépésről lépésre.",
-    "path": ["Foundation", "Data Engineering"],
-    "difficulty": "Kezdő",
-    "estimatedTime": "4–6 óra",
-    "sectionCount": 26,
-    "stack": ["python", "delta-lake", "parquet"],
-    "status": "Kész",
-    "icon": "delta-lake",
-    "url": "./delta-table-crash-course/",
-    "whatYouBuild": "Bronze/Silver/Gold lakehouse adatmodell"
-  },
-  {
-    "slug": "spark-crash-course",
-    "image": "./assets/images/spark-crash-course.jpg",
-    "title": "Apache Spark Crash Course",
-    "description": "Nagy volumenű adatfeldolgozás Apache Sparkkal: DataFrame API, katalizátor optimalizáló, partitioning, shuffle és ETL pipeline építés valós adatokon.",
-    "path": ["Data Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "3–5 óra",
-    "sectionCount": 17,
-    "stack": ["python", "apachespark", "delta-lake"],
-    "status": "Kész",
-    "icon": "apachespark",
-    "url": "./spark-crash-course/",
-    "whatYouBuild": "Nagy volumenű ETL pipeline"
-  },
-  {
-    "slug": "ai-engineering",
-    "image": "./assets/images/ai-engineering.jpg",
-    "title": "AI Engineering",
-    "description": "Építs RAG alapú ügyfélszolgálati chatbotot: OpenAI API, embeddings, ChromaDB vektoros keresés, structured outputs és Streamlit UI — a nulláról production-ig.",
-    "path": ["AI Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "4–6 óra",
-    "sectionCount": 20,
-    "stack": ["python", "openai", "chroma", "streamlit"],
-    "status": "Kész",
-    "icon": "openai",
-    "url": "./ai-engineering/",
-    "whatYouBuild": "RAG ügyfélszolgálati chatbot"
-  },
-  {
-    "slug": "aiops-mlops",
-    "image": "./assets/images/aiops-mlops.jpg",
-    "title": "AIOps & MLOps",
-    "description": "ML modell üzemeltetés a nulláról: MLflow kísérletkövetés, modell regisztráció, FastAPI serving, Docker konténerizáció, CI/CD pipeline, monitoring és drift detektálás.",
-    "path": ["AI Engineering", "Data Engineering"],
-    "difficulty": "Középhaladó–Haladó",
-    "estimatedTime": "3–5 óra",
-    "sectionCount": 15,
-    "stack": ["python", "mlflow", "fastapi", "docker", "grafana"],
-    "status": "Kész",
-    "icon": "mlflow",
-    "url": "./aiops-mlops/",
-    "whatYouBuild": "Churn modell deployment pipeline"
-  },
-  {
-    "slug": "ai-data-engineer",
-    "image": "./assets/images/ai-data-engineer.jpg",
-    "title": "AI Data Engineer",
-    "description": "Feature store és data quality pipeline építése: online/offline feature-ök, Kafka streaming, Feast feature store, dbt analytics, Great Expectations validáció és data lineage.",
-    "path": ["Data Engineering", "AI Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 18,
-    "stack": ["python", "apachespark", "delta-lake", "apachekafka", "feast", "dbt"],
-    "status": "Kész",
-    "icon": "feast",
-    "url": "./ai-data-engineer/",
-    "whatYouBuild": "Feature store és data quality pipeline"
-  },
-  {
-    "slug": "sql-data-modeling",
-    "image": "./assets/images/sql-data-modeling.jpg",
-    "title": "SQL & Data Modeling",
-    "description": "SQL és analitikai adatmodellezési alapok data engineering és analytics engineering munkához: SELECT, JOIN, CTE, window functions, star schema, SCD.",
-    "path": ["Foundation", "Data Engineering"],
-    "difficulty": "Kezdő",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 20,
-    "stack": ["sql", "parquet"],
-    "status": "Kész",
-    "icon": "sql",
-    "url": "./sql-data-modeling/",
-    "whatYouBuild": "WebShop Pro analitikai adatmodell"
-  },
-  {
-    "slug": "python-data-engineering",
-    "image": "./assets/images/python-data-engineering.jpg",
-    "title": "Python for Data Engineering",
-    "description": "Gyakorlati Python alapok adatfeldolgozási, ETL és pipeline-fejlesztési feladatokhoz: virtualenv, pandas, pathlib, logging, pydantic, CLI, unit test.",
-    "path": ["Foundation", "Data Engineering", "AI Engineering"],
-    "difficulty": "Kezdő",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 18,
-    "stack": ["python", "pandas", "parquet"],
-    "status": "Kész",
-    "icon": "python",
-    "url": "./python-data-engineering/",
-    "whatYouBuild": "Lokális Python ETL mini-framework"
-  },
-  {
-    "slug": "docker-local-data-platform",
-    "image": "./assets/images/docker-local-data-platform.jpg",
-    "title": "Docker & Local Data Platform",
-    "description": "Lokális data platform építése Docker Compose segítségével: Postgres, MinIO, Spark, Airflow, MLflow, Prometheus és Grafana egyetlen paranccsal.",
-    "path": ["Foundation", "Data Engineering", "AI Engineering"],
-    "difficulty": "Kezdő–Középhaladó",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 18,
-    "stack": ["docker", "prometheus", "grafana"],
-    "status": "Kész",
-    "icon": "docker",
-    "url": "./docker-local-data-platform/",
-    "whatYouBuild": "Lokális data stack Docker Compose-szal"
-  },
-  {
-    "slug": "airflow-orchestration",
-    "image": "./assets/images/airflow-orchestration.jpg",
-    "title": "Airflow & Orchestration",
-    "description": "Adatpipeline-ok ütemezése, monitorozása és hibakezelése Apache Airflow-val: DAG, operator, sensor, schedule, retry, backfill, XCom, connections.",
-    "path": ["Data Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 16,
-    "stack": ["python", "airflow", "delta-lake"],
-    "status": "Kész",
-    "icon": "airflow",
-    "url": "./airflow-orchestration/",
-    "whatYouBuild": "Napi webshop ETL DAG bronze/silver/gold rétegekkel"
-  },
-  {
-    "slug": "dbt-analytics-engineering",
-    "image": "./assets/images/dbt-analytics-engineering.jpg",
-    "title": "dbt Analytics Engineering",
-    "description": "Analitikai modellezés, tesztelés, dokumentáció és lineage dbt-vel: staging, intermediate, mart modellek, schema tests, incremental models.",
-    "path": ["Data Engineering", "Analytics Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 16,
-    "stack": ["sql", "dbt", "delta-lake"],
-    "status": "Kész",
-    "icon": "dbt",
-    "url": "./dbt-analytics-engineering/",
-    "whatYouBuild": "Webshop analytics layer staging, intermediate és mart modellekkel"
-  },
-  {
-    "slug": "databricks-lakehouse",
-    "image": "./assets/images/databricks-lakehouse.jpg",
-    "title": "Databricks Lakehouse",
-    "description": "Modern lakehouse fejlesztés Databricks környezetben: notebooks, Jobs, Unity Catalog, Delta Live Tables, MLflow és workflow-k valós adatokon.",
-    "path": ["Data Engineering", "AI Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "4–6 óra",
-    "sectionCount": 18,
-    "stack": ["databricks", "delta-lake", "apachespark", "mlflow", "unity-catalog"],
-    "status": "Kész",
-    "icon": "databricks",
-    "url": "./databricks-lakehouse/",
-    "whatYouBuild": "Databricks-alapú lakehouse pipeline bronze/silver/gold rétegekkel"
-  },
-  {
-    "slug": "llmops-genai-production",
-    "image": "./assets/images/llmops-genai-production.jpg",
-    "title": "LLMOps / GenAI Production",
-    "description": "Production GenAI és RAG alkalmazások üzemeltetése: prompt versioning, eval dataset, hallucination tesztek, latency monitoring, guardrails, fallback model.",
-    "path": ["AI Engineering"],
-    "difficulty": "Középhaladó–Haladó",
-    "estimatedTime": "3–5 óra",
-    "sectionCount": 16,
-    "stack": ["python", "openai", "mlflow", "grafana"],
-    "status": "Kész",
-    "icon": "openai",
-    "url": "./llmops-genai-production/",
-    "whatYouBuild": "Production-ready RAG/LLM alkalmazás monitoringgal és eval datasetekkel"
-  },
-  {
-    "slug": "open-table-formats",
-    "image": "./assets/images/open-table-formats.jpg",
-    "title": "Open Table Formats",
-    "description": "Delta Lake vs Apache Iceberg vs Apache Hudi összehasonlítás: table format vs file format, schema evolution, partition evolution, ACID tranzakciók, catalog szerepe, vendor lock-in és teljesítmény.",
-    "path": ["Data Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "2–3 óra",
-    "sectionCount": 16,
-    "stack": ["delta-lake", "apacheiceberg", "parquet", "apachespark"],
-    "status": "Kész",
-    "icon": "delta-lake",
-    "url": "./open-table-formats/",
-    "whatYouBuild": "WebShop Pro táblaformátum-összehasonlítás és döntési útmutató"
-  },
-  {
-    "slug": "streaming-engineering",
-    "image": "./assets/images/streaming-engineering.jpg",
-    "title": "Streaming Engineering",
-    "description": "Valós idejű adatfeldolgozás Kafka és Spark Structured Streaming segítségével: topic/partition, event schema, producer/consumer, exactly-once, DLQ, watermarking, stream-to-Delta pipeline.",
-    "path": ["Data Engineering", "AI Engineering"],
-    "difficulty": "Középhaladó–Haladó",
-    "estimatedTime": "3–5 óra",
-    "sectionCount": 17,
-    "stack": ["apachekafka", "apachespark", "delta-lake", "python"],
-    "status": "Kész",
-    "icon": "apachekafka",
-    "url": "./streaming-engineering/",
-    "whatYouBuild": "WebShop Pro real-time clickstream és rendelés feldolgozó pipeline"
-  },
-  {
-    "slug": "rag-evaluation-ai-safety",
-    "image": "./assets/images/rag-evaluation-ai-safety.jpg",
-    "title": "RAG Evaluation & AI Safety",
-    "description": "Honnan tudod, hogy az AI jól válaszol? Golden dataset, retrieval precision/recall, faithfulness, hallucination detection, prompt regression, guardrails, fallback model és red teaming alapok.",
-    "path": ["AI Engineering"],
-    "difficulty": "Középhaladó–Haladó",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 16,
-    "stack": ["python", "openai", "chroma", "mlflow"],
-    "status": "Kész",
-    "icon": "openai",
-    "url": "./rag-evaluation-ai-safety/",
-    "whatYouBuild": "WebShop Pro AI asszisztens evaluációs pipeline"
-  },
-  {
-    "slug": "data-mesh",
-    "image": "./assets/images/data-mesh.jpg",
-    "title": "Data Mesh",
-    "description": "Domain-orientált adatarchitektúra: data product, federated computational governance, self-serve data platform, Conway's law és Data Contract gyakorlatban.",
-    "path": ["Data Engineering"],
-    "difficulty": "Középhaladó–Haladó",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 16,
-    "stack": ["dbt", "unity-catalog", "python"],
-    "status": "Kész",
-    "icon": "unity-catalog",
-    "url": "./data-mesh/",
-    "whatYouBuild": "WebShop Pro domain-szervezett data product architektúra"
-  },
-  {
-    "slug": "data-governance",
-    "image": "./assets/images/data-governance.jpg",
-    "title": "Data Governance",
-    "description": "GDPR, PII detection, RBAC/ABAC, data lineage, data quality, data catalog, audit logging, master data management — DE/AI mérnöki perspektívából.",
-    "path": ["Data Engineering"],
-    "difficulty": "Középhaladó",
-    "estimatedTime": "3–4 óra",
-    "sectionCount": 16,
-    "stack": ["python", "unity-catalog", "dbt", "sql"],
-    "status": "Kész",
-    "icon": "unity-catalog",
-    "url": "./data-governance/",
-    "whatYouBuild": "WebShop Pro governance: PII redaction, RLS, lineage, audit"
-  },
-  {
-    "slug": "agentic-ai",
-    "image": "./assets/images/agentic-ai.jpg",
-    "title": "Agentic AI",
-    "description": "Agentic AI minták: ReAct loop, tool calling, LangGraph state machine, multi-agent kollaboráció (CrewAI), planning, memory, self-correction, MCP, eval és production deployment.",
-    "path": ["AI Engineering"],
-    "difficulty": "Haladó",
-    "estimatedTime": "4 óra",
-    "sectionCount": 18,
-    "stack": ["python", "openai", "langchain", "anthropic"],
-    "status": "Kész",
-    "icon": "openai",
-    "url": "./agentic-ai/",
-    "whatYouBuild": "WebShop Pro multi-agent ügyfél-rendszer ReAct loop-pal és LangGraph-fal"
+// Course data is loaded from courses.json, which is the canonical course metadata source.
+let COURSES = [];
+const COURSE_DATA_URL = './courses.json';
+
+function normalizeCourse(course){
+  const slug = course.slug;
+  const rawUrl = course.url || `${slug}/index.html`;
+  const cleanUrl = rawUrl.replace(/^\.\//, '').replace(/index\.html$/, '');
+  return {
+    ...course,
+    image: course.image || `./assets/images/${slug}.jpg`,
+    icon: course.icon || (course.stack && course.stack[0]) || 'python',
+    url: cleanUrl.startsWith('http') ? cleanUrl : `./${cleanUrl}`
+  };
+}
+
+async function loadCourses(){
+  const response = await fetch(COURSE_DATA_URL, { cache: 'no-store' });
+  if(!response.ok) throw new Error(`Nem sikerült betölteni: ${COURSE_DATA_URL}`);
+  const data = await response.json();
+  COURSES = data.map(normalizeCourse);
+}
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[ch]));
+}
+
+function escapeAttr(value){
+  return escapeHtml(value).replace(/`/g, '&#96;');
+}
+
+function safeUrl(value){
+  const url = String(value ?? '');
+  return /^javascript:/i.test(url.trim()) ? '#' : url;
+}
+
+function showCourseLoadError(error){
+  const grid = document.getElementById('course-grid');
+  const count = document.getElementById('result-count');
+  if(count) count.textContent = 'A kurzuslista nem tölthető be';
+  if(grid){
+    grid.innerHTML = `<div class="empty-state" style="display:block"><h3>Nem sikerült betölteni a kurzuslistát</h3><p>${escapeHtml(error.message || String(error))}</p></div>`;
   }
-];
+}
 
 const LOGO_NAMES = {
   'python':'Python','delta-lake':'Delta Lake','parquet':'Parquet','apachespark':'Spark',
@@ -1459,10 +1236,12 @@ function renderCourses(){
   const count = document.getElementById('result-count');
 
   let filtered = COURSES.filter(c => {
-    if(activeFilter !== 'all' && !c.path.includes(activeFilter)) return false;
+    const paths = c.path || [];
+    const stack = c.stack || [];
+    if(activeFilter !== 'all' && !paths.includes(activeFilter)) return false;
     if(searchQuery){
       const q = searchQuery.toLowerCase();
-      const haystack = [c.title, c.description, c.whatYouBuild, ...c.stack, ...c.path].join(' ').toLowerCase();
+      const haystack = [c.title, c.description, c.whatYouBuild, ...stack, ...paths].join(' ').toLowerCase();
       if(!haystack.includes(q)) return false;
     }
     return true;
@@ -1493,23 +1272,24 @@ function renderCourses(){
   empty.style.display = 'none';
 
   grid.innerHTML = filtered.map((c, i) => {
-    const diffBadge = `<span class="badge badge-difficulty">${c.difficulty}</span>`;
-    const pathBadges = c.path.map(p => `<span class="badge badge-path">${p}</span>`).join('');
-    const stackChips = c.stack.map(s => {
+    const diffBadge = `<span class="badge badge-difficulty">${escapeHtml(c.difficulty)}</span>`;
+    const pathBadges = (c.path || []).map(p => `<span class="badge badge-path">${escapeHtml(p)}</span>`).join('');
+    const stackChips = (c.stack || []).map(s => {
       const name = LOGO_NAMES[s] || s;
-      const img = `<img src="./assets/logos/${s}.svg" alt="${name}" onerror="this.style.display='none'">`;
-      return `<span class="stack-chip">${img}${name}</span>`;
+      const img = `<img src="./assets/logos/${escapeAttr(s)}.svg" alt="${escapeAttr(name)}" onerror="this.style.display='none'">`;
+      return `<span class="stack-chip">${img}${escapeHtml(name)}</span>`;
     }).join('');
 
     const pct = getCoursePercent(c.slug, c.sectionCount);
     const progressBadge = pct > 0
       ? `<div class="card-progress-badge visible ${pct===100?'complete':''}">${pct===100?'✓ Kész':pct+'%'}</div>`
       : '';
+    const slug = escapeAttr(c.slug);
 
     return `
-      <div class="course-card" data-slug="${c.slug}" data-index="${i}">
+      <div class="course-card" data-slug="${slug}" data-index="${i}">
         <div class="card-cover">
-          <img src="${c.image}" alt="${c.title} borítókép" loading="lazy">
+          <img src="${escapeAttr(safeUrl(c.image))}" alt="${escapeAttr(c.title)} borítókép" loading="lazy">
           ${progressBadge}
           <div class="card-cover-overlay">
             <div class="card-badges">${diffBadge}${pathBadges}</div>
@@ -1517,17 +1297,17 @@ function renderCourses(){
           </div>
         </div>
         <div class="card-body">
-          <h3>${c.title}</h3>
-          <p class="card-desc">${c.description}</p>
-          <div class="card-build"><strong>Mit építesz:</strong> ${c.whatYouBuild}</div>
+          <h3>${escapeHtml(c.title)}</h3>
+          <p class="card-desc">${escapeHtml(c.description)}</p>
+          <div class="card-build"><strong>Mit építesz:</strong> ${escapeHtml(c.whatYouBuild)}</div>
           <div class="card-meta">
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${c.estimatedTime}</span>
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>${c.sectionCount} szekció</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escapeHtml(c.estimatedTime)}</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>${Number(c.sectionCount) || 0} szekció</span>
           </div>
           <div class="card-stack">${stackChips}</div>
           <div class="card-footer">
-            <a href="${c.url}" class="card-btn card-btn-ready" onclick="event.stopPropagation()">→ Kurzus megnyitása</a>
-            <button type="button" class="card-btn card-btn-info" aria-label="Részletek" onclick="event.stopPropagation();openModal('${c.slug}')">
+            <a href="${escapeAttr(safeUrl(c.url))}" class="card-btn card-btn-ready" onclick="event.stopPropagation()">→ Kurzus megnyitása</a>
+            <button type="button" class="card-btn card-btn-info" aria-label="${escapeAttr(c.title)} részletei" onclick="event.stopPropagation();openModal('${slug}')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             </button>
           </div>
@@ -1547,12 +1327,12 @@ function renderCourses(){
 
 // ── Render stack showcase ──
 function renderStack(){
-  const uniqueStacks = [...new Set(COURSES.flatMap(c => c.stack))];
+  const uniqueStacks = [...new Set(COURSES.flatMap(c => c.stack || []))];
   const grid = document.getElementById('stack-grid');
   grid.innerHTML = uniqueStacks.map(s => {
     const name = LOGO_NAMES[s] || s;
-    const img = `<img src="./assets/logos/${s}.svg" alt="${name}" onerror="this.style.display='none'">`;
-    return `<div class="stack-logo">${img}<span>${name}</span></div>`;
+    const img = `<img src="./assets/logos/${escapeAttr(s)}.svg" alt="${escapeAttr(name)}" onerror="this.style.display='none'">`;
+    return `<div class="stack-logo">${img}<span>${escapeHtml(name)}</span></div>`;
   }).join('');
 }
 
@@ -1563,12 +1343,12 @@ function renderPlatformCourseMap(){
   grid.innerHTML = COURSES.map(course => {
     const project = caseStudy.courses[course.slug];
     if(!project) return '';
-    const tools = (project.tools || []).slice(0, 4).map(t => `<span>${t}</span>`).join('');
-    const services = (project.labServices || []).slice(0, 5).map(s => `<span>${s}</span>`).join('');
+    const tools = (project.tools || []).slice(0, 4).map(t => `<span>${escapeHtml(t)}</span>`).join('');
+    const services = (project.labServices || []).slice(0, 5).map(s => `<span>${escapeHtml(s)}</span>`).join('');
     return `
       <article class="platform-course-card">
-        <h3>${course.title}</h3>
-        <p>${project.role}</p>
+        <h3>${escapeHtml(course.title)}</h3>
+        <p>${escapeHtml(project.role)}</p>
         <div class="tools">${tools}</div>
         <div class="services">${services}</div>
       </article>`;
@@ -1607,18 +1387,20 @@ function renderMyProgress(){
 
 // ── Modal ──
 const modal = document.getElementById('course-modal');
+let lastFocusedElement = null;
 function openModal(slug){
   const c = COURSES.find(x => x.slug === slug);
   if(!c) return;
   const d = (window.COURSE_DETAILS || {})[slug] || {};
 
-  document.getElementById('modal-image').src = c.image;
+  lastFocusedElement = document.activeElement;
+  document.getElementById('modal-image').src = safeUrl(c.image);
   document.getElementById('modal-image').alt = c.title + ' borítókép';
   document.getElementById('modal-title').textContent = c.title;
-  document.getElementById('modal-open-btn').href = c.url;
+  document.getElementById('modal-open-btn').href = safeUrl(c.url);
 
-  const badges = `<span class="badge badge-difficulty">${c.difficulty}</span>` +
-                 c.path.map(p => `<span class="badge badge-path">${p}</span>`).join('');
+  const badges = `<span class="badge badge-difficulty">${escapeHtml(c.difficulty)}</span>` +
+                 (c.path || []).map(p => `<span class="badge badge-path">${escapeHtml(p)}</span>`).join('');
   document.getElementById('modal-badges').innerHTML = badges;
 
   const pct = getCoursePercent(c.slug, c.sectionCount);
@@ -1626,7 +1408,7 @@ function openModal(slug){
     ? `<div style="margin-bottom:22px"><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px"><span style="color:#3fb950;font-weight:600">Haladás</span><span style="color:#8b949e;font-family:'JetBrains Mono',monospace">${pct}%</span></div><div style="height:6px;background:rgba(48,54,61,.6);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3fb950,#58a6ff);border-radius:3px"></div></div></div>`
     : '';
 
-  const tagline = d.tagline ? `<div class="modal-tagline">${d.tagline}</div>` : '';
+  const tagline = d.tagline ? `<div class="modal-tagline">${escapeHtml(d.tagline)}</div>` : '';
 
   const buildInfo = `
     <div class="modal-section">
@@ -1634,49 +1416,49 @@ function openModal(slug){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         Mit építesz
       </h3>
-      <p style="font-size:.92rem;padding:12px 16px;background:rgba(88,166,255,.08);border-left:3px solid #58a6ff;border-radius:8px;color:#e6edf3">${c.whatYouBuild}</p>
+      <p style="font-size:.92rem;padding:12px 16px;background:rgba(88,166,255,.08);border-left:3px solid #58a6ff;border-radius:8px;color:#e6edf3">${escapeHtml(c.whatYouBuild)}</p>
     </div>
     <div class="modal-section" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
-      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Időigény</div><div style="font-weight:700;color:#e6edf3">${c.estimatedTime}</div></div>
-      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Szekciók</div><div style="font-weight:700;color:#e6edf3">${c.sectionCount}</div></div>
-      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Nehézség</div><div style="font-weight:700;color:#7dd3fc">${c.difficulty}</div></div>
+      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Időigény</div><div style="font-weight:700;color:#e6edf3">${escapeHtml(c.estimatedTime)}</div></div>
+      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Szekciók</div><div style="font-weight:700;color:#e6edf3">${Number(c.sectionCount) || 0}</div></div>
+      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Nehézség</div><div style="font-weight:700;color:#7dd3fc">${escapeHtml(c.difficulty)}</div></div>
     </div>`;
 
   const prereq = d.prerequisites && d.prerequisites.length ? `
     <div class="modal-section">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Előfeltételek</h3>
-      <ul class="modal-list">${d.prerequisites.map(p=>`<li>${p}</li>`).join('')}</ul>
+      <ul class="modal-list">${d.prerequisites.map(p=>`<li>${escapeHtml(p)}</li>`).join('')}</ul>
     </div>` : '';
 
   const outcomes = d.outcomes && d.outcomes.length ? `
     <div class="modal-section">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Mit fogsz tudni a végén</h3>
-      <ul class="modal-list">${d.outcomes.map(o=>`<li>${o}</li>`).join('')}</ul>
+      <ul class="modal-list">${d.outcomes.map(o=>`<li>${escapeHtml(o)}</li>`).join('')}</ul>
     </div>` : '';
 
   const topics = d.keyTopics && d.keyTopics.length ? `
     <div class="modal-section">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Kulcstémák</h3>
-      <div class="modal-topics">${d.keyTopics.map(t=>`<div class="modal-topic"><strong>${t.title}</strong><span>${t.desc}</span></div>`).join('')}</div>
+      <div class="modal-topics">${d.keyTopics.map(t=>`<div class="modal-topic"><strong>${escapeHtml(t.title)}</strong><span>${escapeHtml(t.desc)}</span></div>`).join('')}</div>
     </div>` : '';
 
   const resourceTypeLabel = {book:'Könyv',doc:'Doc',tutorial:'Tutorial',tool:'Tool',article:'Cikk',video:'Videó'};
   const resources = d.resources && d.resources.length ? `
     <div class="modal-section">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Külső források</h3>
-      <div class="modal-links">${d.resources.map(r=>`<a class="modal-link" href="${r.url}" target="_blank" rel="noopener"><span class="modal-link-type">${resourceTypeLabel[r.type]||r.type}</span><span class="modal-link-title">${r.title}</span></a>`).join('')}</div>
+      <div class="modal-links">${d.resources.map(r=>`<a class="modal-link" href="${escapeAttr(safeUrl(r.url))}" target="_blank" rel="noopener"><span class="modal-link-type">${escapeHtml(resourceTypeLabel[r.type]||r.type)}</span><span class="modal-link-title">${escapeHtml(r.title)}</span></a>`).join('')}</div>
     </div>` : '';
 
   const videos = d.videos && d.videos.length ? `
     <div class="modal-section">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Ajánlott videók</h3>
-      <div class="modal-links">${d.videos.map(v=>`<a class="modal-link" href="${v.url}" target="_blank" rel="noopener"><span class="modal-link-type">▶</span><span class="modal-link-title">${v.title} <span style="color:#6e7681">· ${v.channel}</span></span></a>`).join('')}</div>
+      <div class="modal-links">${d.videos.map(v=>`<a class="modal-link" href="${escapeAttr(safeUrl(v.url))}" target="_blank" rel="noopener"><span class="modal-link-type">▶</span><span class="modal-link-title">${escapeHtml(v.title)} <span style="color:#6e7681">· ${escapeHtml(v.channel)}</span></span></a>`).join('')}</div>
     </div>` : '';
 
   const related = d.related && d.related.length ? `
     <div class="modal-section">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Kapcsolódó kurzusok</h3>
-      <div class="modal-related">${d.related.map(r=>{const rc=COURSES.find(x=>x.slug===r);return rc?`<button class="modal-related-chip" onclick="openModal('${r}')">${rc.title}</button>`:'';}).join('')}</div>
+      <div class="modal-related">${d.related.map(r=>{const rc=COURSES.find(x=>x.slug===r);return rc?`<button class="modal-related-chip" onclick="openModal('${escapeAttr(r)}')">${escapeHtml(rc.title)}</button>`:'';}).join('')}</div>
     </div>` : '';
 
   document.getElementById('modal-body').innerHTML = progressBar + tagline + buildInfo + prereq + outcomes + topics + resources + videos + related;
@@ -1684,12 +1466,20 @@ function openModal(slug){
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
   // Scroll modal to top when opening (in case previous scroll state)
-  setTimeout(()=>{const mb=document.getElementById('modal-box');if(mb)mb.scrollTop=0;},0);
+  setTimeout(()=>{
+    const mb=document.getElementById('modal-box');
+    if(mb) mb.scrollTop=0;
+    const close = document.getElementById('modal-close');
+    if(close) close.focus();
+  },0);
 }
 
 function closeModal(){
   modal.classList.remove('active');
   document.body.style.overflow = '';
+  if(lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+    lastFocusedElement.focus();
+  }
 }
 
 // ── Search / filters / sort handlers ──
@@ -1739,6 +1529,19 @@ document.getElementById('modal-close').addEventListener('click', closeModal);
 modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+  if(e.key === 'Tab' && modal.classList.contains('active')){
+    const focusables = modal.querySelectorAll('a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])');
+    if(!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if(e.shiftKey && document.activeElement === first){
+      e.preventDefault();
+      last.focus();
+    } else if(!e.shiftKey && document.activeElement === last){
+      e.preventDefault();
+      first.focus();
+    }
+  }
   // Keyboard shortcut: "/" focuses search
   if(e.key === '/' && !modal.classList.contains('active') && document.activeElement.tagName !== 'INPUT'){
     e.preventDefault();
@@ -1782,21 +1585,27 @@ document.querySelectorAll('#header-nav a').forEach(a => {
 });
 
 // ── Init ──
-document.addEventListener('DOMContentLoaded', () => {
-  renderCourses();
-  renderStack();
-  renderPlatformCourseMap();
-  renderPathProgress();
-  renderMyProgress();
-  // Update stats
-  document.getElementById('stat-courses').textContent = COURSES.length;
-  document.getElementById('stat-sections').textContent = COURSES.reduce((a,c)=>a+c.sectionCount,0) + '+';
-  const tools = new Set(COURSES.flatMap(c=>c.stack));
-  document.getElementById('stat-tools').textContent = tools.size + '+';
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await loadCourses();
+    renderCourses();
+    renderStack();
+    renderPlatformCourseMap();
+    renderPathProgress();
+    renderMyProgress();
+    // Update stats
+    document.getElementById('stat-courses').textContent = COURSES.length;
+    document.getElementById('stat-sections').textContent = COURSES.reduce((a,c)=>a+(Number(c.sectionCount)||0),0) + '+';
+    const tools = new Set(COURSES.flatMap(c=>c.stack || []));
+    document.getElementById('stat-tools').textContent = tools.size + '+';
+  } catch(error) {
+    showCourseLoadError(error);
+  }
 });
 
 // Re-sync progress when user returns from a course tab
 window.addEventListener('focus', () => {
+  if(!COURSES.length) return;
   renderCourses();
   renderPathProgress();
   renderMyProgress();

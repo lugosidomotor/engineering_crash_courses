@@ -31,6 +31,9 @@ Magyar nyelvű Data Engineering és AI kurzusok — interaktív webes tananyag, 
 | 13 | [RAG Evaluation & AI Safety](https://dataengineer.hu/rag-evaluation-ai-safety/) | AI evaluáció és biztonság |
 | 14 | [LLMOps / GenAI Production](https://dataengineer.hu/llmops-genai-production/) | Production LLM alkalmazások |
 | 15 | [AIOps & MLOps](https://dataengineer.hu/aiops-mlops/) | ML modell üzemeltetés |
+| 16 | [Data Mesh](https://dataengineer.hu/data-mesh/) | Domain ownership, data product, data contract |
+| 17 | [Data Governance](https://dataengineer.hu/data-governance/) | PII, lineage, access control, audit |
+| 18 | [Agentic AI](https://dataengineer.hu/agentic-ai/) | Tool calling, LangGraph, multi-agent minták |
 
 ## WebShop Pro — Közös esettanulmány
 
@@ -46,8 +49,10 @@ Source (orders.json, events.json, catalog.json)
   → Bronze (nyers adatok)
     → Silver (tisztított, validált)
       → Gold (KPI-k, feature táblák)
-        → AI (RAG, churn score, prompt eval)
-          → Ops (Airflow DAG, MLflow, Grafana)
+        → Governance (PII, lineage, policy)
+          → Data Products (domain SLA, contract, catalog)
+            → AI (RAG, agents, churn score, prompt eval)
+              → Ops (Airflow DAG, MLflow, Grafana)
 ```
 
 ## Projekt felépítése
@@ -62,7 +67,7 @@ Source (orders.json, events.json, catalog.json)
 ├── bootstrap.sh / bootstrap.ps1  # venv + kernel telepítő
 ├── smoke_test.py                 # Importálhatóság-ellenőrző
 ├── docker-compose.yml            # Profilrendszerű lab stack
-├── sql-data-modeling/            # Kurzus aloldalak (15 db)
+├── sql-data-modeling/            # Kurzus aloldalak (18 db)
 ├── python-data-engineering/
 ├── docker-local-data-platform/
 ├── delta-table-crash-course/
@@ -77,6 +82,9 @@ Source (orders.json, events.json, catalog.json)
 ├── rag-evaluation-ai-safety/
 ├── llmops-genai-production/
 ├── aiops-mlops/
+├── data-mesh/
+├── data-governance/
+├── agentic-ai/
 ├── webshop-pro/                  # Interaktív webshop demo
 │   ├── index.html
 │   ├── app.js
@@ -98,6 +106,7 @@ Source (orders.json, events.json, catalog.json)
 - **Domain:** [dataengineer.hu](https://dataengineer.hu) (custom domain)
 - **Nyelv:** Magyar
 - **SEO:** Structured data (JSON-LD Course listings), Open Graph, sitemap, robots.txt
+- **Kurzus-metaadat forrása:** `courses.json`; a főoldal ezt tölti be, a CI pedig visszaméri az aloldalak section/code-cell számait és a képek/notebookok meglétét
 - **Responsive:** Desktop + tablet (900px) + mobil (560px) nézet, Safari/iPhone optimalizálás
 - **Közös renderelés:** `shared/course.js` generálja a kurzus aloldalak WebShop Pro projektkapcsolat szekcióját
 - **Cache busting:** `?v=2025may2` paraméter CSS/JS hivatkozásokon

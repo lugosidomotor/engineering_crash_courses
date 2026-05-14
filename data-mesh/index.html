@@ -95,20 +95,21 @@
   <h1>&lt;/&gt; Data Mesh</h1>
   <div class="header-actions">
     <span id="progress-text">0 / 16 section completed</span>
-    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
-    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
+    <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
 </header>
 <div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
-  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="Az Output gomb az előre megírt eredményt mutatja a böngészőben; valódi futtatáshoz használd a saját Python/Spark környezetedet vagy a Local Docker Labot.">ℹ️ Output info</span>
 </div>
 <nav id="side-nav"></nav>
 <main id="main-content">
 
 <div class="section layer-intro" id="s0">
   <div class="section-number">Section 00</div>
-  <h2>Data Mesh Crash Course <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span> <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span></h2>
+  <h2>Data Mesh Crash Course <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span> <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg" alt="" aria-hidden="true">Unity Catalog</span></h2>
   <div class="md-cell"><p>A <strong>Data Mesh</strong> egy szociotechnikai paradigma, amelyet Zhamak Dehghani fogalmazott meg 2019-ben (ThoughtWorks). A központi kérdés: miért nem skáláznak a hagyományos centralizált adatplatformok (data lake, data warehouse) a modern, sok-domainű, gyorsan változó vállalatokban? A válasz nem több hardver és nem egy újabb eszköz — hanem a felelősségek és a tulajdonjog szervezeti újragondolása.</p>
+<p><strong>Gyakorlati lab:</strong> a kurzushoz tartozik egy <code>notebook.ipynb</code>, amely a WebShop Pro domainjeiből data product contract mintát épít. A teljes lokális stack a <code>docker compose --profile mesh up -d</code> paranccsal indítható.</p>
 <p>A klasszikus <span class="glossary-term" data-def="Egy központi adatcsapat felelős a teljes vállalat adatainak ETL-jéért, modellezéséért és kiszolgálásáért">centralizált data lake</span> vagy enterprise data warehouse fájdalmai mára jól dokumentáltak: a központi adatcsapat szűk keresztmetszet lesz, az üzleti domainek várnak heteket-hónapokat egy mező hozzáadásáért, az adatminőség romlik (mert a központ nem érti a domain szemantikáját), és a lineage átláthatatlan. A Data Mesh ezt négy alapelvvel oldja meg.</p>
 <p><strong>A négy alapelv:</strong> (1) <em>domain ownership</em> — minden üzleti domain a saját adatainak tulajdonosa, (2) <em>data as a product</em> — az adatra termékként, nem melléktermékként tekintünk, (3) <em>self-serve data platform</em> — egy közös platform-réteg lehetővé teszi, hogy a domain-csapatok önállóan dolgozzanak, (4) <em>federated computational governance</em> — a globális szabályok automatizáltan, kód formában érvényesülnek, miközben a lokális döntéseket a domainek hozzák.</p>
 <p><strong>WebShop Pro kontextus:</strong> A WebShop Pro-ban négy üzleti domain működik — <strong>marketing</strong> (események, kampányok, attribúció), <strong>sales</strong> (rendelések, kosár, fizetés), <strong>support</strong> (ticketek, ügyfélszolgálati kommunikáció) és <strong>fulfillment</strong> (raktár, logisztika, szállítás). Egy klasszikus data lake-ben mind a négy domain adatát egyetlen 5-fős központi csapat dolgozza fel — ez nem skálázik. A Data Mesh-ben minden domain saját adattermékeit publikálja, a központi platform-csapat csak az infrastruktúrát biztosítja.</p>
@@ -117,7 +118,7 @@
 
 <div class="section layer-general" id="s1">
   <div class="section-number">Section 01</div>
-  <h2>Domain ownership <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
+  <h2>Domain ownership <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span></h2>
   <div class="md-cell"><p>A <strong>domain ownership</strong> alapelv az adatra adaptálja a domain-driven design (DDD) szervezeti modelljét. A klasszikus DDD-ben Eric Evans szerint a szoftvert <em>bounded context</em>-ekre osztjuk: minden context saját nyelvi modellel (ubiquitous language), saját üzleti szabályokkal és saját csapattal rendelkezik. A Data Mesh ugyanezt mondja az adatra: minden üzleti domain a saját analitikai adatainak is tulajdonosa, nem csak az operatív rendszereknek.</p>
 <p>A <span class="glossary-term" data-def="Domain-driven design fogalom: explicit határvonal egy modell körül, amelyen belül a kifejezések egyértelmű jelentéssel bírnak">bounded context</span> azt jelenti, hogy egy fogalom (pl. "rendelés") jelentése a kontextustól függ. A sales domain "rendelés" fogalma tartalmazza a kosártartalmat, kedvezményeket és fizetési módot. A fulfillment domain "rendelés" fogalma viszont a csomag tartalmát, a címkét és a futárszolgálat útvonalát jelenti. Ezek nem ugyanaz az entitás — két különböző modell, két különböző tulajdonossal.</p>
 <p><strong>WebShop Pro példa:</strong> A <code>orders</code> domain a sales csapathoz tartozik — ők értik a fizetési flow-t, a kuponokat és a refund logikát. Az <code>events</code> domain (kattintás, oldalmegtekintés, attribúciós tracking) a marketing csapathoz tartozik — ők értik a kampánymodelleket és a UTM paramétereket. Egy klasszikus, monolitikus data team-ben mindkettőt ugyanaz a 2-3 ember írná dbt-ben, és sokszor egyik domaint sem értené igazán mélyen.</p>
@@ -125,7 +126,7 @@
 <div class="code-cell" id="cell-1">
   <div class="code-header">
     <span class="cell-number">[0]</span>
-    <button class="run-btn" onclick="runCell(1)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(1)">Output</button>
   </div>
   <div class="code-body"><pre># WebShop Pro: domain-tulajdonú repo-struktúra
 # Minden domain saját Git repó-val, saját CI/CD pipeline-nal,
@@ -178,7 +179,7 @@ print("4 domain repo + 1 platform repo = 5 független CI/CD pipeline")</pre></di
 
 <div class="section layer-bronze" id="s2">
   <div class="section-number">Section 02</div>
-  <h2>Data as a product (DATSIS) <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
+  <h2>Data as a product (DATSIS) <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span></h2>
   <div class="md-cell"><p>A <strong>data as a product</strong> alapelv azt jelenti, hogy az adat nem egy ETL pipeline mellékterméke ("ami kifolyik a végén"), hanem egy önálló, kezelt termék, saját SLA-val, dokumentációval, verziókezeléssel és felelős tulajdonossal. Ez gyökeresen más mentalitás, mint a hagyományos "table dump" megközelítés.</p>
 <p>Zhamak Dehghani definiálta a <strong>DATSIS</strong> attribútumokat — egy data product akkor minőségi, ha mind a hét kritériumnak megfelel: <em>Discoverable</em> (egy katalógusban kereshető), <em>Addressable</em> (van egyedi URI/cím), <em>Trustworthy</em> (publikált SLA, freshness, completeness mérőszámokkal), <em>Self-describing</em> (a séma és a szemantika magából a termékből kiderül), <em>Interoperable</em> (szabványos formátumok, közös azonosítók), <em>Secure</em> (auth és access control), és <em>Valuable on its own</em> (önállóan is hasznos, nem csak más termékek nyersanyagaként).</p>
 <p><strong>WebShop Pro példa:</strong> A <code>marts.orders__paid</code> data product a sales domain felelőssége. A <em>contract</em> az ügyféllel (pl. a finance domain): minden fizetett rendelés <strong>15 percen belül</strong> megjelenik, a séma <strong>backward compatible</strong> marad legalább 90 napig, és a <code>order_id</code> globálisan egyedi azonosító, ami az events domain felé is használható join-key.</p>
@@ -186,7 +187,7 @@ print("4 domain repo + 1 platform repo = 5 független CI/CD pipeline")</pre></di
 <div class="code-cell" id="cell-2">
   <div class="code-header">
     <span class="cell-number">[1]</span>
-    <button class="run-btn" onclick="runCell(2)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(2)">Output</button>
   </div>
   <div class="code-body"><pre># dataProduct.yaml — WebShop Pro: orders__paid data product
 apiVersion: dataproduct.io/v1
@@ -232,7 +233,7 @@ Schema: 3 fields, 0 breaking changes vs v1.2.0</pre>
 
 <div class="section layer-bronze" id="s3">
   <div class="section-number">Section 03</div>
-  <h2>Data product specifikáció <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
+  <h2>Data product specifikáció <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span></h2>
   <div class="md-cell"><p>A <strong>data product specifikáció</strong> egy géppel olvasható szerződés, ami a fogyasztói és a tulajdonosi oldal között definiálja a szolgáltatás paramétereit. Iparági szabvány még nem alakult ki teljesen, de két komoly kezdeményezés van: az <strong>Open Data Product Specification (ODPS)</strong> a Bitol Labs gondozásában és a <strong>Data Contract Specification</strong> a datacontract.com-tól.</p>
 <p>Egy érett spec a következő részeket tartalmazza: <em>identity</em> (név, domain, verzió), <em>output ports</em> (hol és milyen formátumban érhető el — Delta tábla, REST API, Kafka topic), <em>input ports</em> (milyen forrás-szerződésekre támaszkodik), <em>schema</em> (mezők, típusok, kötelezőség, leírás), <em>SLA</em> (freshness, availability, completeness), <em>retention</em> (meddig őrizzük az adatot), <em>lineage</em> (upstream/downstream függőségek), <em>classification</em> (PII, internal, public), és <em>contact</em> (felelős csapat, eszkalációs lánc).</p>
 <p><strong>Verziókezelés:</strong> a spec semantic versioning szerint változik. Egy patch (1.2.0 → 1.2.1) leíró javítás. Egy minor (1.2.0 → 1.3.0) <em>backward compatible</em> bővítés (új opcionális mező). Egy major (1.2.0 → 2.0.0) <em>breaking change</em> — ezt deprecation időszakkal kell bevezetni, hogy a fogyasztók át tudjanak állni.</p>
@@ -240,7 +241,7 @@ Schema: 3 fields, 0 breaking changes vs v1.2.0</pre>
 <div class="code-cell" id="cell-3">
   <div class="code-header">
     <span class="cell-number">[2]</span>
-    <button class="run-btn" onclick="runCell(3)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(3)">Output</button>
   </div>
   <div class="code-body"><pre># events__attribution.dataproduct.yaml
 apiVersion: dataproduct.io/v1
@@ -296,7 +297,7 @@ spec:
 
 <div class="section layer-silver" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>Self-serve data platform <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span></h2>
+  <h2>Self-serve data platform <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg" alt="" aria-hidden="true">Unity Catalog</span></h2>
   <div class="md-cell"><p>A <strong>self-serve data platform</strong> alapelv azt mondja: ha minden domain saját adat-csapatot kap, a központi platform-csapat nem tűnik el — átalakul. Nem ETL-t ír többé, hanem <em>belső termékeket</em> (developer tooling, infra, runtime) szállít, amelyeket a domain-csapatok önkiszolgáló módon használhatnak. Ez a platform engineering filozófia adaptálása adatra.</p>
 <p>Egy érett self-serve adatplatformnak hét képességet kell kínálnia: (1) <em>storage</em> — Delta/Iceberg tábla provisioning egy paranccsal, (2) <em>compute</em> — Spark/dbt cluster automata indítással, (3) <em>catalog</em> — séma- és lineage-tár (Unity Catalog, DataHub), (4) <em>orchestration</em> — Airflow/Dagster mint platform-szolgáltatás, (5) <em>observability</em> — log, metrika, freshness check központosítva, (6) <em>access control</em> — RBAC/ABAC policy engine, (7) <em>CI/CD</em> — kódot push-ra automatikusan deploy.</p>
 <p><strong>Klasszikus eszközstack:</strong> Databricks (compute + Delta), dbt (transzformáció), Unity Catalog vagy Atlan (catalog), Airflow vagy Dagster (orchestration), Monte Carlo vagy Soda (observability), Open Policy Agent (governance). A platform-csapat ezeket összerakja, dokumentálja és supportálja — a domain-csapat csak használja.</p>
@@ -305,7 +306,7 @@ spec:
 
 <div class="section layer-silver" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>Federated computational governance <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span></h2>
+  <h2>Federated computational governance <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg" alt="" aria-hidden="true">Unity Catalog</span></h2>
   <div class="md-cell"><p>A <strong>federated computational governance</strong> a Data Mesh negyedik és sokak szerint legnehezebb pillére. A federated jelző a politikai szövetségi modellből származik: bizonyos szabályok globálisak (mint egy szövetségi alkotmány), mások lokálisak (mint a tagállami törvények). Az adatra fordítva: néhány policy az egész vállalatra érvényes, de a legtöbb döntést a domain hozza meg saját üzleti logikája alapján.</p>
 <p><strong>Globális szabályok</strong> — minden domainre kötelezőek: GDPR-megfelelés (PII tagging, retention, subject-access-request), naming convention (snake_case oszlopnevek, UTC timestamp), interoperabilitás (közös ID-formátumok, mint a <code>customer_id</code> UUID v4), security baseline (encryption at rest, audit log), és a data contract verziókezelés szabályai.</p>
 <p><strong>Lokális szabályok</strong> — domain-szintűek: a marketing domain eldöntheti, hogy a <code>campaign_id</code> mezőt kötelező-e minden eseményhez, a sales eldöntheti, hogy a <code>discount_code</code> milyen formátumú, a support eldöntheti, hogy a ticket SLA hogyan számolódik. A platformnak nincs joga ezekhez beleszólni, mert nem érti a domain-specifikus üzleti logikát.</p>
@@ -323,7 +324,7 @@ spec:
 <div class="code-cell" id="cell-6">
   <div class="code-header">
     <span class="cell-number">[3]</span>
-    <button class="run-btn" onclick="runCell(6)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(6)">Output</button>
   </div>
   <div class="code-body"><pre># Architektúra-topológiák összehasonlítása
 
@@ -396,7 +397,7 @@ print("  Data Mesh:     10+ domain, 50+ stakeholder, gyors változás")</pre></d
 
 <div class="section layer-silver" id="s9">
   <div class="section-number">Section 09</div>
-  <h2>Data product technikai megvalósítása <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
+  <h2>Data product technikai megvalósítása <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span></h2>
   <div class="md-cell"><p>A data product nem csak elméleti fogalom — konkrét technikai artifaktokra fordítható le. A leggyakoribb implementáció egy <strong>dbt projekt</strong>, amely egy domain-tulajdonú repó alatt él, saját CI/CD-vel, és output port-ként Delta/Iceberg táblákat publikál. Ezt egészítheti ki egy REST API gateway (FastAPI vagy Hasura), ha a fogyasztók nem Spark-on dolgoznak.</p>
 <p><strong>Output port-ok:</strong> a leggyakoribb választás a Delta vagy Iceberg tábla — könnyen olvasható Spark/Trino/DuckDB-ből, ACID tranzakciókkal és time travel-lel. Magasabb-szintű fogyasztóknak (BI tool, alkalmazás) érdemes REST endpoint-ot is kínálni, ami ugyanazon az adaton dolgozik.</p>
 <p><strong>Input port-ok:</strong> minden upstream forrás <em>contract</em> alapján érhető el, nem közvetlen tábla-hivatkozás alapján. A sales domain pl. nem azt mondja "olvasom a marketing.events tábla X oszlopát", hanem "fogyasztom a marketing/events-attribution@1.4 contract-ot". Így a marketing belül átszervezheti a táblákat, amíg a contract változatlan marad.</p>
@@ -404,7 +405,7 @@ print("  Data Mesh:     10+ domain, 50+ stakeholder, gyors változás")</pre></d
 <div class="code-cell" id="cell-9">
   <div class="code-header">
     <span class="cell-number">[4]</span>
-    <button class="run-btn" onclick="runCell(9)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(9)">Output</button>
   </div>
   <div class="code-body"><pre># models/marts/orders__paid.sql (dbt model — sales domain)
 {{ config(
@@ -476,7 +477,7 @@ models:
 <div class="code-cell" id="cell-10">
   <div class="code-header">
     <span class="cell-number">[5]</span>
-    <button class="run-btn" onclick="runCell(10)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(10)">Output</button>
   </div>
   <div class="code-body"><pre># orders-paid.datacontract.yaml
 dataContractSpecification: 0.9.3
@@ -542,7 +543,7 @@ quality:
 
 <div class="section layer-gold" id="s11">
   <div class="section-number">Section 11</div>
-  <h2>Catalog és discovery <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span></h2>
+  <h2>Catalog és discovery <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg" alt="" aria-hidden="true">Unity Catalog</span></h2>
   <div class="md-cell"><p>A <strong>data catalog</strong> a Data Mesh idegrendszere — ez teszi a DATSIS első attribútumát (<em>Discoverable</em>) lehetővé. Egy katalógus nélkül a 30+ data product gyakorlatilag láthatatlan: senki sem tudja, milyen termékek léteznek, ki a tulajdonos, és melyik a megbízható forrás. Egy érett katalógus három képességet egyesít: schema repository, lineage tracker, és discovery UI.</p>
 <p><strong>Vezető eszközök:</strong> az <a href="https://datahubproject.io/" target="_blank" rel="noopener">DataHub</a> (LinkedIn eredetű, open source, leginkább technikai felhasználóknak), az <strong>OpenMetadata</strong> (aktív open source catalog és quality funkciókkal), az <strong>Atlan</strong> (kereskedelmi, business-glossary erős), és a <strong>Databricks Unity Catalog</strong> (ha Databricks-ön vagy, ez az alapértelmezett governance réteg).</p>
 <p><strong>Discovery user-perspektívából:</strong> egy data analyst beír a katalógus search-be, hogy "customer churn", és kap egy listát a témához kapcsolódó termékekről, mindegyiken megjelenik a tulajdonos, az SLA, az utolsó frissítés, a downstream konzumensek listája és egy "trust score" (mennyire megbízható). Egy kattintással lát egy lineage-grafot, hogy honnan jön az adat, és hova megy.</p>
@@ -550,7 +551,7 @@ quality:
 <div class="code-cell" id="cell-11">
   <div class="code-header">
     <span class="cell-number">[6]</span>
-    <button class="run-btn" onclick="runCell(11)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(11)">Output</button>
   </div>
   <div class="code-body"><pre># DataHub data product regisztráció (Python SDK)
 from datahub.emitter.mce_builder import make_dataset_urn, make_user_urn
@@ -624,7 +625,7 @@ print(f"[ok] Registered: {dataset_urn}")</pre></div>
 <div class="code-cell" id="cell-12">
   <div class="code-header">
     <span class="cell-number">[7]</span>
-    <button class="run-btn" onclick="runCell(12)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(12)">Output</button>
   </div>
   <div class="code-body"><pre># pii_access.rego — OPA policy PII oszlopokra
 package webshop.dataproduct.access
@@ -685,7 +686,7 @@ deny_reason := reason if {
 <div class="code-cell" id="cell-13">
   <div class="code-header">
     <span class="cell-number">[8]</span>
-    <button class="run-btn" onclick="runCell(13)">&#9654; Run</button>
+    <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell(13)">Output</button>
   </div>
   <div class="code-body"><pre># soda/orders_paid_checks.yml
 checks for orders__paid:

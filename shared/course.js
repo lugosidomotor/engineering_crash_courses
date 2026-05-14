@@ -29,6 +29,8 @@
     if (!header) return;
     var btn = document.createElement('button');
     btn.className = 'copy-btn';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Kód másolása');
     btn.textContent = 'Copy';
     btn.onclick = function() {
       var code = cell.querySelector('.code-body pre');
@@ -57,9 +59,14 @@
   // ── Mobile nav toggle ──
   var toggle = document.createElement('button');
   toggle.className = 'nav-toggle';
+  toggle.type = 'button';
+  toggle.setAttribute('aria-label', 'Navigáció megnyitása');
+  toggle.setAttribute('aria-expanded', 'false');
   toggle.textContent = '☰';
   toggle.onclick = function() {
-    if (nav) nav.classList.toggle('open');
+    if (!nav) return;
+    var isOpen = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
   };
   document.body.appendChild(toggle);
 
@@ -68,6 +75,7 @@
     nav.addEventListener('click', function(e) {
       if (e.target.closest('.nav-item') && window.innerWidth <= 900) {
         nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
       }
     });
   }
@@ -198,7 +206,7 @@
     });
   }
 
-  // ── Run Cell (with animation) ──
+  // ── Show Cell Output (with animation) ──
   window.runCell = function(cellId) {
     var cell = document.getElementById('cell-' + cellId);
     if (!cell) return;
@@ -213,7 +221,7 @@
     cell.classList.add('running');
     if (btn) {
       btn.classList.add('running-btn');
-      btn.textContent = '⏳ Running...';
+      btn.textContent = 'Megjelenítés...';
     }
 
     var delay = 400 + Math.random() * 800;
@@ -223,7 +231,7 @@
       if (btn) {
         btn.classList.remove('running-btn');
         btn.classList.add('done-btn');
-        btn.textContent = '✓ Done';
+        btn.textContent = '✓ Látható';
       }
       output.classList.add('visible');
 
@@ -241,7 +249,7 @@
     }, delay);
   };
 
-  // ── Run All ──
+  // ── Show all outputs ──
   window.runAll = async function() {
     if (runAllRunning) return;
     runAllRunning = true;
@@ -270,7 +278,7 @@
       var btn = cell.querySelector('.run-btn');
       if (btn) {
         btn.classList.remove('running-btn', 'done-btn');
-        btn.textContent = '▶ Run';
+        btn.textContent = 'Output';
       }
     });
     document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('completed', 'active'); });
@@ -315,7 +323,7 @@
           var btn = cell.querySelector('.run-btn');
           var output = document.getElementById('out-' + id);
           cell.classList.add('has-output');
-          if (btn) { btn.classList.add('done-btn'); btn.textContent = '✓ Done'; }
+          if (btn) { btn.classList.add('done-btn'); btn.textContent = '✓ Látható'; }
           if (output) output.classList.add('visible');
         });
       }
@@ -500,7 +508,7 @@
     injectCourseIntro();
     injectFurtherLearning();
     addSectionCompleteButtons();
-    setupAutoMarkOnView();
+    // Progress is explicit: users mark sections done or reveal outputs themselves.
   });
 
   // ── Keyboard shortcuts ──

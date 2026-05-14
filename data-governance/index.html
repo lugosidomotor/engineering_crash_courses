@@ -95,12 +95,12 @@
   <h1>&lt;/&gt; Data Governance</h1>
   <div class="header-actions">
     <span id="progress-text">0 / 16 section completed</span>
-    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
-    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
+    <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
 </header>
 <div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
-  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="Az Output gomb az előre megírt eredményt mutatja a böngészőben; valódi futtatáshoz használd a saját Python/Spark környezetedet vagy a Local Docker Labot.">ℹ️ Output info</span>
 </div>
 <nav id="side-nav"></nav>
 <main id="main-content">
@@ -108,6 +108,7 @@
   <div class="section-number">Section 00</div>
   <h2>Data Governance Crash Course </h2>
   <div class="md-cell"><p>A <strong>data governance</strong> (adatkormányzás) az adatok kezelésének, biztonságának, minőségének és felhasználásának átfogó keretrendszere egy szervezeten belül. Nem egy eszköz vagy egyetlen technológia — hanem politikák, folyamatok, szerepkörök és tooling-ok együttese, amelyek garantálják, hogy az adatok megbízhatóak, biztonságosak és <span class="glossary-term" data-def="A General Data Protection Regulation, az EU adatvédelmi rendelete, amely 2018 óta hatályos és komoly bírságokkal (akár 4%-os éves árbevétel-arányos) bünteti a megsértést">GDPR</span>-kompatibilisek.</p>
+<p><strong>Gyakorlati lab:</strong> a kurzushoz tartozik egy <code>notebook.ipynb</code>, amely WebShop Pro rendelésadatokon mutat PII-osztályozást, maszkolást és audit policy blueprintet. A teljes lokális stack a <code>docker compose --profile governance up -d</code> paranccsal indítható.</p>
 <p><strong>Miért szükséges?</strong> Három fő okból: (1) <strong>compliance</strong> — a GDPR, HIPAA, PCI-DSS és más szabályozók megsértése komoly bírságokkal jár (a Meta 2023-ban 1.2 milliárd EUR bírságot kapott). (2) <strong>Trust</strong> — ha az üzleti felhasználók nem bíznak az adatokban, nem hoznak rá döntést, és a data platform befektetése nem térül meg. (3) <strong>ROI</strong> — a Gartner becslése szerint a rossz adatminőség évente átlagosan 12.9 millió USD veszteséget okoz egy nagyvállalatnak.</p>
 <p><strong>Az 5 dimenzió:</strong> A modern data governance öt területre oszlik: <em>data quality</em> (adatminőség), <em>data lineage</em> (adat-eredet és -útvonal), <em>security &amp; access control</em> (biztonság és hozzáférés-szabályozás), <em>compliance &amp; privacy</em> (megfelelőség és magánélet-védelem), valamint <em>master data management</em> (törzsadat-kezelés). Ebben a kurzusban mind az ötöt érintjük.</p>
 <p><strong>WebShop Pro kontextus:</strong> A webshopunknak naponta több ezer rendelése van, ügyfél-emailek, lakcímek, kártyaadatok kerülnek a rendszerbe. Egy GDPR-bejelentés (right to be forgotten), egy fél éve elhagyott munkavállaló még élő hozzáférése vagy egy hibás termékár-bejegyzés mind governance-problémák. A kurzus végére tudni fogod, hogyan építs be governance-t a pipeline-ba a kezdetektől.</p>
@@ -134,7 +135,7 @@
 <p><strong>WebShop Pro:</strong> A <code>customer_deletion_requests</code> táblába jegyzünk fel minden kérést, és egy nightly batch processzálja: anonimizálja a <code>customer_id</code>-t (pl. SHA-256 hash + irreverzibilis salt), törli az emailt, telefont, lakcímet — de megőrzi a rendelési sorokat aggregált statisztikai célra (anonim formában).</p></div><div class="code-cell" id="cell-s2">
     <div class="code-header">
       <span class="cell-number">[2]</span>
-      <button class="run-btn" onclick="runCell('s2')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s2')">Output</button>
     </div>
     <div class="code-body"><pre># GDPR Right to be forgotten — Delta Lake implementáció
 from delta.tables import DeltaTable
@@ -175,7 +176,7 @@ VACUUM lefutott: time-travel history törölve 7 napon túl</pre>
 
 <div class="section layer-bronze" id="s3">
   <div class="section-number">Section 03</div>
-  <h2>PII detection és redaction <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>PII detection és redaction <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell"><p>A <strong>PII detection</strong> (személyes adatok automatikus felismerése) elengedhetetlen, ha nagy mennyiségű strukturálatlan vagy félig strukturált adat érkezik a rendszerbe — pl. email szöveg, support chat log, szerződés-PDF, free-text comment field. Manuálisan átnézni lehetetlen, automatizált tooling kell.</p>
 <p><strong>Microsoft Presidio:</strong> Nyílt forráskódú PII detection és redaction Python library, amelyet a Microsoft fejleszt. Felismeri a <code>EMAIL_ADDRESS</code>, <code>PHONE_NUMBER</code>, <code>CREDIT_CARD</code>, <code>IP_ADDRESS</code>, <code>PERSON</code>, <code>LOCATION</code> és sok más entitást. Két komponensből áll: <em>Presidio Analyzer</em> (felismerés) és <em>Presidio Anonymizer</em> (helyettesítés/maszkolás).</p>
 <p><strong>AWS Comprehend és Azure AI Language:</strong> Felhő-natív alternatívák, amelyek pre-trained NER (Named Entity Recognition) modelleket biztosítanak. Az AWS Comprehend külön <em>PII detection</em> API-val rendelkezik, de a dokumentált PII nyelvi támogatása angol és spanyol; magyar adatoknál ezért validált regex, Presidio custom recognizer vagy nyelvspecifikus NER modell kell. Költségesebbek, mint a self-hosted megoldások (per-API-call), de kezelt szolgáltatásként kevesebb üzemeltetést igényelnek.</p>
@@ -184,7 +185,7 @@ VACUUM lefutott: time-travel history törölve 7 napon túl</pre>
 <p><strong>WebShop Pro példa:</strong> A customer support chat log-ot beolvassuk Bronze layer-be, és a Silver layer-be már redaktált formában kerül. Az eredeti, nem-redaktált adat csak short-term retention-nel van (pl. 30 nap a debugging célra), utána automatikusan törlődik.</p></div><div class="code-cell" id="cell-s3">
     <div class="code-header">
       <span class="cell-number">[3]</span>
-      <button class="run-btn" onclick="runCell('s3')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s3')">Output</button>
     </div>
     <div class="code-body"><pre># Microsoft Presidio: PII detection és redaction WebShop chat log-ra
 from presidio_analyzer import AnalyzerEngine
@@ -233,7 +234,7 @@ print(chat_log[["chat_id", "message_redacted"]].to_string())</pre></div>
 
 <div class="section layer-bronze" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>Anonimizálás vs pszeudonimizálás <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Anonimizálás vs pszeudonimizálás <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell"><p>A GDPR megkülönbözteti az <strong>anonimizálást</strong> és a <strong>pszeudonimizálást</strong> — és ez a különbség alapvető fontosságú. Az anonimizált adat <em>nem személyes adat</em> (a GDPR hatálya alól kikerül), míg a pszeudonimizált adat továbbra is személyes adat, csak biztonságosabb.</p>
 <p><strong>Anonimizálás:</strong> Az adat olyan módon átalakítva, hogy <em>visszaállíthatatlan</em> az eredeti személyhez kötés — még a feldolgozó félnek sincs technikai eszköze a visszafejtésre. Példa: aggregált statisztikák ("a 18-25 éves felhasználók 67%-a vásárolt cipőt"), <strong>k-anonymity</strong>, <strong>differential privacy</strong>.</p>
 <p><strong>Pszeudonimizálás:</strong> Az adat egy másik értékre cserélve (pl. valós név helyett UUID), de egy <em>külön táblában</em> vagy kulccsal a leképezés visszaállítható. Példa: SHA-256 hash + salt — ha ugyanaz a salt minden esetben, ugyanaz az input ugyanazt a hash-t adja (deterministic), így az analytics továbbra is működik (pl. ugyanazon ügyfél több vásárlása összeköthető), de a "valódi" identitás csak a salt birtokában fejthető vissza.</p>
@@ -242,7 +243,7 @@ print(chat_log[["chat_id", "message_redacted"]].to_string())</pre></div>
 <p><strong>WebShop Pro:</strong> A <code>customer_id</code>-t pszeudonimizáljuk SHA-256 + per-customer-salt-tal, hogy az analytics csapat tudjon repeat-purchaser elemzést, de ne lássák a valódi nevet. A marketing csapat számára k=10 anonim aggregátumot szolgáltatunk: minden szegmensben legalább 10 ember van.</p></div><div class="code-cell" id="cell-s4">
     <div class="code-header">
       <span class="cell-number">[4]</span>
-      <button class="run-btn" onclick="runCell('s4')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s4')">Output</button>
     </div>
     <div class="code-body"><pre># Pszeudonimizálás: SHA-256 hash + salt
 import hashlib
@@ -292,7 +293,7 @@ print(customers)</pre></div>
 
 <div class="section layer-silver" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>RBAC vs ABAC <span class="tool-badge"><img src="../assets/logos/sql.svg">SQL</span></h2>
+  <h2>RBAC vs ABAC <span class="tool-badge"><img src="../assets/logos/sql.svg" alt="" aria-hidden="true">SQL</span></h2>
   <div class="md-cell"><p>A <strong>hozzáférés-szabályozás</strong> (access control) két fő modell mentén épül fel: <strong>RBAC</strong> (Role-Based Access Control — szerepkör-alapú) és <strong>ABAC</strong> (Attribute-Based Access Control — attribútum-alapú). Mindkettőnek van helye a modern data platform-ban, és gyakran kombinálva használjuk őket.</p>
 <p><strong>RBAC — Role-Based:</strong> A felhasználókat szerepkörökhöz rendeljük (pl. <code>analyst</code>, <code>data_engineer</code>, <code>customer_service</code>), és a jogosultságokat a szerepkörökhöz, nem közvetlenül a felhasználókhoz. Egyszerű, jól skálázódik 10-100 szerepkörig. PostgreSQL <code>GRANT SELECT ON ... TO analyst</code>, Snowflake <code>GRANT ROLE ANALYST TO USER alice</code>, Unity Catalog group-based grants.</p>
 <p><strong>ABAC — Attribute-Based:</strong> A hozzáférést dinamikusan, attribútumok alapján döntik el — pl. felhasználó attribútumok (osztály, lokáció, biztonsági szint), erőforrás attribútumok (data classification, owner), környezeti attribútumok (idő, IP cím). Rugalmas, de bonyolultabb. AWS IAM policy condition-ök, OPA/Rego policy-k, Snowflake <em>Row Access Policies</em>.</p>
@@ -301,7 +302,7 @@ print(customers)</pre></div>
 <p><strong>WebShop Pro:</strong> Az analytics csapat csak a Silver/Gold layert láthatja, pszeudonimizált customer_id-vel. A customer service munkatársak csak a saját régiójuk ügyfeleit (RLS based on <code>region_assignment</code>). A finance csak a payment_summary aggregátumokat, a részletes kártya-tranzakciókat egyikük sem.</p></div><div class="code-cell" id="cell-s5">
     <div class="code-header">
       <span class="cell-number">[5]</span>
-      <button class="run-btn" onclick="runCell('s5')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s5')">Output</button>
     </div>
     <div class="code-body"><pre>-- PostgreSQL Row Level Security: regional access
 -- 1. Engedélyezzük az RLS-t a táblán
@@ -350,7 +351,7 @@ RBAC hierarchia: senior_analyst > analyst (joggörölés)</pre>
 
 <div class="section layer-silver" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>Data lineage <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
+  <h2>Data lineage <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span></h2>
   <div class="md-cell"><p>A <strong>data lineage</strong> (adat-eredet és -útvonal) az adatok útjának teljes körű dokumentációja a forrásrendszertől a végfelhasználói riport-ig. Megmutatja, hogy egy adott KPI-érték milyen pipeline-okon, transzformációkon keresztül jutott el oda, ahol a CFO látja. Kritikus eszköz az impact analysis-hez (mi törik el, ha kiveszek egy oszlopot?), a debugginghoz és az audithoz.</p>
 <p><strong>Két szint:</strong> <em>Table-level lineage</em> — melyik tábla származik melyikből (pl. <code>gold.daily_sales</code> ← <code>silver.orders</code> + <code>silver.products</code>). <em>Column-level lineage</em> — melyik oszlop származik melyik forrás-oszlopból, milyen transzformációval (pl. <code>gold.daily_sales.revenue</code> = <code>SUM(silver.orders.amount * silver.products.price)</code>). A column-level a sokkal értékesebb, de nehezebb előállítani.</p>
 <p><strong>dbt automatic lineage:</strong> A dbt automatikusan generálja a lineage-et a SQL modellek elemzésével. A <code>dbt docs generate</code> parancs interaktív DAG-ot hoz létre, ahol minden node egy modell, minden él egy <code>ref()</code> vagy <code>source()</code> hivatkozás. Ingyenes, beépített funkció.</p>
@@ -359,7 +360,7 @@ RBAC hierarchia: senior_analyst > analyst (joggörölés)</pre>
 <p><strong>WebShop Pro:</strong> Ha a CFO megkérdezi, "miért 3.2M Ft a tegnapi árbevétel?", a lineage-en keresztül visszakövetjük: <code>gold.daily_revenue</code> ← <code>silver.orders</code> ← <code>bronze.orders_raw</code> (Kafka Topic <code>webshop-orders</code>). Az impact analysis: ha a <code>products.price_huf</code> oszlop nevet változtat, 14 downstream modell érintett — mindenkit értesítünk.</p></div><div class="code-cell" id="cell-s6">
     <div class="code-header">
       <span class="cell-number">[6]</span>
-      <button class="run-btn" onclick="runCell('s6')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s6')">Output</button>
     </div>
     <div class="code-body"><pre># OpenLineage event JSON — egy Spark job lefutása után küldött lineage event
 {
@@ -419,7 +420,7 @@ DAG node: build_daily_orders_silver (kafka:webshop-orders-raw → s3:silver/orde
 
 <div class="section layer-silver" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>Data catalog és metadata management <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span> <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Data catalog és metadata management <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg" alt="" aria-hidden="true">Unity Catalog</span> <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell"><p>A <strong>data catalog</strong> a vállalat adatleltára: minden tábla, view, dashboard, ML modell központi nyilvántartása metaadatokkal — leírás, owner, tagek, sémák, lineage, használati statisztika. Nélküle az új munkavállaló napokat tölt el azzal, hogy "melyik tábla a forrása az árbevétel-riportnak?". Vele 30 másodperc.</p>
 <p><strong>DataHub (LinkedIn):</strong> Nyílt forráskódú, modern data catalog. Erős integrációs ecosystem: Spark, Airflow, dbt, Snowflake, BigQuery, Looker — mind van hozzá ingestion plugin. Metadata model rugalmas (Pegasus schema). Self-hosted (Kubernetes) vagy SaaS (Acryl).</p>
 <p><strong>Amundsen (Lyft):</strong> Szintén nyílt forráskódú, egyszerűbb mint a DataHub. Search-first UX (Google-szerű kereső). Kisebb közösség, lassabb fejlődés. Jó választás, ha gyorsan akarsz indulni és nem kell mély lineage.</p>
@@ -429,7 +430,7 @@ DAG node: build_daily_orders_silver (kafka:webshop-orders-raw → s3:silver/orde
 <p><strong>WebShop Pro:</strong> A DataHub-ot választottuk, mert az ingestion plugin-ja Spark, Airflow és Snowflake-hez is van — egyetlen nightly job-bal a teljes katalógus naprakész. Minden tábla owner-rel és business glossary-vel van címkézve, így a nem-technikai user-ek is megtalálják, amit keresnek.</p></div><div class="code-cell" id="cell-s7">
     <div class="code-header">
       <span class="cell-number">[7]</span>
-      <button class="run-btn" onclick="runCell('s7')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s7')">Output</button>
     </div>
     <div class="code-body"><pre># DataHub Python ingestion: WebShop Snowflake metadata feltöltése
 # pip install 'acryl-datahub[snowflake]'
@@ -500,7 +501,7 @@ Pipeline finished: 12m 34s</pre>
 <p><strong>WebShop Pro:</strong> A Bronze layer-en alap szintű check-ek (séma validáció), a Silver-en business rule check-ek (negatív összeg tilos), a Gold-on cross-table konzisztencia (revenue match-eljen a payment-tel). Minden check eredménye egy <code>dq_results</code> Delta táblába íródik, és a Grafana dashboardon napi DQ score látható.</p></div><div class="code-cell" id="cell-s8">
     <div class="code-header">
       <span class="cell-number">[8]</span>
-      <button class="run-btn" onclick="runCell('s8')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s8')">Output</button>
     </div>
     <div class="code-body"><pre># Soda Core check YAML — WebShop Pro silver.orders tábla
 # checks/silver_orders.yml
@@ -566,7 +567,7 @@ DQ score: 0.91</pre>
 
 <div class="section layer-gold" id="s9">
   <div class="section-number">Section 09</div>
-  <h2>Audit logging és compliance reporting <span class="tool-badge"><img src="../assets/logos/sql.svg">SQL</span></h2>
+  <h2>Audit logging és compliance reporting <span class="tool-badge"><img src="../assets/logos/sql.svg" alt="" aria-hidden="true">SQL</span></h2>
   <div class="md-cell"><p>Az <strong>audit log</strong> a governance-keretrendszer "fekete doboza" — minden érzékeny művelet rögzítésre kerül, hogy később vizsgálható legyen. GDPR, SOC 2, HIPAA, PCI-DSS mind explicit megkövetelik az audit log-ot. Egy adatszivárgás esetén az auditorok és a hatóságok az első kérdése: "ki mikor mit látott?".</p>
 <p><strong>Mit kell logolni?</strong> (1) <em>PII access</em> — minden olvasás a kifejezetten PII-t tartalmazó táblákon/oszlopokon. (2) <em>Schema change</em> — DDL műveletek (CREATE, DROP, ALTER), különösen jogosultság-változások. (3) <em>Large export</em> — bulk download, nagy SELECT eredmények (potenciális adatszivárgás). (4) <em>Failed login attempts</em> — gyakori failed login → brute force kísérlet. (5) <em>Privileged role assumption</em> — admin szerepkörök használata.</p>
 <p><strong>PostgreSQL pgaudit:</strong> Extension, amelyet engedélyezni kell (<code>shared_preload_libraries</code>). Minden olyan SQL műveletet logol, amelyet beállítasz (READ, WRITE, DDL, ROLE, FUNCTION, MISC). Az output a <code>postgresql.log</code>-ba megy, érdemes egy SIEM rendszerbe (pl. Splunk, ELK) továbbítani.</p>
@@ -576,7 +577,7 @@ DQ score: 0.91</pre>
 <p><strong>WebShop Pro:</strong> Snowflake ACCESS_HISTORY-ból minden hét hétfőjén egy automatizált riport készül: top 10 user PII-tábla olvasásban, anomáliák (pl. egy normálisan napi 10 query-t futtató user hirtelen 1000-et indít).</p></div><div class="code-cell" id="cell-s9">
     <div class="code-header">
       <span class="cell-number">[9]</span>
-      <button class="run-btn" onclick="runCell('s9')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9')">Output</button>
     </div>
     <div class="code-body"><pre>-- Snowflake: ki milyen PII oszlopot olvasott az utolsó 30 napban?
 SELECT
@@ -639,7 +640,7 @@ Anomalia: marketing_zsolt 2026-05-12 — 847 PII queries (avg 30d: 12, ratio: 70
 
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
-  <h2>Master Data Management (MDM) <span class="tool-badge"><img src="../assets/logos/dbt.svg">dbt</span></h2>
+  <h2>Master Data Management (MDM) <span class="tool-badge"><img src="../assets/logos/dbt.svg" alt="" aria-hidden="true">dbt</span></h2>
   <div class="md-cell"><p>A <strong>Master Data Management (MDM)</strong> a vállalat törzsadatainak (customer, product, vendor, employee) egységes, autoritatív kezelésére szolgáló diszciplína. A célja a "single source of truth" — egyetlen helyen, egyetlen verzióban tárolt törzsadat, amelyre minden rendszer hivatkozik.</p>
 <p><strong>Customer 360 / Golden record:</strong> Egy ügyfél több rendszerben is létezhet (CRM, webshop, support tool, marketing automation), gyakran kissé eltérő néven, eltérő ID-val. A "golden record" az a kanonikus rekord, amely a teljes vásárló-képet egyesíti — match-merge logikával előállítva.</p>
 <p><strong>Match-merge logic:</strong> Két rekord match-el, ha valamelyik kulcs egyezik (deterministic match: ugyanaz az email vagy adószám) vagy a hasonlóság meghaladja a küszöböt (probabilistic match: hasonló név + ugyanaz a város + hasonló születési dátum, fuzzy matching pl. Levenshtein-távolság alapján). A merge eldönti, hogy a két rekordból melyik mező nyer (survivorship rules) — pl. a legfrissebb wins, vagy a CRM nyer, ha ütközés van.</p>
@@ -649,7 +650,7 @@ Anomalia: marketing_zsolt 2026-05-12 — 847 PII queries (avg 30d: 12, ratio: 70
 <p><strong>WebShop Pro:</strong> A CRM-ben, a webshop-ban és a Klaviyo-ban különböző email-formátum miatt 47.000 ügyfél vélhetően duplikátum. dbt-ben futtatunk egy nightly entity resolution job-ot, amely email-normalizálással (lowercase, trim, plus-tag eltávolítás) deterministic match-et csinál, és telefon + név alapján probabilistic match-et a maradékra.</p></div><div class="code-cell" id="cell-s10">
     <div class="code-header">
       <span class="cell-number">[10]</span>
-      <button class="run-btn" onclick="runCell('s10')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10')">Output</button>
     </div>
     <div class="code-body"><pre>-- dbt model: customer entity resolution → master.customers
 -- models/master/master_customers.sql
@@ -716,7 +717,7 @@ SELECT DISTINCT * FROM golden
 <p><strong>WebShop Pro:</strong> Az S3 lifecycle policy 30 nap után IA-ra, 1 év után Glacier-ra mozgatja a Bronze adatokat. A 7 év elteltével (számviteli minimum) automatikusan törli. A Silver/Gold layer hot tier-en marad, mert napi riport-okhoz kell.</p></div><div class="code-cell" id="cell-s11">
     <div class="code-header">
       <span class="cell-number">[11]</span>
-      <button class="run-btn" onclick="runCell('s11')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s11')">Output</button>
     </div>
     <div class="code-body"><pre>{
   "Rules": [
@@ -775,7 +776,7 @@ Költségmegtakarítás becslés: 71% az első éves tárolási költségen</pre
 
 <div class="section layer-silver" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>Data sharing és data clean rooms <span class="tool-badge"><img src="../assets/logos/delta-lake.svg">Delta Sharing</span></h2>
+  <h2>Data sharing és data clean rooms <span class="tool-badge"><img src="../assets/logos/delta-lake.svg" alt="" aria-hidden="true">Delta Sharing</span></h2>
   <div class="md-cell"><p>A <strong>data sharing</strong> az adatmegosztás modern alternatívája az ETL-en alapuló adatcserének. Klasszikusan: az "A" cég exportálja CSV-be, FTP-n átküldi, a "B" cég újra-importálja a saját rendszerébe. Ez a megoldás napokat késik, biztonsági réseket nyit (CSV titkosítás?), és minden változásnál újra kell csinálni. A modern data sharing élő hozzáférést ad — a fogyasztó közvetlenül a forrásból olvas.</p>
 <p><strong>Snowflake Data Sharing:</strong> A platform legkorábbi és legkiforrottabb data sharing megoldása. Egy share objektumon keresztül a "provider" számla megoszt egy táblát, view-t vagy schema-t a "consumer" számlával — fizikai adatmásolás nélkül. A provider továbbra is fizet a storage-ért, a consumer csak a compute-ért. Cross-region és cross-cloud is működik (de költséggel).</p>
 <p><strong>Databricks Delta Sharing:</strong> Az iparág első nyílt protokollja — a Delta Sharing egy REST API specifikáció, amelyet bárki implementálhat. A consumer nem feltétlenül Databricks-en van: Spark, Pandas, Power BI, Tableau mind tud olvasni Delta Share endpoint-ból. Linux Foundation projekt, vendor-független.</p>
@@ -784,7 +785,7 @@ Költségmegtakarítás becslés: 71% az első éves tárolási költségen</pre
 <p><strong>WebShop Pro:</strong> A logisztikai partnerünknek (DPD) megosztjuk a <code>silver.shipments</code> Delta táblát Delta Sharing-en keresztül — read-only, csak a DPD régiójára szűrt rekordok. A marketing partner Klaviyo egy aggregált Snowflake share-en keresztül kapja a customer segment statistikát, anonim kohort-formában.</p></div><div class="code-cell" id="cell-s12">
     <div class="code-header">
       <span class="cell-number">[12]</span>
-      <button class="run-btn" onclick="runCell('s12')">&#9654; Run</button>
+      <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s12')">Output</button>
     </div>
     <div class="code-body"><pre>-- Delta Sharing: WebShop Pro → DPD logisztikai partner
 -- 1. Catalog & schema előkészítése Unity Catalog-ban
@@ -856,7 +857,7 @@ DPD partner profil-fájlt kapott (webshop.share JSON, 90 nap token-élet)</pre>
 
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
-  <h2>Tool-stack döntéstámogatás <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg">Unity Catalog</span> <span class="tool-badge"><img src="../assets/logos/databricks.svg">Databricks</span></h2>
+  <h2>Tool-stack döntéstámogatás <span class="tool-badge"><img src="../assets/logos/unity-catalog.svg" alt="" aria-hidden="true">Unity Catalog</span> <span class="tool-badge"><img src="../assets/logos/databricks.svg" alt="" aria-hidden="true">Databricks</span></h2>
   <div class="md-cell"><p>A governance-tooling kiválasztása stratégiai döntés — a téves választás évekig fájó vendor lock-in-t okozhat. A piacon jelenleg három fő archetípus létezik: <em>open-source self-hosted</em>, <em>SaaS startup</em>, <em>enterprise legacy</em>. Mindegyiknek megvan a maga ideális use case-e.</p>
 <p><strong>Unity Catalog OSS:</strong> A Databricks 2024-ben open-source-szá tette a Unity Catalog-ot. Ideális, ha (1) Databricks-en futsz vagy futni fogsz, (2) Delta Lake a primary táblaformátum, (3) erős column-level lineage és access control kell. Ingyenes (self-hosted), de a kezelése nem triviális (Kubernetes, Postgres metastore, identity provider integráció). Becsült éves költség: 0 USD license + 1-2 FTE platform engineer.</p>
 <p><strong>Atlan (SaaS):</strong> Modern, kollaborációs governance platform. Ideális, ha (1) gyors time-to-value kell (4-6 hét bevezetés), (2) sok stakeholder (DE + analyst + business) együtt használja, (3) több source-ról (Snowflake + dbt + Looker + Tableau) kell központi katalógus. Drágább: kb. 50.000 - 250.000 USD/év, méretfüggő.</p>

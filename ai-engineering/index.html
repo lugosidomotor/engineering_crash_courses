@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
@@ -95,12 +95,12 @@
   <h1>&lt;/&gt; AI Engineering Crash Course</h1>
   <div class="header-actions">
     <span id="progress-text">0 / 20 section completed</span>
-    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
-    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
+    <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
 </header>
 <div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
-  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="Az Output gomb az előre megírt eredményt mutatja a böngészőben; valódi futtatáshoz használd a saját Python/Spark környezetedet vagy a Local Docker Labot.">ℹ️ Output info</span>
 </div>
 <nav id="side-nav"></nav>
 <main>
@@ -109,8 +109,8 @@
 <div class="section layer-intro" id="s0">
   <div class="section-number">Intro</div>
   <h2>AI Engineering: RAG chatbot &#233;p&#237;t&#233;se a null&#225;t&#243;l
-    <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span>
-    <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span>
+    <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span>
+    <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span>
   </h2>
   <div class="md-cell">
     <p>Ebben a kurzusban egy <strong>webshop &#252;gyf&#233;lszolg&#225;lati RAG chatbotot</strong> &#233;p&#237;t&#252;nk l&#233;p&#233;sr&#243;l l&#233;p&#233;sre. A v&#233;g&#233;n lesz egy m&#367;k&#246;d&#337; rendszered, ami dokumentumokat t&#246;lt be, embeddingeket gener&#225;l, szemantikus keres&#233;st v&#233;gez, v&#225;laszt gener&#225;l, eval metrik&#225;kat m&#233;r &#233;s cost/latency-t monitoroz.</p>
@@ -128,7 +128,7 @@
 <!-- ══════════ S1: Fogalmi t&#233;rk&#233;p ══════════ -->
 <div class="section layer-general" id="s1">
   <div class="section-number">Section 01</div>
-  <h2>Fogalmi t&#233;rk&#233;p: LLM, RAG, Agent, Embedding <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>Fogalmi t&#233;rk&#233;p: LLM, RAG, Agent, Embedding <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <table>
       <tr><th>Fogalom</th><th>Magyar&#225;zat</th><th>Anal&#243;gia</th></tr>
@@ -150,7 +150,7 @@
 <!-- ══════════ S2: Architektúra ══════════ -->
 <div class="section layer-general" id="s2">
   <div class="section-number">Section 02</div>
-  <h2>Architektúra-térkép: a RAG pipeline <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span> <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>Architektúra-térkép: a RAG pipeline <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span> <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>A végcél egy ilyen pipeline:</p>
     <div class="arch-flow">
@@ -180,7 +180,7 @@
 <!-- ══════════ S3: Környezet ══════════ -->
 <div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
-  <h2>Környezet előkészítése <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Környezet előkészítése <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell">
     <p>Mielőtt elkezdenénk a RAG chatbot építését, be kell állítanunk a fejlesztői környezetünket. Ehhez három fő Python csomagra van szükségünk: az <strong>openai</strong> könyvtár az LLM és embedding API hívásokhoz, a <strong>chromadb</strong> a vektoradatbázis műveleteihez, és a <strong>numpy</strong> a numerikus számításokhoz, például a koszinusz-hasonlóság kiszámításához.</p>
     <p>Az <code>OpenAI()</code> kliens automatikusan az <code>OPENAI_API_KEY</code> környezeti változóból olvassa be az API kulcsot. Ha ez nincs beállítva, a hívások hibát dobnak. Éles környezetben soha ne hardkódold az API kulcsot a forráskódba -- használj <code>.env</code> fájlt vagy secret managert.</p>
@@ -191,7 +191,7 @@
     </div>
   </div>
   <div class="code-cell" id="cell-s3">
-    <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s3')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s3')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># pip install openai chromadb numpy</span>
 <span class="kw">import</span> os, json, time
 <span class="kw">from</span> openai <span class="kw">import</span> OpenAI
@@ -209,7 +209,7 @@ client = OpenAI()  <span class="cm"># OPENAI_API_KEY a környezeti változóból
 <!-- ══════════ S4: Chat Completions API ══════════ -->
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>Chat Completions API alapok <span class="tool-badge"><img src="../assets/logos/openai.svg">Chat Completions API</span></h2>
+  <h2>Chat Completions API alapok <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">Chat Completions API</span></h2>
   <div class="md-cell">
     <p>Az OpenAI Python SDK <strong>Chat Completions API</strong>-ja a standard, széles körben használt mód LLM hívásokhoz. A modell kontextusát egy <code>messages</code> lista hordozza, amelynek elemei <code>role</code> (system / user / assistant) és <code>content</code> mezőkkel azonosítják, ki mit mondott.</p>
     <table>
@@ -220,7 +220,7 @@ client = OpenAI()  <span class="cm"># OPENAI_API_KEY a környezeti változóból
     </table>
   </div>
   <div class="code-cell" id="cell-s4">
-    <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('s4')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s4')">Output</button></div>
     <div class="code-body"><pre>response = client.chat.completions.create(
     model=<span class="str">"gpt-4o"</span>,
     messages=[
@@ -249,14 +249,14 @@ A szállítási idő a választott módtól függ:
 <!-- ══════════ S5: System message vs User message ══════════ -->
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>System message vs User message <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>System message vs User message <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p><strong>system message</strong> — rendszer-szintű viselkedési szabályok. Rögzített, általában nem változik hívásonként.<br>
     <strong>user message</strong> — a konkrét felhasználói kérdés, hívásonként változik.</p>
     <p>Biztonsági szempontból fontos: a két szerepet <strong>külön messages elemekre</strong> kell osztani, nem pedig egyetlen f-stringbe ágyazni. Ha a felhasználói inputot (<code>kerdes</code>) közvetlenül a system promptba interpolálod, az utat nyit a <strong>prompt injection</strong>-nek (a felhasználó beleírhat olyan instrukciót, ami felülírja a rendszerprompt szabályait). A <code>role</code> alapú elválasztás biztonságosabb, mert a modell tudja, melyik üzenet honnan származik.</p>
   </div>
   <div class="code-cell" id="cell-s5">
-    <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('s5')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s5')">Output</button></div>
     <div class="code-body"><pre>SYSTEM_INSTRUCTIONS = <span class="str">"""
 Te a WebShop Pro ügyfélszolgálati botja vagy.
 Szabályok:
@@ -301,7 +301,7 @@ Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted
 <!-- ══════════ S6: Structured outputs ══════════ -->
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>Structured outputs: JSON válasz <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>Structured outputs: JSON válasz <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>A <strong>structured output</strong> (strukturált kimenet) azt jelenti, hogy az LLM válaszát nem szabad szabad formátumú szövegként kezelnünk, hanem egy előre meghatározott JSON sémának megfelelő objektumként kapjuk vissza. Ez kulcsfontosságú RAG rendszerekben, ahol a válasz mellé forrást, megbízhatósági pontszámot és kategóriát is vissza kell adni a downstream rendszerek számára.</p>
     <p>A Chat Completions API beépítetten támogatja a <strong>JSON schema</strong> kikényszerítést a <code>response_format</code> paraméterén keresztül. Nem kell kérned az LLM-et, hogy "válaszolj JSON-ban" és remélni a legjobbakat -- a <code>strict: True</code> kapcsoló esetén az API garantálja, hogy a válasz illeszkedik a megadott sémára. Ez azért forradalmi, mert megszünteti a kimenet parsing hibáit, amelyek a termelési rendszerek egyik leggyakoribb hibaforrásai.</p>
@@ -312,7 +312,7 @@ Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted
     </div>
   </div>
   <div class="code-cell" id="cell-s6">
-    <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s6')">Output</button></div>
     <div class="code-body"><pre><span class="kw">import</span> json
 
 response = client.chat.completions.create(
@@ -362,7 +362,7 @@ result = json.loads(response.choices[<span class="num">0</span>].message.content
 <!-- ══════════ S7: Tool calling ══════════ -->
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>Tool calling: függvények hívása <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>Tool calling: függvények hívása <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>A <strong>tool calling</strong> (eszközhívás) az a képesség, amellyel az LLM képes külső függvényeket meghívni a válaszgenerálás során. Nem te magad döntöd el, mikor hívod a függvényt -- a modell maga ismeri fel a szituációt, és automatikusan kéri a függvény meghívását, ha szükséges. Ez teszi az LLM-et "ügynökké": önállóan tervez és cselekszik.</p>
     <p>A folyamat lépései: (1) elküldöd a kérdést az LLM-nek a definiált eszközökkel együtt, (2) a modell felismeri, hogy egy tool-t kell hívnia, és visszaadja a függvény nevét és paramétereit, (3) te futtatod a saját kódodat az eredménnyel, (4) visszaküldöd az eredményt a modellnek, (5) a modell a végleges választ generálja az eredmény alapján.</p>
@@ -374,7 +374,7 @@ result = json.loads(response.choices[<span class="num">0</span>].message.content
     </div>
   </div>
   <div class="code-cell" id="cell-s7">
-    <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('s7')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s7')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Tool definíció</span>
 tools = [{
     <span class="str">"type"</span>: <span class="str">"function"</span>,
@@ -436,7 +436,7 @@ A WSP-12345 számú rendelés jelenleg szállítás alatt van, várható kézbes
 <!-- ══════════ S8: Embedding fogalmak ══════════ -->
 <div class="section layer-general" id="s8">
   <div class="section-number">Section 08</div>
-  <h2>Embedding fogalmak: szövegekből vektorok <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>Embedding fogalmak: szövegekből vektorok <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>Az <strong>embedding</strong> a szöveg numerikus ábrázolása. Minden szövegrészlet egy <strong>vektor</strong> lesz, ami a jelentését kódolja.</p>
     <p><strong>Példa:</strong> "A szállítás 3 nap." → <code>[0.12, -0.34, 0.78, ..., 0.05]</code> (1536 dimenzió)</p>
@@ -447,7 +447,7 @@ A WSP-12345 számú rendelés jelenleg szállítás alatt van, várható kézbes
     </table>
   </div>
   <div class="code-cell" id="cell-s8">
-    <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('s8')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s8')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Koszinusz-hasonlóság demó</span>
 <span class="kw">import</span> numpy <span class="kw">as</span> np
 
@@ -477,7 +477,7 @@ vec_vissza    = np.array([<span class="num">0.1</span>, <span class="num">0.2</s
 <!-- ══════════ S9: OpenAI Embeddings ══════════ -->
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
-  <h2>OpenAI Embeddings API <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>OpenAI Embeddings API <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>Az OpenAI <code>text-embedding-3-small</code> modellje a legköltséghatékonyabb embedding megoldás: 1536 dimenziós vektorokat generál, és nagyjából $0.02 dollárba kerül 1 millió tokenenként. Ez azt jelenti, hogy 1000 átlagos dokumentum (kb. 500K token) feldolgozása mindössze 1 centbe kerül -- ez teszi praktikussá a kísérletezést és a prototípusépítést.</p>
     <p>Az <code>embeddings.create()</code> hívás egy vektorlistát ad vissza: minden bemeneti szöveghez egy 1536 lebegőpontos számból álló tömböt. Ezek a számok a szöveg szemantikai jelentését kódolják -- a hasonló jelentésű szövegek vektorai közel helyezkednek el egymáshoz a vektortérben. Az API válasza tartalmazza a felhasznált tokenek számát is, ami a költségszámításhoz szükséges.</p>
@@ -489,7 +489,7 @@ vec_vissza    = np.array([<span class="num">0.1</span>, <span class="num">0.2</s
     </div>
   </div>
   <div class="code-cell" id="cell-s9">
-    <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('s9')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9')">Output</button></div>
     <div class="code-body"><pre>emb_response = client.embeddings.create(
     model=<span class="str">"text-embedding-3-small"</span>,
     input=<span class="str">"Mennyi idő alatt érkezik meg a csomag?"</span>
@@ -517,7 +517,7 @@ vector = emb_response.data[<span class="num">0</span>].embedding
 <!-- ══════════ S10: ChromaDB ══════════ -->
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
-  <h2>ChromaDB alapok: vektoradatbázis <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span></h2>
+  <h2>ChromaDB alapok: vektoradatbázis <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span></h2>
   <div class="md-cell">
     <p>A <strong>ChromaDB</strong> egy nyílt forráskódú vektoradatbázis, amelyet kifejezetten AI alkalmazásokhoz terveztek. Lokálisan futtatható, nem kell hozzá külön szerver vagy felhőszolgáltatás -- ez teszi ideálissá a fejlesztéshez és prototípusokhoz. Három alapvető művelete van: <code>add</code> (dokumentumok hozzáadása), <code>query</code> (hasonlósági keresés) és <code>delete</code> (eltávolítás).</p>
     <p>A ChromaDB kulcsfontosságú eleme a RAG rendszernek: itt tároljuk a dokumentumok embeddingjeit, és ide küldjük a felhasználói kérdés embeddingjét kereséskor. A ChromaDB automatikusan generálja az embeddingeket, ha nem adsz meg saját embedding funkciót -- a háttérben egy alapértelmezett modellt használ ehhez. Éles környezetben érdemes saját OpenAI embedding funkciót megadni a jobb minőség érdekében.</p>
@@ -528,7 +528,7 @@ vector = emb_response.data[<span class="num">0</span>].embedding
     </div>
   </div>
   <div class="code-cell" id="cell-s10">
-    <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('s10')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10')">Output</button></div>
     <div class="code-body"><pre><span class="kw">import</span> chromadb
 
 <span class="cm"># Lokális ChromaDB (in-memory demo)</span>
@@ -558,7 +558,7 @@ collection.add(
     </div>
   </div>
   <div class="code-cell" id="cell-s10b">
-    <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('s10b')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10b')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Keresés a gyűjteményben</span>
 results = collection.query(
     query_texts=[<span class="str">"meddig tarthatja meg a terméket?"</span>],
@@ -589,7 +589,7 @@ results = collection.query(
 <!-- ══════════ S11: Chunking ══════════ -->
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
-  <h2>Chunking stratégiák <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Chunking stratégiák <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell">
     <p>A dokumentumokat <strong>darabolni kell</strong>, mert az LLM kontextusablaka véges és a vektoros keresés kis egységeken működik a legjobban.</p>
     <table>
@@ -600,7 +600,7 @@ results = collection.query(
     </table>
   </div>
   <div class="code-cell" id="cell-s11">
-    <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('s11')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s11')">Output</button></div>
     <div class="code-body"><pre><span class="kw">def</span> <span class="fn">chunk_text</span>(text, chunk_size=<span class="num">200</span>, overlap=<span class="num">50</span>):
     chunks = []
     start = <span class="num">0</span>
@@ -638,7 +638,7 @@ napon belül megtörténik. 6. Elektromos termékekre a garancia 2 év érvénye
 <!-- ══════════ S12: Dokumentumok ══════════ -->
 <div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>Dokumentumok betöltése: WebShop Pro tudásbázis <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Dokumentumok betöltése: WebShop Pro tudásbázis <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell">
     <p>A WebShop Pro tudásbázisa négy dokumentumból áll: szállítási tájékoztató, visszaküldési szabályzat, garanciális feltételek és gyakori kérdések. A valóságban ezek PDF dokumentumok, Notion oldalak, Confluence wikik vagy akár adatbázis-lekérdezések eredményei lennének. Most egyszerű Python dictionary-kben tároljuk őket a demonstráció kedvéért.</p>
     <p>A dokumentumok betöltése után a korábban definiált <code>chunk_text()</code> függvénnyel daraboljuk őket, és minden chunkhoz metaadatot rendelünk -- konkrétan a forrásdokumentum címét. Ez a metaadat később lehetővé teszi, hogy a RAG válaszban hivatkozzunk a forrásra, ami kritikus a felhasználói bizalom és a válaszok ellenőrizhetősége szempontjából.</p>
@@ -649,7 +649,7 @@ napon belül megtörténik. 6. Elektromos termékekre a garancia 2 év érvénye
     </div>
   </div>
   <div class="code-cell" id="cell-s12">
-    <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('s12')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s12')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># WebShop Pro tudásbázis</span>
 DOCUMENTS = [
     {<span class="str">"id"</span>: <span class="str">"szallitas"</span>, <span class="str">"title"</span>: <span class="str">"Szállítási tájékoztató"</span>,
@@ -705,7 +705,7 @@ all_chunks = []
 <!-- ══════════ S13: Indexelés ══════════ -->
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
-  <h2>Indexelés: ChromaDB feltöltése <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span> <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>Indexelés: ChromaDB feltöltése <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span> <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>Az <strong>indexelés</strong> az a lépés, ahol a feldarabolt dokumentumchunkokat betöltjük a ChromaDB-be. A ChromaDB automatikusan generál embeddingeket minden chunkhoz, és indexet épít a gyors hasonlósági kereséshez. Ez a lépés "előkészíti a terepet" a későbbi lekérdezések számára -- indexelés nélkül nem tudunk keresni.</p>
     <p>A kódban egy új <code>webshop_rag</code> gyűjteményt hozunk létre, és az <code>add()</code> metódussal feltöltjük a chunkokkal. Három paramétert adunk át: <code>documents</code> (a chunk szövegei), <code>ids</code> (egyedi azonosítók) és <code>metadatas</code> (forrásinformáció). A metadata filtering lehetővé teszi, hogy később csak bizonyos forrásokra keressünk -- például csak a szállítási dokumentumok között.</p>
@@ -716,7 +716,7 @@ all_chunks = []
     </div>
   </div>
   <div class="code-cell" id="cell-s13">
-    <div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" onclick="runCell('s13')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s13')">Output</button></div>
     <div class="code-body"><pre>rag_collection = chroma_client.create_collection(name=<span class="str">"webshop_rag"</span>)
 
 rag_collection.add(
@@ -738,7 +738,7 @@ rag_collection.add(
 <!-- ══════════ S14: Vektoros keresés ══════════ -->
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
-  <h2>Vektoros keresés: a releváns chunkok megkeresése <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span></h2>
+  <h2>Vektoros keresés: a releváns chunkok megkeresése <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span></h2>
   <div class="md-cell">
     <p>A <strong>vektoros keresés</strong> (vector search) a RAG rendszer szíve: a felhasználói kérdést embedding-gé alakítjuk, majd a ChromaDB megkeresi a hozzá legközelebbi vektorokat a vektortérben. Ez a <strong>retrieval</strong> (visszakeresés) lépés -- a RAG rövidítés első betűje. Minél relevánsabb chunkokat találunk, annál jobb választ tud generálni az LLM.</p>
     <p>A <code>retrieve()</code> függvény a ChromaDB <code>query()</code> metódusát használja: elküldi a kérdés szövegét, és a ChromaDB automatikusan embedding-gé alakítja, majd koszinusz-hasonlóság alapján megkeresi a <code>n_results</code> darab legközelebbi chunkot. Az eredmény tartalmazza a dokumentum szövegét, a metaadatokat (forrás) és a távolságot -- minél kisebb a távolság, annál relevánsabb a találat.</p>
@@ -749,7 +749,7 @@ rag_collection.add(
     </div>
   </div>
   <div class="code-cell" id="cell-s14">
-    <div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" onclick="runCell('s14')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[13]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s14')">Output</button></div>
     <div class="code-body"><pre><span class="kw">def</span> <span class="fn">retrieve</span>(query, n_results=<span class="num">3</span>):
     results = rag_collection.query(
         query_texts=[query],
@@ -786,7 +786,7 @@ results = <span class="fn">retrieve</span>(<span class="str">"Mennyibe kerül a 
 <!-- ══════════ S15: RAG pipeline ══════════ -->
 <div class="section layer-general" id="s15">
   <div class="section-number">Section 15</div>
-  <h2>RAG pipeline: retrieve → augment → generate <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span></h2>
+  <h2>RAG pipeline: retrieve → augment → generate <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span></h2>
   <div class="md-cell">
     <p>Most összerakjuk az egészet! A <strong>RAG pipeline</strong> három lépése:</p>
     <ol>
@@ -796,7 +796,7 @@ results = <span class="fn">retrieve</span>(<span class="str">"Mennyibe kerül a 
     </ol>
   </div>
   <div class="code-cell" id="cell-s15">
-    <div class="code-header"><span class="cell-number">[14]</span><button class="run-btn" onclick="runCell('s15')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[14]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s15')">Output</button></div>
     <div class="code-body"><pre><span class="kw">def</span> <span class="fn">rag_query</span>(question, n_results=<span class="num">3</span>):
     <span class="cm"># 1. RETRIEVE</span>
     retrieved = <span class="fn">retrieve</span>(question, n_results=n_results)
@@ -854,7 +854,7 @@ Ha a kérdés nem szerepel a tudásbázisban, mondd: "Ezt a kérdést továbbít
 <!-- ══════════ S16: Evaluáció ══════════ -->
 <div class="section layer-general" id="s16">
   <div class="section-number">Section 16</div>
-  <h2>Evaluáció: a RAG minőségének mérése <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span></h2>
+  <h2>Evaluáció: a RAG minőségének mérése <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>Honnan tudjuk, hogy a RAG rendszer jól működik? <strong>Eval metrikák:</strong></p>
     <table>
@@ -866,7 +866,7 @@ Ha a kérdés nem szerepel a tudásbázisban, mondd: "Ezt a kérdést továbbít
     </table>
   </div>
   <div class="code-cell" id="cell-s16">
-    <div class="code-header"><span class="cell-number">[15]</span><button class="run-btn" onclick="runCell('s16')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[15]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s16')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Egyszerű eval: LLM-as-judge</span>
 <span class="kw">def</span> <span class="fn">evaluate_answer</span>(question, answer, context):
     eval_response = client.chat.completions.create(
@@ -917,7 +917,7 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 <!-- ══════════ S17: Cost és latency ══════════ -->
 <div class="section layer-general" id="s17">
   <div class="section-number">Section 17</div>
-  <h2>Cost és latency tracking <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
+  <h2>Cost és latency tracking <span class="tool-badge"><img src="../assets/logos/grafana.svg" alt="" aria-hidden="true">Grafana</span></h2>
   <div class="md-cell">
     <p>A <strong>költség- és válaszidő-monitorozás</strong> (cost és latency tracking) elengedhetetlen minden termelési RAG rendszernél. Egyetlen GPT-4o hívás $0.01-0.05 dollárba kerülhet, és egy rosszul optimalizált RAG pipeline könnyen napi tíz vagy száz dolláros számlát generálhat. A válaszidő pedig közvetlenül befolyásolja a felhasználói élményt -- ha a chatbot 5 másodpercig gondolkodik, a felhasználók elhagyják az oldalt.</p>
     <p>A <code>rag_query_tracked()</code> függvény egy wrapper, amely megméri a teljes folyamat és az LLM hívás külön-külön eltelt idejét. Ez a felbontás fontos, mert a retrieval lokális és gyors (ezredmásodpercek), míg az LLM hívás távoli API és lassabb (száz milliszekundumoktól másodpercekig). A szűk keresztmetszet azonosítása segíti az optimalizálást.</p>
@@ -939,7 +939,7 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 </div>
   </div>
   <div class="code-cell" id="cell-s17">
-    <div class="code-header"><span class="cell-number">[16]</span><button class="run-btn" onclick="runCell('s17')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[16]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s17')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Cost és latency wrapper</span>
 <span class="kw">def</span> <span class="fn">rag_query_tracked</span>(question):
     start = time.time()
@@ -991,7 +991,7 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 <!-- ══════════ S18: Streamlit ══════════ -->
 <div class="section layer-general" id="s18">
   <div class="section-number">Section 18</div>
-  <h2>Streamlit UI: chat frontend <span class="tool-badge"><img src="../assets/logos/streamlit.svg">Streamlit</span></h2>
+  <h2>Streamlit UI: chat frontend <span class="tool-badge"><img src="../assets/logos/streamlit.svg" alt="" aria-hidden="true">Streamlit</span></h2>
   <div class="md-cell">
     <p>A <strong>Streamlit</strong> egy Python webes keretrendszer, amely pár sornyi kóddal lehetővé teszi interaktív webes alkalmazások készítését -- HTML, CSS vagy JavaScript ismerete nélkül. A RAG chatbot esetén ez a leggyorsabb módja annak, hogy a háttérben futó Python logikát felhasználói felülettel lássuk el, és a chatbotot böngészőből lehessen elérni.</p>
     <p>A kód három fő részből áll: (1) a chat előzmények tárolása a <code>session_state</code>-ben, ami minden felhasználói munkamenethez külön memóriát biztosít, (2) a korábbi üzenetek megjelenítése a <code>st.chat_message()</code> widgettel, amely automatikusan formázza a beszélgetést, és (3) az új üzenetek fogadása a <code>st.chat_input()</code> widgettel, amely egy beviteli mezőt jelenít meg a chat alján.</p>
@@ -1002,7 +1002,7 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
     </div>
   </div>
   <div class="code-cell" id="cell-s18">
-    <div class="code-header"><span class="cell-number">[17]</span><button class="run-btn" onclick="runCell('s18')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[17]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s18')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># streamlit run app.py</span>
 <span class="cm"># pip install streamlit</span>
 
@@ -1042,7 +1042,7 @@ st.title(<span class="str">"WebShop Pro Support Bot"</span>)
 <!-- ══════════ S19: Összefoglalás ══════════ -->
 <div class="section layer-general" id="s19">
   <div class="section-number">Section 19</div>
-  <h2>Összefoglalás <span class="tool-badge"><img src="../assets/logos/openai.svg">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/chroma.svg">ChromaDB</span></h2>
+  <h2>Összefoglalás <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span> <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span></h2>
   <div class="md-cell">
     <div class="callout success">
       <div class="callout-title">Mit építettünk?</div>

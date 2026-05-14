@@ -9,69 +9,181 @@ on:
 
 jobs:
   html-structure:
-    name: HTML structure check
+    name: Course catalog and HTML check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Validate course HTML structure
+      - name: Validate course catalog, pages and lab links
         run: |
           python <<'PY'
+          import json
           from pathlib import Path
-          import re, sys
+          import re
+          import struct
+          import sys
 
-          courses = [
-              'sql-data-modeling','python-data-engineering','docker-local-data-platform',
-              'delta-table-crash-course','open-table-formats','spark-crash-course',
-              'airflow-orchestration','dbt-analytics-engineering','databricks-lakehouse',
-              'streaming-engineering','ai-data-engineer','ai-engineering',
-              'rag-evaluation-ai-safety','llmops-genai-production','aiops-mlops',
-              'data-mesh','data-governance','agentic-ai',
-          ]
+          courses = json.loads(Path("courses.json").read_text(encoding="utf-8"))
+          required = {
+              "slug", "title", "description", "url", "image", "difficulty",
+              "estimatedTime", "sectionCount", "codeCellCount", "stack",
+              "whatYouBuild", "status",
+          }
+          expected_new = {
+              "data-mesh": "docker compose --profile mesh up -d",
+              "data-governance": "docker compose --profile governance up -d",
+              "agentic-ai": "docker compose --profile agentic up -d",
+          }
           fails = []
-          for c in courses:
-              f = Path(c) / 'index.html'
-              if not f.exists():
-                  fails.append(f"{c}: missing index.html"); continue
-              s = f.read_text(encoding='utf-8')
-              if s.count('review-banner') != 1:
-                  fails.append(f"{c}: review-banner count != 1")
-              if s.count('<div') != s.count('</div>'):
-                  fails.append(f"{c}: div tags unbalanced")
-              if s.count('<pre') != s.count('</pre>'):
-                  fails.append(f"{c}: pre tags unbalanced")
-              sec = len(re.findall(r'class="section ', s))
-              m = re.search(r'(\d+) / (\d+) section completed', s)
-              if m and int(m.group(2)) != sec:
-                  fails.append(f"{c}: progress text {m.group(2)} != actual sections {sec}")
+
+          def path_from_catalog(value):
+              return Path(str(value).lstrip("./"))
+
+          def count_class(html, class_name):
+              return sum(1 for attr in re.findall(r'class="([^"]*)"', html) if class_name in attr.split())
+
+          def jpeg_size(path):
+              data = path.read_bytes()
+              if not data.startswith(b"\xff\xd8"):
+                  return None
+              i = 2
+              sof = {0xC0,0xC1,0xC2,0xC3,0xC5,0xC6,0xC7,0xC9,0xCA,0xCB,0xCD,0xCE,0xCF}
+              while i < len(data):
+                  while i < len(data) and data[i] == 0xFF:
+                      i += 1
+                  if i >= len(data):
+                      break
+                  marker = data[i]
+                  i += 1
+                  if marker in (0xD8, 0xD9):
+                      continue
+                  if i + 2 > len(data):
+                      break
+                  length = struct.unpack(">H", data[i:i+2])[0]
+                  if marker in sof and i + 7 <= len(data):
+                      height = struct.unpack(">H", data[i+3:i+5])[0]
+                      width = struct.unpack(">H", data[i+5:i+7])[0]
+                      return width, height
+                  i += length
+              return None
+
+          seen = set()
+          for course in courses:
+              slug = course.get("slug", "<missing-slug>")
+              if slug in seen:
+                  fails.append(f"{slug}: duplicate slug")
+              seen.add(slug)
+
+              missing = sorted(required - set(course))
+              if missing:
+                  fails.append(f"{slug}: missing fields {', '.join(missing)}")
+              if course.get("status") != "Kész":
+                  fails.append(f"{slug}: status != Kész")
+
+              page = Path(slug) / "index.html"
+              if not page.exists():
+                  fails.append(f"{slug}: missing index.html")
+                  continue
+              html = page.read_text(encoding="utf-8")
+
+              if html.count("review-banner") != 1:
+                  fails.append(f"{slug}: review-banner count != 1")
+              if html.count("<div") != html.count("</div>"):
+                  fails.append(f"{slug}: div tags unbalanced")
+              if html.count("<pre") != html.count("</pre>"):
+                  fails.append(f"{slug}: pre tags unbalanced")
+
+              sections = count_class(html, "section")
+              code_cells = count_class(html, "code-cell")
+              progress = re.search(r"(\d+) / (\d+) section completed", html)
+              if progress and int(progress.group(2)) != sections:
+                  fails.append(f"{slug}: progress text {progress.group(2)} != actual sections {sections}")
+              if course.get("sectionCount") != sections:
+                  fails.append(f"{slug}: sectionCount {course.get('sectionCount')} != actual sections {sections}")
+              if course.get("codeCellCount") != code_cells:
+                  fails.append(f"{slug}: codeCellCount {course.get('codeCellCount')} != actual code cells {code_cells}")
+
+              if "Run gomb" in html or ">▶ Run</button>" in html or ">Run All</button>" in html:
+                  fails.append(f"{slug}: stale Run wording in UI")
+              if '<button class="run-btn" onclick=' in html:
+                  fails.append(f"{slug}: run button missing type/aria attributes")
+              for img_tag in re.findall(r'<span class="tool-badge"><img[^>]+>', html):
+                  if 'alt=""' not in img_tag or 'aria-hidden="true"' not in img_tag:
+                      fails.append(f"{slug}: tool badge image missing decorative alt/aria-hidden")
+
+              target = path_from_catalog(course.get("url", ""))
+              if not target.exists():
+                  fails.append(f"{slug}: url points to missing file {course.get('url')}")
+
+              image = path_from_catalog(course.get("image", ""))
+              if not image.exists():
+                  fails.append(f"{slug}: image points to missing file {course.get('image')}")
+              elif jpeg_size(image) != (800, 450):
+                  fails.append(f"{slug}: image is not 800x450 JPEG")
+
+              notebook_name = "data_engineering_crash_course.ipynb" if slug == "delta-table-crash-course" else "notebook.ipynb"
+              notebook_path = Path(slug) / notebook_name
+              if not notebook_path.exists():
+                  fails.append(f"{slug}: missing notebook {notebook_name}")
+              else:
+                  notebook_text = notebook_path.read_text(encoding="utf-8")
+                  notebook = json.loads(notebook_text)
+                  if notebook.get("nbformat") != 4 or not notebook.get("cells"):
+                      fails.append(f"{slug}: invalid or empty notebook")
+                  if slug in expected_new and expected_new[slug] not in notebook_text:
+                      fails.append(f"{slug}: missing lab profile command in notebook")
+
+              if slug in expected_new and expected_new[slug] not in html:
+                  fails.append(f"{slug}: missing lab profile command in page")
+
+          if len(courses) != 18:
+              fails.append(f"courses.json: expected 18 courses, got {len(courses)}")
+
+          home = Path("index.html").read_text(encoding="utf-8")
+          if "const COURSES = [" in home:
+              fails.append("index.html: still contains inline course catalog")
+          if "COURSE_DATA_URL" not in home or "loadCourses" not in home:
+              fails.append("index.html: does not load courses.json")
+
+          readme = Path("README.md").read_text(encoding="utf-8")
+          if "15 db" in readme:
+              fails.append("README.md: stale 15-course count")
+          for course in courses:
+              if course["slug"] not in readme or course["title"] not in readme:
+                  fails.append(f"README.md: missing {course['slug']} / {course['title']}")
+
+          sitemap = Path("sitemap.xml").read_text(encoding="utf-8")
+          for course in courses:
+              if f"https://dataengineer.hu/{course['slug']}/" not in sitemap:
+                  fails.append(f"sitemap.xml: missing {course['slug']}")
+
+          manifest = json.loads(Path("webshop-lab/docs/tooling-manifest.json").read_text(encoding="utf-8"))
+          profiles = manifest.get("course_services", {})
+          for course in courses:
+              if course["slug"] not in profiles:
+                  fails.append(f"tooling-manifest.json: missing course profile {course['slug']}")
+
+          seed = Path("webshop-lab/postgres/init/01_webshop.sql").read_text(encoding="utf-8")
+          for slug in expected_new:
+              if slug not in seed:
+                  fails.append(f"postgres seed: missing {slug}")
+
+          versions = Path("VERSIONS.md").read_text(encoding="utf-8")
+          if "Responses API minta nem létezik" in versions:
+              fails.append("VERSIONS.md: stale OpenAI Responses API note")
+
           if fails:
               print("FAIL:")
-              for x in fails: print(f"  - {x}")
+              for item in fails:
+                  print(f"  - {item}")
               sys.exit(1)
-          print(f"OK: {len(courses)} courses validated")
+          print(f"OK: {len(courses)} course pages, catalog records, images and notebooks validated")
           PY
 
-      - name: Validate courses.json
-        run: |
-          python <<'PY'
-          import json, sys
-          from pathlib import Path
-
-          d = json.load(open('courses.json', encoding='utf-8'))
-          fails = []
-          for c in d:
-              if c.get('status') != 'Kész':
-                  fails.append(f"{c['slug']}: status != 'Kész'")
-              if c.get('url'):
-                  if not Path(c['url']).exists():
-                      fails.append(f"{c['slug']}: url points to missing file {c['url']}")
-          if fails:
-              for x in fails: print(f"FAIL: {x}")
-              sys.exit(1)
-          print(f"OK: {len(d)} courses in JSON")
-          PY
+      - name: Run metadata validator
+        run: python generate_courses.py
 
   smoke-test:
     name: Smoke test core deps
@@ -85,7 +197,7 @@ jobs:
       - name: Install minimal core
         run: |
           python -m pip install --upgrade pip
-          # Csak a core data csomagok — a pyspark/airflow nehéz, és nem kritikus a CI-hez
+          # Csak a core data csomagok: a pyspark/airflow nehéz, és nem kritikus a CI-hez
           pip install pandas pyarrow numpy duckdb pydantic pytest deltalake requests
       - name: Run smoke test
         run: python smoke_test.py

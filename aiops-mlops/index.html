@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
@@ -95,12 +95,12 @@
   <h1>&lt;/&gt; AIOps &amp; MLOps Crash Course</h1>
   <div class="header-actions">
     <span id="progress-text">0 / 15 section completed</span>
-    <button class="btn btn-run-all" onclick="runAll()">Run All</button>
-    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
+    <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
 </header>
 <div class="review-banner" style="margin-left:240px;padding:8px 32px;background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.2);font-size:0.75rem;color:#8aa3b8;font-family:'JetBrains Mono',monospace;">
-  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="A Run gomb az előre megírt outputot mutatja a böngészőben — valódi futtatáshoz használd a saját Python/Spark környezetedet (lásd QUICKSTART.md)">ℹ️ Run gomb info</span>
+  📅 Utoljára szakmailag felülvizsgálva: <strong style="color:#00d4ff">2026-05-14</strong> · Verzió-mátrix: <a href="../VERSIONS.md" style="color:#00d4ff;text-decoration:none">VERSIONS.md</a> · <span title="Az Output gomb az előre megírt eredményt mutatja a böngészőben; valódi futtatáshoz használd a saját Python/Spark környezetedet vagy a Local Docker Labot.">ℹ️ Output info</span>
 </div>
 <nav id="side-nav"></nav>
 <main>
@@ -109,8 +109,8 @@
 <div class="section layer-intro" id="s0">
   <div class="section-number">Intro</div>
   <h2>MLOps: churn modell a tanítástól a productionig
-    <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span>
-    <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span>
+    <span class="tool-badge"><img src="../assets/logos/mlflow.svg" alt="" aria-hidden="true">MLflow</span>
+    <span class="tool-badge"><img src="../assets/logos/fastapi.svg" alt="" aria-hidden="true">FastAPI</span>
   </h2>
   <div class="md-cell">
     <p>Ebben a kurzusban egy <strong>churn predikciós modellt</strong> viszünk végig a teljes életcikluson: kísérletkövetés, tanítás, regisztráció, validáció, deployment, monitoring és drift detektálás.</p>
@@ -132,7 +132,7 @@
 <!-- S1: Fogalmi térkép -->
 <div class="section layer-general" id="s1">
   <div class="section-number">Section 01</div>
-  <h2>Fogalmi térkép: MLOps, CI/CD, drift, registry <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>Fogalmi térkép: MLOps, CI/CD, drift, registry <span class="tool-badge"><img src="../assets/logos/mlflow.svg" alt="" aria-hidden="true">MLflow</span></h2>
   <div class="md-cell">
     <table>
       <tr><th>Fogalom</th><th>Magyarázat</th></tr>
@@ -154,7 +154,7 @@
 <!-- S2: Architektúratérkép -->
 <div class="section layer-general" id="s2">
   <div class="section-number">Section 02</div>
-  <h2>Architektúratérkép: ML pipeline <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
+  <h2>Architektúratérkép: ML pipeline <span class="tool-badge"><img src="../assets/logos/fastapi.svg" alt="" aria-hidden="true">FastAPI</span></h2>
   <div class="md-cell">
     <div class="arch-flow">
       <div class="arch-step">📊 Adatok</div>
@@ -184,9 +184,9 @@
 <!-- S3: Környezet -->
 <div class="section layer-general" id="s3">
   <div class="section-number">Section 03</div>
-  <h2>Környezet elokeszitese <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Környezet elokeszitese <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="code-cell" id="cell-s3">
-    <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" onclick="runCell('s3')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s3')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># pip install mlflow scikit-learn pandas fastapi uvicorn</span>
 <span class="kw">import</span> pandas <span class="kw">as</span> pd
 <span class="kw">import</span> numpy <span class="kw">as</span> np
@@ -206,7 +206,7 @@
 <!-- S4: MLflow alapok -->
 <div class="section layer-general" id="s4">
   <div class="section-number">Section 04</div>
-  <h2>MLflow alapok: kísérletkövetés <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>MLflow alapok: kísérletkövetés <span class="tool-badge"><img src="../assets/logos/mlflow.svg" alt="" aria-hidden="true">MLflow</span></h2>
   <div class="md-cell">
     <p>Az <strong>MLflow</strong> a Databricks által fejlesztett nyílt forráskódú platform, amely a gépi tanulási kísérletek nyomon követését, a modellek regisztrációját és a szolgáltatást (serving) egyesíti egyetlen keretrendszerben. Segítségével minden tanítási futás paraméterei, metrikái és a generált modell artifactok egy központi helyen naplózásra kerülnek, ami elengedhetetlen a reprodukálhatósághoz.</p>
     <p><strong>Miért fontos?</strong> ML projektekben tipikusan tucatnyi kísérletet futtatunk különböző hiperparaméterekkel. Notebookban ez könnyen átláthatatlanná válik: nem tudjuk, melyik modell milyen beállításokkal készült, és melyik teljesített a legjobban. Az MLflow automatikusan naplózza ezeket, így bármikor visszakereshető, hogy az adott modell milyen körülmények között született.</p>
@@ -214,7 +214,7 @@
     <p><strong>Tip:</strong> Productionben érdemes remote MLflow szervert használni (pl. Databricks Managed MLflow vagy saját Kubernetes-ben futó szerver) artifact store-ral (S3, GCS) és hozzáférés-kezeléssel.</p>
   </div>
   <div class="code-cell" id="cell-s4">
-    <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" onclick="runCell('s4')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s4')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># MLflow kísérlet beállítása</span>
 mlflow.set_experiment(<span class="str">"webshop-churn"</span>)
 
@@ -251,7 +251,7 @@ data[<span class="str">"churn"</span>] = ((data[<span class="str">"last_days"</s
 <!-- S5: Kísérletkövetés -->
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
-  <h2>Kísérletkövetés: paraméterek és metrikák <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>Kísérletkövetés: paraméterek és metrikák <span class="tool-badge"><img src="../assets/logos/mlflow.svg" alt="" aria-hidden="true">MLflow</span></h2>
   <div class="md-cell">
     <p>A kísérletkövetés (experiment tracking) az MLOps alapköve: minden tanítási futás során szisztematikusan rögzítjük a hiperparamétereket, a metrikákat és magát a modellt. Az MLflow ehhez három kulcsfüggvényt biztosít: <code>log_param</code> egyetlen paraméter naplózásához, <code>log_metric</code> a teljesítménymutatókhoz és <code>log_model</code> a betanított modell artifact mentéséhez.</p>
     <p><strong>Miért elengedhetetlen?</strong> Képzeljünk el egy helyzetet, ahol 20 különböző konfigurációval tanítunk modellt. Nélkülözhetetlen, hogy később pontosan rekonstruálható legyen, melyik futás milyen eredményt hozott. A kísérletkövetés garantálja, hogy a legjobb modell azonosítható és reprodukálható maradjon.</p>
@@ -259,7 +259,7 @@ data[<span class="str">"churn"</span>] = ((data[<span class="str">"last_days"</s
     <p><strong>Tip:</strong> Használj értelmes <code>run_name</code> nevet (pl. <code>rf_100</code>), és adj meg <code>tags</code>-et is (pl. <code>model_type: random_forest</code>), hogy később szűrhetőek legyenek a futások. Nagy projektekben ez megtakarítja a keresés idejét.</p>
   </div>
   <div class="code-cell" id="cell-s5">
-    <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" onclick="runCell('s5')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s5')">Output</button></div>
     <div class="code-body"><pre>X = data.drop(<span class="str">"churn"</span>, axis=<span class="num">1</span>)
 y = data[<span class="str">"churn"</span>]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
@@ -296,7 +296,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
 <!-- S6: Model regisztráció -->
 <div class="section layer-general" id="s6">
   <div class="section-number">Section 06</div>
-  <h2>Model Registry: modellverziózás <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>Model Registry: modellverziózás <span class="tool-badge"><img src="../assets/logos/mlflow.svg" alt="" aria-hidden="true">MLflow</span></h2>
   <div class="md-cell">
     <p>A <strong>Model Registry</strong> az MLflow központi modelltára, ahol a betanított modellek verziózva, <strong>aliasokkal</strong> (pl. <code>@production</code>, <code>@staging</code>, <code>@champion</code>, <code>@challenger</code>) ellátva tárolódnak. Az aliasok rugalmas címkék: tetszőleges nevet adhatsz nekik, és bármikor másik verzióra mutathatnak.</p>
     <div class="callout warn">
@@ -308,7 +308,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
     <p><strong>Tip:</strong> Élesben a <code>@staging</code> → <code>@production</code> alias átmozgatást ne manuálisan végezd, hanem automatizáld: CI/CD pipeline validálja a modellt, és ha átmeneti teszteken is sikeres, automatikusan állítsa át az aliast. Így elkerülhető az emberi hiba. Bevett pattern: <code>@champion</code> a jelenlegi production modell, <code>@challenger</code> az A/B tesztelt új jelölt.</p>
   </div>
   <div class="code-cell" id="cell-s6">
-    <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" onclick="runCell('s6')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s6')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Modell regisztrálása a legjobb futásból</span>
 best_run = mlflow.search_runs(
     experiment_names=[<span class="str">"webshop-churn"</span>],
@@ -355,7 +355,7 @@ client.set_registered_model_alias(
 <!-- S7: Churn modell építés -->
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>Churn modell építés: teljes pipeline <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span> <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span></h2>
+  <h2>Churn modell építés: teljes pipeline <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span> <span class="tool-badge"><img src="../assets/logos/mlflow.svg" alt="" aria-hidden="true">MLflow</span></h2>
   <div class="md-cell">
     <p>Ebben a lépésben egy <strong>fejlettebb churn modellt</strong> építünk feature engineering segítségével. A feature engineering lényege, hogy a nyers adatokból új, informatívabb változókat hozunk létre, amelyekkel a modell jobban meg tudja fogni a churn mögötti mintákat. Célunk, hogy a churn valószínűséget a lehető legmegbízhatóbban predikáljuk.</p>
     <p><strong>Miért fontos a feature engineering?</strong> A nyers adatok (kor, jövedelem, vásárlások száma) önmagukban nem mindig tükrözik a churn kockázatát. Ha viszont olyan származtatott változókat hozunk létre, mint a <code>purchase_rate</code> (vásárlási gyakoriság) vagy a <code>high_risk</code> (magas kockázatú jelző), a modell sokkal jobban képes megkülönböztetni a churnelő és a maradó ügyfeleket.</p>
@@ -363,7 +363,7 @@ client.set_registered_model_alias(
     <p><strong>Tip:</strong> A feature importance mindig vizsgáld meg: ha egy fontos üzleti változó (pl. <code>is_active</code>) dominál, az jó jel. Ha viszont irreleváns változók kapnak nagy súlyt, az overfittingre utalhat. Ilyenkor érdemes a modellt egyszerűsíteni vagy regularizálni.</p>
   </div>
   <div class="code-cell" id="cell-s7">
-    <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" onclick="runCell('s7')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s7')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Feature engineering</span>
 data[<span class="str">"purchase_rate"</span>] = data[<span class="str">"purchases"</span>] / (data[<span class="str">"last_days"</span>] + <span class="num">1</span>)
 data[<span class="str">"high_risk"</span>] = ((data[<span class="str">"last_days"</span>] > <span class="num">180</span>) & (data[<span class="str">"purchases"</span>] < <span class="num">10</span>)).astype(<span class="kw">int</span>)
@@ -412,7 +412,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
 <!-- S8: Model validáció -->
 <div class="section layer-general" id="s8">
   <div class="section-number">Section 08</div>
-  <h2>Model validáció: gateway a productionhoz <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>Model validáció: gateway a productionhoz <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell">
     <p>A <strong>modell validáció</strong> egy minőségi kapu (quality gate) a production deployment előtt. Egy új modell csak akkor léphet élesbe, ha előre meghatározott <strong>validációs kritériumokat</strong> teljesít — ilyen például a minimális accuracy (pl. 90%) és minimális F1 score (pl. 85%). Ha a modell nem felel meg, a deployment automatikusan leáll.</p>
     <p><strong>Miért elengedhetetlen?</strong> Egy rosszul teljesítő modell productionbe állítata komoly üzleti kockázatot jelent: téves predikciók, rossz ügyfélmegítélés, potenciális bevételkiesés. A validációs küszöbök (thresholdok) biztosítják, hogy csak a kellően megbízható modellek kerüljenek az ügyfelek elé.</p>
@@ -420,7 +420,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
     <p><strong>Tip:</strong> Productionben a validáció kiterjeszthető: adj hozzá bias auditot (fairness check), latencia benchmarkot (a modell predikciós ideje elfogadható-e), memória-használat mérést, és baseline összehasonlítást (az új modell jobb-e, mint a jelenlegi production modell).</p>
   </div>
   <div class="code-cell" id="cell-s8">
-    <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" onclick="runCell('s8')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s8')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Validációs kriteriumok</span>
 THRESHOLDS = {<span class="str">"min_accuracy"</span>: <span class="num">0.90</span>, <span class="str">"min_f1"</span>: <span class="num">0.85</span>}
 
@@ -471,7 +471,7 @@ validation = <span class="fn">validate_model</span>(model, X_test, y_test, THRES
 <!-- S9: FastAPI szolgáltatás -->
 <div class="section layer-general" id="s9">
   <div class="section-number">Section 09</div>
-  <h2>FastAPI: model serving <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
+  <h2>FastAPI: model serving <span class="tool-badge"><img src="../assets/logos/fastapi.svg" alt="" aria-hidden="true">FastAPI</span></h2>
   <div class="md-cell">
     <p>A tanított modellt <strong>FastAPI</strong> REST API-val szolgáltatjuk ki, ami azt jelenti, hogy a modell predikcióit HTTP végponton keresztül teszi elérhetővé. Bármilyen alkalmazás — webes frontend, mobilalkalmazás, másik mikroszolgáltatás — egyszerű HTTP POST kéréssel kérhet churn predikciót.</p>
     <p><strong>Miért FastAPI?</strong> A FastAPI az egyik leggyorsabban fejlődő Python webes keretrendszer, amely natív aszinkron támogatást, automatikus OpenAPI dokumentációt és Pydantic-alapú adatvalidációt kínál. Ezek a tulajdonságok különösen fontosak ML modellek kiszolgálásánál, ahol a bemeneti adatok helyessége kritikus.</p>
@@ -479,7 +479,7 @@ validation = <span class="fn">validate_model</span>(model, X_test, y_test, THRES
     <p><strong>Tip:</strong> Productionben a modellt ne minden kérésnél töltsd be újra, hanem alkalmazz singleton mintát vagy modell caching-et. Emellett adj hozzá loggingot, hibakezelést és rate limitinget is a végponthoz.</p>
   </div>
   <div class="code-cell" id="cell-s9">
-    <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" onclick="runCell('s9')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># app.py - FastAPI szolgáltatás</span>
 <span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
 <span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
@@ -527,7 +527,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 <!-- S10: Docker konténerizáció -->
 <div class="section layer-general" id="s10">
   <div class="section-number">Section 10</div>
-  <h2>Docker konténerizáció <span class="tool-badge"><img src="../assets/logos/docker.svg">Docker</span></h2>
+  <h2>Docker konténerizáció <span class="tool-badge"><img src="../assets/logos/docker.svg" alt="" aria-hidden="true">Docker</span></h2>
   <div class="md-cell">
     <p>A <strong>Docker konténerizáció</strong> a modell és az összes függőségének egy önálló, hordozható csomagba foglalását jelenti. A konténer garantálja, hogy a modell pontosan ugyanúgy működik a fejlesztői laptopon, a staging környezetben és a production szerveren — megszüntetve a „nálam működik" problémát.</p>
     <p><strong>Miért elengedhetetlen?</strong> ML modelleknél a futási környezet különösen sérülékeny: a Python verzió, a scikit-learn verzió, az operációs rendszer és a rendszerkönyvtárak is befolyásolhatják a predikció eredményét. A Docker ezeket a változókat rögzíti egy immutable image-ben, ami bárhová telepíthető.</p>
@@ -535,7 +535,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
     <p><strong>Tip:</strong> Használj multi-stage build-et a konténer méretének csökkentésére, és mindig fixeld a függőségek verzióit (pl. <code>scikit-learn==1.3.0</code>). Productionben a konténert Kubernetes vagy Docker Swarm segítségével skálázhatod több példányra.</p>
   </div>
   <div class="code-cell" id="cell-s10">
-    <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" onclick="runCell('s10')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># Dockerfile</span>
 <span class="kw">FROM</span> python:<span class="num">3.11</span>-slim
 <span class="kw">WORKDIR</span> /app
@@ -572,7 +572,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 <!-- S11: CI/CD pipeline -->
 <div class="section layer-general" id="s11">
   <div class="section-number">Section 11</div>
-  <h2>CI/CD pipeline: automatizált deployment <span class="tool-badge"><img src="../assets/logos/github.svg">GitHub</span></h2>
+  <h2>CI/CD pipeline: automatizált deployment <span class="tool-badge"><img src="../assets/logos/github.svg" alt="" aria-hidden="true">GitHub</span></h2>
   <div class="md-cell">
     <p>A <strong>CI/CD</strong> (Continuous Integration / Continuous Deployment) automatizálja a szoftverfejlesztés kritikus lépéseit: a kód módosítás után automatikusan lefutnak a tesztek, ha azok átmegyünk, elkészül a Docker image, és ha az is valid, automatikusan deployolásra kerül a production környezetbe. Minden <code>git push</code> aktiválja a pipeline-t.</p>
     <p><strong>Miért fontos ML-nél?</strong> ML rendszereknél nemcsak a kód változik, hanem az adatok és a modell is. A CI/CD pipeline kiterjeszthető úgy, hogy modell validációt és drift ellenőrzést is tartalmazzon. Így garantálható, hogy egy hibás modell sosem kerül élesbe, és minden változtatás nyomon követhető.</p>
@@ -581,7 +581,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
     <p><strong>Tip:</strong> Valós projektekben a deploy job tartalmazzon canary deployment-et (először csak 1-5% forgalom az új verzióra), automatikus rollback lehetőséget és Slack/email értesítést a csapat számára. Emellett a modell artifact verziókat is számon kell tartani az MLflow Model Registry-ben.</p>
   </div>
   <div class="code-cell" id="cell-s11">
-    <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" onclick="runCell('s11')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s11')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># .github/workflows/deploy.yml</span>
 <span class="cm"># name: ML Pipeline</span>
 <span class="cm"># on: [push]</span>
@@ -623,7 +623,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
 <!-- S12: Monitoring és drift -->
 <div class="section layer-general" id="s12">
   <div class="section-number">Section 12</div>
-  <h2>Monitoring és drift detektálás <span class="tool-badge"><img src="../assets/logos/grafana.svg">Grafana</span></h2>
+  <h2>Monitoring és drift detektálás <span class="tool-badge"><img src="../assets/logos/grafana.svg" alt="" aria-hidden="true">Grafana</span></h2>
   <div class="md-cell">
     <p>A modell deployment után <strong>folyamatos monitorozásra</strong> van szükség, mert az ML modellek teljesítménye az idő múlásával romolhat. Két tipikus probléma fenyeget: a <strong>data drift</strong>, amikor a bemeneti adatok eltolódnak a tanító adatokhoz képest (pl. a felhasználók életkora megemelkedik, a jövedelemszerkezet megváltozik), és a <strong>concept drift</strong>, amikor maga a kapcsolat változik az input és az output között (pl. a vásárlói magatartás alapvetően átalakul egy új versenytárs miatt). Mindkettő a modell pontosságának romlásához vezet.</p>
     <p><strong>Miért kritikus?</strong> Productionben a modell csendben romolhat — a predikciók egyre pontatlanabbak lesznek, de ezt senki nem veszi észre, amíg valamilyen üzleti metrika (pl. megtartási arány, bevétel) el nem kezd csökkenni. A drift detektálás korai figyelmeztetést ad, még mielőtt az üzleti hatás jelentős lenne. Statisztikai tesztekkel (KS-test, PSI) összehasonlítjuk a referencia (tanító) és a jelenlegi adateloszlást, és ha a különbség meghaladja a küszöböt, riasztást küldünk.</p>
@@ -631,7 +631,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
     <p><strong>Tip:</strong> Productionben az egyszerű átlag-összehasonlítás helyett használj statisztikai teszteket: <strong>KS-test</strong> (Kolmogorov-Smirnov) a folytonos változók eloszlásának összehasonlítására, <strong>PSI</strong> (Population Stability Index) a teljes populáció stabilitásának mérésére, vagy dedikált könyvtárakat, mint az <strong>Evidently AI</strong>. A detektált drift automatikusan triggereljen újra tanítást (retrain) a friss adatokon.</p>
   </div>
   <div class="code-cell" id="cell-s12">
-    <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" onclick="runCell('s12')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s12')">Output</button></div>
     <div class="code-body"><pre><span class="kw">def</span> <span class="fn">detect_drift</span>(reference_data, current_data, threshold=<span class="num">0.05</span>):
     <span class="cm"># Egyszerű drift detektálás: feature átlagok összehasonlítása</span>
     drift_detected = <span class="kw">False</span>
@@ -690,7 +690,7 @@ drift, alerts = <span class="fn">detect_drift</span>(X_train, new_data)
 <!-- S13: A/B tesztelés -->
 <div class="section layer-general" id="s13">
   <div class="section-number">Section 13</div>
-  <h2>A/B tesztelés: két modell összehasonlítása <span class="tool-badge"><img src="../assets/logos/python.svg">Python</span></h2>
+  <h2>A/B tesztelés: két modell összehasonlítása <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell">
     <p>A/B tesztelés során <strong>két modellverziót párhuzamosan futtatunk</strong> valós felhasználói adatokon, hogy statisztikailag megalapozott döntést hozhassunk arról, melyik teljesít jobban. A forgalom egy része (pl. 80%) a régi modellhez (A), a többi (pl. 20%) az új modellhez (B) kerül.</p>
     <p><strong>Miért fontos?</strong> A modell fejlesztésekor a tesztadatokon mért javulás nem feltétlenül jelent javulást valós adatokon. Az A/B tesztelés a valós környezetben, valós felhasználói interakciókkal méri a teljesítményt, így megbízhatóbb képet ad. Ez az egyetlen módszer, amely az üzleti hatást is képes mérni.</p>
@@ -698,7 +698,7 @@ drift, alerts = <span class="fn">detect_drift</span>(X_train, new_data)
     <p><strong>Tip:</strong> Productionben használj canary deployment-et (1% → 5% → 20% → 100% fokozatos rollout), definiálj egyértelmű „killer metric"-et (pl. F1 score vagy üzleti KPI), és állíts be automatikus rollback-et, ha a B variáns rosszabbul teljesít. A teszt időtartama legyen elegendő a statisztikai szignifikancia eléréséhez.</p>
   </div>
   <div class="code-cell" id="cell-s13">
-    <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" onclick="runCell('s13')">▶ Run</button></div>
+    <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s13')">Output</button></div>
     <div class="code-body"><pre><span class="cm"># A/B teszt szimulátor</span>
 np.random.seed(<span class="num">42</span>)
 n_requests = <span class="num">1000</span>
@@ -741,7 +741,7 @@ improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span cla
 <!-- S14: Összefoglalás -->
 <div class="section layer-general" id="s14">
   <div class="section-number">Section 14</div>
-  <h2>Összefoglalás <span class="tool-badge"><img src="../assets/logos/mlflow.svg">MLflow</span> <span class="tool-badge"><img src="../assets/logos/fastapi.svg">FastAPI</span></h2>
+  <h2>Összefoglalás <span class="tool-badge"><img src="../assets/logos/mlflow.svg" alt="" aria-hidden="true">MLflow</span> <span class="tool-badge"><img src="../assets/logos/fastapi.svg" alt="" aria-hidden="true">FastAPI</span></h2>
   <div class="md-cell">
     <div class="callout success">
       <div class="callout-title">Mit építettünk?</div>
