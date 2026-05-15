@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local LLM Engineering kurzus magyarul | DataEngineer.hu</title>
+<meta name="description" content="Local LLM Engineering magyarul: Ollama, GGUF, quantization, OpenAI-kompatibilis lokális API, RAG, tool calling, benchmark, privacy és hybrid routing.">
+<meta name="keywords" content="Local LLM, Ollama, GGUF, llama.cpp, vLLM, RAG, AI engineering, magyar kurzus">
+<meta name="author" content="Lugosi Dömötör">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0d1117">
+<link rel="canonical" href="https://dataengineer.hu/local-llm-engineering/">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Local LLM Engineering kurzus magyarul | DataEngineer.hu">
+<meta property="og:description" content="Építs privacy-first lokális LLM gatewayt WebShop Pro RAG-gel, mérhető latencyvel és fallback stratégiával.">
+<meta property="og:url" content="https://dataengineer.hu/local-llm-engineering/">
+<meta property="og:site_name" content="Engineering Crash Courses">
+<meta property="og:locale" content="hu_HU">
+<meta property="og:image" content="https://dataengineer.hu/assets/images/local-llm-engineering.jpg">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="450">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Local LLM Engineering">
+<meta name="twitter:description" content="Ollama, GGUF, lokális RAG, tool calling, benchmark, privacy és hybrid LLM routing magyarul.">
+<meta name="twitter:image" content="https://dataengineer.hu/assets/images/local-llm-engineering.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Local LLM Engineering",
+  "description": "Local LLM stack építése: Ollama, GGUF, quantization, OpenAI-kompatibilis lokális API, RAG, tool calling, benchmark, privacy és hybrid routing.",
+  "url": "https://dataengineer.hu/local-llm-engineering/",
+  "inLanguage": "hu",
+  "provider": {
+    "@type": "Organization",
+    "name": "Engineering Crash Courses",
+    "url": "https://dataengineer.hu/",
+    "sameAs": "https://github.com/lugosidomotor/engineering_crash_courses"
+  },
+  "educationalLevel": "Középhaladó-Haladó",
+  "timeRequired": "PT4H",
+  "numberOfCredits": 16,
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "HUF",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": {
+    "@type": "CourseInstance",
+    "courseMode": "online",
+    "inLanguage": "hu"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Főoldal", "item": "https://dataengineer.hu/"},
+    {"@type": "ListItem", "position": 2, "name": "Kurzusok", "item": "https://dataengineer.hu/#courses"},
+    {"@type": "ListItem", "position": 3, "name": "Local LLM Engineering", "item": "https://dataengineer.hu/local-llm-engineering/"}
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="../shared/course.css?v=2026may15">
+</head>
+<body>
+<div id="progress-bar"></div>
+<header>
+  <a href="../index.html" class="back-btn" title="Vissza">&#8592;</a>
+  <h1>&lt;/&gt; Local LLM Engineering Crash Course</h1>
+  <div class="header-actions">
+    <span id="progress-text">0 / 16 section completed</span>
+    <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
+    <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
+  </div>
+</header>
+<div class="review-banner" role="note" aria-label="Szakmai felülvizsgálat állapota">
+  <span class="review-banner-date">Utoljára szakmailag felülvizsgálva: <strong>2026-05-15</strong></span>
+  <span class="review-banner-separator" aria-hidden="true">·</span>
+  <a href="../VERSIONS.md">Verzió-mátrix</a>
+  <span class="review-banner-separator" aria-hidden="true">·</span>
+  <span class="review-banner-info" title="Az Output gomb az előre megírt eredményt mutatja a böngészőben; valódi futtatáshoz használd a saját Python környezetedet vagy a Local Docker Labot.">Output: előre megírt eredmény</span>
+</div>
+<nav id="side-nav"></nav>
+<main id="main-content">
+
+<div class="section layer-intro" id="s0">
+  <div class="section-number">Intro</div>
+  <h2>Local LLM Engineering: saját gépen futó AI stack
+    <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span>
+    <span class="tool-badge"><img src="../assets/logos/docker.svg" alt="" aria-hidden="true">Docker</span>
+  </h2>
+  <div class="md-cell">
+    <p>A kurzus célja egy <strong>lokális, privacy-first LLM gateway</strong> felépítése. Nem csak azt nézzük meg, hogyan indíts el egy modellt a gépeden, hanem azt is, hogyan döntesz modellméret, quantization, latency, RAG, tool calling, observability és cloud fallback között.</p>
+    <div class="callout">
+      <div class="callout-title">Projekt: WebShop Pro Local AI Gateway</div>
+      <p>A WebShop Pro ügyfélszolgálati asszisztense először lokális modellt használ, érzékeny vagy lassú esetekben pedig szabályozottan tud fallbackelni külső providerre.</p>
+    </div>
+    <div class="callout success">
+      <div class="callout-title">A kurzus végére</div>
+      <p>Lesz egy tervezési mátrixod, egy OpenAI-kompatibilis lokális kliensed, egy lokális RAG prototípusod, mérési scriptjeid és egy hybrid routing mintád production gondolkodáshoz.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s1">
+  <div class="section-number">Section 01</div>
+  <h2>Döntési térkép: mikor jó a local LLM?</h2>
+  <div class="md-cell">
+    <p>A local LLM nem olcsóbb vagy jobb automatikusan. Akkor jó, ha a privacy, offline működés, stabil költség, testreszabhatóság vagy gyors iteráció fontosabb, mint a legerősebb modellminőség.</p>
+    <table>
+      <tr><th>Szempont</th><th>Local LLM előny</th><th>Kockázat</th><th>Tipikus döntés</th></tr>
+      <tr><td>Privacy</td><td>Az adat nem hagyja el a gépet vagy VPC-t</td><td>Lokális hozzáférésvédelem kell</td><td>PII-s első kör lokálisan</td></tr>
+      <tr><td>Latency</td><td>Kis modellel gyors roundtrip</td><td>Nagy modell CPU-n lassú</td><td>7B-8B quantized modell napi UX-hez</td></tr>
+      <tr><td>Minőség</td><td>Domainprompttal stabil lehet</td><td>Komplex reasoningben gyengébb</td><td>Hybrid router nehéz kérdésekre</td></tr>
+      <tr><td>Költség</td><td>Nincs token alapú számla</td><td>Hardware és üzemeltetés van</td><td>Nagy volumenű, ismétlődő feladatok</td></tr>
+      <tr><td>Operáció</td><td>Teljes kontroll</td><td>Patch, model drift, monitoring rád marad</td><td>Gateway + eval + rollback</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section layer-general" id="s2">
+  <div class="section-number">Section 02</div>
+  <h2>Hardware és modell budget <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
+  <div class="md-cell">
+    <p>A legelső mérnöki kérdés: mekkora modellt bír el a gép? A paraméterszám, quantization és context window együtt határozza meg a memóriát. A becslés nem helyettesíti a mérést, de segít elkerülni a rossz első választást.</p>
+    <div class="callout warning">
+      <div class="callout-title">Durva hüvelykszabály</div>
+      <p>Q4 quantization mellett a 7B-8B modellek jellemzően laptopon is tanulhatóak. 30B+ modellhez már GPU VRAM vagy erős szerver kell.</p>
+    </div>
+  </div>
+  <div class="code-cell" id="cell-s2">
+    <div class="code-header"><span class="cell-number">[1]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s2')">Output</button></div>
+    <div class="code-body"><pre>def estimate_model_ram(params_billion, bits_per_weight=4, context_tokens=8192):
+    weights_gb = params_billion * 1_000_000_000 * bits_per_weight / 8 / 1e9
+    kv_cache_gb = context_tokens / 8192 * params_billion * 0.10
+    overhead_gb = 1.2
+    return round(weights_gb + kv_cache_gb + overhead_gb, 1)
+
+models = [
+    ("small-support", 3, 4),
+    ("daily-driver", 8, 4),
+    ("reasoning-heavy", 14, 4),
+    ("server-grade", 32, 4),
+]
+
+for name, params, bits in models:
+    print(f"{name:16} {params:>2}B Q{bits}: ~{estimate_model_ram(params, bits)} GB RAM")</pre></div>
+    <div class="output-area" id="out-s2">
+      <div class="output-label">Output:</div>
+      <pre>small-support     3B Q4: ~3.0 GB RAM
+daily-driver      8B Q4: ~6.0 GB RAM
+reasoning-heavy  14B Q4: ~9.6 GB RAM
+server-grade     32B Q4: ~21.2 GB RAM</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s3">
+  <div class="section-number">Section 03</div>
+  <h2>Ollama első lokális chat <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI API shape</span></h2>
+  <div class="md-cell">
+    <p>A leggyorsabb tanulási út az, ha a lokális runtime OpenAI-kompatibilis API-t ad. Így a meglévő LLM klienskódod nagy része változatlan marad, csak a <code>base_url</code> és a modellnév cserélődik.</p>
+    <table>
+      <tr><th>Lépés</th><th>Parancs</th><th>Mit bizonyít?</th></tr>
+      <tr><td>Runtime indítás</td><td><code>ollama serve</code></td><td>Lokális API fut a 11434 porton</td></tr>
+      <tr><td>Modell letöltés</td><td><code>ollama pull llama3.1:8b</code></td><td>Van futtatható modell</td></tr>
+      <tr><td>API smoke test</td><td><code>curl http://localhost:11434/api/tags</code></td><td>A gateway látja a modelleket</td></tr>
+    </table>
+  </div>
+  <div class="code-cell" id="cell-s3">
+    <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s3')">Output</button></div>
+    <div class="code-body"><pre>from openai import OpenAI
+
+local_client = OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama",
+)
+
+response = local_client.chat.completions.create(
+    model="llama3.1:8b",
+    messages=[
+        {"role": "system", "content": "Válaszolj röviden, magyarul."},
+        {"role": "user", "content": "Mi a local LLM legnagyobb előnye egy webshop support botnál?"},
+    ],
+)
+
+print(response.choices[0].message.content)</pre></div>
+    <div class="output-area" id="out-s3">
+      <div class="output-label">Output:</div>
+      <pre>A legnagyobb előny, hogy az érzékeny ügyféladatokat lokálisan tarthatod, miközben gyorsan prototipizálhatsz és kontrollálhatod a futtatási költséget.</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s4">
+  <div class="section-number">Section 04</div>
+  <h2>GGUF és quantization döntések</h2>
+  <div class="md-cell">
+    <p>A GGUF a llama.cpp ökoszisztéma praktikus modellformátuma. A quantization csökkenti a memóriát és gyorsíthat, de minőségvesztést okozhat. Mérnökként nem a legkisebb fájl a cél, hanem a legjobb <strong>quality / latency / RAM</strong> kompromisszum.</p>
+  </div>
+  <div class="code-cell" id="cell-s4">
+    <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s4')">Output</button></div>
+    <div class="code-body"><pre>quantization = {
+    "Q8_0": {"quality": 0.98, "ram": "high", "use": "quality-sensitive eval"},
+    "Q6_K": {"quality": 0.96, "ram": "medium-high", "use": "good laptop/server default"},
+    "Q5_K_M": {"quality": 0.94, "ram": "medium", "use": "balanced daily driver"},
+    "Q4_K_M": {"quality": 0.90, "ram": "low", "use": "laptop-friendly default"},
+    "Q3_K_M": {"quality": 0.82, "ram": "very-low", "use": "only if memory constrained"},
+}
+
+for q, meta in quantization.items():
+    print(f"{q:7} quality~{meta['quality']:.2f} ram={meta['ram']:11} use={meta['use']}")</pre></div>
+    <div class="output-area" id="out-s4">
+      <div class="output-label">Output:</div>
+      <pre>Q8_0    quality~0.98 ram=high        use=quality-sensitive eval
+Q6_K    quality~0.96 ram=medium-high use=good laptop/server default
+Q5_K_M  quality~0.94 ram=medium      use=balanced daily driver
+Q4_K_M  quality~0.90 ram=low         use=laptop-friendly default
+Q3_K_M  quality~0.82 ram=very-low    use=only if memory constrained</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s5">
+  <div class="section-number">Section 05</div>
+  <h2>OpenAI-kompatibilis lokális gateway <span class="tool-badge"><img src="../assets/logos/fastapi.svg" alt="" aria-hidden="true">FastAPI</span></h2>
+  <div class="md-cell">
+    <p>Productionben ne az app minden pontján legyen runtime-specifikus logika. Legyen egy vékony gateway réteg, amely egységesíti a provider hívást, a timeoutot, a logolást és később a fallbacket.</p>
+  </div>
+  <div class="code-cell" id="cell-s5">
+    <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s5')">Output</button></div>
+    <div class="code-body"><pre>from dataclasses import dataclass
+from openai import OpenAI
+
+@dataclass
+class LLMConfig:
+    name: str
+    base_url: str
+    api_key: str
+    default_model: str
+    timeout_s: int = 30
+
+local_cfg = LLMConfig(
+    name="local-ollama",
+    base_url="http://localhost:11434/v1",
+    api_key="ollama",
+    default_model="llama3.1:8b",
+)
+
+client = OpenAI(base_url=local_cfg.base_url, api_key=local_cfg.api_key, timeout=local_cfg.timeout_s)
+print(f"provider={local_cfg.name} model={local_cfg.default_model} timeout={local_cfg.timeout_s}s")</pre></div>
+    <div class="output-area" id="out-s5">
+      <div class="output-label">Output:</div>
+      <pre>provider=local-ollama model=llama3.1:8b timeout=30s</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s6">
+  <div class="section-number">Section 06</div>
+  <h2>Prompting kis modellekkel</h2>
+  <div class="md-cell">
+    <p>A kisebb lokális modellek kevesebb implicit kontextust tartanak fejben. Itt a jó prompt nem dísz, hanem kontrollfelület: rövid role, explicit scope, output séma, fallback válasz és tiltott viselkedés.</p>
+  </div>
+  <div class="code-cell" id="cell-s6">
+    <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s6')">Output</button></div>
+    <div class="code-body"><pre>def webshop_support_prompt(question, context):
+    return f"""
+Te a WebShop Pro lokális support asszisztense vagy.
+Csak a CONTEXT alapján válaszolj. Ha nincs benne elég információ, mondd ezt:
+"Erre nincs elég információm a lokális tudásbázisban."
+
+Válaszformátum:
+- válasz: 2-4 mondat magyarul
+- forrás: dokumentum neve vagy "nincs"
+- bizonyosság: low | medium | high
+
+CONTEXT:
+{context}
+
+USER QUESTION:
+{question}
+""".strip()
+
+print(webshop_support_prompt("Mikor kapom meg a rendelésem?", "shipping_policy.md: Budapesten 2 munkanap."))</pre></div>
+    <div class="output-area" id="out-s6">
+      <div class="output-label">Output:</div>
+      <pre>Te a WebShop Pro lokális support asszisztense vagy.
+Csak a CONTEXT alapján válaszolj. Ha nincs benne elég információ, mondd ezt:
+"Erre nincs elég információm a lokális tudásbázisban."
+
+Válaszformátum:
+- válasz: 2-4 mondat magyarul
+- forrás: dokumentum neve vagy "nincs"
+- bizonyosság: low | medium | high
+
+CONTEXT:
+shipping_policy.md: Budapesten 2 munkanap.
+
+USER QUESTION:
+Mikor kapom meg a rendelésem?</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s7">
+  <div class="section-number">Section 07</div>
+  <h2>Lokális embeddings és tudásbázis <span class="tool-badge"><img src="../assets/logos/chroma.svg" alt="" aria-hidden="true">ChromaDB</span></h2>
+  <div class="md-cell">
+    <p>Local LLM mellett a RAG még fontosabb, mert a modell mérete kisebb. A tudásbázis tartsa a vállalati tényeket, a modell pedig fogalmazzon és kössön össze.</p>
+  </div>
+  <div class="code-cell" id="cell-s7">
+    <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s7')">Output</button></div>
+    <div class="code-body"><pre>documents = [
+    {"id": "shipping-1", "source": "shipping_policy.md", "text": "Budapesten a standard szállítás 2 munkanap, vidéken 3 munkanap."},
+    {"id": "returns-1", "source": "return_policy.md", "text": "A vásárló 14 napon belül jelezheti az elállást sérülésmentes termékre."},
+    {"id": "warranty-1", "source": "warranty.md", "text": "Elektronikai termékekre 24 hónap jótállás vonatkozik."},
+]
+
+chunks = []
+for doc in documents:
+    chunks.append({
+        "id": doc["id"],
+        "text": doc["text"],
+        "metadata": {"source": doc["source"], "privacy": "public-support"},
+    })
+
+print(f"Prepared {len(chunks)} chunks for local embedding")</pre></div>
+    <div class="output-area" id="out-s7">
+      <div class="output-label">Output:</div>
+      <pre>Prepared 3 chunks for local embedding</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s8">
+  <div class="section-number">Section 08</div>
+  <h2>WebShop Pro RAG lokálisan</h2>
+  <div class="md-cell">
+    <p>A lokális RAG pipeline két részből áll: retrieval és generation. Ha a retrieval rossz, a local LLM nem fogja megmenteni. Ezért mentsd a forrást, score-t és chunk id-t minden válasz mellé.</p>
+  </div>
+  <div class="code-cell" id="cell-s8">
+    <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s8')">Output</button></div>
+    <div class="code-body"><pre>def simple_retrieve(question, chunks, top_k=2):
+    terms = set(question.lower().split())
+    scored = []
+    for chunk in chunks:
+        score = sum(1 for t in terms if t in chunk["text"].lower())
+        scored.append((score, chunk))
+    return [chunk for score, chunk in sorted(scored, reverse=True, key=lambda x: x[0])[:top_k]]
+
+question = "Hány nap alatt érkezik meg Budapestre a rendelés?"
+hits = simple_retrieve(question, chunks)
+context = "\n".join(f"{h['metadata']['source']}: {h['text']}" for h in hits)
+print(context)</pre></div>
+    <div class="output-area" id="out-s8">
+      <div class="output-label">Output:</div>
+      <pre>shipping_policy.md: Budapesten a standard szállítás 2 munkanap, vidéken 3 munkanap.
+return_policy.md: A vásárló 14 napon belül jelezheti az elállást sérülésmentes termékre.</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s9">
+  <div class="section-number">Section 09</div>
+  <h2>Tool calling lokális modellel</h2>
+  <div class="md-cell">
+    <p>Nem minden local runtime ad ugyanakkora tool calling támogatást. A robusztus minta az, hogy a modelltől strukturált JSON döntést kérsz, majd a saját kódod validálja és futtatja az eszközt.</p>
+  </div>
+  <div class="code-cell" id="cell-s9">
+    <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9')">Output</button></div>
+    <div class="code-body"><pre>allowed_tools = {
+    "lookup_order": {"required": ["order_id"]},
+    "search_policy": {"required": ["query"]},
+}
+
+model_plan = {
+    "tool": "lookup_order",
+    "arguments": {"order_id": "ORD-1042"},
+    "reason": "A felhasználó konkrét rendelés állapotát kérdezi.",
+}
+
+def validate_tool_call(plan):
+    if plan["tool"] not in allowed_tools:
+        raise ValueError("Unknown tool")
+    missing = set(allowed_tools[plan["tool"]]["required"]) - set(plan["arguments"])
+    if missing:
+        raise ValueError(f"Missing args: {missing}")
+    return True
+
+print(validate_tool_call(model_plan), model_plan["tool"], model_plan["arguments"])</pre></div>
+    <div class="output-area" id="out-s9">
+      <div class="output-label">Output:</div>
+      <pre>True lookup_order {'order_id': 'ORD-1042'}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s10">
+  <div class="section-number">Section 10</div>
+  <h2>Benchmark: latency, throughput, RAM</h2>
+  <div class="md-cell">
+    <p>Local LLM-nél a benchmark nem vanity metrika. A felhasználói élményt a time-to-first-token, a tokens/sec, a memória és a timeout arány határozza meg. Minden modellváltás előtt és után mérj.</p>
+  </div>
+  <div class="code-cell" id="cell-s10">
+    <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10')">Output</button></div>
+    <div class="code-body"><pre>bench = [
+    {"model": "3b-q4", "ttft_ms": 280, "tok_s": 42, "ram_gb": 3.2, "quality": 0.74},
+    {"model": "8b-q4", "ttft_ms": 520, "tok_s": 24, "ram_gb": 6.1, "quality": 0.86},
+    {"model": "14b-q4", "ttft_ms": 950, "tok_s": 14, "ram_gb": 9.8, "quality": 0.91},
+]
+
+def score(row):
+    latency_penalty = row["ttft_ms"] / 1000
+    speed_bonus = row["tok_s"] / 50
+    return round(row["quality"] + speed_bonus - latency_penalty, 2)
+
+for row in sorted(bench, key=score, reverse=True):
+    print(row["model"], "score=", score(row), "ttft=", row["ttft_ms"], "ms", "ram=", row["ram_gb"], "GB")</pre></div>
+    <div class="output-area" id="out-s10">
+      <div class="output-label">Output:</div>
+      <pre>8b-q4 score=0.82 ttft=520 ms ram=6.1 GB
+3b-q4 score=0.74 ttft=280 ms ram=3.2 GB
+14b-q4 score=0.24 ttft=950 ms ram=9.8 GB</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s11">
+  <div class="section-number">Section 11</div>
+  <h2>Hybrid routing: local vs cloud</h2>
+  <div class="md-cell">
+    <p>A legerősebb production minta nem vallási kérdés: használd a lokális modellt ott, ahol elég, és küldd tovább a kérdést, amikor komplex reasoning, nagy context vagy erős tool support kell.</p>
+  </div>
+  <div class="code-cell" id="cell-s11">
+    <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s11')">Output</button></div>
+    <div class="code-body"><pre>def route_request(question, contains_pii=False, complexity=0.3, user_tier="standard"):
+    if contains_pii:
+        return "local-private"
+    if complexity > 0.75:
+        return "cloud-frontier"
+    if user_tier == "free":
+        return "local-small"
+    return "local-balanced"
+
+cases = [
+    ("Mi a visszaküldési határidő?", False, 0.2, "standard"),
+    ("Elemezd ezt a panaszt és írj kompenzációs tervet.", True, 0.8, "premium"),
+    ("Írj SQL-t a rendelési kohorszokra.", False, 0.85, "premium"),
+]
+
+for question, pii, complexity, tier in cases:
+    print(route_request(question, pii, complexity, tier), "-", question[:42])</pre></div>
+    <div class="output-area" id="out-s11">
+      <div class="output-label">Output:</div>
+      <pre>local-balanced - Mi a visszaküldési határidő?
+local-private - Elemezd ezt a panaszt és írj kompenzáci
+cloud-frontier - Írj SQL-t a rendelési kohorszokra.</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s12">
+  <div class="section-number">Section 12</div>
+  <h2>Local Docker Lab profil <span class="tool-badge"><img src="../assets/logos/docker.svg" alt="" aria-hidden="true">Docker</span></h2>
+  <div class="md-cell">
+    <p>A kurzus Docker profilja a közös AI lab service-eket indítja: FastAPI gateway, ChromaDB, Streamlit demo, MLflow és monitoring. A modell runtime maradhat hoston futó Ollama, így nem kényszerítünk rá több gigabájtos image-et minden indításra.</p>
+    <div class="callout">
+      <div class="callout-title">Indítás</div>
+      <p><code>docker compose --profile local-llm up -d</code></p>
+    </div>
+  </div>
+  <div class="code-cell" id="cell-s12">
+    <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s12')">Output</button></div>
+    <div class="code-body"><pre># Lab indítása a repo gyökeréből
+docker compose --profile local-llm up -d
+
+# Hoston futó Ollama ellenőrzése
+curl http://localhost:11434/api/tags
+
+# Gateway dokumentáció
+open http://localhost:8000/docs</pre></div>
+    <div class="output-area" id="out-s12">
+      <div class="output-label">Output:</div>
+      <pre>Services: api, chroma, streamlit, mlflow, prometheus, grafana, lab-runner
+Local LLM runtime: host Ollama on http://localhost:11434</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s13">
+  <div class="section-number">Section 13</div>
+  <h2>Evaluáció: lokális modell vs cloud modell</h2>
+  <div class="md-cell">
+    <p>Ha nem mérsz, a local LLM döntés vélemény marad. A minimum eval: retrieval hit, answer groundedness, policy compliance, latency, és user-visible fallback rate.</p>
+  </div>
+  <div class="code-cell" id="cell-s13">
+    <div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s13')">Output</button></div>
+    <div class="code-body"><pre>eval_results = [
+    {"provider": "local-8b", "grounded": 0.86, "policy": 0.94, "latency_ms": 1450, "cost": 0.00},
+    {"provider": "cloud-frontier", "grounded": 0.94, "policy": 0.97, "latency_ms": 2100, "cost": 0.018},
+]
+
+for r in eval_results:
+    pass_mark = r["grounded"] >= 0.85 and r["policy"] >= 0.90 and r["latency_ms"] &lt; 2500
+    print(f"{r['provider']:15} pass={pass_mark} grounded={r['grounded']} latency={r['latency_ms']}ms cost=${r['cost']}")</pre></div>
+    <div class="output-area" id="out-s13">
+      <div class="output-label">Output:</div>
+      <pre>local-8b        pass=True grounded=0.86 latency=1450ms cost=$0.0
+cloud-frontier  pass=True grounded=0.94 latency=2100ms cost=$0.018</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section layer-general" id="s14">
+  <div class="section-number">Section 14</div>
+  <h2>Privacy, governance és threat model</h2>
+  <div class="md-cell">
+    <p>A "lokális" nem egyenlő a "biztonságos"-sal. A runtime logolhat promptot, a modell cache-elhet adatot, a notebook kimenthet PII-t, a fejlesztői gép pedig lehet gyengén védett. A local LLM governance első verziója legyen egyszerű, de explicit.</p>
+    <table>
+      <tr><th>Kockázat</th><th>Kontroll</th><th>Ellenőrzés</th></tr>
+      <tr><td>Promptban PII</td><td>Redaction gateway előtt</td><td>Mintavételes audit</td></tr>
+      <tr><td>Lokális log szivárgás</td><td>Structured logging PII mezők nélkül</td><td>Log scan CI-ben</td></tr>
+      <tr><td>Nem jó modellválasz</td><td>Golden eval és policy tests</td><td>Release gate</td></tr>
+      <tr><td>Shadow AI runtime</td><td>Engedélyezett modell lista</td><td>Tooling manifest</td></tr>
+      <tr><td>Fallback adatküldés</td><td>PII-blokkoló router szabály</td><td>Trace review</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section layer-intro" id="s15">
+  <div class="section-number">Section 15</div>
+  <h2>Összefoglalás és következő lépések</h2>
+  <div class="md-cell">
+    <p>A local LLM engineering lényege nem az, hogy minden cloud modellt lecserélj. A jó rendszer pontosan tudja, melyik feladatot bírja el a lokális modell, melyikhez kell retrieval, mikor kell fallback, és hogyan bizonyítod méréssel, hogy a döntés működik.</p>
+    <table>
+      <tr><th>Megtanultad</th><th>Mit viszel tovább?</th></tr>
+      <tr><td>Hardware és quantization</td><td>Reális modellválasztás laptopra vagy szerverre</td></tr>
+      <tr><td>OpenAI-kompatibilis lokális API</td><td>Provider-csere minimális app módosítással</td></tr>
+      <tr><td>Lokális RAG</td><td>Kontrollált, forrásolt WebShop Pro válaszok</td></tr>
+      <tr><td>Benchmark és eval</td><td>Vélemény helyett mérhető döntés</td></tr>
+      <tr><td>Hybrid routing</td><td>Privacy és minőség egy rendszerben</td></tr>
+    </table>
+    <div class="callout success">
+      <div class="callout-title">Portfólió artifact</div>
+      <p>Dokumentáld a választott modellt, quantizationt, benchmark eredményt, routing szabályokat és governance kontrollokat. Ez egy seniorabb AI engineering gondolkodást mutató projekt, nem csak egy "futtattam egy modellt" demo.</p>
+    </div>
+  </div>
+</div>
+
+<div class="quiz-box" data-answer="1">
+  <h3>Quiz: Mikor erős döntés a local LLM?</h3>
+  <button class="quiz-option">Mindig, mert ingyenes</button>
+  <button class="quiz-option">Ha privacy, offline működés vagy stabil költség fontos, és a minőséget méréssel validálod</button>
+  <button class="quiz-option">Csak akkor, ha nincs internet</button>
+  <button class="quiz-option">Csak akkor, ha nincs RAG</button>
+  <div class="quiz-feedback"></div>
+</div>
+<div class="quiz-box" data-answer="2">
+  <h3>Quiz: Mit érdemes mérni modellváltás előtt?</h3>
+  <button class="quiz-option">Csak a modell fájlméretét</button>
+  <button class="quiz-option">Csak a letöltések számát</button>
+  <button class="quiz-option">Latency, tokens/sec, memória, groundedness és policy compliance</button>
+  <button class="quiz-option">Csak a context window méretét</button>
+  <div class="quiz-feedback"></div>
+</div>
+</main>
+<script>
+window.COURSE_CONFIG = {
+  slug: 'local-llm-engineering',
+  toc: [
+    {"id":"s0","num":"00","label":"Intro"},
+    {"id":"s1","num":"01","label":"Döntési térkép"},
+    {"id":"s2","num":"02","label":"Hardware budget"},
+    {"id":"s3","num":"03","label":"Ollama chat"},
+    {"id":"s4","num":"04","label":"GGUF"},
+    {"id":"s5","num":"05","label":"Gateway"},
+    {"id":"s6","num":"06","label":"Prompting"},
+    {"id":"s7","num":"07","label":"Embeddings"},
+    {"id":"s8","num":"08","label":"Local RAG"},
+    {"id":"s9","num":"09","label":"Tools"},
+    {"id":"s10","num":"10","label":"Benchmark"},
+    {"id":"s11","num":"11","label":"Hybrid router"},
+    {"id":"s12","num":"12","label":"Docker Lab"},
+    {"id":"s13","num":"13","label":"Eval"},
+    {"id":"s14","num":"14","label":"Governance"},
+    {"id":"s15","num":"15","label":"Összegzés"}
+  ]
+};
+</script>
+<script src="../assets/webshop-case-study.js?v=webshop-pro"></script>
+<script src="../assets/courses-detail.js"></script>
+<script src="../shared/course.js?v=2025may2"></script>
+</body>
+</html>

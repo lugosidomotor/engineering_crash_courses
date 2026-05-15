@@ -184,6 +184,7 @@ docker compose --profile all up -d --build</code></pre>
         <tr><td><code>ai-de</code></td><td><code>--profile ai-de</code></td><td>core + kafka, minio, lab-runner, mlflow</td><td>~3 GB</td></tr>
         <tr><td><code>aiops</code></td><td><code>--profile aiops</code></td><td>core + mlflow, api, monitoring</td><td>~2 GB</td></tr>
         <tr><td><code>llmops</code></td><td><code>--profile llmops</code></td><td>core + mlflow, api, monitoring</td><td>~2 GB</td></tr>
+        <tr><td><code>local-llm</code></td><td><code>--profile local-llm</code></td><td>core + chroma, streamlit, api, mlflow, monitoring</td><td>~2.5 GB</td></tr>
         <tr><td><code>rag</code></td><td><code>--profile rag</code></td><td>core + chroma, lab-runner, mlflow</td><td>~2 GB</td></tr>
         <tr><td><code>governance</code></td><td><code>--profile governance</code></td><td>core + unity, lab-runner, minio, monitoring</td><td>~2.5 GB</td></tr>
         <tr><td><code>mesh</code></td><td><code>--profile mesh</code></td><td>core + dbt, unity, lab-runner, minio</td><td>~2 GB</td></tr>
@@ -269,6 +270,7 @@ docker compose logs -f api airflow dbt</code></pre>
       <a class="service" href="http://localhost:5000/"><strong>MLflow</strong><span>webshop-pro-course-lab experiment</span><em class="pill">mlflow</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:8501/"><strong>Streamlit</strong><span>AI support és kurzusanyag nézet</span><em class="pill">streamlit</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:8001/api/v1/heartbeat"><strong>ChromaDB</strong><span>webshop_course_materials collection</span><em class="pill">chroma</em><div class="login"><code>nincs login</code></div></a>
+      <a class="service" href="http://localhost:11434/api/tags"><strong>Ollama</strong><span>Opcionális host runtime local LLM modellekhez</span><em class="pill">host :11434</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:3000/"><strong>Grafana</strong><span>API és modell monitoring dashboard</span><em class="pill">grafana</em><div class="login"><code>admin</code><code>admin</code></div></a>
       <a class="service" href="http://localhost:9090/"><strong>Prometheus</strong><span>FastAPI metrikák</span><em class="pill">prometheus</em><div class="login"><code>nincs login</code></div></a>
       <a class="service" href="http://localhost:8089/"><strong>Unity Catalog OSS</strong><span>Lakehouse governance gyakorló service</span><em class="pill">unity-catalog</em><div class="login"><code>nincs login</code></div></a>
@@ -296,6 +298,7 @@ docker compose logs -f api airflow dbt</code></pre>
         <tr><td>Data Mesh</td><td>dbt, unity-catalog, postgres, lab-runner, minio</td><td>domain data product térkép, contract/SLA és catalog discovery minta</td></tr>
         <tr><td>Streaming</td><td>kafka, event-producer</td><td>folyamatos clickstream események</td></tr>
         <tr><td>AI/RAG</td><td>chroma, streamlit, api</td><td>support policy és kurzusösszefoglaló dokumentumok ChromaDB-ben</td></tr>
+        <tr><td>Local LLM</td><td>api, chroma, streamlit, mlflow, prometheus, grafana, lab-runner</td><td>local gateway, WebShop Pro RAG, benchmark és hybrid routing minta</td></tr>
         <tr><td>Agentic AI</td><td>api, streamlit, chroma, lab-runner, prometheus, grafana</td><td>tool-calling agent gyakorlóanyag, runtime endpointok és monitoring hely</td></tr>
         <tr><td>MLOps/LLMOps</td><td>mlflow, api, prometheus, grafana</td><td>MLflow demo run, FastAPI /predict, Grafana dashboard</td></tr>
       </tbody>

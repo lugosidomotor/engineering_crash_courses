@@ -6,7 +6,8 @@
     "Melyik terméknél fogy el hamar a készlet?",
     "Melyik ügyfél valószínűleg lemorzsolódik?",
     "Milyen választ adjon az AI ügyfélszolgálat a webshop szabályzata alapján?",
-    "Mely adatok tartalmaznak PII-t, ki férhet hozzájuk, és melyik domén felel értük?"
+    "Mely adatok tartalmaznak PII-t, ki férhet hozzájuk, és melyik domén felel értük?",
+    "Mely ügyfélszolgálati kérdések válaszolhatók meg biztonságosan lokális LLM-mel, és mikor kell cloud fallback?"
   ],
   "layers": [
     {"layer": "source", "examples": ["orders.json", "events.json", "catalog.json"]},
@@ -15,8 +16,8 @@
     {"layer": "gold", "examples": ["napi KPI", "ügyfél feature tábla", "termék teljesítmény"]},
     {"layer": "governance", "examples": ["PII osztályozás", "lineage", "audit policy"]},
     {"layer": "data-product", "examples": ["sales mart", "support dataset", "domain SLA"]},
-    {"layer": "ai", "examples": ["RAG support bot", "agentic support flow", "churn score", "prompt eval"]},
-    {"layer": "ops", "examples": ["Airflow DAG", "MLflow run", "Grafana dashboard"]}
+    {"layer": "ai", "examples": ["RAG support bot", "agentic support flow", "churn score", "prompt eval", "local LLM gateway"]},
+    {"layer": "ops", "examples": ["Airflow DAG", "MLflow run", "Grafana dashboard", "local LLM benchmark"]}
   ],
   "docker_lab": {
     "compose_file": "docker-compose.yml",
@@ -39,12 +40,14 @@
       {"name": "grafana", "url": "http://localhost:3000/", "course": "aiops-mlops", "login": "admin / admin"},
       {"name": "unity-catalog", "url": "http://localhost:8089/", "course": "databricks-lakehouse", "login": "nincs"},
       {"name": "databricks-local", "url": "http://localhost:8888/", "course": "databricks-lakehouse", "login": "token nélkül"},
-      {"name": "lab-runner", "url": "docker compose exec lab-runner bash", "course": "python-data-engineering", "login": "nincs"}
+      {"name": "lab-runner", "url": "docker compose exec lab-runner bash", "course": "python-data-engineering", "login": "nincs"},
+      {"name": "ollama-host", "url": "http://localhost:11434/api/tags", "course": "local-llm-engineering", "login": "nincs"}
     ]
   },
   "notes": [
     "Databricks lokális labban JupyterLab + Spark + MLflow + Unity Catalog OSS kombinációval jelenik meg.",
     "Kuberneteshez compose helyett deployment manifest készül a webshop-lab/kubernetes mappában.",
-    "OpenAI kulcs nélkül offline demo válasz fut; kulccsal a kurzusokban lehet valódi API hívást bekötni."
+    "OpenAI kulcs nélkül offline demo válasz fut; kulccsal a kurzusokban lehet valódi API hívást bekötni.",
+    "A Local LLM kurzusnál a compose a gateway/RAG/monitoring service-eket indítja, az Ollama runtime hoston opcionális."
   ]
 }

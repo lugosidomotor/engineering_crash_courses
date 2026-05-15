@@ -60,6 +60,7 @@ docker compose config --profiles
 | `--profile streaming` | Core + Kafka + Spark + Kafka UI | ~2 GB |
 | `--profile dbt` | Core + dbt | ~1 GB |
 | `--profile ai-eng` | Core + ChromaDB + Streamlit + FastAPI + MLflow | ~2 GB |
+| `--profile local-llm` | Core + ChromaDB + Streamlit + FastAPI + MLflow + monitoring | ~2.5 GB |
 | `--profile aiops` | Core + MLflow + FastAPI + Prometheus + Grafana | ~2 GB |
 | `--profile governance` | Core + Unity Catalog + lab-runner + MinIO + monitoring | ~2.5 GB |
 | `--profile mesh` | Core + dbt + Unity Catalog + lab-runner + MinIO | ~2 GB |
@@ -74,6 +75,9 @@ docker compose up -d
 
 # Delta kurzushoz a teljes data lake stack
 docker compose --profile delta up -d
+
+# Local LLM kurzushoz a gateway/RAG lab
+docker compose --profile local-llm up -d
 
 # Minden indítása (lassú, sok RAM)
 docker compose --profile all up -d
@@ -95,6 +99,7 @@ docker compose --profile all up -d
 | dbt docs | http://localhost:8092 | — |
 | FastAPI | http://localhost:8000/docs | — |
 | Streamlit (RAG demo) | http://localhost:8501 | — |
+| Ollama (hoston opcionális) | http://localhost:11434 | — |
 | Prometheus | http://localhost:9090 | — |
 | Grafana | http://localhost:3000 | `admin` / `admin` |
 | Jupyter (Databricks-like) | http://localhost:8888 | — |

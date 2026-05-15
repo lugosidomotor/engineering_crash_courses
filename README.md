@@ -28,12 +28,13 @@ Magyar nyelvű Data Engineering és AI kurzusok — interaktív webes tananyag, 
 | 10 | [Streaming Engineering](https://dataengineer.hu/streaming-engineering/) | Kafka és Spark Structured Streaming |
 | 11 | [AI Data Engineer](https://dataengineer.hu/ai-data-engineer/) | Feature store és data quality |
 | 12 | [AI Engineering](https://dataengineer.hu/ai-engineering/) | RAG chatbot építése production-ig |
-| 13 | [RAG Evaluation & AI Safety](https://dataengineer.hu/rag-evaluation-ai-safety/) | AI evaluáció és biztonság |
-| 14 | [LLMOps / GenAI Production](https://dataengineer.hu/llmops-genai-production/) | Production LLM alkalmazások |
-| 15 | [AIOps & MLOps](https://dataengineer.hu/aiops-mlops/) | ML modell üzemeltetés |
-| 16 | [Data Mesh](https://dataengineer.hu/data-mesh/) | Domain ownership, data product, data contract |
-| 17 | [Data Governance](https://dataengineer.hu/data-governance/) | PII, lineage, access control, audit |
-| 18 | [Agentic AI](https://dataengineer.hu/agentic-ai/) | Tool calling, LangGraph, multi-agent minták |
+| 13 | [Local LLM Engineering](https://dataengineer.hu/local-llm-engineering/) | Lokális LLM stack, GGUF, RAG és hybrid routing |
+| 14 | [RAG Evaluation & AI Safety](https://dataengineer.hu/rag-evaluation-ai-safety/) | AI evaluáció és biztonság |
+| 15 | [LLMOps / GenAI Production](https://dataengineer.hu/llmops-genai-production/) | Production LLM alkalmazások |
+| 16 | [AIOps & MLOps](https://dataengineer.hu/aiops-mlops/) | ML modell üzemeltetés |
+| 17 | [Data Mesh](https://dataengineer.hu/data-mesh/) | Domain ownership, data product, data contract |
+| 18 | [Data Governance](https://dataengineer.hu/data-governance/) | PII, lineage, access control, audit |
+| 19 | [Agentic AI](https://dataengineer.hu/agentic-ai/) | Tool calling, LangGraph, multi-agent minták |
 
 ## WebShop Pro — Közös esettanulmány
 
@@ -67,7 +68,7 @@ Source (orders.json, events.json, catalog.json)
 ├── bootstrap.sh / bootstrap.ps1  # venv + kernel telepítő
 ├── smoke_test.py                 # Importálhatóság-ellenőrző
 ├── docker-compose.yml            # Profilrendszerű lab stack
-├── sql-data-modeling/            # Kurzus aloldalak (18 db)
+├── sql-data-modeling/            # Kurzus aloldalak (19 db)
 ├── python-data-engineering/
 ├── docker-local-data-platform/
 ├── delta-table-crash-course/
@@ -79,6 +80,7 @@ Source (orders.json, events.json, catalog.json)
 ├── streaming-engineering/
 ├── ai-data-engineer/
 ├── ai-engineering/
+├── local-llm-engineering/
 ├── rag-evaluation-ai-safety/
 ├── llmops-genai-production/
 ├── aiops-mlops/

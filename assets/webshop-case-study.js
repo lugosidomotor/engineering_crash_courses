@@ -43,7 +43,7 @@ window.WEBSHOP_CASE_STUDY = {
     "Apache Spark", "Apache Kafka", "Airflow", "dbt", "Databricks", "Unity Catalog",
     "Apache Iceberg", "Apache Hudi", "Feast", "Great Expectations", "MLflow",
     "FastAPI", "Grafana", "Prometheus", "OpenAI", "ChromaDB", "Streamlit",
-    "Kubernetes", "DataHub", "OpenLineage", "OPA", "Presidio", "LangGraph",
+    "Ollama", "GGUF", "Local LLM", "Kubernetes", "DataHub", "OpenLineage", "OPA", "Presidio", "LangGraph",
     "CrewAI", "Anthropic"
   ],
   courses: {
@@ -144,6 +144,14 @@ window.WEBSHOP_CASE_STUDY = {
       tools: ["OpenAI", "ChromaDB", "Streamlit", "Python"],
       labServices: ["chroma", "streamlit", "api"],
       dailyUse: "Az AI válaszai nem hasból jönnek, hanem visszakeresett, ellenőrizhető kontextusból."
+    },
+    "local-llm-engineering": {
+      role: "A WebShop Pro support bothoz privacy-first lokális LLM gatewayt tervezel.",
+      artifact: "Local AI gateway: Ollama-kompatibilis kliens, WebShop Pro RAG, benchmark és hybrid routing.",
+      tools: ["Ollama", "GGUF", "ChromaDB", "FastAPI", "Docker"],
+      labServices: ["api", "chroma", "streamlit", "mlflow", "prometheus", "grafana", "lab-runner"],
+      labCommand: "docker compose --profile local-llm up -d",
+      dailyUse: "Eldöntöd, mely kérdések futhatnak lokálisan, mikor kell cloud fallback, és hogyan bizonyítod méréssel a döntést."
     },
     "rag-evaluation-ai-safety": {
       role: "A WebShop Pro AI support bot válaszait méred és hibákra teszteled.",

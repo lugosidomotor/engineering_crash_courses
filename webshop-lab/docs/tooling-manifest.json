@@ -17,7 +17,8 @@
     {"name": "Prometheus", "url": "http://localhost:9090/", "login": "nincs"},
     {"name": "Grafana", "url": "http://localhost:3000/", "login": "admin / admin"},
     {"name": "Unity Catalog OSS", "url": "http://localhost:8089/", "login": "nincs"},
-    {"name": "JupyterLab", "url": "http://localhost:8888/", "login": "token nélkül"}
+    {"name": "JupyterLab", "url": "http://localhost:8888/", "login": "token nélkül"},
+    {"name": "Ollama (hoston opcionális)", "url": "http://localhost:11434/api/tags", "login": "nincs"}
   ],
   "database_credentials": {
     "postgres": "postgresql://webshop:webshop@localhost:5432/webshop"
@@ -37,6 +38,7 @@
     "streaming-engineering": ["kafka", "event-producer", "spark-master"],
     "ai-data-engineer": ["lab-runner", "kafka", "dbt", "postgres"],
     "ai-engineering": ["chroma", "streamlit", "api"],
+    "local-llm-engineering": ["api", "chroma", "streamlit", "mlflow", "prometheus", "grafana", "lab-runner"],
     "rag-evaluation-ai-safety": ["lab-runner", "chroma", "api"],
     "llmops-genai-production": ["mlflow", "grafana", "prometheus", "api"],
     "agentic-ai": ["api", "streamlit", "chroma", "lab-runner", "prometheus", "grafana"],
@@ -48,11 +50,13 @@
     "kafka": "webshop.events, webshop.orders, webshop.support topic",
     "chroma": "webshop_course_materials collection",
     "mlflow": "webshop-pro-course-lab experiment",
-    "grafana": "WebShop Pro Course Lab dashboard"
+    "grafana": "WebShop Pro Course Lab dashboard",
+    "local-llm": "WebShop Pro support policy, local gateway és benchmark minta"
   },
   "cloud_or_runtime_notes": {
     "Databricks": "Lokálisan JupyterLab + Spark + MLflow + Unity Catalog OSS adja ugyanazt a tanulási mental modellt.",
     "Kubernetes": "A compose nem indít nested Kubernetes clustert; a deployment manifest a webshop-lab/kubernetes mappában van.",
-    "OpenAI": "Az OpenAI API kulcs opcionális. A lab alapból offline demo választ ad, hogy kulcs nélkül is tanulható legyen."
+    "OpenAI": "Az OpenAI API kulcs opcionális. A lab alapból offline demo választ ad, hogy kulcs nélkül is tanulható legyen.",
+    "Local LLM": "A compose profil a gateway/RAG/monitoring labot indítja; az Ollama runtime hoston opcionálisan fut a 11434 porton."
   }
 }

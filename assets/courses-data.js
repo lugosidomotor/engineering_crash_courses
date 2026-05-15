@@ -1,4 +1,4 @@
-﻿// Generated from ../courses.json so index.html can load course metadata from file:// without fetch().
+// Generated from ../courses.json so index.html can load course metadata from file:// without fetch().
 // Keep this file in sync when courses.json changes.
 window.ECC_COURSES =
 [
@@ -99,6 +99,40 @@ window.ECC_COURSES =
                    ],
         "image":  "./assets/images/ai-engineering.jpg",
         "icon":  "openai"
+    },
+    {
+        "slug":  "local-llm-engineering",
+        "title":  "Local LLM Engineering",
+        "description":  "Lokális LLM stack építése mérnöki szemmel: Ollama, GGUF és quantization döntések, OpenAI-kompatibilis API, WebShop Pro RAG, tool calling, benchmark, privacy és hybrid routing.",
+        "path":  [
+                     "AI Engineering"
+                 ],
+        "difficulty":  "Középhaladó–Haladó",
+        "estimatedTime":  "3–5 óra",
+        "sectionCount":  16,
+        "codeCellCount":  12,
+        "stack":  [
+                      "python",
+                      "docker",
+                      "fastapi",
+                      "chroma",
+                      "openai"
+                  ],
+        "status":  "Kész",
+        "url":  "local-llm-engineering/index.html",
+        "whatYouBuild":  "Privacy-first lokális LLM gateway WebShop Pro RAG-gel",
+        "topics":  [
+                       "Ollama és lokális LLM runtime",
+                       "GGUF, quantization és modellválasztás",
+                       "OpenAI-kompatibilis lokális API",
+                       "Lokális RAG ChromaDB-vel",
+                       "Tool calling validáció",
+                       "Latency, throughput és RAM benchmark",
+                       "Hybrid local/cloud routing",
+                       "Privacy, governance és audit kontrollok"
+                   ],
+        "image":  "./assets/images/local-llm-engineering.jpg",
+        "icon":  "docker"
     },
     {
         "slug":  "aiops-mlops",

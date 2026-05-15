@@ -372,8 +372,9 @@
       if (project.labServices && project.labServices.length) {
         html += '<div class="cip-lab-services"><strong>Local Docker Lab service-ek:</strong>' + project.labServices.map(function(s){ return '<span>' + escape(s) + '</span>'; }).join('') + '</div>';
       }
-      if (caseStudy.lab && caseStudy.lab.command) {
-        html += '<div class="cip-lab-command"><code>' + escape(caseStudy.lab.command) + '</code></div>';
+      var labCommand = project.labCommand || (caseStudy.lab && caseStudy.lab.command);
+      if (labCommand) {
+        html += '<div class="cip-lab-command"><code>' + escape(labCommand) + '</code></div>';
       }
       html += '<div class="cip-actions cip-project-actions">';
       html += '<a class="cip-action cip-action-primary" href="../webshop-pro/" target="_blank" rel="noopener">WebShop Pro demo megnyitása</a>';

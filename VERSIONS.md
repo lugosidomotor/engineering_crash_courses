@@ -58,6 +58,14 @@ Ez a fájl rögzíti, melyik kurzus milyen verziókkal lett tesztelve. A kódmin
 | `anthropic` | 0.42.0 | Claude API, prompt caching támogatott |
 | `ragas` | 0.2.10 | RAG evaluation; **v0.0.x deprecated** |
 
+## Local LLM runtime-ok
+
+| Runtime / formátum | Verzió | Megjegyzés |
+|--------------------|--------|------------|
+| Ollama | hoston telepített stabil verzió | A Local LLM kurzus OpenAI-kompatibilis `http://localhost:11434/v1` kliensmintával számol. |
+| GGUF / llama.cpp | modell artifacttól függ | A kurzus Q4/Q5/Q8 quantization döntési mintákat tanít, nem konkrét modellfájlt pinel. |
+| vLLM | opcionális GPU-s referencia | Production serving irányként szerepel; a lokális lab nem indít vLLM konténert. |
+
 ## Cloud-szolgáltatások (referenciaként)
 
 | Szolgáltatás | Verzió/SKU | Megjegyzés |

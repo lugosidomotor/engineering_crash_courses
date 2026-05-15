@@ -713,7 +713,99 @@ window.COURSE_DETAILS = {
       { title: "RAG from Scratch", channel: "LangChain", url: "https://www.youtube.com/playlist?list=PLfaIDFEXuae2LXbO1_PKyVJiQ23ZztA0x" },
       { title: "Building RAG Applications", channel: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/" }
     ],
-    related: ["python-data-engineering", "rag-evaluation-ai-safety", "agentic-ai", "llmops-genai-production"]
+    related: ["python-data-engineering", "local-llm-engineering", "rag-evaluation-ai-safety", "agentic-ai"]
+  },
+
+  "local-llm-engineering": {
+    tagline: "Lokális LLM stack mérnöki szemmel: modellválasztás, privacy, RAG, tool calling, benchmark és hybrid fallback.",
+    diagram: {
+      title: "Local LLM gateway - privacy-first RAG és fallback",
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" role="img" aria-label="Local LLM gateway architektúra: kliens, gateway, privacy filter, local model, vector store, cloud fallback és monitoring">
+        <defs>
+          <style>
+            .box{fill:rgba(88,166,255,.10);stroke:#58a6ff;stroke-width:2}
+            .private{fill:rgba(63,185,80,.10);stroke:#3fb950;stroke-width:2}
+            .model{fill:rgba(255,215,0,.10);stroke:#ffd700;stroke-width:2}
+            .fallback{fill:rgba(255,123,114,.10);stroke:#ff7b72;stroke-width:2}
+            .ops{fill:rgba(188,140,255,.10);stroke:#bc8cff;stroke-width:2}
+            .h{fill:#e6edf3;font-family:Inter,Arial,sans-serif;font-weight:700;font-size:13px}
+            .s{fill:#8b949e;font-family:Inter,Arial,sans-serif;font-size:10px}
+            .arr{fill:none;stroke:#6e7681;stroke-width:2;marker-end:url(#allm)}
+            .arr2{fill:none;stroke:#ff7b72;stroke-width:2;stroke-dasharray:5,3;marker-end:url(#ared)}
+          </style>
+          <marker id="allm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6e7681"/></marker>
+          <marker id="ared" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff7b72"/></marker>
+        </defs>
+        <rect class="box" x="24" y="120" width="110" height="62" rx="8"/>
+        <text class="h" x="79" y="146" text-anchor="middle">App/API</text>
+        <text class="s" x="79" y="164" text-anchor="middle">support bot</text>
+
+        <rect class="private" x="170" y="120" width="130" height="62" rx="8"/>
+        <text class="h" x="235" y="146" text-anchor="middle">Privacy filter</text>
+        <text class="s" x="235" y="164" text-anchor="middle">PII + policy</text>
+
+        <rect class="box" x="336" y="120" width="130" height="62" rx="8"/>
+        <text class="h" x="401" y="146" text-anchor="middle">LLM gateway</text>
+        <text class="s" x="401" y="164" text-anchor="middle">routing + timeout</text>
+
+        <rect class="model" x="520" y="54" width="140" height="62" rx="8"/>
+        <text class="h" x="590" y="80" text-anchor="middle">Local model</text>
+        <text class="s" x="590" y="98" text-anchor="middle">Ollama / GGUF</text>
+
+        <rect class="private" x="520" y="186" width="140" height="62" rx="8"/>
+        <text class="h" x="590" y="212" text-anchor="middle">Vector store</text>
+        <text class="s" x="590" y="230" text-anchor="middle">ChromaDB</text>
+
+        <rect class="fallback" x="690" y="54" width="88" height="62" rx="8"/>
+        <text class="h" x="734" y="80" text-anchor="middle">Cloud</text>
+        <text class="s" x="734" y="98" text-anchor="middle">fallback</text>
+
+        <rect class="ops" x="336" y="252" width="324" height="54" rx="8"/>
+        <text class="h" x="498" y="276" text-anchor="middle">Eval + benchmark + monitoring</text>
+        <text class="s" x="498" y="294" text-anchor="middle">quality, latency, memory, fallback rate</text>
+
+        <path class="arr" d="M136,151 L168,151"/>
+        <path class="arr" d="M302,151 L334,151"/>
+        <path class="arr" d="M466,142 L518,94"/>
+        <path class="arr" d="M466,162 L518,206"/>
+        <path class="arr2" d="M662,85 L688,85"/>
+        <path class="arr" d="M402,184 L402,250"/>
+        <path class="arr" d="M590,118 L590,184"/>
+      </svg>`
+    },
+    prerequisites: [
+      "Python alapok és API kliens használat",
+      "AI Engineering / RAG alapfogalmak előny",
+      "Docker ajánlott; hoston futó Ollama opcionális"
+    ],
+    outcomes: [
+      "Local LLM use case döntési mátrix készítése",
+      "Ollama vagy más OpenAI-kompatibilis lokális runtime bekötése",
+      "GGUF és quantization kompromisszumok értelmezése",
+      "WebShop Pro lokális RAG pipeline megtervezése",
+      "Tool calling validáció lokális modell mellett",
+      "Latency, throughput, memória és minőség mérése",
+      "Hybrid local/cloud routing és privacy gate kialakítása"
+    ],
+    keyTopics: [
+      { title: "Runtime", desc: "Ollama, llama.cpp, vLLM és OpenAI-kompatibilis API shape" },
+      { title: "Quantization", desc: "Q4/Q5/Q8 döntések RAM, latency és minőség alapján" },
+      { title: "Local RAG", desc: "ChromaDB, lokális embeddings, forrásolt support válaszok" },
+      { title: "Tool calling", desc: "JSON-terv, validáció, engedélyezett tool lista" },
+      { title: "Benchmark", desc: "TTFT, tokens/sec, RAM, groundedness, policy pass rate" },
+      { title: "Hybrid routing", desc: "PII local-first, komplex feladat cloud fallbackkel" }
+    ],
+    resources: [
+      { type: "doc", title: "Ollama Docs", url: "https://github.com/ollama/ollama/tree/main/docs" },
+      { type: "doc", title: "llama.cpp GitHub", url: "https://github.com/ggml-org/llama.cpp" },
+      { type: "doc", title: "vLLM OpenAI-Compatible Server", url: "https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html" },
+      { type: "doc", title: "Hugging Face Quantization", url: "https://huggingface.co/docs/transformers/quantization" }
+    ],
+    videos: [
+      { title: "Local LLMs and RAG", channel: "DataTalksClub", url: "https://www.youtube.com/results?search_query=local+llm+rag+datatalksclub" },
+      { title: "llama.cpp and GGUF", channel: "Hugging Face", url: "https://www.youtube.com/results?search_query=huggingface+gguf+llama.cpp" }
+    ],
+    related: ["ai-engineering", "rag-evaluation-ai-safety", "llmops-genai-production", "agentic-ai"]
   },
 
   "rag-evaluation-ai-safety": {
@@ -749,7 +841,7 @@ window.COURSE_DETAILS = {
       { title: "Evaluating RAG Applications", channel: "Jason Liu", url: "https://www.youtube.com/results?search_query=rag+evaluation+jason+liu" },
       { title: "LLM Red Teaming", channel: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/" }
     ],
-    related: ["ai-engineering", "agentic-ai", "llmops-genai-production", "aiops-mlops"]
+    related: ["ai-engineering", "local-llm-engineering", "agentic-ai", "llmops-genai-production"]
   },
 
   "llmops-genai-production": {
@@ -786,7 +878,7 @@ window.COURSE_DETAILS = {
       { title: "LLMOps: Production ML for LLMs", channel: "DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/" },
       { title: "Monitoring LLM Applications", channel: "Arize AI", url: "https://www.youtube.com/@arizeai" }
     ],
-    related: ["ai-engineering", "rag-evaluation-ai-safety", "agentic-ai", "aiops-mlops"]
+    related: ["ai-engineering", "local-llm-engineering", "rag-evaluation-ai-safety", "agentic-ai"]
   },
 
   "aiops-mlops": {
@@ -998,6 +1090,6 @@ window.COURSE_DETAILS = {
       { title: "LangGraph Agent Workflows", channel: "LangChain", url: "https://www.youtube.com/results?search_query=LangGraph+agent+workflow" },
       { title: "AI Agents in Production", channel: "DeepLearning.AI / community", url: "https://www.youtube.com/results?search_query=AI+agents+production+tool+calling" }
     ],
-    related: ["ai-engineering", "rag-evaluation-ai-safety", "llmops-genai-production", "aiops-mlops"]
+    related: ["ai-engineering", "local-llm-engineering", "rag-evaluation-ai-safety", "llmops-genai-production"]
   }
 };

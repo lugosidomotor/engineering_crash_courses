@@ -35,6 +35,7 @@ jobs:
               "data-mesh": "docker compose --profile mesh up -d",
               "data-governance": "docker compose --profile governance up -d",
               "agentic-ai": "docker compose --profile agentic up -d",
+              "local-llm-engineering": "docker compose --profile local-llm up -d",
           }
           fails = []
 
@@ -164,8 +165,8 @@ jobs:
               if slug in expected_new and expected_new[slug] not in html:
                   fails.append(f"{slug}: missing lab profile command in page")
 
-          if len(courses) != 18:
-              fails.append(f"courses.json: expected 18 courses, got {len(courses)}")
+          if len(courses) != 19:
+              fails.append(f"courses.json: expected 19 courses, got {len(courses)}")
 
           home = Path("index.html").read_text(encoding="utf-8")
           if "const COURSES = [" in home:
