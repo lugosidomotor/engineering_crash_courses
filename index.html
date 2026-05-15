@@ -1149,6 +1149,7 @@ button{font-family:inherit}
 </footer>
 
 <script src="./assets/webshop-case-study.js?v=webshop-pro"></script>
+<script src="./assets/courses-data.js?v=2026may15"></script>
 <script src="./assets/courses-detail.js"></script>
 <script>
 // Course data is loaded from courses.json, which is the canonical course metadata source.
@@ -1168,6 +1169,10 @@ function normalizeCourse(course){
 }
 
 async function loadCourses(){
+  if(location.protocol === 'file:' && Array.isArray(window.ECC_COURSES)){
+    COURSES = window.ECC_COURSES.map(normalizeCourse);
+    return;
+  }
   const response = await fetch(COURSE_DATA_URL, { cache: 'no-store' });
   if(!response.ok) throw new Error(`Nem sikerült betölteni: ${COURSE_DATA_URL}`);
   const data = await response.json();

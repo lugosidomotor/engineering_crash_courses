@@ -38,6 +38,26 @@ jobs:
           }
           fails = []
 
+          fallback_path = Path("assets/courses-data.js")
+          if not fallback_path.exists():
+              fails.append("assets/courses-data.js: missing file:// fallback course data")
+          else:
+              fallback_js = fallback_path.read_text(encoding="utf-8-sig")
+              marker = "window.ECC_COURSES ="
+              if marker not in fallback_js:
+                  fails.append("assets/courses-data.js: missing window.ECC_COURSES assignment")
+              else:
+                  fallback_payload = fallback_js.split(marker, 1)[1].strip()
+                  if fallback_payload.endswith(";"):
+                      fallback_payload = fallback_payload[:-1].strip()
+                  try:
+                      fallback_courses = json.loads(fallback_payload)
+                  except json.JSONDecodeError as exc:
+                      fails.append(f"assets/courses-data.js: invalid embedded JSON ({exc})")
+                  else:
+                      if fallback_courses != courses:
+                          fails.append("assets/courses-data.js: not in sync with courses.json")
+
           def path_from_catalog(value):
               return Path(str(value).lstrip("./"))
 
