@@ -94,7 +94,7 @@
   <a href="../index.html" class="back-btn" title="Vissza">&#8592;</a>
   <h1>&lt;/&gt; AI Engineering Crash Course</h1>
   <div class="header-actions">
-    <span id="progress-text">0 / 20 section completed</span>
+    <span id="progress-text">0 / 20 szakasz kész</span>
     <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
     <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
@@ -176,7 +176,7 @@
     <div class="callout">
       <div class="callout-title">Demo vs Production</div>
       <p><strong>Demóban:</strong> néhány dokumentum, lokális ChromaDB, egy API hívás</p>
-      <p><strong>Productionben:</strong> dokumentum verziókezelés, embedding cache, rate limiting, fallback modellek, observability, auth, SLA</p>
+      <p><strong>Éles környezetben:</strong> dokumentum verziókezelés, embedding cache, rate limiting, fallback modellek, observability, auth, SLA</p>
     </div>
   </div>
 </div>
@@ -215,7 +215,7 @@ client = OpenAI()  <span class="cm"># OPENAI_API_KEY a környezeti változóból
   <div class="section-number">Section 04</div>
   <h2>Chat Completions API alapok <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">Chat Completions API</span></h2>
   <div class="md-cell">
-    <p>Az OpenAI Python SDK <strong>Chat Completions API</strong>-ja a standard, széles körben használt mód LLM hívásokhoz. A modell kontextusát egy <code>messages</code> lista hordozza, amelynek elemei <code>role</code> (system / user / assistant) és <code>content</code> mezőkkel azonosítják, ki mit mondott.</p>
+    <p>Az OpenAI Python SDK-ban ma két fontos mintával találkozol: az újabb <strong>Responses API</strong>-val és a sok meglévő projektben használt <strong>Chat Completions API</strong>-val. Ebben a blokkban Chat Completions-kompatibilis példát használunk, mert a <code>messages</code> lista nagyon jól megmutatja az alapgondolatot: minden üzenetnek van <code>role</code> mezője (system / user / assistant) és <code>content</code> mezője, vagyis az API pontosan látja, ki mit mondott.</p>
     <table>
       <tr><th>Mező</th><th>Mire való</th></tr>
       <tr><td><code>client.chat.completions.create()</code></td><td>A hívás belépési pontja</td></tr>
@@ -308,7 +308,7 @@ Igen, a terméket a vásárlástól számított 30 napon belül visszaküldheted
   <h2>Structured outputs: JSON válasz <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
     <p>A <strong>structured output</strong> (strukturált kimenet) azt jelenti, hogy az LLM válaszát nem szabad szabad formátumú szövegként kezelnünk, hanem egy előre meghatározott JSON sémának megfelelő objektumként kapjuk vissza. Ez kulcsfontosságú RAG rendszerekben, ahol a válasz mellé forrást, megbízhatósági pontszámot és kategóriát is vissza kell adni a downstream rendszerek számára.</p>
-    <p>A Chat Completions API beépítetten támogatja a <strong>JSON schema</strong> kikényszerítést a <code>response_format</code> paraméterén keresztül. Nem kell kérned az LLM-et, hogy "válaszolj JSON-ban" és remélni a legjobbakat -- a <code>strict: True</code> kapcsoló esetén az API garantálja, hogy a válasz illeszkedik a megadott sémára. Ez azért forradalmi, mert megszünteti a kimenet parsing hibáit, amelyek a termelési rendszerek egyik leggyakoribb hibaforrásai.</p>
+    <p>Az OpenAI API-k strukturált kimenetet is támogatnak: megadhatsz egy JSON sémát, és a modell válaszát ehhez a sémához kötheted. Ez sokkal megbízhatóbb, mint egyszerűen beleírni a promptba, hogy „válaszolj JSON-ban", mert a séma gépileg ellenőrizhető szerződéssé válik a modell és az alkalmazás között. Éles rendszerben ettől lesz stabil a downstream feldolgozás: a frontend, a validátor és a monitoring ugyanazokra a mezőkre számíthat.</p>
     <p>A példában egy <code>support_answer</code> sémát definiálunk három mezővel: <code>answer</code> (a tényleges válaszszöveg), <code>category</code> (enum: szallitas, visszakuldes, garancia, egyeb), és <code>confidence</code> (0-1 közötti szám). A modell mindig ezt a struktúrát adja vissza, így a frontend kód biztonsággal dolgozhatja fel.</p>
     <div class="callout">
       <div class="callout-title">Gyakori hiba</div>
@@ -359,7 +359,7 @@ result = json.loads(response.choices[<span class="num">0</span>].message.content
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demóban:</strong> JSON schema validáció. <strong>Productionben:</strong> schema verziókezelés, backward compat, fallback, validation middleware.</p>
+    <p><strong>Demóban:</strong> JSON schema validáció. <strong>Éles környezetben:</strong> schema verziókezelés, backward compat, fallback, validation middleware.</p>
   </div>
 </div>
 
@@ -368,7 +368,7 @@ result = json.loads(response.choices[<span class="num">0</span>].message.content
   <div class="section-number">Section 07</div>
   <h2>Tool calling: függvények hívása <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
-    <p>A <strong>tool calling</strong> (eszközhívás) az a képesség, amellyel az LLM képes külső függvényeket meghívni a válaszgenerálás során. Nem te magad döntöd el, mikor hívod a függvényt -- a modell maga ismeri fel a szituációt, és automatikusan kéri a függvény meghívását, ha szükséges. Ez teszi az LLM-et "ügynökké": önállóan tervez és cselekszik.</p>
+    <p>A <strong>eszközhívás</strong> (eszközhívás) az a képesség, amellyel az LLM képes külső függvényeket meghívni a válaszgenerálás során. Nem te magad döntöd el, mikor hívod a függvényt -- a modell maga ismeri fel a szituációt, és automatikusan kéri a függvény meghívását, ha szükséges. Ez teszi az LLM-et "ügynökké": önállóan tervez és cselekszik.</p>
     <p>A folyamat lépései: (1) elküldöd a kérdést az LLM-nek a definiált eszközökkel együtt, (2) a modell felismeri, hogy egy tool-t kell hívnia, és visszaadja a függvény nevét és paramétereit, (3) te futtatod a saját kódodat az eredménnyel, (4) visszaküldöd az eredményt a modellnek, (5) a modell a végleges választ generálja az eredmény alapján.</p>
     <p>A példában egy <code>get_order_status</code> függvényt definiálunk, amely rendelésszám alapján lekérdezi a rendelés státuszát. Amikor a felhasználó azt kérdezi, "Mi a helyzet a WSP-12345 rendeléssel?", a modell felismeri, hogy rendelésszám van a szövegben, és automatikusan meghívja a tool-t.</p>
     <div class="callout">
@@ -483,13 +483,13 @@ vec_vissza    = np.array([<span class="num">0.1</span>, <span class="num">0.2</s
   <div class="section-number">Section 09</div>
   <h2>OpenAI Embeddings API <span class="tool-badge"><img src="../assets/logos/openai.svg" alt="" aria-hidden="true">OpenAI</span></h2>
   <div class="md-cell">
-    <p>Az OpenAI <code>text-embedding-3-small</code> modellje a legköltséghatékonyabb embedding megoldás: 1536 dimenziós vektorokat generál, és nagyjából $0.02 dollárba kerül 1 millió tokenenként. Ez azt jelenti, hogy 1000 átlagos dokumentum (kb. 500K token) feldolgozása mindössze 1 centbe kerül -- ez teszi praktikussá a kísérletezést és a prototípusépítést.</p>
+    <p>Az OpenAI <code>text-embedding-3-small</code> modellje olcsó, gyors embedding megoldás: alapértelmezés szerint 1536 dimenziós vektorokat generál, és az OpenAI aktuális modelloldala 1 millió tokenenkénti árazást ad meg hozzá. Ez azt jelenti, hogy embeddingekkel prototípust építeni általában nagyságrendekkel olcsóbb, mint minden kérdésre nagy nyelvi modellt futtatni. A pontos árat mindig az aktuális pricing oldalon ellenőrizd, mert a modellárak idővel változhatnak.</p>
     <p>Az <code>embeddings.create()</code> hívás egy vektorlistát ad vissza: minden bemeneti szöveghez egy 1536 lebegőpontos számból álló tömböt. Ezek a számok a szöveg szemantikai jelentését kódolják -- a hasonló jelentésű szövegek vektorai közel helyezkednek el egymáshoz a vektortérben. Az API válasza tartalmazza a felhasznált tokenek számát is, ami a költségszámításhoz szükséges.</p>
     <p>Éles környezetben érdemes az embeddingeket gyorsítótárazni, mert ugyanarra a szövegre mindig ugyanazt a vektort kapod. Ha a dokumentumaid nem változnak, felesleges minden alkalommal újra generálni az embeddingeket -- tárold őket a vektoradatbázisban, és csak az új vagy módosított dokumentumokat töltsd fel.</p>
     <div class="callout">
       <div class="callout-title">Modell választás</div>
-      <p>A <code>text-embedding-3-small</code> olcsó és gyors, a legtöbb RAG használathoz elegendő. Ha maximális pontosság kell, próbáld a <code>text-embedding-3-large</code> modellt (3072 dimenzió, kb. 3x drágább). A dimenziócsökkentés is támogatott az API-ban.</p>
-      <p><strong>Megjegyzés:</strong> A régi <code>text-embedding-ada-002</code> modell deprecated státuszú; új projektekben a <code>text-embedding-3-small</code> / <code>-large</code> család használata javasolt.</p>
+      <p>A <code>text-embedding-3-small</code> olcsó és gyors, a legtöbb RAG használathoz elegendő. Ha maximális pontosság kell, próbáld a <code>text-embedding-3-large</code> modellt, amely alapértelmezés szerint 3072 dimenziós vektorokat ad. A <code>dimensions</code> paraméterrel a harmadik generációs embedding modelleknél csökkenthető a vektorméret.</p>
+      <p><strong>Megjegyzés:</strong> új projektekben a <code>text-embedding-3-small</code> / <code>-large</code> családot érdemes választani; a régebbi embedding modelleket csak meglévő rendszereknél tartsd meg indokolt kompatibilitási okból.</p>
     </div>
   </div>
   <div class="code-cell" id="cell-s9">
@@ -514,7 +514,7 @@ vector = emb_response.data[<span class="num">0</span>].embedding
   </div>
   <div class="callout">
     <div class="callout-title">Cost</div>
-    <p>text-embedding-3-small: ~$0.02 / 1M token. 1000 dokumentum ~ 500K token ~ $0.01</p>
+    <p>Az embedding költségét mindig az aktuális szolgáltatói árlista és a tényleges tokenhasználat alapján számold. A kurzusban a lényeg a módszer: mérd a <code>usage.total_tokens</code> értéket, az egységárakat tartsd konfigurációban, és abból számolj becsült dokumentumonkénti vagy futásonkénti költséget.</p>
   </div>
 </div>
 
@@ -586,7 +586,7 @@ results = collection.query(
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demóban:</strong> in-memory, 3 dokumentum. <strong>Productionben:</strong> persist_directory, több ezer dokumentum, metadata filtering, embedding function override.</p>
+    <p><strong>Demóban:</strong> in-memory, 3 dokumentum. <strong>Éles környezetben:</strong> persist_directory, több ezer dokumentum, metadata filtering, embedding function override.</p>
   </div>
 </div>
 
@@ -847,7 +847,7 @@ Ha a kérdés nem szerepel a tudásbázisban, mondd: "Ezt a kérdést továbbít
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demóban:</strong> egy függvény, mindig ugyanaz. <strong>Productionben:</strong> conversation history, streaming, fallback modellek, rate limiting, cache, re-ranking, hybrid search (keyword + vector), guardrails.</p>
+    <p><strong>Demóban:</strong> egy függvény, mindig ugyanaz. <strong>Éles környezetben:</strong> conversation history, streaming, fallback modellek, rate limiting, cache, re-ranking, hybrid search (keyword + vector), guardrails.</p>
   </div>
   <details>
     <summary>🔬 Feladat: Hallucináció teszt</summary>
@@ -923,15 +923,15 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
   <div class="section-number">Section 17</div>
   <h2>Cost és latency tracking <span class="tool-badge"><img src="../assets/logos/grafana.svg" alt="" aria-hidden="true">Grafana</span></h2>
   <div class="md-cell">
-    <p>A <strong>költség- és válaszidő-monitorozás</strong> (cost és latency tracking) elengedhetetlen minden termelési RAG rendszernél. Egyetlen GPT-4o hívás $0.01-0.05 dollárba kerülhet, és egy rosszul optimalizált RAG pipeline könnyen napi tíz vagy száz dolláros számlát generálhat. A válaszidő pedig közvetlenül befolyásolja a felhasználói élményt -- ha a chatbot 5 másodpercig gondolkodik, a felhasználók elhagyják az oldalt.</p>
+    <p>A <strong>költség- és válaszidő-monitorozás</strong> (cost és latency tracking) elengedhetetlen minden éles RAG rendszernél. A költség nem fix „chatbot díj", hanem főleg tokenfogyasztásból, modellválasztásból, tool-hívásokból és cache-hit arányból áll össze. Egy rosszul optimalizált RAG pipeline könnyen váratlan számlát generálhat. A válaszidő pedig közvetlenül befolyásolja a felhasználói élményt: ha a chatbot túl sokáig gondolkodik, a felhasználók elhagyják az oldalt.</p>
     <p>A <code>rag_query_tracked()</code> függvény egy wrapper, amely megméri a teljes folyamat és az LLM hívás külön-külön eltelt idejét. Ez a felbontás fontos, mert a retrieval lokális és gyors (ezredmásodpercek), míg az LLM hívás távoli API és lassabb (száz milliszekundumoktól másodpercekig). A szűk keresztmetszet azonosítása segíti az optimalizálást.</p>
-    <p>A token szám alapján kiszámítható a költség: GPT-4o esetén $2.50/1M input token és $10/1M output token. A <code>response.usage</code> objektum tartalmazza a bemeneti és kimeneti tokenek számát, amiből automatizáltan számolható a költség. Éles rendszerben ezeket az adatokat Prometheus vagy Grafana dashboardra küldjük, és alertinget állítunk be a küszöbértékekre.</p>
+    <p>A token szám alapján automatizáltan számolható a becsült költség. A <code>response.usage</code> objektum tartalmazza a bemeneti és kimeneti tokenek számát; ezt szorozzuk az aktuális modellárakkal. Éles rendszerben ezeket az adatokat Prometheus vagy Grafana dashboardra küldjük, és riasztást állítunk be a küszöbértékekre. A modellárakat ne hard-kódold örökre: kezeld konfigurációként, és időnként egyeztesd az OpenAI billing/pricing felülettel.</p>
     <div class="callout">
       <div class="callout-title">Optimalizálási tippek</div>
       <p>A költség csökkentésére: (1) használj kisebb modellt (GPT-4o-mini) egyszerű kérdéseknél, (2) cache-eld a gyakori kérdések válaszait, (3) korlátozd a kontextus hosszát. A válaszidő javítására: (4) használj streaming választ, (5) párhuzamosítsd a retrieval-t, (6) válassz gyorsabb embedding modellt.</p>
     </div>
     <div class="callout"><div class="callout-title">TTFB ≠ total latency</div>
-<p>A <code>stream=True</code> az LLM válaszában <strong>time-to-first-byte</strong>-ot (TTFB) javítja: a felhasználó az első token megjelenésekor látja, hogy "valami történik". A <strong>teljes válasz latency</strong> azonban változatlan vagy minimálisan rosszabb (a streamed encoding overhead miatt). Tehát: jobb UX-érzet, de a system throughput nem nő. Batch inferenciánál (pl. tömeges dokumentum-feldolgozás) nincs előnye — ott a sima request-response a hatékonyabb.</p>
+<p>A <code>stream=True</code> az LLM válaszában <strong>time-to-first-byte</strong>-ot (TTFB) javítja: a felhasználó az első token megjelenésekor látja, hogy "valami történik". A <strong>teljes válasz latency</strong> azonban változatlan vagy minimálisan rosszabb (a streamelt átvitel többlete miatt). Tehát: jobb UX-érzet, de a system throughput nem nő. Batch inferenciánál (pl. tömeges dokumentum-feldolgozás) nincs előnye — ott a sima request-response a hatékonyabb.</p>
 </div>
     <div class="callout"><div class="callout-title">Production tipp — prompt caching (2024+)</div>
 <p>RAG kontextusoknál a system message + dokumentum-kontextus gyakran ismétlődik. Mind az <strong>Anthropic</strong>, mind az <strong>OpenAI</strong> támogat natív prompt caching-et:</p>
@@ -939,7 +939,7 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 <li><strong>Anthropic</strong>: explicit <code>cache_control={"type": "ephemeral"}</code> markert teszünk a prompt statikus részére. Cache hit: input token költség <strong>10%</strong> (90% megtakarítás). 5 perces TTL.</li>
 <li><strong>OpenAI</strong>: automatikus, 1024+ tokenes prompt prefix esetén. Cache hit: input költség <strong>50%</strong>.</li>
 </ul>
-<p>RAG/agentic workflow-knál ez a 2024-2025 LLMOps egyik fő költségredukciós technikája. Részletek és példák: <strong>LLMOps kurzus, Section 11</strong>.</p>
+<p>RAG/agentic munkafolyamatoknál a prompt caching az egyik legfontosabb költségcsökkentési technika, különösen akkor, ha hosszú, de sok kérésben ismétlődő system promptot vagy dokumentum-kontextust használsz. Részletek és példák: <strong>LLMOps kurzus 11. szakasza</strong>.</p>
 </div>
   </div>
   <div class="code-cell" id="cell-s17">
@@ -965,12 +965,14 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
 
     total_time = time.time() - start
 
-    <span class="cm"># GPT-4o pricing: $2.50/1M input, $10/1M output</span>
+    <span class="cm"># Modellárakat konfigurációból tölts, mert idővel változhatnak.</span>
+    PRICING = {<span class="str">"gpt-4o"</span>: {<span class="str">"input_per_1m"</span>: <span class="num">2.50</span>, <span class="str">"output_per_1m"</span>: <span class="num">10.00</span>}}  <span class="cm"># példaérték</span>
+    price = PRICING[<span class="str">"gpt-4o"</span>]
     <span class="cm"># A response.usage tartalmazza a token számot:</span>
     <span class="cm">#   prompt_tokens, completion_tokens, total_tokens</span>
     usage = response.usage
-    in_cost = usage.prompt_tokens * <span class="num">2.50</span> / <span class="num">1_000_000</span>
-    out_cost = usage.completion_tokens * <span class="num">10</span> / <span class="num">1_000_000</span>
+    in_cost = usage.prompt_tokens * price[<span class="str">"input_per_1m"</span>] / <span class="num">1_000_000</span>
+    out_cost = usage.completion_tokens * price[<span class="str">"output_per_1m"</span>] / <span class="num">1_000_000</span>
     <span class="fn">print</span>(<span class="str">f"Retrieval: {(total_time - llm_time)*1000:.0f}ms"</span>)
     <span class="fn">print</span>(<span class="str">f"LLM: {llm_time*1000:.0f}ms"</span>)
     <span class="fn">print</span>(<span class="str">f"Total: {total_time*1000:.0f}ms"</span>)
@@ -988,7 +990,7 @@ result = <span class="fn">evaluate_answer</span>(q, a, ctx)
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demóban:</strong> print. <strong>Productionben:</strong> Prometheus/Grafana dashboard, alerting ha latency > 2s vagy cost/nap > $X, per-endpoint breakdown, token usage per model.</p>
+    <p><strong>Demóban:</strong> print. <strong>Éles környezetben:</strong> Prometheus/Grafana dashboard, alerting ha latency > 2s vagy cost/nap > $X, per-endpoint breakdown, token usage per model.</p>
   </div>
 </div>
 

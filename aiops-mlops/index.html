@@ -94,7 +94,7 @@
   <a href="../index.html" class="back-btn" title="Vissza">&#8592;</a>
   <h1>&lt;/&gt; AIOps &amp; MLOps Crash Course</h1>
   <div class="header-actions">
-    <span id="progress-text">0 / 15 section completed</span>
+    <span id="progress-text">0 / 15 szakasz kész</span>
     <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
     <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
@@ -180,7 +180,7 @@
     </div>
     <div class="callout">
       <div class="callout-title">Demo vs Production</div>
-      <p><strong>Demoban:</strong> lokális MLflow, egy model, nincs CI/CD. <strong>Productionben:</strong> Kubernetes, model store (S3), feature store, Prometheus/Grafana, canary deployment, rollback, auth.</p>
+      <p><strong>Demoban:</strong> lokális MLflow, egy model, nincs CI/CD. <strong>Éles környezetben:</strong> Kubernetes, model store (S3), feature store, Prometheus/Grafana, canary deployment, rollback, auth.</p>
     </div>
   </div>
 </div>
@@ -215,7 +215,7 @@
     <p>Az <strong>MLflow</strong> a Databricks által fejlesztett nyílt forráskódú platform, amely a gépi tanulási kísérletek nyomon követését, a modellek regisztrációját és a szolgáltatást (serving) egyesíti egyetlen keretrendszerben. Segítségével minden tanítási futás paraméterei, metrikái és a generált modell artifactok egy központi helyen naplózásra kerülnek, ami elengedhetetlen a reprodukálhatósághoz.</p>
     <p><strong>Miért fontos?</strong> ML projektekben tipikusan tucatnyi kísérletet futtatunk különböző hiperparaméterekkel. Notebookban ez könnyen átláthatatlanná válik: nem tudjuk, melyik modell milyen beállításokkal készült, és melyik teljesített a legjobban. Az MLflow automatikusan naplózza ezeket, így bármikor visszakereshető, hogy az adott modell milyen körülmények között született.</p>
     <p><strong>Működés:</strong> Az <code>mlflow.set_experiment()</code> hívással definiáljuk a kísérletet, majd a <code>mlflow.start_run()</code> kontextuskezelőn belül naplózzuk a paramétereket (<code>log_param</code>), metrikákat (<code>log_metric</code>) és a modellt (<code>log_model</code>). Az MLflow UI-ban vizuálisan összehasonlíthatók a futások.</p>
-    <p><strong>Tip:</strong> Productionben érdemes remote MLflow szervert használni (pl. Databricks Managed MLflow vagy saját Kubernetes-ben futó szerver) artifact store-ral (S3, GCS) és hozzáférés-kezeléssel.</p>
+    <p><strong>Tipp:</strong> Éles környezetben érdemes remote MLflow szervert használni (pl. Databricks Managed MLflow vagy saját Kubernetes-ben futó szerver) artifact store-ral (S3, GCS) és hozzáférés-kezeléssel.</p>
   </div>
   <div class="code-cell" id="cell-s4">
     <div class="code-header"><span class="cell-number">[2]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s4')">Output</button></div>
@@ -259,8 +259,8 @@ data[<span class="str">"churn"</span>] = ((data[<span class="str">"last_days"</s
   <div class="md-cell">
     <p>A kísérletkövetés (experiment tracking) az MLOps alapköve: minden tanítási futás során szisztematikusan rögzítjük a hiperparamétereket, a metrikákat és magát a modellt. Az MLflow ehhez három kulcsfüggvényt biztosít: <code>log_param</code> egyetlen paraméter naplózásához, <code>log_metric</code> a teljesítménymutatókhoz és <code>log_model</code> a betanított modell artifact mentéséhez.</p>
     <p><strong>Miért elengedhetetlen?</strong> Képzeljünk el egy helyzetet, ahol 20 különböző konfigurációval tanítunk modellt. Nélkülözhetetlen, hogy később pontosan rekonstruálható legyen, melyik futás milyen eredményt hozott. A kísérletkövetés garantálja, hogy a legjobb modell azonosítható és reprodukálható maradjon.</p>
-    <p><strong>A gyakorlatban:</strong> A lentebbi kódban egy <code>for</code> ciklussal három RandomForest modellt tanítunk különböző <code>n_estimators</code> értékekkel (50, 100, 200). Minden iterációban egy új MLflow run indul, amely naplózza a paramétert és az accuracy/F1 metrikákat. A kód lefutása után az MLflow UI-ban összehasonlíthatóak a futások.</p>
-    <p><strong>Tip:</strong> Használj értelmes <code>run_name</code> nevet (pl. <code>rf_100</code>), és adj meg <code>tags</code>-et is (pl. <code>model_type: random_forest</code>), hogy később szűrhetőek legyenek a futások. Nagy projektekben ez megtakarítja a keresés idejét.</p>
+    <p><strong>A gyakorlatban:</strong> Az alábbi kódban egy <code>for</code> ciklussal három RandomForest modellt tanítunk különböző <code>n_estimators</code> értékekkel (50, 100, 200). Minden iterációban egy új MLflow run indul, amely naplózza a paramétert és az accuracy/F1 metrikákat. A kód lefutása után az MLflow UI-ban összehasonlíthatóak a futások.</p>
+    <p><strong>Tipp:</strong> Használj értelmes <code>run_name</code> nevet (pl. <code>rf_100</code>), és adj meg <code>tags</code>-et is (pl. <code>model_type: random_forest</code>), hogy később szűrhetőek legyenek a futások. Nagy projektekben ez megtakarítja a keresés idejét.</p>
   </div>
   <div class="code-cell" id="cell-s5">
     <div class="code-header"><span class="cell-number">[3]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s5')">Output</button></div>
@@ -293,7 +293,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demoban:</strong> lokális MLflow. <strong>Productionben:</strong> remote tracking server (pl. Databricks), artifact store (S3), access control.</p>
+    <p><strong>Demoban:</strong> lokális MLflow. <strong>Éles környezetben:</strong> remote tracking server (pl. Databricks), artifact store (S3), access control.</p>
   </div>
 </div>
 
@@ -307,9 +307,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
       <div class="callout-title">Figyelem: Stages deprecated</div>
       <p>A <code>Stages</code> (Staging/Production/Archived) MLflow 2.9+ óta <strong>deprecated</strong>. Az aktuális ajánlás a Model Registry <strong>aliases</strong> használata, mert rugalmasabbak és jobban illeszkednek a modern deployment patternekhez (champion/challenger, A/B, canary). A <code>transition_model_version_stage</code> hívás helyett használd a <code>set_registered_model_alias</code> metódust.</p>
     </div>
-    <p><strong>Miért kritikus?</strong> Productionben nem elég, hogy van egy jól teljesítő modellünk — tudnunk kell, melyik verzió fut éppen (<code>@production</code> alias), szükség esetén vissza tudjunk állni egy korábbi verzióra (rollback: az aliast átmozgatjuk egy régebbi verzióra), és a változtatások nyomon követhetőek legyenek. A Model Registry pontosan ezt a governance-t biztosítja.</p>
+    <p><strong>Miért kritikus?</strong> Éles környezetben nem elég, hogy van egy jól teljesítő modellünk — tudnunk kell, melyik verzió fut éppen (<code>@production</code> alias), szükség esetén vissza tudjunk állni egy korábbi verzióra (rollback: az aliast átmozgatjuk egy régebbi verzióra), és a változtatások nyomon követhetőek legyenek. A Model Registry pontosan ezt a governance-t biztosítja.</p>
     <p><strong>A folyamat:</strong> A kódban először a <code>search_runs</code> segítségével megkeressük a legjobb F1 score-ral rendelkező futást, majd <code>register_model</code> hívással regisztráljuk a modellt. Ezután az <code>MlflowClient.set_registered_model_alias</code> metódussal a modellhez hozzárendeljük a <code>production</code> aliast. Minden új regisztráció automatikusan új verziót hoz létre, az alias pedig egyetlen verzióra mutat.</p>
-    <p><strong>Tip:</strong> Élesben a <code>@staging</code> → <code>@production</code> alias átmozgatást ne manuálisan végezd, hanem automatizáld: CI/CD pipeline validálja a modellt, és ha átmeneti teszteken is sikeres, automatikusan állítsa át az aliast. Így elkerülhető az emberi hiba. Bevett pattern: <code>@champion</code> a jelenlegi production modell, <code>@challenger</code> az A/B tesztelt új jelölt.</p>
+    <p><strong>Tipp:</strong> Élesben a <code>@staging</code> → <code>@production</code> alias átmozgatást ne manuálisan végezd, hanem automatizáld: CI/CD pipeline validálja a modellt, és ha átmeneti teszteken is sikeres, automatikusan állítsa át az aliast. Így elkerülhető az emberi hiba. Bevett pattern: <code>@champion</code> a jelenlegi éles modell, <code>@challenger</code> az A/B tesztelt új jelölt.</p>
   </div>
   <div class="code-cell" id="cell-s6">
     <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s6')">Output</button></div>
@@ -364,7 +364,7 @@ client.set_registered_model_alias(
     <p>Ebben a lépésben egy <strong>fejlettebb churn modellt</strong> építünk feature engineering segítségével. A feature engineering lényege, hogy a nyers adatokból új, informatívabb változókat hozunk létre, amelyekkel a modell jobban meg tudja fogni a churn mögötti mintákat. Célunk, hogy a churn valószínűséget a lehető legmegbízhatóbban predikáljuk.</p>
     <p><strong>Miért fontos a feature engineering?</strong> A nyers adatok (kor, jövedelem, vásárlások száma) önmagukban nem mindig tükrözik a churn kockázatát. Ha viszont olyan származtatott változókat hozunk létre, mint a <code>purchase_rate</code> (vásárlási gyakoriság) vagy a <code>high_risk</code> (magas kockázatú jelző), a modell sokkal jobban képes megkülönböztetni a churnelő és a maradó ügyfeleket.</p>
     <p><strong>A folyamat:</strong> Létrehozzuk az új featureöket, majd a bővített változóhalmazzal egy új RandomForest modellt tanítunk. Az MLflow-ba az összes paramétert és metrikát elmentjük, hogy a korábbi modellekkel összehasonlítható legyen a teljesítmény. A <code>feature_importances_</code> elemzéssel megvizsgáljuk, melyik változó járul hozzá leginkább a predikcióhoz.</p>
-    <p><strong>Tip:</strong> A feature importance mindig vizsgáld meg: ha egy fontos üzleti változó (pl. <code>is_active</code>) dominál, az jó jel. Ha viszont irreleváns változók kapnak nagy súlyt, az overfittingre utalhat. Ilyenkor érdemes a modellt egyszerűsíteni vagy regularizálni.</p>
+    <p><strong>Tipp:</strong> A feature importance mindig vizsgáld meg: ha egy fontos üzleti változó (pl. <code>is_active</code>) dominál, az jó jel. Ha viszont irreleváns változók kapnak nagy súlyt, az overfittingre utalhat. Ilyenkor érdemes a modellt egyszerűsíteni vagy regularizálni.</p>
   </div>
   <div class="code-cell" id="cell-s7">
     <div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s7')">Output</button></div>
@@ -419,9 +419,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class=
   <h2>Model validáció: gateway a productionhoz <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell">
     <p>A <strong>modell validáció</strong> egy minőségi kapu (quality gate) a production deployment előtt. Egy új modell csak akkor léphet élesbe, ha előre meghatározott <strong>validációs kritériumokat</strong> teljesít — ilyen például a minimális accuracy (pl. 90%) és minimális F1 score (pl. 85%). Ha a modell nem felel meg, a deployment automatikusan leáll.</p>
-    <p><strong>Miért elengedhetetlen?</strong> Egy rosszul teljesítő modell productionbe állítata komoly üzleti kockázatot jelent: téves predikciók, rossz ügyfélmegítélés, potenciális bevételkiesés. A validációs küszöbök (thresholdok) biztosítják, hogy csak a kellően megbízható modellek kerüljenek az ügyfelek elé.</p>
+    <p><strong>Miért elengedhetetlen?</strong> Egy rosszul teljesítő modell éles környezetbe állítása komoly üzleti kockázatot jelent: téves predikciók, rossz ügyfélmegítélés, potenciális bevételkiesés. A validációs küszöbértékek biztosítják, hogy csak a kellően megbízható modellek kerüljenek az ügyfelek elé.</p>
     <p><strong>A folyamat:</strong> A kódban definiálunk egy <code>validate_model</code> függvényt, amely a tesztadatokon kiértékeli a modellt, és minden kritériumot ellenőriz. Ha bármelyik metrika a küszöb alá esik, a validáció megbukik. A függvény részletes eredményt ad vissza, így pontosan látható, melyik teszten ment át vagy esett el a modell.</p>
-    <p><strong>Tip:</strong> Productionben a validáció kiterjeszthető: adj hozzá bias auditot (fairness check), latencia benchmarkot (a modell predikciós ideje elfogadható-e), memória-használat mérést, és baseline összehasonlítást (az új modell jobb-e, mint a jelenlegi production modell).</p>
+    <p><strong>Tipp:</strong> Éles környezetben a validáció kiterjeszthető: adj hozzá bias auditot (fairness check), latencia benchmarkot (a modell predikciós ideje elfogadható-e), memória-használat mérést, és baseline összehasonlítást (az új modell jobb-e, mint a jelenlegi éles modell).</p>
   </div>
   <div class="code-cell" id="cell-s8">
     <div class="code-header"><span class="cell-number">[6]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s8')">Output</button></div>
@@ -480,7 +480,7 @@ validation = <span class="fn">validate_model</span>(model, X_test, y_test, THRES
     <p>A tanított modellt <strong>FastAPI</strong> REST API-val szolgáltatjuk ki, ami azt jelenti, hogy a modell predikcióit HTTP végponton keresztül teszi elérhetővé. Bármilyen alkalmazás — webes frontend, mobilalkalmazás, másik mikroszolgáltatás — egyszerű HTTP POST kéréssel kérhet churn predikciót.</p>
     <p><strong>Miért FastAPI?</strong> A FastAPI az egyik leggyorsabban fejlődő Python webes keretrendszer, amely natív aszinkron támogatást, automatikus OpenAPI dokumentációt és Pydantic-alapú adatvalidációt kínál. Ezek a tulajdonságok különösen fontosak ML modellek kiszolgálásánál, ahol a bemeneti adatok helyessége kritikus.</p>
     <p><strong>A folyamat:</strong> A kódban definiálunk egy <code>CustomerData</code> Pydantic modellt, amely leírja az API bemenetének szerkezetét (kor, jövedelem, vásárlások, stb.). A <code>/predict</code> végpont fogadja a kérést, kiszámítja a feature engineeringgel előállított változókat, majd a modell <code>predict_proba</code> metódusával meghatározza a churn valószínűséget és a kockázati szintet (LOW/MEDIUM/HIGH).</p>
-    <p><strong>Tip:</strong> Productionben a modellt ne minden kérésnél töltsd be újra, hanem alkalmazz singleton mintát vagy modell caching-et. Emellett adj hozzá loggingot, hibakezelést és rate limitinget is a végponthoz.</p>
+    <p><strong>Tipp:</strong> Éles környezetben a modellt ne minden kérésnél töltsd be újra, hanem alkalmazz singleton mintát vagy modell caching-et. Emellett adj hozzá naplózást, hibakezelést és sebességkorlátozást is a végponthoz.</p>
   </div>
   <div class="code-cell" id="cell-s9">
     <div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9')">Output</button></div>
@@ -536,7 +536,7 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
     <p>A <strong>Docker konténerizáció</strong> a modell és az összes függőségének egy önálló, hordozható csomagba foglalását jelenti. A konténer garantálja, hogy a modell pontosan ugyanúgy működik a fejlesztői laptopon, a staging környezetben és a production szerveren — megszüntetve a „nálam működik" problémát.</p>
     <p><strong>Miért elengedhetetlen?</strong> ML modelleknél a futási környezet különösen sérülékeny: a Python verzió, a scikit-learn verzió, az operációs rendszer és a rendszerkönyvtárak is befolyásolhatják a predikció eredményét. A Docker ezeket a változókat rögzíti egy immutable image-ben, ami bárhová telepíthető.</p>
     <p><strong>A folyamat:</strong> A Dockerfile meghatározza, hogyan épül fel a konténer: alap image (python:3.11-slim), függőségek telepítése (requirements.txt), alkalmazáskód másolása és a futtatási parancs megadása. A <code>docker build</code> paranccsal létrehozzuk az image-et, a <code>docker run</code> paranccsal pedig elindítjuk, amely a 8000-as porton elérhetővé teszi a FastAPI szolgáltatást.</p>
-    <p><strong>Tip:</strong> Használj multi-stage build-et a konténer méretének csökkentésére, és mindig fixeld a függőségek verzióit (pl. <code>scikit-learn==1.3.0</code>). Productionben a konténert Kubernetes vagy Docker Swarm segítségével skálázhatod több példányra.</p>
+    <p><strong>Tipp:</strong> Használj multi-stage build-et a konténer méretének csökkentésére, és mindig fixeld a függőségek verzióit (pl. <code>scikit-learn==1.3.0</code>). Éles környezetben a konténert Kubernetes vagy Docker Swarm segítségével skálázhatod több példányra.</p>
   </div>
   <div class="code-cell" id="cell-s10">
     <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10')">Output</button></div>
@@ -578,11 +578,11 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
   <div class="section-number">Section 11</div>
   <h2>CI/CD pipeline: automatizált deployment <span class="tool-badge"><img src="../assets/logos/github.svg" alt="" aria-hidden="true">GitHub</span></h2>
   <div class="md-cell">
-    <p>A <strong>CI/CD</strong> (Continuous Integration / Continuous Deployment) automatizálja a szoftverfejlesztés kritikus lépéseit: a kód módosítás után automatikusan lefutnak a tesztek, ha azok átmegyünk, elkészül a Docker image, és ha az is valid, automatikusan deployolásra kerül a production környezetbe. Minden <code>git push</code> aktiválja a pipeline-t.</p>
+    <p>A <strong>CI/CD</strong> (Continuous Integration / Continuous Deployment) automatizálja a szoftverfejlesztés kritikus lépéseit: kódmódosítás után automatikusan lefutnak a tesztek, siker esetén elkészül a Docker image, majd a validált image kontrolláltan kikerülhet az éles környezetbe. Minden <code>git push</code> aktiválja a pipeline-t.</p>
     <p><strong>Miért fontos ML-nél?</strong> ML rendszereknél nemcsak a kód változik, hanem az adatok és a modell is. A CI/CD pipeline kiterjeszthető úgy, hogy modell validációt és drift ellenőrzést is tartalmazzon. Így garantálható, hogy egy hibás modell sosem kerül élesbe, és minden változtatás nyomon követhető.</p>
-    <p><strong>A folyamat:</strong> A GitHub Actions workflow két job-ból áll: a <code>train</code> job lefuttatja a tanítást (<code>train.py</code>) és a modell validációt (<code>validate_model.py</code>), a <code>deploy</code> job pedig (ha a validáció átment) buildeli a Docker image-t és pusholja a registry-be. A két job közötti függőséget a <code>needs: train</code> biztosítja.</p>
-    <p><strong>Megjegyzés:</strong> A <code>validate_model.py</code> egy külön script, amelyet ebben a kurzusban nem definiálunk explicit fájlban — tipikusan a Section 08-ban látott <code>validate_model</code> függvényt csomagolja CLI-vé: betölti a frissen tanított modellt, lefuttatja a threshold-ellenőrzéseket (min accuracy, min F1), és nem-nulla exit kóddal kilép, ha a modell nem felel meg a kritériumoknak. Így a CI pipeline automatikusan elbukik, és nem deployol rossz modellt.</p>
-    <p><strong>Tip:</strong> Valós projektekben a deploy job tartalmazzon canary deployment-et (először csak 1-5% forgalom az új verzióra), automatikus rollback lehetőséget és Slack/email értesítést a csapat számára. Emellett a modell artifact verziókat is számon kell tartani az MLflow Model Registry-ben.</p>
+    <p><strong>A folyamat:</strong> A GitHub Actions munkafolyamat két job-ból áll: a <code>train</code> job lefuttatja a tanítást (<code>train.py</code>) és a modell validációt (<code>validate_model.py</code>), a <code>deploy</code> job pedig (ha a validáció átment) buildeli a Docker image-t és pusholja a registry-be. A két job közötti függőséget a <code>needs: train</code> biztosítja.</p>
+    <p><strong>Megjegyzés:</strong> A <code>validate_model.py</code> egy külön script, amelyet ebben a kurzusban nem definiálunk explicit fájlban — tipikusan a Section 08-ban látott <code>validate_model</code> függvényt csomagolja CLI-vé: betölti a frissen tanított modellt, lefuttatja a küszöbérték-ellenőrzéseket (min accuracy, min F1), és nem-nulla exit kóddal kilép, ha a modell nem felel meg a kritériumoknak. Így a CI pipeline automatikusan elbukik, és nem deployol rossz modellt.</p>
+    <p><strong>Tipp:</strong> Valós projektekben a deploy job tartalmazzon canary deployment-et (először csak 1-5% forgalom az új verzióra), automatikus rollback lehetőséget és Slack/email értesítést a csapat számára. Emellett a modell artifact verziókat is számon kell tartani az MLflow Model Registry-ben.</p>
   </div>
   <div class="code-cell" id="cell-s11">
     <div class="code-header"><span class="cell-number">[9]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s11')">Output</button></div>
@@ -630,9 +630,9 @@ app = FastAPI(title=<span class="str">"WebShop Churn API"</span>)
   <h2>Monitoring és drift detektálás <span class="tool-badge"><img src="../assets/logos/grafana.svg" alt="" aria-hidden="true">Grafana</span></h2>
   <div class="md-cell">
     <p>A modell deployment után <strong>folyamatos monitorozásra</strong> van szükség, mert az ML modellek teljesítménye az idő múlásával romolhat. Két tipikus probléma fenyeget: a <strong>data drift</strong>, amikor a bemeneti adatok eltolódnak a tanító adatokhoz képest (pl. a felhasználók életkora megemelkedik, a jövedelemszerkezet megváltozik), és a <strong>concept drift</strong>, amikor maga a kapcsolat változik az input és az output között (pl. a vásárlói magatartás alapvetően átalakul egy új versenytárs miatt). Mindkettő a modell pontosságának romlásához vezet.</p>
-    <p><strong>Miért kritikus?</strong> Productionben a modell csendben romolhat — a predikciók egyre pontatlanabbak lesznek, de ezt senki nem veszi észre, amíg valamilyen üzleti metrika (pl. megtartási arány, bevétel) el nem kezd csökkenni. A drift detektálás korai figyelmeztetést ad, még mielőtt az üzleti hatás jelentős lenne. Statisztikai tesztekkel (KS-test, PSI) összehasonlítjuk a referencia (tanító) és a jelenlegi adateloszlást, és ha a különbség meghaladja a küszöböt, riasztást küldünk.</p>
-    <p><strong>A folyamat:</strong> A lenti kódban egy egyszerű drift detektálást valósítunk meg: a referencia adatok (tanító halmaz) és az újonnan érkező adatok feature-önkénti átlagait hasonlítjuk össze. Ha egy változó átlaga eltérése meghaladja a 5%-os küszöböt, driftet jelentünk. A szimulált új adatokban szándékosan idősebb és magasabb jövedelmű vásárlókat generálunk, hogy a drift jól látható legyen.</p>
-    <p><strong>Tip:</strong> Productionben az egyszerű átlag-összehasonlítás helyett használj statisztikai teszteket: <strong>KS-test</strong> (Kolmogorov-Smirnov) a folytonos változók eloszlásának összehasonlítására, <strong>PSI</strong> (Population Stability Index) a teljes populáció stabilitásának mérésére, vagy dedikált könyvtárakat, mint az <strong>Evidently AI</strong>. A detektált drift automatikusan triggereljen újra tanítást (retrain) a friss adatokon.</p>
+    <p><strong>Miért kritikus?</strong> Éles környezetben a modell csendben romolhat — a predikciók egyre pontatlanabbak lesznek, de ezt senki nem veszi észre, amíg valamilyen üzleti metrika (pl. megtartási arány, bevétel) el nem kezd csökkenni. A drift detektálás korai figyelmeztetést ad, még mielőtt az üzleti hatás jelentős lenne. Statisztikai tesztekkel (KS-test, PSI) összehasonlítjuk a referencia (tanító) és a jelenlegi adateloszlást, és ha a különbség meghaladja a küszöböt, riasztást küldünk.</p>
+    <p><strong>A folyamat:</strong> Az alábbi kódban egy egyszerű drift detektálást valósítunk meg: a referencia adatok (tanító halmaz) és az újonnan érkező adatok feature-önkénti átlagait hasonlítjuk össze. Ha egy változó átlagának eltérése meghaladja az 5%-os küszöböt, driftet jelentünk. A szimulált új adatokban szándékosan idősebb és magasabb jövedelmű vásárlókat generálunk, hogy a drift jól látható legyen.</p>
+    <p><strong>Tipp:</strong> Éles környezetben az egyszerű átlag-összehasonlítás helyett használj statisztikai teszteket: <strong>KS-test</strong> (Kolmogorov-Smirnov) a folytonos változók eloszlásának összehasonlítására, <strong>PSI</strong> (Population Stability Index) a teljes populáció stabilitásának mérésére, vagy dedikált könyvtárakat, mint az <strong>Evidently AI</strong>. A detektált drift automatikusan triggereljen újra tanítást (retrain) a friss adatokon.</p>
   </div>
   <div class="code-cell" id="cell-s12">
     <div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s12')">Output</button></div>
@@ -675,11 +675,11 @@ drift, alerts = <span class="fn">detect_drift</span>(X_train, new_data)
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
-    <p><strong>Demoban:</strong> egyszerű átlag összehasonlítás. <strong>Productionben:</strong> KS-test, PSI (Population Stability Index), Evidently AI, Prometheus metrikák, Grafana dashboard, auto-retrain trigger.</p>
+    <p><strong>Demoban:</strong> egyszerű átlag összehasonlítás. <strong>Éles környezetben:</strong> KS-test, PSI (Population Stability Index), Evidently AI, Prometheus metrikák, Grafana dashboard, auto-retrain trigger.</p>
   </div>
   <div class="callout warn">
     <div class="callout-title">Drift detection productionben — részletesebben</div>
-    <p>A példa egyszerűsített: production-ben különbséget teszünk <strong>data drift</strong> (input feature eloszlás megváltozott — pl. új vásárlói korosztály érkezik) és <strong>concept drift</strong> (input-output kapcsolat megváltozott — pl. ugyanaz az ügyfélprofil ma már nem churn, mint régen; ezt csak ground truth labelekkel tudjuk észlelni) között.</p>
+    <p>A példa egyszerűsített: éles környezetben különbséget teszünk <strong>data drift</strong> (input feature eloszlás megváltozott — pl. új vásárlói korosztály érkezik) és <strong>concept drift</strong> (input-output kapcsolat megváltozott — pl. ugyanaz az ügyfélprofil ma már nem churn, mint régen; ezt csak ground truth labelekkel tudjuk észlelni) között.</p>
     <p><strong>Statisztikai módszerek:</strong></p>
     <ul>
       <li><strong>PSI (Population Stability Index)</strong> — kategorikus + numerikus változókhoz; általános ipari ökölszabály: PSI &lt; 0.1 stabil, 0.1–0.25 enyhe drift, &gt; 0.25 jelentős drift.</li>
@@ -699,7 +699,7 @@ drift, alerts = <span class="fn">detect_drift</span>(X_train, new_data)
     <p>A/B tesztelés során <strong>két modellverziót párhuzamosan futtatunk</strong> valós felhasználói adatokon, hogy statisztikailag megalapozott döntést hozhassunk arról, melyik teljesít jobban. A forgalom egy része (pl. 80%) a régi modellhez (A), a többi (pl. 20%) az új modellhez (B) kerül.</p>
     <p><strong>Miért fontos?</strong> A modell fejlesztésekor a tesztadatokon mért javulás nem feltétlenül jelent javulást valós adatokon. Az A/B tesztelés a valós környezetben, valós felhasználói interakciókkal méri a teljesítményt, így megbízhatóbb képet ad. Ez az egyetlen módszer, amely az üzleti hatást is képes mérni.</p>
     <p><strong>A folyamat:</strong> A kód egy szimulátort mutat be: 1000 kérést oszt szét a két modell között, majd méri az accuracy-t mindkét variánson. A z-test statisztikai szignifikanciát vizsgál — vagyis azt, hogy a mért különbség nem csupán véletlenszerű fluktuáció-e.</p>
-    <p><strong>Tip:</strong> Productionben használj canary deployment-et (1% → 5% → 20% → 100% fokozatos rollout), definiálj egyértelmű „killer metric"-et (pl. F1 score vagy üzleti KPI), és állíts be automatikus rollback-et, ha a B variáns rosszabbul teljesít. A teszt időtartama legyen elegendő a statisztikai szignifikancia eléréséhez.</p>
+    <p><strong>Tipp:</strong> Éles környezetben használj canary deployment-et (1% → 5% → 20% → 100% fokozatos rollout), definiálj egyértelmű „killer metric"-et (pl. F1 score vagy üzleti KPI), és állíts be automatikus rollback-et, ha a B variáns rosszabbul teljesít. A teszt időtartama legyen elegendő a statisztikai szignifikancia eléréséhez.</p>
   </div>
   <div class="code-cell" id="cell-s13">
     <div class="code-header"><span class="cell-number">[11]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s13')">Output</button></div>

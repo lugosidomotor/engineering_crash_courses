@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Local LLM Engineering kurzus magyarul | DataEngineer.hu</title>
-<meta name="description" content="Local LLM Engineering magyarul: Ollama, GGUF, quantization, OpenAI-kompatibilis lokális API, RAG, tool calling, benchmark, privacy és hybrid routing.">
+<meta name="description" content="Local LLM Engineering magyarul: Ollama, GGUF, quantization, OpenAI-kompatibilis lokális API, RAG, eszközhívás, benchmark, privacy és hybrid routing.">
 <meta name="keywords" content="Local LLM, Ollama, GGUF, llama.cpp, vLLM, RAG, AI engineering, magyar kurzus">
 <meta name="author" content="Lugosi Dömötör">
 <meta name="robots" content="index, follow, max-image-preview:large">
@@ -24,7 +24,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Local LLM Engineering">
-<meta name="twitter:description" content="Ollama, GGUF, lokális RAG, tool calling, benchmark, privacy és hybrid LLM routing magyarul.">
+<meta name="twitter:description" content="Ollama, GGUF, lokális RAG, eszközhívás, benchmark, privacy és hybrid LLM routing magyarul.">
 <meta name="twitter:image" content="https://dataengineer.hu/assets/images/local-llm-engineering.jpg">
 
 <script type="application/ld+json">
@@ -32,7 +32,7 @@
   "@context": "https://schema.org",
   "@type": "Course",
   "name": "Local LLM Engineering",
-  "description": "Local LLM stack építése: Ollama, GGUF, quantization, OpenAI-kompatibilis lokális API, RAG, tool calling, benchmark, privacy és hybrid routing.",
+  "description": "Local LLM stack építése: Ollama, GGUF, quantization, OpenAI-kompatibilis lokális API, RAG, eszközhívás, benchmark, privacy és hybrid routing.",
   "url": "https://dataengineer.hu/local-llm-engineering/",
   "inLanguage": "hu",
   "provider": {
@@ -78,7 +78,7 @@
   <a href="../index.html" class="back-btn" title="Vissza">&#8592;</a>
   <h1>&lt;/&gt; Local LLM Engineering Crash Course</h1>
   <div class="header-actions">
-    <span id="progress-text">0 / 16 section completed</span>
+    <span id="progress-text">0 / 16 szakasz kész</span>
     <button class="btn btn-run-all" type="button" aria-label="Összes output megjelenítése" onclick="runAll()">Összes output</button>
     <button class="btn btn-reset" type="button" onclick="resetAll()">Visszaállítás</button>
   </div>
@@ -100,7 +100,7 @@
     <span class="tool-badge"><img src="../assets/logos/docker.svg" alt="" aria-hidden="true">Docker</span>
   </h2>
   <div class="md-cell">
-    <p>A kurzus célja egy <strong>lokális, privacy-first LLM gateway</strong> felépítése. Nem csak azt nézzük meg, hogyan indíts el egy modellt a gépeden, hanem azt is, hogyan döntesz modellméret, quantization, latency, RAG, tool calling, observability és cloud fallback között.</p>
+    <p>A kurzus célja egy <strong>lokális, privacy-first LLM gateway</strong> felépítése. Nem csak azt nézzük meg, hogyan indíts el egy modellt a gépeden, hanem azt is, hogyan döntesz modellméret, quantization, latency, RAG, eszközhívás, observability és cloud fallback között.</p>
     <div class="callout">
       <div class="callout-title">Projekt: WebShop Pro Local AI Gateway</div>
       <p>A WebShop Pro ügyfélszolgálati asszisztense először lokális modellt használ, érzékeny vagy lassú esetekben pedig szabályozottan tud fallbackelni külső providerre.</p>
@@ -235,7 +235,7 @@ Q3_K_M  quality~0.82 ram=very-low    use=only if memory constrained</pre>
   <div class="section-number">Section 05</div>
   <h2>OpenAI-kompatibilis lokális gateway <span class="tool-badge"><img src="../assets/logos/fastapi.svg" alt="" aria-hidden="true">FastAPI</span></h2>
   <div class="md-cell">
-    <p>Productionben ne az app minden pontján legyen runtime-specifikus logika. Legyen egy vékony gateway réteg, amely egységesíti a provider hívást, a timeoutot, a logolást és később a fallbacket.</p>
+    <p>Éles környezetben ne az app minden pontján legyen runtime-specifikus logika. Legyen egy vékony gateway réteg, amely egységesíti a provider hívást, a timeoutot, a logolást és később a fallbacket.</p>
   </div>
   <div class="code-cell" id="cell-s5">
     <div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s5')">Output</button></div>
@@ -375,7 +375,7 @@ return_policy.md: A vásárló 14 napon belül jelezheti az elállást sérülé
   <div class="section-number">Section 09</div>
   <h2>Tool calling lokális modellel</h2>
   <div class="md-cell">
-    <p>Nem minden local runtime ad ugyanakkora tool calling támogatást. A robusztus minta az, hogy a modelltől strukturált JSON döntést kérsz, majd a saját kódod validálja és futtatja az eszközt.</p>
+    <p>Nem minden local runtime ad ugyanakkora eszközhívás támogatást. A robusztus minta az, hogy a modelltől strukturált JSON döntést kérsz, majd a saját kódod validálja és futtatja az eszközt.</p>
   </div>
   <div class="code-cell" id="cell-s9">
     <div class="code-header"><span class="cell-number">[8]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s9')">Output</button></div>
@@ -513,11 +513,11 @@ Local LLM runtime: host Ollama on http://localhost:11434</pre>
 
 for r in eval_results:
     pass_mark = r["grounded"] >= 0.85 and r["policy"] >= 0.90 and r["latency_ms"] &lt; 2500
-    print(f"{r['provider']:15} pass={pass_mark} grounded={r['grounded']} latency={r['latency_ms']}ms cost=${r['cost']}")</pre></div>
+    print(f"{r['provider']:15} pass={pass_mark} grounded={r['grounded']} latency={r['latency_ms']}ms cost_units={r['cost']}")</pre></div>
     <div class="output-area" id="out-s13">
       <div class="output-label">Output:</div>
-      <pre>local-8b        pass=True grounded=0.86 latency=1450ms cost=$0.0
-cloud-frontier  pass=True grounded=0.94 latency=2100ms cost=$0.018</pre>
+      <pre>local-8b        pass=True grounded=0.86 latency=1450ms cost_units=0.0
+cloud-frontier  pass=True grounded=0.94 latency=2100ms cost_units=0.018</pre>
     </div>
   </div>
 </div>
@@ -553,7 +553,7 @@ cloud-frontier  pass=True grounded=0.94 latency=2100ms cost=$0.018</pre>
     </table>
     <div class="callout success">
       <div class="callout-title">Portfólió artifact</div>
-      <p>Dokumentáld a választott modellt, quantizationt, benchmark eredményt, routing szabályokat és governance kontrollokat. Ez egy seniorabb AI engineering gondolkodást mutató projekt, nem csak egy "futtattam egy modellt" demo.</p>
+      <p>Dokumentáld a választott modellt, quantizationt, benchmark eredményt, routing szabályokat és governance kontrollokat. Ez egy seniorabb AI engineering gondolkodást mutató projekt, nemcsak egy "futtattam egy modellt" demo.</p>
     </div>
   </div>
 </div>
