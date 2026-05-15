@@ -516,7 +516,7 @@ services:
   # ─── DATABRICKS ────────────────────────────────────────────────
 
   unity-catalog:
-    image: unitycatalog/unitycatalog:0.2.1
+    image: unitycatalog/unitycatalog:main
     container_name: webshop-unity-catalog
     profiles: ["spark", "databricks", "otf", "governance", "mesh", "all"]
     ports:
