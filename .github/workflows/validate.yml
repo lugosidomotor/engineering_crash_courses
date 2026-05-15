@@ -88,8 +88,14 @@ jobs:
                   continue
               html = page.read_text(encoding="utf-8")
 
-              if html.count("review-banner") != 1:
+              if html.count('class="review-banner"') != 1:
                   fails.append(f"{slug}: review-banner count != 1")
+              if '<div class="review-banner" style=' in html:
+                  fails.append(f"{slug}: review banner still uses inline styles")
+              if 'class="review-banner" role="note"' not in html:
+                  fails.append(f"{slug}: review banner missing role=note")
+              if "../shared/course.css?v=2026may15" not in html:
+                  fails.append(f"{slug}: stale course.css cache-busting version")
               if html.count("<div") != html.count("</div>"):
                   fails.append(f"{slug}: div tags unbalanced")
               if html.count("<pre") != html.count("</pre>"):
