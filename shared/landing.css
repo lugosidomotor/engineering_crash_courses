@@ -474,6 +474,11 @@ button { font-family: inherit; cursor: pointer; }
   box-sizing: border-box;
 }
 
+.section-muted > :is(.section-label, h2, .title-orange-line, .section-desc, .footnote) {
+  margin-left: 0;
+  margin-right: auto;
+}
+
 .section-catalog {
   max-width: none;
   background: var(--white);
@@ -483,6 +488,11 @@ button { font-family: inherit; cursor: pointer; }
 .section-catalog > * {
   max-width: var(--max);
   margin-left: auto;
+  margin-right: auto;
+}
+
+.section-catalog > :is(.section-label, h2, .title-orange-line, .section-desc, .filter-chips, .controls, .result-count) {
+  margin-left: 0;
   margin-right: auto;
 }
 
@@ -530,7 +540,7 @@ button { font-family: inherit; cursor: pointer; }
 .section-desc {
   font-size: 1.0625rem;
   color: var(--ink-2);
-  max-width: 58ch;
+  max-width: 65ch;
   margin-bottom: 40px;
   line-height: 1.65;
 }
