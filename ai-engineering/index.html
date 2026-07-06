@@ -538,7 +538,7 @@ vector = emb_response.data[<span class="num">0</span>].embedding
 <span class="cm"># Lokális ChromaDB (in-memory demo)</span>
 chroma_client = chromadb.Client()
 
-collection = chroma_client.create_collection(
+collection = chroma_client.get_or_create_collection(
     name=<span class="str">"webshop_docs"</span>,
     metadata={<span class="str">"description"</span>: <span class="str">"WebShop Pro dokumentumok"</span>}
 )
@@ -556,7 +556,7 @@ collection.add(
 <span class="fn">print</span>(<span class="str">f"Dokumentumok száma: {collection.count()}"</span>)</pre></div>
     <div class="output-area" id="out-s10">
       <div class="output-label">Output:</div>
-      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">create_collection()</span> <span class="log-dim">name="webshop_docs"</span>
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">get_or_create_collection()</span> <span class="log-dim">name="webshop_docs"</span>
 <span class="log-chroma">[chroma]</span> <span class="log-step">add()</span> <span class="log-dim">3 documents added</span>
 <span class="log-ok">Dokumentumok száma: 3</span></pre>
     </div>
@@ -582,7 +582,7 @@ results = collection.query(
   </div>
   <div class="callout">
     <div class="callout-title">Distance metrika</div>
-    <p>A Chroma alapból <strong>squared L2 distance</strong>-t ad vissza (kisebb = közelebb), nem cosine similarity-t. Cosine-hoz használd <code>metadata={'hnsw:space':'cosine'}</code> collection paramétert létrehozáskor — pl. <code>create_collection(name="...", metadata={"hnsw:space": "cosine"})</code>. Ekkor a <code>distances</code> 0 (azonos) és 2 (ellentétes) között mozog, ami <code>1 - cosine_similarity</code>.</p>
+    <p>A Chroma alapból <strong>squared L2 distance</strong>-t ad vissza (kisebb = közelebb), nem cosine similarity-t. Cosine-hoz használd <code>metadata={'hnsw:space':'cosine'}</code> collection paramétert létrehozáskor — pl. <code>get_or_create_collection(name="...", metadata={"hnsw:space": "cosine"})</code>. Ekkor a <code>distances</code> 0 (azonos) és 2 (ellentétes) között mozog, ami <code>1 - cosine_similarity</code>.</p>
   </div>
   <div class="callout">
     <div class="callout-title">Demo vs Production</div>
@@ -721,7 +721,7 @@ all_chunks = []
   </div>
   <div class="code-cell" id="cell-s13">
     <div class="code-header"><span class="cell-number">[12]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s13')">Output</button></div>
-    <div class="code-body"><pre>rag_collection = chroma_client.create_collection(name=<span class="str">"webshop_rag"</span>)
+    <div class="code-body"><pre>rag_collection = chroma_client.get_or_create_collection(name=<span class="str">"webshop_rag"</span>)
 
 rag_collection.add(
     documents=[c[<span class="str">"text"</span>] <span class="kw">for</span> c <span class="kw">in</span> all_chunks],
@@ -732,7 +732,7 @@ rag_collection.add(
 <span class="fn">print</span>(<span class="str">f"Indexed chunks: {rag_collection.count()}"</span>)</pre></div>
     <div class="output-area" id="out-s13">
       <div class="output-label">Output:</div>
-      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">create_collection()</span> <span class="log-dim">name="webshop_rag"</span>
+      <pre><span class="log-chroma">[chroma]</span> <span class="log-step">get_or_create_collection()</span> <span class="log-dim">name="webshop_rag"</span>
 <span class="log-chroma">[chroma]</span> <span class="log-step">add()</span> <span class="log-dim">7 chunks with metadata</span>
 <span class="log-ok">Indexed chunks: 7</span></pre>
     </div>

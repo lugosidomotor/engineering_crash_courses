@@ -111,7 +111,7 @@ Source (orders.json, events.json, catalog.json)
 - **Kurzus-metaadat forrása:** `courses.json`; a főoldal ezt tölti be, a CI pedig visszaméri az aloldalak section/code-cell számait és a képek/notebookok meglétét
 - **Responsive:** Desktop + tablet (900px) + mobil (560px) nézet, Safari/iPhone optimalizálás
 - **Közös renderelés:** `shared/course.js` generálja a kurzus aloldalak WebShop Pro projektkapcsolat szekcióját
-- **Cache busting:** `?v=2025may2` paraméter CSS/JS hivatkozásokon
+- **Cache busting:** verziózott `?v=...` paraméterek CSS/JS hivatkozásokon
 
 ## Docker Lab
 

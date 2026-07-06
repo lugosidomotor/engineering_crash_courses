@@ -899,7 +899,7 @@ print(round(sum(orders)/len(orders), 1))</pre>
 
 client = OpenAI()
 chroma = chromadb.Client()
-coll = chroma.create_collection(<span class="str">"webshop_kb"</span>)
+coll = chroma.get_or_create_collection(<span class="str">"webshop_kb"</span>)
 coll.add(documents=[
     <span class="str">"Visszaküldési határidő 30 nap a vásárlástól számítva."</span>,
     <span class="str">"Standard szállítás 3-5 munkanap, expressz 1-2."</span>,

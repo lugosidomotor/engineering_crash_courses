@@ -1,6 +1,6 @@
 # Quickstart
 
-5 perc alatt elindul az egész stack a saját géppen.
+5 perc alatt elindul az egész stack a saját gépeden.
 
 ## Mire van szükséged
 

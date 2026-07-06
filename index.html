@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='9' height='9' rx='2' fill='%2300d4ff'/%3E%3Crect x='13' y='2' width='9' height='9' rx='2' fill='%23b366ff'/%3E%3Crect x='2' y='13' width='9' height='9' rx='2' fill='%2300ff88'/%3E%3Crect x='13' y='13' width='9' height='9' rx='2' fill='%23ffd700'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='24' height='24' rx='4' fill='%23EC6608'/%3E%3Cpath d='M6 8h12M6 12h8M6 16h10' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>Data & AI Engineering Crash Course-ok magyarul | 19 ingyenes projektalapú kurzus</title>
 <meta name="description" content="19 ingyenes, projektalapú Data & AI Engineering kurzus magyarul: Delta Lake, Spark, Databricks, Airflow, dbt, Data Mesh, data governance, Local LLM, RAG, Agentic AI, MLflow, MLOps, streaming és feature store — egy közös webshop esettanulmányon.">
 <meta name="keywords" content="data engineering magyarul, AI engineering, Delta Lake, Apache Spark, Databricks, Airflow, dbt, Data Mesh, data governance, Agentic AI, MLflow, RAG, MLOps, adatbányászat, adatmérnök tanfolyam">
@@ -23,7 +23,7 @@
 <meta name="twitter:title" content="Data & AI Engineering Crash Course-ok magyarul">
 <meta name="twitter:description" content="19 ingyenes, projektalapú Data & AI Engineering kurzus magyarul.">
 <meta name="twitter:image" content="https://dataengineer.hu/assets/og-image.png">
-<meta name="theme-color" content="#0d1117">
+<meta name="theme-color" content="#EC6608">
 <meta name="robots" content="index, follow, max-image-preview:large">
 
 <script type="application/ld+json">
@@ -86,418 +86,11 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ── Reset ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;overflow-x:hidden}
-body{font-family:'Inter',system-ui,sans-serif;background:#0d1117;color:#e6edf3;line-height:1.6;min-height:100vh;overflow-x:hidden}
-a{color:#58a6ff;text-decoration:none}
-a:hover{text-decoration:underline}
-img{max-width:100%;display:block}
-button{font-family:inherit}
-
-/* ── Scroll progress bar ── */
-.scroll-progress{position:fixed;top:0;left:0;height:3px;z-index:200;background:linear-gradient(90deg,#58a6ff,#bc8cff,#3fb950);width:0;transition:width .1s linear}
-
-/* ── Header ── */
-.site-header{background:rgba(13,17,23,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(48,54,61,.6);padding:14px 24px;position:sticky;top:0;z-index:100}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.logo{font-size:1.15rem;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
-.logo svg{width:22px;height:22px}
-.header-links{display:flex;gap:20px;align-items:center}
-.header-links a{color:#8b949e;font-size:.88rem;font-weight:500;transition:color .15s}
-.header-links a:hover{color:#e6edf3;text-decoration:none}
-.github-link{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(48,54,61,.6);transition:all .2s}
-.github-link:hover{background:rgba(255,255,255,.08);border-color:rgba(88,166,255,.4);color:#e6edf3;text-decoration:none}
-.github-link svg{width:16px;height:16px}
-.menu-toggle{display:none;background:none;border:1px solid rgba(48,54,61,.6);color:#e6edf3;width:36px;height:36px;border-radius:8px;cursor:pointer;align-items:center;justify-content:center}
-.menu-toggle svg{width:18px;height:18px}
-
-/* ── Hero ── */
-.hero{max-width:1200px;margin:0 auto;padding:80px 24px 40px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(88,166,255,.1) 0%,transparent 60%);z-index:-1;pointer-events:none}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(88,166,255,.12);color:#58a6ff;padding:6px 16px;border-radius:20px;font-size:.82rem;font-weight:600;margin-bottom:20px;border:1px solid rgba(88,166,255,.25)}
-.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:#3fb950;box-shadow:0 0 8px #3fb950;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.hero h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:800;line-height:1.15;margin-bottom:18px;background:linear-gradient(135deg,#e6edf3 0%,#58a6ff 50%,#bc8cff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:clamp(1rem,2vw,1.2rem);color:#8b949e;max-width:760px;margin:0 auto 32px;line-height:1.65}
-.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:.95rem;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
-.btn:hover{text-decoration:none}
-.btn-primary{background:linear-gradient(135deg,#238636,#2ea043);color:#fff}
-.btn-primary:hover{box-shadow:0 0 24px rgba(46,160,67,.4);transform:translateY(-1px)}
-.btn-secondary{background:rgba(188,140,255,.15);color:#bc8cff;border:1px solid rgba(188,140,255,.3)}
-.btn-secondary:hover{background:rgba(188,140,255,.25);transform:translateY(-1px)}
-.btn svg{width:18px;height:18px}
-
-/* ── Stats bar ── */
-.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:900px;margin:0 auto;padding:24px;background:rgba(22,27,34,.6);border:1px solid rgba(48,54,61,.6);border-radius:16px;backdrop-filter:blur(8px)}
-.stat-item{text-align:center}
-.stat-value{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;background:linear-gradient(135deg,#58a6ff,#bc8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-family:'JetBrains Mono',monospace;line-height:1.1}
-.stat-label{font-size:.78rem;color:#8b949e;font-weight:500;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
-
-/* ── Personal progress bar ── */
-.my-progress{max-width:900px;margin:20px auto 0;padding:18px 24px;background:linear-gradient(135deg,rgba(63,185,80,.08),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.25);border-radius:12px;display:none}
-.my-progress.active{display:block}
-.my-progress-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.my-progress-title{font-size:.9rem;font-weight:600;color:#e6edf3;display:flex;align-items:center;gap:8px}
-.my-progress-title svg{width:18px;height:18px;color:#3fb950}
-.my-progress-label{font-size:.82rem;color:#8b949e;font-family:'JetBrains Mono',monospace}
-.my-progress-label strong{color:#3fb950}
-.my-progress-track{height:8px;background:rgba(48,54,61,.6);border-radius:4px;overflow:hidden;position:relative}
-.my-progress-fill{height:100%;background:linear-gradient(90deg,#3fb950,#58a6ff);border-radius:4px;transition:width .6s ease;width:0}
-.my-progress-reset{background:transparent;border:none;color:#8b949e;font-size:.78rem;cursor:pointer;padding:4px 8px;transition:color .15s}
-.my-progress-reset:hover{color:#e6edf3}
-
-/* ── Sections ── */
-.section{max-width:1200px;margin:0 auto;padding:60px 24px}
-.section-label{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#58a6ff;margin-bottom:12px}
-.section-label svg{width:16px;height:16px}
-.section h2{font-size:clamp(1.4rem,3vw,1.8rem);font-weight:700;margin-bottom:12px}
-.section-desc{color:#8b949e;font-size:.98rem;margin-bottom:32px;max-width:680px}
-
-/* ── For whom ── */
-.for-whom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.whom-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:12px;padding:20px;transition:all .2s}
-.whom-card:hover{border-color:rgba(88,166,255,.35);transform:translateY(-2px)}
-.whom-icon{font-size:1.5rem;margin-bottom:10px}
-.whom-card h3{font-size:.95rem;font-weight:600;margin-bottom:6px}
-.whom-card p{font-size:.82rem;color:#8b949e;line-height:1.5}
-
-/* ── Paths ── */
-.paths-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px}
-.path-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:14px;padding:24px;position:relative;overflow:hidden;transition:border-color .2s}
-.path-card:hover{border-color:rgba(88,166,255,.3)}
-.path-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.path-foundation::before{background:linear-gradient(90deg,#58a6ff,#79c0ff)}
-.path-de::before{background:linear-gradient(90deg,#3fb950,#56d364)}
-.path-ai::before{background:linear-gradient(90deg,#bc8cff,#d2a8ff)}
-.path-card h3{font-size:1.1rem;font-weight:700;margin-bottom:4px}
-.path-meta{font-size:.82rem;color:#8b949e;margin-bottom:14px}
-.path-steps{list-style:none;counter-reset:step}
-.path-steps li{counter-increment:step;display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(48,54,61,.4);font-size:.88rem;position:relative}
-.path-steps li:last-child{border-bottom:none}
-.path-steps li::before{content:counter(step);display:flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:50%;background:rgba(88,166,255,.12);color:#58a6ff;font-size:.75rem;font-weight:700;flex-shrink:0}
-.path-steps li.done::before{content:'✓';background:rgba(63,185,80,.18);color:#3fb950}
-.path-steps li.planned{opacity:.55}
-.path-steps li.planned::before{background:rgba(139,148,158,.12);color:#8b949e}
-.path-steps li a{color:#e6edf3;font-weight:500;flex:1}
-.path-steps li a:hover{color:#58a6ff}
-.path-steps .step-mini-progress{margin-left:auto;width:40px;height:4px;background:rgba(48,54,61,.6);border-radius:2px;overflow:hidden}
-.path-steps .step-mini-progress-fill{height:100%;background:#3fb950;border-radius:2px;transition:width .4s}
-
-/* ── Search & Filters ── */
-.controls{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap;align-items:center}
-.search-box{flex:1;min-width:220px;position:relative}
-.search-box input{width:100%;background:rgba(22,27,34,.9);border:1px solid rgba(48,54,61,.6);border-radius:10px;padding:10px 40px 10px 40px;color:#e6edf3;font-size:.9rem;font-family:inherit;outline:none;transition:border-color .2s}
-.search-box input:focus{border-color:#58a6ff}
-.search-box input::placeholder{color:#6e7681}
-.search-box .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#6e7681;pointer-events:none}
-.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#6e7681;cursor:pointer;padding:4px;display:none;border-radius:4px}
-.search-clear.visible{display:flex}
-.search-clear:hover{color:#e6edf3;background:rgba(255,255,255,.05)}
-.search-clear svg{width:16px;height:16px}
-.filter-chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{padding:7px 14px;border-radius:20px;font-size:.8rem;font-weight:500;cursor:pointer;border:1px solid rgba(48,54,61,.6);background:rgba(22,27,34,.6);color:#8b949e;transition:all .15s;user-select:none}
-.chip:hover{border-color:rgba(88,166,255,.4);color:#e6edf3}
-.chip.active{background:rgba(88,166,255,.15);border-color:rgba(88,166,255,.5);color:#58a6ff}
-.sort-select{background:rgba(22,27,34,.9);border:1px solid rgba(48,54,61,.6);border-radius:10px;padding:9px 14px;color:#e6edf3;font-size:.85rem;font-family:inherit;cursor:pointer;outline:none}
-.sort-select:hover{border-color:rgba(88,166,255,.4)}
-.sort-select:focus{border-color:#58a6ff}
-.result-count{font-size:.82rem;color:#6e7681;margin-bottom:16px;font-family:'JetBrains Mono',monospace}
-
-/* ── Course Grid ── */
-.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
-.course-card{background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:14px;transition:all .25s;position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;overflow:hidden;cursor:pointer}
-.course-card:hover{text-decoration:none;color:inherit;border-color:rgba(88,166,255,.45);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
-.course-card:hover,.course-card:hover *{text-decoration:none!important}
-.card-cover{position:relative;height:160px;overflow:hidden}
-.card-cover img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
-.course-card:hover .card-cover img{transform:scale(1.05)}
-.card-cover-overlay{position:absolute;inset:0;padding:12px 16px;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(transparent 10%,rgba(0,0,0,.85) 70%)}
-.card-progress-badge{position:absolute;top:10px;right:10px;background:rgba(63,185,80,.9);color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;backdrop-filter:blur(4px);z-index:3;display:none}
-.card-progress-badge.visible{display:inline-flex}
-.card-progress-badge.complete{background:rgba(255,215,0,.95);color:#000}
-.card-body{padding:16px 24px 0;display:flex;flex-direction:column;flex:1}
-.course-card h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;line-height:1.3}
-.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.card-badges{display:flex;gap:6px;flex-wrap:wrap}
-.badge{padding:3px 10px;border-radius:10px;font-size:.7rem;font-weight:600;letter-spacing:.3px}
-.badge-status-ready{background:rgba(63,185,80,.12);color:#3fb950}
-.badge-status-planned{background:rgba(139,148,158,.12);color:#8b949e}
-.card-cover-overlay .badge-difficulty{background:rgba(0,0,0,.55);color:#7dd3fc;border:1px solid rgba(125,211,252,.25)}
-.card-cover-overlay .badge-path{background:rgba(0,0,0,.55);color:#c4b5fd;border:1px solid rgba(196,181,253,.25)}
-.badge-difficulty{background:rgba(88,166,255,.1);color:#58a6ff}
-.badge-path{background:rgba(188,140,255,.1);color:#bc8cff}
-.card-cover-overlay .card-number{font-size:.75rem;color:rgba(255,255,255,.7);font-weight:600;font-family:'JetBrains Mono',monospace;position:relative;z-index:2}
-.card-cover-overlay .card-badges{position:relative;z-index:2}
-.card-number{font-size:.75rem;color:#6e7681;font-weight:600;font-family:'JetBrains Mono',monospace}
-.card-desc{font-size:.85rem;color:#8b949e;margin-bottom:14px;line-height:1.5}
-.card-build{font-size:.82rem;color:#e6edf3;margin-bottom:14px;padding:10px 14px;background:rgba(88,166,255,.06);border-radius:8px;border-left:3px solid #58a6ff}
-.card-build strong{color:#58a6ff;font-weight:600}
-.card-meta{display:flex;gap:16px;margin-bottom:14px;font-size:.8rem;color:#6e7681;flex-wrap:wrap}
-.card-meta span{display:flex;align-items:center;gap:4px}
-.card-meta svg{width:14px;height:14px}
-.card-stack{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.stack-chip{display:flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;background:rgba(255,255,255,.04);font-size:.75rem;color:#8b949e;font-weight:500}
-.stack-chip img{width:14px;height:14px}
-.card-footer{margin-top:auto;padding-top:14px;padding-bottom:24px;border-top:1px solid rgba(48,54,61,.4);display:flex;gap:8px}
-.card-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:8px;font-size:.88rem;font-weight:600;transition:all .15s;flex:1;border:none;cursor:pointer;font-family:inherit}
-.card-btn-ready{background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.25)}
-.card-btn-ready:hover{background:rgba(63,185,80,.22)}
-.card-btn-info{background:rgba(88,166,255,.08);color:#58a6ff;border:1px solid rgba(88,166,255,.25);padding:10px 12px;flex:0 0 auto}
-.card-btn-info:hover{background:rgba(88,166,255,.18)}
-.card-btn-info svg{width:16px;height:16px}
-.course-card:hover h3{text-decoration:none}
-
-/* ── Empty state ── */
-.empty-state{text-align:center;padding:60px 24px;color:#6e7681}
-.empty-state p{font-size:1rem;margin-bottom:12px}
-.empty-state button{padding:8px 20px;border-radius:8px;background:rgba(88,166,255,.12);color:#58a6ff;border:1px solid rgba(88,166,255,.25);cursor:pointer;font-size:.88rem;font-weight:500}
-.empty-state button:hover{background:rgba(88,166,255,.2)}
-
-/* ── WebShop Pro ── */
-.platform-section{background:linear-gradient(135deg,rgba(22,27,34,.9),rgba(13,17,23,.95));border:1px solid rgba(48,54,61,.6);border-radius:16px;padding:40px;margin:40px auto;max-width:1200px}
-.platform-section h2{font-size:1.6rem;margin-bottom:8px}
-.platform-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.82fr);gap:28px;align-items:center;margin-bottom:28px}
-.platform-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
-.platform-lab-strip{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);gap:16px;align-items:stretch;margin:20px 0 28px;padding:16px;border:1px solid rgba(63,185,80,.24);border-radius:14px;background:linear-gradient(135deg,rgba(63,185,80,.08),rgba(88,166,255,.07))}
-.platform-lab-strip strong{display:block;margin-bottom:4px;color:#e6edf3}
-.platform-lab-strip p{margin:0;color:#8b949e;font-size:.84rem}
-.platform-command{overflow:hidden;border:1px solid rgba(88,166,255,.22);border-radius:14px;background:#05080d;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px rgba(0,0,0,.2)}
-.platform-command-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;border-bottom:1px solid rgba(48,54,61,.75);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015))}
-.platform-command-dots{display:flex;align-items:center;gap:5px}
-.platform-command-dots span{width:8px;height:8px;border-radius:50%;display:block}.platform-command-dots span:nth-child(1){background:#ff5f56}.platform-command-dots span:nth-child(2){background:#ffbd2e}.platform-command-dots span:nth-child(3){background:#27c93f}
-.platform-command-label{color:#9fb7d8;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.platform-command code{display:flex;gap:10px;align-items:flex-start;padding:14px 15px;color:#dbeafe;font-family:'JetBrains Mono',monospace;font-size:.84rem;line-height:1.55;white-space:pre-wrap;word-break:break-word}
-.platform-command code::before{content:"$";flex:0 0 auto;color:#3fb950}
-.platform-shot{margin:0;border:1px solid rgba(48,54,61,.6);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.03)}
-.platform-shot img{width:100%;aspect-ratio:16/10;object-fit:cover}
-.platform-shot figcaption{padding:10px 14px;color:#8b949e;font-size:.78rem}
-.platform-story-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:26px 0}
-.platform-story-grid article{background:rgba(255,255,255,.035);border:1px solid rgba(48,54,61,.5);border-radius:12px;padding:16px}
-.platform-story-grid span{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(88,166,255,.14);color:#58a6ff;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:10px}
-.platform-story-grid h3{font-size:.96rem;margin-bottom:6px}
-.platform-story-grid p{font-size:.8rem;color:#8b949e;line-height:1.55}
-.platform-course-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:26px}
-.platform-course-card{background:rgba(255,255,255,.035);border:1px solid rgba(48,54,61,.5);border-radius:12px;padding:16px}
-.platform-course-card h3{font-size:.92rem;margin-bottom:8px;color:#e6edf3}
-.platform-course-card p{font-size:.78rem;color:#8b949e;line-height:1.5;margin-bottom:12px}
-.platform-course-card .tools,.platform-course-card .services{display:flex;flex-wrap:wrap;gap:6px}
-.platform-course-card .services{margin-top:8px}
-.platform-course-card .tools span,.platform-course-card .services span{font-size:.68rem;font-family:'JetBrains Mono',monospace;border-radius:999px;padding:3px 8px}
-.platform-course-card .tools span{color:#58a6ff;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.22)}
-.platform-course-card .services span{color:#3fb950;background:rgba(63,185,80,.09);border:1px solid rgba(63,185,80,.22)}
-.platform-diagram{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:24px 0}
-.platform-item{background:rgba(255,255,255,.03);border:1px solid rgba(48,54,61,.5);border-radius:10px;padding:16px;text-align:center;transition:all .2s;position:relative}
-.platform-item:hover{border-color:rgba(88,166,255,.35);transform:translateY(-2px)}
-.platform-item .pi-icon{font-size:1.3rem;margin-bottom:8px}
-.platform-item h4{font-size:.88rem;font-weight:600;margin-bottom:4px}
-.platform-item p{font-size:.78rem;color:#8b949e;line-height:1.4}
-
-.flow-diagram{margin:30px 0;padding:24px;background:rgba(13,17,23,.5);border:1px solid rgba(48,54,61,.4);border-radius:12px;overflow:hidden;max-width:100%;contain:layout paint}
-.flow-diagram-title{font-size:.85rem;color:#8b949e;margin-bottom:16px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
-.flow-chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));align-items:stretch;gap:12px;min-width:0}
-.flow-node{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:70px;padding:10px 12px;background:rgba(22,27,34,.8);border:1px solid rgba(48,54,61,.6);border-radius:8px;font-size:.82rem;color:#e6edf3;font-weight:500;white-space:normal;overflow-wrap:anywhere;text-align:center}
-.flow-node.bronze{border-color:rgba(205,127,50,.5);color:#cd7f32}
-.flow-node.silver{border-color:rgba(192,192,192,.5);color:#c0c0c0}
-.flow-node.gold{border-color:rgba(255,215,0,.5);color:#ffd700}
-.flow-node.ai{border-color:rgba(188,140,255,.5);color:#bc8cff}
-.flow-node small{margin-top:2px;line-height:1.25}
-.flow-arrow{display:none}
-
-/* ── Stack showcase ── */
-.stack-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.stack-logo{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;background:rgba(22,27,34,.6);border:1px solid rgba(48,54,61,.4);border-radius:10px;min-width:84px;transition:all .2s}
-.stack-logo:hover{border-color:rgba(88,166,255,.4);transform:translateY(-2px)}
-.stack-logo img{width:32px;height:32px}
-.stack-logo span{font-size:.7rem;color:#8b949e;font-weight:500}
-
-/* ── Resources ── */
-.resources-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.resource-card{background:rgba(22,27,34,.7);border:1px solid rgba(48,54,61,.6);border-radius:12px;padding:20px;transition:all .2s}
-.resource-card:hover{border-color:rgba(88,166,255,.4);transform:translateY(-2px)}
-.resource-card h3{font-size:.95rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.resource-card h3 svg{width:18px;height:18px;color:#58a6ff}
-.resource-card p{font-size:.82rem;color:#8b949e;margin-bottom:12px;line-height:1.5}
-.resource-card ul{list-style:none;padding:0;margin:0}
-.resource-card li{padding:4px 0;font-size:.83rem}
-.resource-card li a{color:#58a6ff}
-
-/* ── FAQ ── */
-.faq-list{display:flex;flex-direction:column;gap:10px}
-.faq-item{background:rgba(22,27,34,.7);border:1px solid rgba(48,54,61,.6);border-radius:10px;overflow:hidden;transition:border-color .2s}
-.faq-item:hover{border-color:rgba(88,166,255,.3)}
-.faq-item[open]{border-color:rgba(88,166,255,.4)}
-.faq-item summary{padding:16px 20px;font-size:.95rem;font-weight:600;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#e6edf3}
-.faq-item summary::-webkit-details-marker{display:none}
-.faq-item summary::after{content:'+';font-size:1.5rem;color:#8b949e;transition:transform .2s;flex-shrink:0}
-.faq-item[open] summary::after{content:'−';color:#58a6ff}
-.faq-answer{padding:0 20px 16px 20px;color:#8b949e;font-size:.9rem;line-height:1.7}
-.faq-answer a{color:#58a6ff}
-
-/* ── Career / Next steps ── */
-.career-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.career-card{background:rgba(22,27,34,.7);border:1px solid rgba(48,54,61,.6);border-radius:12px;padding:20px}
-.career-card .role-icon{font-size:1.6rem;margin-bottom:10px}
-.career-card h3{font-size:1rem;font-weight:700;margin-bottom:6px}
-.career-card .salary{font-size:.78rem;color:#3fb950;font-family:'JetBrains Mono',monospace;margin-bottom:10px;font-weight:600}
-.career-card p{font-size:.83rem;color:#8b949e;line-height:1.55;margin-bottom:12px}
-.career-card .role-tags{display:flex;flex-wrap:wrap;gap:6px}
-.career-card .role-tag{font-size:.7rem;padding:2px 8px;background:rgba(88,166,255,.1);color:#58a6ff;border-radius:10px;font-weight:500}
-
-/* ── Modal ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;z-index:300;padding:40px 20px;overflow-y:auto}
-.modal-overlay.active{display:flex;animation:fadeIn .2s}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{background:#0d1117;border:1px solid rgba(48,54,61,.8);border-radius:16px;max-width:860px;width:100%;max-height:calc(100dvh - 80px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:slideUp .3s;position:relative;margin:auto 0}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-header{position:relative;height:180px;overflow:hidden;border-radius:16px 16px 0 0}
-.modal-header img{width:100%;height:100%;object-fit:cover}
-.modal-header::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 20%,rgba(13,17,23,.95) 90%)}
-.modal-close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .15s}
-.modal-close:hover{background:rgba(0,0,0,.9)}
-.modal-close svg{width:18px;height:18px}
-.modal-header-content{position:absolute;bottom:0;left:0;right:0;padding:20px 28px;z-index:5}
-.modal-header-content .modal-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.modal-header-content h2{font-size:1.5rem;font-weight:800;color:#fff}
-.modal-body{padding:24px 28px 28px}
-.modal-tagline{font-size:1rem;color:#c4b5fd;font-style:italic;padding:14px 18px;background:rgba(188,140,255,.06);border-left:3px solid #bc8cff;border-radius:8px;margin-bottom:22px}
-.modal-section{margin-bottom:22px}
-.modal-section h3{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#58a6ff;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.modal-section h3 svg{width:16px;height:16px}
-.modal-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
-.modal-list li{padding:8px 12px;background:rgba(255,255,255,.03);border-radius:6px;font-size:.88rem;color:#e6edf3;display:flex;align-items:flex-start;gap:8px}
-.modal-list li::before{content:'›';color:#3fb950;font-weight:700;flex-shrink:0}
-.modal-topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.modal-topic{background:rgba(255,255,255,.03);border:1px solid rgba(48,54,61,.5);border-radius:8px;padding:12px}
-.modal-topic strong{display:block;color:#e6edf3;font-size:.85rem;margin-bottom:2px}
-.modal-topic span{font-size:.78rem;color:#8b949e}
-.modal-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
-.modal-link{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;color:#58a6ff;font-size:.82rem;font-weight:500;transition:all .15s}
-.modal-link:hover{background:rgba(88,166,255,.12);text-decoration:none;color:#79c0ff}
-.modal-link-type{font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(88,166,255,.15);flex-shrink:0}
-.modal-link-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.modal-related{display:flex;flex-wrap:wrap;gap:8px}
-.modal-related-chip{padding:6px 12px;background:rgba(188,140,255,.08);border:1px solid rgba(188,140,255,.3);border-radius:20px;font-size:.78rem;color:#bc8cff;font-weight:500;cursor:pointer;transition:all .15s}
-.modal-related-chip:hover{background:rgba(188,140,255,.18)}
-.modal-footer{padding:18px 28px 24px;border-top:1px solid rgba(48,54,61,.4);display:flex;gap:10px;flex-wrap:wrap}
-.modal-footer .btn{flex:1;justify-content:center;min-width:140px}
-
-/* ── Scroll-to-top ── */
-.scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:rgba(88,166,255,.2);border:1px solid rgba(88,166,255,.4);color:#58a6ff;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:90;backdrop-filter:blur(8px);transition:all .2s}
-.scroll-top.visible{display:flex}
-.scroll-top:hover{background:rgba(88,166,255,.35);transform:translateY(-2px)}
-.scroll-top svg{width:20px;height:20px}
-
-/* ── Footer ── */
-.site-footer{border-top:1px solid rgba(48,54,61,.6);padding:40px 24px 30px;color:#8b949e;font-size:.85rem;margin-top:60px;background:rgba(13,17,23,.6)}
-.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;margin-bottom:26px}
-.footer-col h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:#e6edf3;margin-bottom:12px;font-weight:700}
-.footer-col ul{list-style:none;padding:0;margin:0}
-.footer-col li{padding:4px 0}
-.footer-col a{color:#8b949e;font-size:.83rem}
-.footer-col a:hover{color:#58a6ff}
-.footer-col p{font-size:.83rem;line-height:1.6;color:#8b949e;margin-bottom:8px}
-.footer-bottom{max-width:1200px;margin:0 auto;text-align:center;padding-top:20px;border-top:1px solid rgba(48,54,61,.4);font-size:.78rem;color:#6e7681}
-.footer-bottom a{color:#6e7681}
-.footer-bottom a:hover{color:#58a6ff}
-
-/* ── Responsive ── */
-@media(max-width:900px){
-  .footer-inner{grid-template-columns:1fr 1fr;gap:24px}
-}
-@media(max-width:768px){
-  .hero{padding:40px 16px 24px;overflow:visible}
-  .hero::before{width:min(360px,100vw);height:360px}
-  .hero-badge{max-width:100%;justify-content:center;text-align:center;white-space:normal;line-height:1.35;border-radius:14px}
-  .hero h1{max-width:100%;font-size:1.55rem;line-height:1.18;word-break:normal;overflow-wrap:anywhere}
-  .hero p{max-width:100%;font-size:.95rem;padding:0 4px;overflow-wrap:break-word}
-  .section{padding:40px 16px}
-  .section h2{font-size:1.25rem;word-break:break-word}
-  .platform-section{padding:24px 16px;margin:24px 16px}
-  .platform-section h2{font-size:1.3rem}
-  .platform-hero{grid-template-columns:1fr}
-  .platform-shot{display:none}
-  .platform-lab-strip{grid-template-columns:1fr}
-  .platform-story-grid{grid-template-columns:1fr}
-  .course-grid{grid-template-columns:1fr;gap:16px}
-  .paths-container{grid-template-columns:1fr;gap:14px}
-  .controls{flex-direction:column;align-items:stretch;gap:10px}
-  .controls > *{min-width:0;width:100%;max-width:100%}
-  .search-box{min-width:0;width:100%;max-width:100%}
-  .search-box input,.sort-select{min-width:0;width:100%;max-width:100%}
-  .filter-chips{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-  .filter-chips{min-width:0;width:100%;max-width:100%}
-  .filter-chips::-webkit-scrollbar{height:2px}
-  .chip{flex-shrink:0;white-space:nowrap}
-  .flow-diagram{max-width:100%;overflow:hidden}
-  .flow-chain{grid-template-columns:repeat(auto-fit,minmax(112px,1fr))}
-  .platform-diagram{grid-template-columns:repeat(2,1fr);gap:10px}
-  .platform-item{padding:12px}
-  .stats-bar{grid-template-columns:repeat(2,1fr);padding:16px;gap:10px}
-  .my-progress{margin:14px 16px 0;padding:14px 16px}
-  .my-progress-top{font-size:.78rem}
-  .header-inner{gap:8px}
-  .header-links{display:none}
-  .header-links.mobile-open{display:flex;position:absolute;top:100%;left:0;right:0;background:rgba(13,17,23,.98);flex-direction:column;padding:20px;gap:14px;border-bottom:1px solid rgba(48,54,61,.6);z-index:99}
-  .menu-toggle{display:flex}
-  .logo{font-size:.95rem}
-  .logo svg{width:20px;height:20px}
-  .modal{margin:0;border-radius:12px 12px 0 0;max-height:100dvh;touch-action:pan-y}
-  .modal-overlay{padding:0;align-items:flex-end;overflow:hidden}
-  .modal-header{height:130px;border-radius:12px 12px 0 0}
-  .modal-header-content h2{font-size:1.1rem}
-  .modal-body{padding:18px}
-  .modal-footer{padding:14px 18px 18px;flex-direction:column}
-  .modal-footer .btn{width:100%}
-  .flow-chain{gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
-  .flow-node{min-width:0;min-height:64px;padding:8px 10px;font-size:.72rem}
-  .flow-node small{display:block;font-size:.65rem}
-  .flow-arrow{font-size:.9rem}
-  .for-whom-grid{grid-template-columns:1fr 1fr;gap:12px}
-  .whom-card{padding:14px}
-  .whom-card h3{font-size:.88rem}
-  .whom-card p{font-size:.78rem}
-  .resources-grid{grid-template-columns:1fr}
-  .career-grid{grid-template-columns:1fr}
-  .stack-grid{gap:8px}
-  .stack-logo{min-width:74px;padding:10px}
-  .stack-logo img{width:28px;height:28px}
-  /* FAQ touch target */
-  .faq-item summary{padding:14px 16px;font-size:.88rem}
-  .faq-answer{padding:0 16px 14px 16px;font-size:.85rem}
-}
-@media(max-width:480px){
-  .hero h1{font-size:1.32rem}
-  .hero p{font-size:.9rem}
-  .for-whom-grid{grid-template-columns:1fr}
-  .hero-ctas{flex-direction:column;align-items:stretch;width:100%}
-  .hero-ctas .btn{width:100%;min-width:0;max-width:100%;justify-content:center;text-align:center;white-space:normal;line-height:1.25}
-  .footer-inner{grid-template-columns:1fr}
-  .platform-diagram{grid-template-columns:1fr}
-  .stats-bar{grid-template-columns:repeat(2,1fr)}
-  .stat-value{font-size:1.4rem}
-  .stat-label{font-size:.7rem}
-  .result-count{font-size:.75rem}
-  .card-build{font-size:.78rem;padding:8px 12px}
-  .card-desc{font-size:.82rem}
-  .course-card h3{font-size:1rem}
-  .card-meta{gap:12px;font-size:.75rem}
-  .scroll-top{bottom:16px;right:16px;width:40px;height:40px}
-}
-
-/* ── Accessibility ── */
-@media(prefers-reduced-motion:reduce){
-  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
-}
-.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-
-:focus-visible{outline:2px solid #58a6ff;outline-offset:2px;border-radius:6px}
-</style>
+<link rel="stylesheet" href="./shared/landing.css">
 </head>
 <body>
+
+<a href="#main" class="skip-link">Ugrás a tartalomhoz</a>
 
 <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
 
@@ -505,7 +98,7 @@ button{font-family:inherit}
 <header class="site-header">
   <div class="header-inner">
     <a href="#" class="logo" aria-label="Engineering Crash Courses főoldal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="currentColor" stroke-width="1.6"/><path d="M12 12l9-5M12 12v10M12 12L3 7" stroke="currentColor" stroke-width="1.6"/></svg>
       Engineering Crash Courses
     </a>
     <nav class="header-links" id="header-nav" aria-label="Elsődleges navigáció">
@@ -526,23 +119,35 @@ button{font-family:inherit}
 </header>
 
 <!-- Hero -->
+<main id="main">
+<div class="hero-band">
 <section class="hero">
-  <div class="hero-badge">
-    <span class="dot" aria-hidden="true"></span>
-    Ingyenes · Magyar nyelvű · Nyílt forráskódú
+  <div class="hero-copy">
+    <div class="hero-kicker">Engineering Crash Courses</div>
+    <h1 class="title-orange-line">Data &amp; AI engineering kurzusok</h1>
+    <p class="hero-intro">19 projektalapú, ingyenes modul magyarul — egy közös WebShop Pro platformon. SQL, Spark, governance, RAG, agentic AI, MLOps: futtatható kóddal, lépésről lépésre.</p>
+    <div class="hero-trust" aria-label="Platform jellemzők">
+      <span>Ingyenes</span>
+      <span>MIT License</span>
+      <span>Magyar nyelv</span>
+      <span>Projektalapú lab</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#courses" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M3 14h7v7H3z"/><path d="M14 14h7v7h-7z"/></svg>
+        Kurzusok
+      </a>
+      <a href="#paths" class="btn btn-secondary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Útvonalak
+      </a>
+    </div>
   </div>
-  <h1>Projektalapú Data &amp; AI Engineering crash course-ok</h1>
-  <p>Építs végig egy modern adat- és AI-platformot lokálisan: Delta Lake, Spark, data governance, Data Mesh, RAG chatbot, agentic AI, MLflow, Docker és monitoring — egy közös webshop esettanulmányon keresztül.</p>
-  <div class="hero-ctas">
-    <a href="#courses" class="btn btn-primary">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M3 14h7v7H3z"/><path d="M14 14h7v7h-7z"/></svg>
-      Kurzusok böngészése
-    </a>
-    <a href="#paths" class="btn btn-secondary">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      Tanulási útvonalak
-    </a>
-  </div>
+
+  <figure class="hero-media">
+    <img src="./assets/images/webshop-pro-dashboard.png" alt="WebShop Pro dashboard a közös kurzusprojekthez">
+    <figcaption>A kurzusok egy közös webshop adataival dolgoznak — ugyanazok a rendelések, termékek és események minden modulban.</figcaption>
+  </figure>
 
   <div class="stats-bar" role="list" aria-label="Oldal statisztikák">
     <div class="stat-item" role="listitem">
@@ -569,12 +174,13 @@ button{font-family:inherit}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         Saját haladás
       </div>
-      <div class="my-progress-label"><strong id="mp-percent">0%</strong> · <span id="mp-sections">0 / 333 szekció kész</span></div>
+      <div class="my-progress-label"><strong id="mp-percent">0%</strong> / <span id="mp-sections">0 / 333 szekció kész</span></div>
       <button class="my-progress-reset" id="mp-reset" title="Haladás törlése (minden kurzus)">Törlés</button>
     </div>
     <div class="my-progress-track"><div class="my-progress-fill" id="mp-fill"></div></div>
   </div>
 </section>
+</div>
 
 <!-- Kinek szól -->
 <section class="section" id="for-whom">
@@ -582,30 +188,26 @@ button{font-family:inherit}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     Kinek szól?
   </div>
-  <h2>Az oldal kifejezetten gyakorlatias</h2>
+  <h2>Kinek szól?</h2>
+  <p class="section-desc">Gyakorlati, végigcsinálható kurzusok data és AI engineering szerepkörökre készülő szakembereknek.</p>
   <div class="for-whom-grid">
     <div class="whom-card">
-      <div class="whom-icon">🔧</div>
       <h3>Junior / Medior Data Engineer</h3>
       <p>Akik szeretnének elsajátítani modern data toolokat: Delta Lake, Spark, Airflow, dbt, Databricks.</p>
     </div>
     <div class="whom-card">
-      <div class="whom-icon">📊</div>
       <h3>Analytics Engineer</h3>
       <p>Akik mélyebben meg akarják érteni a data pipeline-okat, adatminőséget, lineage-et és lakehouse architektúrát.</p>
     </div>
     <div class="whom-card">
-      <div class="whom-icon">🧭</div>
       <h3>Data Architect / Governance</h3>
       <p>Akik data product, data contract, jogosultság, audit és Data Mesh döntéseket szeretnének mérnöki szemmel kezelni.</p>
     </div>
     <div class="whom-card">
-      <div class="whom-icon">💻</div>
-      <h3>Backend fejlesztő → Data irány</h3>
+      <h3>Backend fejlesztő data irányba</h3>
       <p>Akik pályát akarnak módosítani data engineering vagy AI engineering irányba, gyakorlati projektekkel.</p>
     </div>
     <div class="whom-card">
-      <div class="whom-icon">🤖</div>
       <h3>AI Engineer / MLOps iránt érdeklődő</h3>
       <p>Akik RAG rendszert, agenteket, ML deployment-et, monitoringot vagy feature store-t akarnak építeni.</p>
     </div>
@@ -613,18 +215,18 @@ button{font-family:inherit}
 </section>
 
 <!-- Tanulási útvonalak -->
-<section class="section" id="paths">
+<section class="section section-muted" id="paths">
   <div class="section-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
     Tanulási útvonalak
   </div>
-  <h2>Logikus sorrendben haladhatsz</h2>
-  <p class="section-desc">Válaszd ki a számodra megfelelő útvonalat, és haladj a kurzusok sorrendjében. A zöld pipa jelöli az általad teljesített kurzusokat.</p>
+  <h2>Három útvonal, egy közös platform</h2>
+  <p class="section-desc">Válaszd ki a számodra megfelelő irányt, és ugyanarra a WebShop Pro labra építve haladj végig az alapoktól a production AI mintákig.</p>
 
   <div class="paths-container">
     <div class="path-card path-foundation">
-      <h3>🏗️ Foundation</h3>
-      <p class="path-meta">Alapozás · 3 kurzus · Kezdő</p>
+      <h3>Foundation</h3>
+      <p class="path-meta">Alapozás, 3 kurzus, kezdő</p>
       <ol class="path-steps" data-path="foundation">
         <li data-slug="sql-data-modeling"><a href="./sql-data-modeling/">SQL & Data Modeling</a><span class="step-mini-progress"><span class="step-mini-progress-fill"></span></span></li>
         <li data-slug="python-data-engineering"><a href="./python-data-engineering/">Python for Data Engineering</a><span class="step-mini-progress"><span class="step-mini-progress-fill"></span></span></li>
@@ -633,8 +235,8 @@ button{font-family:inherit}
     </div>
 
     <div class="path-card path-de">
-      <h3>⚡ Data Engineering</h3>
-      <p class="path-meta">Teljes pipeline · 12 kurzus · Kezdőtől haladóig</p>
+      <h3>Data Engineering</h3>
+      <p class="path-meta">Teljes pipeline, 12 kurzus, kezdőtől haladóig</p>
       <ol class="path-steps" data-path="data-engineering">
         <li data-slug="sql-data-modeling"><a href="./sql-data-modeling/">SQL & Data Modeling</a><span class="step-mini-progress"><span class="step-mini-progress-fill"></span></span></li>
         <li data-slug="python-data-engineering"><a href="./python-data-engineering/">Python for Data Engineering</a><span class="step-mini-progress"><span class="step-mini-progress-fill"></span></span></li>
@@ -652,8 +254,8 @@ button{font-family:inherit}
     </div>
 
     <div class="path-card path-ai">
-      <h3>🤖 AI Engineering</h3>
-      <p class="path-meta">LLM → Local LLM → RAG → Eval → Agents → Production · 9 kurzus · Középhaladó–Haladó</p>
+      <h3>AI Engineering</h3>
+      <p class="path-meta">LLM, Local LLM, RAG, eval, agents, production. 9 kurzus, középhaladó-haladó</p>
       <ol class="path-steps" data-path="ai-engineering">
         <li data-slug="python-data-engineering"><a href="./python-data-engineering/">Python for Data Engineering</a><span class="step-mini-progress"><span class="step-mini-progress-fill"></span></span></li>
         <li data-slug="docker-local-data-platform"><a href="./docker-local-data-platform/">Docker & Local Data Platform</a><span class="step-mini-progress"><span class="step-mini-progress-fill"></span></span></li>
@@ -669,14 +271,18 @@ button{font-family:inherit}
   </div>
 </section>
 
-<!-- Kurzuskártyák -->
-<section class="section" id="courses">
-  <div class="section-label">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    Kurzusok
+<!-- Kurzuslista -->
+<section class="section section-catalog" id="courses">
+  <h2 class="title-orange-line">Kurzusaink</h2>
+  <p class="section-desc">19 interaktív, projektalapú és magyar nyelvű kurzus. Minden kurzus kész és azonnal elkezdhető.</p>
+
+  <div class="filter-chips" id="filters" role="group" aria-label="Kurzus szűrők">
+    <button class="chip active" data-filter="all">Összes</button>
+    <button class="chip" data-filter="Foundation">Foundation</button>
+    <button class="chip" data-filter="Data Engineering">Data Engineering</button>
+    <button class="chip" data-filter="AI Engineering">AI Engineering</button>
+    <button class="chip" data-filter="Analytics Engineering">Analytics Engineering</button>
   </div>
-  <h2>Összes kurzus egy helyen</h2>
-  <p class="section-desc">19 interaktív, projektalapú és magyar nyelvű kurzus. Minden kurzus kész és azonnal elkezdhető — kattints az info ikonra a részletes előnézetért.</p>
 
   <div class="controls">
     <div class="search-box">
@@ -692,23 +298,16 @@ button{font-family:inherit}
       <option value="difficulty">Rendezés: Nehézség szerint</option>
       <option value="time">Rendezés: Időigény szerint</option>
     </select>
-    <div class="filter-chips" id="filters" role="group" aria-label="Kurzus szűrők">
-      <button class="chip active" data-filter="all">Összes</button>
-      <button class="chip" data-filter="Foundation">🏗️ Foundation</button>
-      <button class="chip" data-filter="Data Engineering">⚡ Data Engineering</button>
-      <button class="chip" data-filter="AI Engineering">🤖 AI Engineering</button>
-      <button class="chip" data-filter="Analytics Engineering">📐 Analytics Engineering</button>
-    </div>
   </div>
 
   <div class="result-count" id="result-count" aria-live="polite">19 kurzus</div>
 
-  <div class="course-grid" id="course-grid">
+  <div class="course-list" id="course-grid">
     <!-- Generated by JS from COURSES -->
   </div>
 
   <div class="empty-state" id="empty-state" style="display:none">
-    <p>😿 Nincs találat a megadott szűrőkre.</p>
+    <p>Nincs találat a megadott szűrőkre.</p>
     <button type="button" onclick="clearFilters()">Szűrők törlése</button>
   </div>
 </section>
@@ -777,7 +376,7 @@ button{font-family:inherit}
   </div>
 
   <div class="flow-diagram">
-    <div class="flow-diagram-title">Adatfolyam: source → bronze → silver → gold → governance → data product → AI → ops</div>
+    <div class="flow-diagram-title">Adatfolyam: source, bronze, silver, gold, governance, data product, AI, ops</div>
     <div class="flow-chain">
       <div class="flow-node">orders / events</div>
       <span class="flow-arrow">→</span>
@@ -801,80 +400,73 @@ button{font-family:inherit}
 </section>
 
 <!-- Karrier / Következő lépések -->
-<section class="section" id="career">
+<section class="section section-muted" id="career">
   <div class="section-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M9 18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2h-3"/><path d="M8 13l2 2 4-4"/></svg>
     Karrier és kimenetek
   </div>
   <h2>Milyen szerepkörökre készít fel?</h2>
-  <p class="section-desc">A kurzusok nem önéletrajz-díszítők — gyakorlati tudást adnak, amit valódi állásinterjún és projekten használhatsz. Az alábbi szerepekre direkt módon készítenek fel.</p>
+  <p class="section-desc">A kurzusok nem önéletrajz-díszítők. Gyakorlati tudást adnak, amit valódi állásinterjún és projekten használhatsz. Az alábbi szerepekre direkt módon készítenek fel.</p>
 
   <div class="career-grid">
     <div class="career-card">
-      <div class="role-icon">⚡</div>
       <h3>Data Engineer</h3>
-      <div class="salary">900.000 – 2.000.000 Ft/hó*</div>
+      <div class="salary">900.000 - 2.000.000 Ft/hó*</div>
       <p>Pipeline-okat épít, adatokat mozgat és transzformál. Ez az oldal Foundation + Data Engineering útvonalát járja be.</p>
       <div class="role-tags">
         <span class="role-tag">Spark</span><span class="role-tag">Delta Lake</span><span class="role-tag">Airflow</span><span class="role-tag">SQL</span>
       </div>
     </div>
     <div class="career-card">
-      <div class="role-icon">📐</div>
       <h3>Analytics Engineer</h3>
-      <div class="salary">800.000 – 1.600.000 Ft/hó*</div>
+      <div class="salary">800.000 - 1.600.000 Ft/hó*</div>
       <p>Híd az adatmérnök és a data analyst között. dbt-vel és SQL-lel rétegzett analitikai modelleket épít.</p>
       <div class="role-tags">
         <span class="role-tag">dbt</span><span class="role-tag">SQL</span><span class="role-tag">BI</span><span class="role-tag">Git</span>
       </div>
     </div>
     <div class="career-card">
-      <div class="role-icon">🤖</div>
       <h3>AI / ML Engineer</h3>
-      <div class="salary">1.000.000 – 2.500.000 Ft/hó*</div>
+      <div class="salary">1.000.000 - 2.500.000 Ft/hó*</div>
       <p>LLM és ML modelleket integrál production rendszerekbe. RAG, agentic AI, eval és MLOps a mindennapok.</p>
       <div class="role-tags">
         <span class="role-tag">OpenAI</span><span class="role-tag">RAG</span><span class="role-tag">LangGraph</span><span class="role-tag">FastAPI</span>
       </div>
     </div>
     <div class="career-card">
-      <div class="role-icon">🧭</div>
       <h3>Data Platform Architect</h3>
-      <div class="salary">1.300.000 – 2.800.000 Ft/hó*</div>
+      <div class="salary">1.300.000 - 2.800.000 Ft/hó*</div>
       <p>Adatplatformot tervez governance-szel, domain ownershippel, data contractokkal és self-serve platform mintákkal.</p>
       <div class="role-tags">
         <span class="role-tag">Data Mesh</span><span class="role-tag">Governance</span><span class="role-tag">Unity Catalog</span><span class="role-tag">dbt</span>
       </div>
     </div>
     <div class="career-card">
-      <div class="role-icon">🚀</div>
       <h3>MLOps Engineer</h3>
-      <div class="salary">1.100.000 – 2.200.000 Ft/hó*</div>
+      <div class="salary">1.100.000 - 2.200.000 Ft/hó*</div>
       <p>ML infrastruktúra, deployment, monitoring és drift. CI/CD pipeline ML modellekre.</p>
       <div class="role-tags">
         <span class="role-tag">Docker</span><span class="role-tag">Kubernetes</span><span class="role-tag">Prometheus</span><span class="role-tag">MLflow</span>
       </div>
     </div>
     <div class="career-card">
-      <div class="role-icon">☁️</div>
       <h3>Cloud Data Engineer</h3>
-      <div class="salary">1.000.000 – 2.100.000 Ft/hó*</div>
+      <div class="salary">1.000.000 - 2.100.000 Ft/hó*</div>
       <p>Databricks, Azure/AWS/GCP lakehouse platformokat üzemeltet és governance-kompatibilis data productokat publikál.</p>
       <div class="role-tags">
         <span class="role-tag">Databricks</span><span class="role-tag">Azure</span><span class="role-tag">Unity Catalog</span><span class="role-tag">Data Products</span>
       </div>
     </div>
     <div class="career-card">
-      <div class="role-icon">🌊</div>
       <h3>Streaming Engineer</h3>
-      <div class="salary">1.100.000 – 2.400.000 Ft/hó*</div>
+      <div class="salary">1.100.000 - 2.400.000 Ft/hó*</div>
       <p>Real-time adatfeldolgozás Kafka és Flink/Spark stack-kel. Event-driven architektúrák.</p>
       <div class="role-tags">
         <span class="role-tag">Kafka</span><span class="role-tag">Spark Streaming</span><span class="role-tag">Flink</span>
       </div>
     </div>
   </div>
-  <p style="font-size:.72rem;color:#6e7681;margin-top:16px">* Magyar piaci bérsáv, 2025 végi adatok alapján (Profession.hu, Pallon, Hays). A konkrét bér cég, senioritás és régió függő.</p>
+  <p class="footnote">* Magyar piaci bérsáv, 2025 végi adatok alapján (Profession.hu, Pallon, Hays). A konkrét bér cég, senioritás és régió függő.</p>
 </section>
 
 <!-- Tech Stack -->
@@ -884,12 +476,12 @@ button{font-family:inherit}
     Technológiai stack
   </div>
   <h2>Amit használni fogsz</h2>
-  <p class="section-desc">Valós production környezetben használt eszközök — nem Hello World demók, hanem tényleges szakmai toolkit.</p>
+  <p class="section-desc">Valós production környezetben használt eszközök, nem Hello World demók, hanem tényleges szakmai toolkit.</p>
   <div class="stack-grid" id="stack-grid"></div>
 </section>
 
 <!-- Resources -->
-<section class="section" id="resources">
+<section class="section section-muted" id="resources">
   <div class="section-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
     További források
@@ -1076,6 +668,7 @@ button{font-family:inherit}
     </details>
   </div>
 </section>
+</main>
 
 <!-- Modal -->
 <div class="modal-overlay" id="course-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -1112,7 +705,7 @@ button{font-family:inherit}
       <h4>Engineering Crash Courses</h4>
       <p>Projektalapú Data &amp; AI Engineering kurzusok magyar nyelven. Minden kurzus ingyenes és nyílt forráskódú.</p>
       <p>
-        <a href="https://github.com/lugosidomotor/engineering_crash_courses" target="_blank" rel="noopener">GitHub repo</a> ·
+        <a href="https://github.com/lugosidomotor/engineering_crash_courses" target="_blank" rel="noopener">GitHub repo</a> |
         <a href="https://github.com/lugosidomotor/engineering_crash_courses/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
       </p>
     </div>
@@ -1129,13 +722,13 @@ button{font-family:inherit}
     <div class="footer-col">
       <h4>Útvonalak</h4>
       <ul>
-        <li><a href="./sql-data-modeling/">🏗️ Foundation</a></li>
-        <li><a href="./delta-table-crash-course/">⚡ Data Engineering</a></li>
-        <li><a href="./ai-engineering/">🤖 AI Engineering</a></li>
+        <li><a href="./sql-data-modeling/">Foundation</a></li>
+        <li><a href="./delta-table-crash-course/">Data Engineering</a></li>
+        <li><a href="./ai-engineering/">AI Engineering</a></li>
         <li><a href="./local-llm-engineering/">Local LLM Engineering</a></li>
-        <li><a href="./data-governance/">🧭 Data Governance</a></li>
-        <li><a href="./agentic-ai/">🧠 Agentic AI</a></li>
-        <li><a href="./dbt-analytics-engineering/">📐 Analytics Eng.</a></li>
+        <li><a href="./data-governance/">Data Governance</a></li>
+        <li><a href="./agentic-ai/">Agentic AI</a></li>
+        <li><a href="./dbt-analytics-engineering/">Analytics Eng.</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -1147,7 +740,7 @@ button{font-family:inherit}
     </div>
   </div>
   <div class="footer-bottom">
-    <p>© 2026 Engineering Crash Courses · Készült ❤️-vel Budapesten · <a href="https://github.com/lugosidomotor/engineering_crash_courses/issues" target="_blank" rel="noopener">Hibajelentés</a></p>
+    <p>© 2026 Engineering Crash Courses | Budapest | <a href="https://github.com/lugosidomotor/engineering_crash_courses/issues" target="_blank" rel="noopener">Hibajelentés</a></p>
   </div>
 </footer>
 
@@ -1282,7 +875,6 @@ function renderCourses(){
   empty.style.display = 'none';
 
   grid.innerHTML = filtered.map((c, i) => {
-    const diffBadge = `<span class="badge badge-difficulty">${escapeHtml(c.difficulty)}</span>`;
     const pathBadges = (c.path || []).map(p => `<span class="badge badge-path">${escapeHtml(p)}</span>`).join('');
     const stackChips = (c.stack || []).map(s => {
       const name = LOGO_NAMES[s] || s;
@@ -1292,41 +884,38 @@ function renderCourses(){
 
     const pct = getCoursePercent(c.slug, c.sectionCount);
     const progressBadge = pct > 0
-      ? `<div class="card-progress-badge visible ${pct===100?'complete':''}">${pct===100?'✓ Kész':pct+'%'}</div>`
+      ? `<div class="card-progress-badge visible ${pct===100?'complete':''}">${pct===100?'Kész':pct+'%'}</div>`
       : '';
     const slug = escapeAttr(c.slug);
+    const courseUrl = escapeAttr(safeUrl(c.url));
 
     return `
-      <div class="course-card" data-slug="${slug}" data-index="${i}">
-        <div class="card-cover">
-          <img src="${escapeAttr(safeUrl(c.image))}" alt="${escapeAttr(c.title)} borítókép" loading="lazy">
+      <article class="course-list-item" data-slug="${slug}" data-index="${i}">
+        <a href="${courseUrl}" class="course-list-photo" onclick="event.stopPropagation()" tabindex="-1" aria-hidden="true">
+          <img src="${escapeAttr(safeUrl(c.image))}" alt="" loading="lazy">
           ${progressBadge}
-          <div class="card-cover-overlay">
-            <div class="card-badges">${diffBadge}${pathBadges}</div>
-            <span class="card-number">#${String(i+1).padStart(2,'0')}</span>
-          </div>
-        </div>
-        <div class="card-body">
-          <h3>${escapeHtml(c.title)}</h3>
-          <p class="card-desc">${escapeHtml(c.description)}</p>
-          <div class="card-build"><strong>Mit építesz:</strong> ${escapeHtml(c.whatYouBuild)}</div>
-          <div class="card-meta">
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${escapeHtml(c.estimatedTime)}</span>
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>${Number(c.sectionCount) || 0} szekció</span>
-          </div>
-          <div class="card-stack">${stackChips}</div>
-          <div class="card-footer">
-            <a href="${escapeAttr(safeUrl(c.url))}" class="card-btn card-btn-ready" onclick="event.stopPropagation()">→ Kurzus megnyitása</a>
-            <button type="button" class="card-btn card-btn-info" aria-label="${escapeAttr(c.title)} részletei" onclick="event.stopPropagation();openModal('${slug}')">
+          <span class="card-number">#${String(i+1).padStart(2,'0')}</span>
+        </a>
+        <div class="course-list-content">
+          <h2>${escapeHtml(c.title)}</h2>
+          <p class="course-list-meta"><strong>${escapeHtml(c.estimatedTime)}</strong> · ${Number(c.sectionCount) || 0} szekció · <strong>${escapeHtml(c.difficulty)}</strong>${pct > 0 ? ` · Haladás: <strong>${pct}%</strong>` : ''}</p>
+          <p class="course-list-desc">${escapeHtml(c.description)}</p>
+          <p class="course-list-build"><strong>Mit építesz:</strong> ${escapeHtml(c.whatYouBuild)}</p>
+          ${pathBadges ? `<div class="course-list-paths">${pathBadges}</div>` : ''}
+          <div class="course-list-stack">${stackChips}</div>
+          <div class="course-list-actions">
+            <a href="${courseUrl}" class="course-list-btn course-list-btn-primary" onclick="event.stopPropagation()">Kurzus megnyitása</a>
+            <button type="button" class="course-list-btn course-list-btn-info" aria-label="${escapeAttr(c.title)} részletei" onclick="event.stopPropagation();openModal('${slug}')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             </button>
           </div>
         </div>
-      </div>`;
+        <a href="${courseUrl}" class="course-list-arrow" onclick="event.stopPropagation()" aria-label="${escapeAttr(c.title)} megnyitása">→</a>
+      </article>`;
   }).join('');
 
   // Click opens modal (except explicit link/button handlers above)
-  grid.querySelectorAll('.course-card').forEach(card => {
+  grid.querySelectorAll('.course-list-item').forEach(card => {
     card.addEventListener('click', (e) => {
       // Ignore clicks on links/buttons - they handle themselves
       if(e.target.closest('a') || e.target.closest('button')) return;
@@ -1415,7 +1004,7 @@ function openModal(slug){
 
   const pct = getCoursePercent(c.slug, c.sectionCount);
   const progressBar = pct > 0
-    ? `<div style="margin-bottom:22px"><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px"><span style="color:#3fb950;font-weight:600">Haladás</span><span style="color:#8b949e;font-family:'JetBrains Mono',monospace">${pct}%</span></div><div style="height:6px;background:rgba(48,54,61,.6);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3fb950,#58a6ff);border-radius:3px"></div></div></div>`
+    ? `<div class="modal-progress"><div class="modal-progress-top"><span>Haladás</span><span>${pct}%</span></div><div class="modal-progress-track"><div class="modal-progress-fill" style="width:${pct}%"></div></div></div>`
     : '';
 
   const tagline = d.tagline ? `<div class="modal-tagline">${escapeHtml(d.tagline)}</div>` : '';
@@ -1426,12 +1015,14 @@ function openModal(slug){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         Mit építesz
       </h3>
-      <p style="font-size:.92rem;padding:12px 16px;background:rgba(88,166,255,.08);border-left:3px solid #58a6ff;border-radius:8px;color:#e6edf3">${escapeHtml(c.whatYouBuild)}</p>
+      <p class="modal-build-text">${escapeHtml(c.whatYouBuild)}</p>
     </div>
-    <div class="modal-section" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
-      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Időigény</div><div style="font-weight:700;color:#e6edf3">${escapeHtml(c.estimatedTime)}</div></div>
-      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Szekciók</div><div style="font-weight:700;color:#e6edf3">${Number(c.sectionCount) || 0}</div></div>
-      <div style="padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(48,54,61,.5)"><div style="font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Nehézség</div><div style="font-weight:700;color:#7dd3fc">${escapeHtml(c.difficulty)}</div></div>
+    <div class="modal-section">
+      <div class="modal-stats">
+        <div class="modal-stat"><div class="modal-stat-label">Időigény</div><div class="modal-stat-value">${escapeHtml(c.estimatedTime)}</div></div>
+        <div class="modal-stat"><div class="modal-stat-label">Szekciók</div><div class="modal-stat-value">${Number(c.sectionCount) || 0}</div></div>
+        <div class="modal-stat"><div class="modal-stat-label">Nehézség</div><div class="modal-stat-value">${escapeHtml(c.difficulty)}</div></div>
+      </div>
     </div>`;
 
   const prereq = d.prerequisites && d.prerequisites.length ? `
@@ -1462,7 +1053,7 @@ function openModal(slug){
   const videos = d.videos && d.videos.length ? `
     <div class="modal-section">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Ajánlott videók</h3>
-      <div class="modal-links">${d.videos.map(v=>`<a class="modal-link" href="${escapeAttr(safeUrl(v.url))}" target="_blank" rel="noopener"><span class="modal-link-type">▶</span><span class="modal-link-title">${escapeHtml(v.title)} <span style="color:#6e7681">· ${escapeHtml(v.channel)}</span></span></a>`).join('')}</div>
+      <div class="modal-links">${d.videos.map(v=>`<a class="modal-link" href="${escapeAttr(safeUrl(v.url))}" target="_blank" rel="noopener"><span class="modal-link-type">▶</span><span class="modal-link-title">${escapeHtml(v.title)} · ${escapeHtml(v.channel)}</span></a>`).join('')}</div>
     </div>` : '';
 
   const related = d.related && d.related.length ? `
