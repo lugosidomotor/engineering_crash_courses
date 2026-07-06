@@ -546,8 +546,8 @@ print("Windowed aggregation: 5 min windows, 2 min watermark")</pre></div>
   <h2>Stream-to-Delta <span class="tool-badge"><img src="../assets/logos/apachespark.svg" alt="" aria-hidden="true">Spark</span> <span class="tool-badge"><img src="../assets/logos/delta-lake.svg" alt="" aria-hidden="true">Delta Lake</span></h2>
   <div class="md-cell"><p>A streaming adatok Delta táblába írása a leggyakoribb lakehouse minta, amely ötvözi a streaming feldolgozás valós idejűségét a Delta Lake ACID tranzakcióinak megbízhatóságával. A Spark Structured Streaming natívan támogatja a Delta sink-et, így egyetlen API hívással írhatunk stream-ből Delta táblába.</p>
 <p><strong>Hogyan működik?</strong> A Spark minden micro-batch-ben új Parquet fájlokat ír a Delta tábla könyvtárába, és atomi művelettel frissíti a <code>_delta_log/</code> tranzakciós naplót. A <code>checkpointLocation</code> könyvtár tartalmazza a streaming progress-t (offsetek, state), így ha a lekérdezés újraindul, onnan folytatja, ahol abbahagyta — ez a fault tolerance alapja.</p>
-<p><strong>Output módok:</strong> Az <code>append</code> mód csak új sorokat ad hozzá (későn érkező adatok nem módosítják a korábbiakat). Az <code>update</code> mód frissíti a meglévő sorokat (pl. aggregációknál). A <code>complete</code> mód minden micro-batch-ben kiírja a teljes eredményt (ritkán használt, nagy state-nél drága).</p>
-<p><strong>WebShop Pro:</strong> A kosár-események és készlet-frissítések is Delta táblákba íródnak. A kosár-események append módban, mert csak új események jönnek. A készlet-frissítések update módban, mert a termékkészlet értéke felülíródik a legfrissebb állapottal.</p></div><div class="code-cell" id="cell-s12">
+<p><strong>Output módok:</strong> Az <code>append</code> mód csak új sorokat ad hozzá — ez az egyetlen támogatott mód a Delta streaming sink-nél. Az <code>update</code> és <code>complete</code> mód aggregációs lekérdezéseknél működik, de <strong>Delta táblába íráskor nem</strong>: készlet-upserthez <code>foreachBatch</code> + <code>MERGE INTO</code> kell.</p>
+<p><strong>WebShop Pro:</strong> A kosár-események append módban mennek Delta-ba (csak új események). A készlet-frissítéseknél micro-batch-enként <code>foreachBatch</code>-ben <code>MERGE</code>-elünk, így a termékkészlet soronként frissül anélkül, hogy felülírnánk a teljes táblát.</p></div><div class="code-cell" id="cell-s12">
     <div class="code-header">
       <span class="cell-number">[12]</span>
       <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s12')">Output</button>
@@ -571,16 +571,27 @@ inventory_stream = spark.readStream \
     .option("subscribe", "webshop.inventory") \
     .load()
 
+def upsert_inventory(batch_df, batch_id):
+    if batch_df.isEmpty():
+        return
+    batch_df.createOrReplaceTempView("inventory_updates")
+    spark.sql("""
+        MERGE INTO inventory AS target
+        USING inventory_updates AS source
+        ON target.product_id = source.product_id
+        WHEN MATCHED THEN UPDATE SET *
+        WHEN NOT MATCHED THEN INSERT *
+    """)
+
 inventory_query = inventory_stream \
     .select(from_json(col("value").cast("string"), inv_schema).alias("d")) \
     .select("d.*") \
     .writeStream \
-    .format("delta") \
-    .outputMode("update") \
+    .foreachBatch(upsert_inventory) \
     .option("checkpointLocation", "./checkpoint/inventory") \
-    .start("./data/delta/inventory")
+    .start()
 
-print("2 streaming query fut: cart_events → Delta, inventory → Delta")</pre></div>
+print("2 streaming query fut: cart_events → Delta append, inventory → Delta MERGE")</pre></div>
     <div class="output-area" id="out-s12">
       <div class="output-label">Output:</div>
       <pre>2 streaming query fut: cart_events → Delta, inventory → Delta</pre>

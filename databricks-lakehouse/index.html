@@ -172,9 +172,9 @@ Permissions: data-engineers (read/write), analysts (read-only)</pre></div></div>
   <div class="section-number">Section 04</div>
   <h2>Bronze réteg: adatbetöltés</h2>
 <div class="md-cell"><p>Az Auto Loader a Databricks intelligens adatbetöltő eszköze, amely automatikusan felfedezi az új fájlokat a felhőtárhelyen, kikövetkezteti a sémát, és inkrementálisan betölti az adatokat a Bronze rétegbe. Nem kell manuálisan megadnod a fájlneveket vagy a sémát — az Auto Loader mindezt automatikusan kezeli, ami különösen hasznos, ha a forrásrendszer folyamatosan hoz létre új fájlokat (pl. óránként egy új CSV a rendelésekből).</p>
-<p>A példa egy streaming lekérdezést mutat: a spark.readStream.format('cloudFiles') hívás inicializálja az Auto Loadert, amely a megadott S3 könyvtárat figyeli. A cloudFiles.schemaLocation paraméter határozza meg, hova mentse a kikövetkeztetett sémát — ha egy új fájl tartalmaz egy új oszlopot, az Auto Loader automatikusan hozzáadja a sémához. A checkpointLocation biztosítja, hogy a már feldolgozott fájlokat ne töltse be újra, a trigger(once=True) pedig egyszeri futtatást jelent (batch mód).</p>
+<p>A példa egy streaming lekérdezést mutat: a spark.readStream.format('cloudFiles') hívás inicializálja az Auto Loadert, amely a megadott S3 könyvtárat figyeli. A cloudFiles.schemaLocation paraméter határozza meg, hova mentse a kikövetkeztetett sémát — ha egy új fájl tartalmaz egy új oszlopot, az Auto Loader automatikusan hozzáadja a sémához. A checkpointLocation biztosítja, hogy a már feldolgozott fájlokat ne töltse be újra, a <code>availableNow=True</code> trigger pedig egyszeri futtatást jelent (batch mód).</p>
 <p>Amit a háttérben történik: az Auto Loader nyomon követi, mely fájlokat dolgozta már fel (a checkpoint könyvtárban), és minden futtatáskor csak az újakat olvassa be. A séma-inferencia az első fájlok alapján történik, de a cloudFiles.schemaHints opcióval finomhangolhatod a típusokat. A kimenet Delta Lake formátumú, amely azonnal lekérdezhető a Silver réteg transzformációihoz.</p>
-<p>Tipp: Használd az Auto Loadert minden structured streaming forráshoz a manuális fájlkezelés helyett. A trigger(once=True) batch feldolgozásra alkalmas, de ha valós idejű feldolgozásra van szükséged, használd a trigger(processingTime='30 seconds') beállítást, amely félpercenként ellenőrzi az új fájlokat.</p></div><div class="code-cell" id="cell-4"><div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('4')">Output</button></div><div class="code-body"><pre># Auto Loader: incremental file ingestion
+<p>Tipp: Használd az Auto Loadert minden structured streaming forráshoz a manuális fájlkezelés helyett. A <code>availableNow=True</code> batch feldolgozásra alkalmas (a régi <code>once=True</code> deprecated), de ha valós idejű feldolgozásra van szükséged, használd a <code>processingTime='30 seconds'</code> beállítást, amely félpercenként ellenőrzi az új fájlokat.</p></div><div class="code-cell" id="cell-4"><div class="code-header"><span class="cell-number">[4]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('4')">Output</button></div><div class="code-body"><pre># Auto Loader: incremental file ingestion
 query = (spark.readStream.format('cloudFiles')
     .option('cloudFiles.format', 'csv')
     .option('cloudFiles.schemaLocation', 's3://webshop/schema/orders')
@@ -183,7 +183,7 @@ query = (spark.readStream.format('cloudFiles')
     .writeStream
     .format('delta')
     .option('checkpointLocation', 's3://webshop/checkpoints/orders')
-    .trigger(once=True)
+    .trigger(availableNow=True)
     .toTable('webshop.bronze.orders'))</pre></div><div class="output-area" id="out-4"><div class="output-label">Output:</div><pre>Auto Loader: processed 15 new files
 Loaded 1420 rows into webshop.bronze.orders</pre></div></div>
 </div>
@@ -451,12 +451,15 @@ All green!</pre></div></div>
   <div class="section-number">Section 16</div>
   <h2>Governance és security</h2>
   <div class="md-cell"><p>A Governance és security a lakehouse enterprise-grade üzemeltetésének alapja: a Unity Catalog biztosítja a hozzáférés-vezérlést (ki melyik adatot láthatja), az audit logging nyomon követi minden hozzáférést (ki, mikor, mit csinált), és a data classification címkézi a bizalmas adatokat (PII, PHI, pénzügyi). A Databricks-ben ezek a funkciók nem opcionális kiegészítők, hanem beépített képességek, amelyeket a projekt kezdetétől érdemes használni.</p>
-<p>A row-level security (RLS) lehetővé teszi, hogy ugyanaz a tábla különböző felhasználóknak más-más sorokat mutasson — anélkül, hogy külön táblákat kellene fenntartani. A példában a region_filter függvény ellenőrzi, hogy a felhasználó régiója megegyezik-e a sor régiójával: egy kelet-magyarországi regionális menedzser csak a kelet-magyarországi adatokat látja, míg a központi vezetőség mindent. A column masking hasonló elven működik: az email oszlop értéke „maszkírozva" jelenik meg azok számára, akiknek nincs explicit jogosultságuk a teljes e-mail cím megtekintésére (pl. „j***@email.com").</p>
+<p>A row-level security (RLS) lehetővé teszi, hogy ugyanaz a tábla különböző felhasználóknak más-más sorokat mutasson — anélkül, hogy külön táblákat kellene fenntartani. A példában a region_filter függvény a <code>current_user()</code> alapján egy jogosultsági táblából ellenőrzi, mely régiókat láthatja a felhasználó: egy regionális menedzser csak a saját régióját látja, míg a központi vezetőség mindent. A column masking hasonló elven működik: az email oszlop értéke „maszkírozva" jelenik meg azok számára, akiknek nincs explicit jogosultságuk a teljes e-mail cím megtekintésére (pl. „j***@email.com").</p>
 <p>Az audit logging minden adathozzáférést rögzít: ki futtatott SELECT lekérdezést, ki módosított táblát, ki kapott új engedélyt. Ez kritikus a compliance (GDPR, HIPAA, SOX) és a belső ellenőrzések szempontjából. A Databricks UI-ban vagy a system tables segítségével lekérdezhetők az audit események. A data classification funkcióval címkézheted a bizalmas oszlopokat (pl. „SSN", „credit_card", „email"), és a rendszer figyelmeztet, ha egy lekérdezés ilyen oszlopokat ér el.</p>
-<p>Tipp: Implementáld a governance-t a projekt legelején, ne utólag. A row-level security és column masking Unity Catalog SQL függvényekkel definiálhatók, és a meglévő táblákhoz utólag is hozzáadhatók. Használj szolgáltatásneveket (service principals) a Job-ok futtatásához, ne személyes felhasználói fiókokat — így a jogosultságok függetlenek lesznek a személyektől.</p></div><div class="code-cell" id="cell-16"><div class="code-header"><span class="cell-number">[16]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('16')">Output</button></div><div class="code-body"><pre>-- Row-level security
+<p>Tipp: Implementáld a governance-t a projekt legelején, ne utólag. A row-level security és column masking Unity Catalog SQL függvényekkel definiálhatók, és a meglévő táblákhoz utólag is hozzáadhatók. Használj szolgáltatásneveket (service principals) a Job-ok futtatásához, ne személyes felhasználói fiókokat — így a jogosultságok függetlenek lesznek a személyektől.</p></div><div class="code-cell" id="cell-16"><div class="code-header"><span class="cell-number">[16]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('16')">Output</button></div><div class="code-body"><pre>-- Row-level security (current_user() + jogosultsági tábla)
 CREATE FUNCTION webshop.region_filter(region STRING)
 RETURNS BOOLEAN
-RETURN region = current_user_metadata('region');
+RETURN EXISTS (
+  SELECT 1 FROM webshop.governance.user_region_map
+  WHERE user_email = current_user() AND allowed_region = region
+);
 
 -- Apply to table
 ALTER TABLE webshop.gold.fct_revenue

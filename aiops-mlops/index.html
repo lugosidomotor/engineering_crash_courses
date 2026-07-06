@@ -725,15 +725,22 @@ results_b = {<span class="str">"correct"</span>: <span class="num">0</span>, <sp
 <span class="fn">print</span>(<span class="str">f"Model A: {results_a['correct']}/{results_a['total']} = {results_a['correct']/results_a['total']:.3f}"</span>)
 <span class="fn">print</span>(<span class="str">f"Model B: {results_b['correct']}/{results_b['total']} = {results_b['correct']/results_b['total']:.3f}"</span>)
 
-<span class="cm"># Statisztikai szignifikancia (egyszerű z-test)</span>
-improvement = (results_b[<span class="str">"correct"</span>]/results_b[<span class="str">"total"</span>]) - (results_a[<span class="str">"correct"</span>]/results_a[<span class="str">"total"</span>])
-<span class="fn">print</span>(<span class="str">f"\\nJavulás: {improvement:+.3f}"</span>)</pre></div>
+<span class="cm"># Statisztikai szignifikancia: két arány z-tesztje</span>
+<span class="kw">from</span> statsmodels.stats.proportion <span class="kw">import</span> proportions_ztest
+
+acc_a = results_a[<span class="str">"correct"</span>] / results_a[<span class="str">"total"</span>]
+acc_b = results_b[<span class="str">"correct"</span>] / results_b[<span class="str">"total"</span>]
+z_stat, p_value = proportions_ztest(
+    [results_b[<span class="str">"correct"</span>], results_a[<span class="str">"correct"</span>]],
+    [results_b[<span class="str">"total"</span>], results_a[<span class="str">"total"</span>]],
+)
+<span class="fn">print</span>(<span class="str">f"\\nJavulás: {acc_b - acc_a:+.3f}, p-value: {p_value:.4f}"</span>)</pre></div>
     <div class="output-area" id="out-s13">
       <div class="output-label">Output:</div>
       <pre><span class="log-step">[ab-test]</span> Model A: <span class="log-info">758/798 = 0.950</span>
 <span class="log-step">[ab-test]</span> Model B: <span class="log-info">193/202 = 0.955</span>
 
-<span class="log-ok">Javulás: +0.006</span></pre>
+<span class="log-ok">Javulás: +0.006, p-value: 0.7421</span></pre>
     </div>
   </div>
   <div class="callout">

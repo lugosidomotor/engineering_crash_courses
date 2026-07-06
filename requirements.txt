@@ -48,7 +48,7 @@ apache-airflow==2.10.3
 dbt-postgres==1.9.0
 
 # Quality
-great-expectations==0.18.22
+great-expectations>=1.0
 
 # ML / LLM ops
 mlflow==2.20.3

@@ -687,8 +687,10 @@ g.set_entry_point(<span class="str">"request_return"</span>)
 g.add_edge(<span class="str">"request_return"</span>, <span class="str">"notify"</span>)
 g.add_edge(<span class="str">"notify"</span>, END)
 
-<span class="cm"># SqliteSaver — perzisztens state minden lépés után</span>
-checkpointer = SqliteSaver.from_conn_string(<span class="str">":memory:"</span>)
+<span class="cm"># SqliteSaver — a from_conn_string() context manager, nem maga a saver</span>
+<span class="kw">import</span> sqlite3
+conn = sqlite3.connect(<span class="str">":memory:"</span>, check_same_thread=<span class="kw">False</span>)
+checkpointer = SqliteSaver(conn)
 app = g.compile(checkpointer=checkpointer, interrupt_before=[<span class="str">"request_return"</span>])
 
 config = {<span class="str">"configurable"</span>: {<span class="str">"thread_id"</span>: <span class="str">"user_42_session_1"</span>}}

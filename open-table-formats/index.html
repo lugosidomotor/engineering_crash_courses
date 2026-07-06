@@ -156,12 +156,14 @@ Delta → _delta_log/ mappa létrejön, ACID garantált</pre>
       <span class="cell-number">[2]</span>
       <button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s2')">Output</button>
     </div>
-    <div class="code-body"><pre>from delta import DeltaTable
+    <div class="code-body"><pre>from delta.tables import DeltaTable
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder \
     .appName("WebShop-Delta") \
-    .config("spark.jars.packages", "io.delta:delta-core_2.12:3.1.0") \
+    .config("spark.jars.packages", "io.delta:delta-spark_2.12:3.2.0") \
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
     .getOrCreate()
 
 # WebShop rendelések DataFrame
@@ -347,7 +349,7 @@ Iceberg: legteljesebb séma evolúció (rename, reorder, típus változás)</pre
   <div class="md-cell"><p>A particionálás evolúciója az egyik legfájdalmasabb művelet hagyományos data lake-ben. Ha rájössz, hogy a napi particionálás helyett havi particionálásra lenne szükség, a teljes adatmennyiséget át kell mozgatni — terabájtnyi adatnál ez órákig tart, és a pipeline-t le kell állítani közben.</p>
 <p>Az <strong>Apache Iceberg rejtett particionálása</strong> (hidden partitioning) forradalmian megoldja ezt a problémát. A lényeg: a particionáló oszlop nem jelenik meg külön oszlopként az adatokban, és a lekérdezések automatikusan használják a megfelelő particionálást anélkül, hogy a felhasználónak tudnia kellene róla. A <code>months(order_date)</code> transzformáció például havi particionálást hoz létre anélkül, hogy egy <code>order_month</code> oszlopot kellene hozzáadni.</p>
 <p><strong>Partition evolution:</strong> Az Iceberg-ben a particionálási stratégia verziózott. Ha heti particionálásról havira váltasz, az Iceberg egyszerűen új partition spec-et hoz létre. A régi adatok az eredeti particionálással, az új adatok az új particionálással maradnak, és a lekérdezés engine mindkettőt átláthatóan kezeli — nem kell adatot mozgatni.</p>
-<p><strong>Összehasonlítás:</strong> A Delta Lake particionálás-evolúciója manuális <code>REORGANIZE</code> műveletet igényel. A Hudi particionálása a record key + precombine keyhez kötött, korlátozottan változtatható. Az Iceberg az egyetlen, amely teljesen automatikus, transzparens particionálás-evolúciót kínál.</p></div><table><tr><th>Formátum</th><th>Partition evolution</th><th>Rejtett particionálás</th></tr><tr><td>Delta Lake</td><td>Manuális REORGANIZE</td><td>Nem</td></tr><tr><td>Iceberg</td><td>Automatikus partition spec váltás</td><td>Igen (year/month/day/hour transforms)</td></tr><tr><td>Hudi</td><td>Korlátozott</td><td>Nem (record key + precombine key)</td></tr></table>
+<p><strong>Összehasonlítás:</strong> A Delta Lake <strong>nem támogat partition evolution-t</strong> — a particionálási stratégia megváltoztatásához új táblát kell létrehozni és az adatokat átmigrálni. A Hudi particionálása a record key + precombine keyhez kötött, korlátozottan változtatható. Az Iceberg az egyetlen, amely teljesen automatikus, transzparens particionálás-evolúciót kínál.</p></div><table><tr><th>Formátum</th><th>Partition evolution</th><th>Rejtett particionálás</th></tr><tr><td>Delta Lake</td><td>Nem támogatott (új tábla + migráció)</td><td>Nem</td></tr><tr><td>Iceberg</td><td>Automatikus partition spec váltás</td><td>Igen (year/month/day/hour transforms)</td></tr><tr><td>Hudi</td><td>Korlátozott</td><td>Nem (record key + precombine key)</td></tr></table>
 </div>
 
 <div class="section layer-general" id="s9">
@@ -411,7 +413,7 @@ Hudi: as.of.instant (timestamp)</pre>
   <div class="section-number">Section 12</div>
   <h2>Vendor lock-in </h2>
   <div class="md-cell"><p>A <strong>vendor lock-in</strong> (szállítói függőség) az egyik legfontosabb stratégiai kérdés a táblaformátum választásakor. Bár mindhárom formátum nyílt forráskódú, a mögöttük álló ökoszisztéma és a felhőszolgáltató integrációk szintje eltérő, ami befolyásolja a jövőbeli mozgásteret.</p>
-<p><strong>Delta Lake:</strong> Bár a Linux Foundation alatt nyílt forráskódú, a legjobb teljesítményt és funkciókat a Databricks platformon belül éri el. A Unity Catalog, a Photon engine és az OPTIMIZE/Z-ORDER műveletek mind Databricks-specifikusak. Ha ma Databricks-öt használsz, a Delta a legkényelmesebb választás, de a későbbi váltás más platformra többletmunkát igényel.</p>
+<p><strong>Delta Lake:</strong> Bár a Linux Foundation alatt nyílt forráskódú, a legjobb integrációt a Databricks platformon belül éri el (Unity Catalog, Photon). Az <code>OPTIMIZE</code> és <code>Z-ORDER</code> parancsok az <strong>OSS Delta Lake-ben is elérhetők</strong> (Spark 3.x + delta-spark 2.0+), nem csak Databricksen — a DBX-specifikus rész inkább a managed runtime és a Liquid Clustering. Ha ma Databricks-öt használsz, a Delta a legkényelmesebb választás, de a későbbi váltás más platformra többletmunkát igényel.</p>
 <p><strong>Apache Iceberg:</strong> A legkisebb vendor lock-in kockázattal rendelkezik. Az Apache Software Foundation projektje, amelyet az Apple, a Netflix és az AWS is támogat. Multi-engine támogatása (Spark, Flink, Trino, Presto, Dremio, Snowflake) garantálja, hogy nem kötsz ki egyetlen feldolgozó motorhoz vagy felhőszolgáltatóhoz sem.</p>
 <p><strong>Apache Hudi:</strong> Az Uber által indított, ma Apache projekt. Az Amazon és a Onehouse támogatja, de az ökoszisztéma szűkebb, mint az Iceberg-é vagy a Delta-é. A Hudi erőssége a streaming upsert, ami egy specifikus felhasználási esethez köti.</p>
 <p><strong>Fontos megjegyzés:</strong> A formátum nyílt forráskódú, de a <strong>felhőszolgáltató vendor lock-in</strong> továbbra is létezik. Ha Delta Lake-et használsz a Databricks-ön, az Iceberg-et AWS/Snowflake-en, vagy a Hudit Amazon EMR-en — a szolgáltatói ökoszisztémából kilépni mindig komoly migrációs erőforrást igényel. A formátum hordozhatósága csak az adatok szintjén garantált, nem a teljes platform szintjén.</p></div><table><tr><th>Formátum</th><th>Nyílt forráskód?</th><th>Fő sponsor</th><th>Lock-in kockázat</th></tr><tr><td>Delta Lake</td><td>Igen (Linux Foundation)</td><td>Databricks</td><td>Alacsony (de Databricks optimalizált)</td></tr><tr><td>Iceberg</td><td>Igen (Apache)</td><td>Apple, Netflix, AWS</td><td>Nagyon alacsony (multi-engine)</td></tr><tr><td>Hudi</td><td>Igen (Apache)</td><td>Uber, Amazon, Onehouse</td><td>Alacsony</td></tr></table><div class="callout warning"><div class="callout-title">Figyelem</div><p>A formátum nyílt forráskódú, de a CLOUD SZOLGÁLTATÓ vendor lock-in marad. Delta + Databricks, Iceberg + AWS/Snowflake, stb.</p></div>

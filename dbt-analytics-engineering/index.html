@@ -271,7 +271,7 @@ select
     category,
     segment,
     count(distinct order_id) as order_count,
-    count(distinct customer_name) as unique_customers,
+    count(distinct customer_id) as unique_customers,
     sum(amount) as revenue,
     avg(amount) as avg_order_value
 from enriched
@@ -281,8 +281,8 @@ OK created TABLE analytics.fct_monthly_revenue [SELECT 48]</pre></div></div>
 </div>
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
-  <h2>Schema tesztek</h2>
-  <div class="md-cell"><p>A schema tesztek a dbt beépített adatminőségi ellenőrzései, amelyeket YAML fájlokban definiálunk. Négy alapvető teszttípus létezik: unique (az oszlop értékei egyediek), not_null (nincs hiányzó érték), accepted_values (az oszlop csak megadott értékeket vehet fel), és relationships (idegen kulcs integritás — az értéknek léteznie kell egy másik tábla megfelelő oszlopában). Ezek a tesztek SQL lekérdezésekké fordulnak, amelyek a hibás sorokat adják vissza — ha az eredményhalmaz üres, a teszt átment.</p>
+  <h2>Data tesztek (column tests)</h2>
+  <div class="md-cell"><p>A data tesztek (korábban „schema tests”) a dbt beépített adatminőségi ellenőrzései, amelyeket YAML fájlokban definiálunk. Négy alapvető teszttípus létezik: unique (az oszlop értékei egyediek), not_null (nincs hiányzó érték), accepted_values (az oszlop csak megadott értékeket vehet fel), és relationships (idegen kulcs integritás — az értéknek léteznie kell egy másik tábla megfelelő oszlopában). Ezek a tesztek SQL lekérdezésekké fordulnak, amelyek a hibás sorokat adják vissza — ha az eredményhalmaz üres, a teszt átment.</p>
 <p>A példában az order_id oszlopra unique és not_null teszteket futtatunk (biztosítva, hogy minden rendelésnek legyen egyedi azonosítója), a customer_id-ra not_null és relationships tesztet (ellenőrzi, hogy minden ügyfél ID létezik a stg_customers táblában), a status-ra pedig accepted_values (csak a négy megengedett státuszérték egyike lehet). Ez a teszt-kombináció gyakorlatilag biztosítja az adatok referenciális integritását és az üzleti szabályok betartását.</p>
 <p>A schema tesztek futtatása a dbt test paranccsal történik, amely a dbt run után érdemes lefuttatni. CI/CD pipeline-ban mindkettőt automatizálni kell: ha bármelyik teszt elbukik, a deployment nem folytatódhat. A teszteredmények a dbt docs-ban is megjelennek, így az adatok felhasználói láthatják, milyen minőségi garanciák vannak az adatokra nézve.</p>
 <p>Tipp: Definiálj teszteket minden kritikus oszlopra — legalább not_null az elsődleges kulcsokra és relationships az idegen kulcsokra. Ne várd meg, amíg egy üzleti felhasználó jelzi, hogy duplikált rendelésszámokat lát; a tesztek proaktívan védik az adatminőséget.</p></div><div class="code-cell" id="cell-7"><div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('7')">Output</button></div><div class="code-body"><pre># models/staging/_stg_models__yml.yml

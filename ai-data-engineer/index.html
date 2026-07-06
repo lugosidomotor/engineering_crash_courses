@@ -135,7 +135,7 @@
 <div class="section layer-intro" id="s3">
   <div class="section-number">Section 03</div>
   <h2>Környezet</h2>
-  <div class="code-cell" id="cell-s3"><div class="code-header"><span class="cell-number">[s3]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s3')">Output</button></div><div class="code-body"><pre>pip install feast kafka-python delta-spark dbt-core great-expectations</pre></div><div class="output-area" id="out-s3"><div class="output-label">Output:</div><pre><span class="log-step">[env]</span> <span class="log-ok">feast-0.41</span> <span class="log-kafka">kafka-2.0</span> <span class="log-delta">delta-3.2</span> <span class="log-dbt">dbt-1.9</span> <span class="log-dim">gx-0.18</span></pre></div></div>
+  <div class="code-cell" id="cell-s3"><div class="code-header"><span class="cell-number">[s3]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s3')">Output</button></div><div class="code-body"><pre>pip install feast kafka-python delta-spark dbt-core "great-expectations>=1.0"</pre></div><div class="output-area" id="out-s3"><div class="output-label">Output:</div><pre><span class="log-step">[env]</span> <span class="log-ok">feast-0.41</span> <span class="log-kafka">kafka-2.0</span> <span class="log-delta">delta-3.2</span> <span class="log-dbt">dbt-1.9</span> <span class="log-dim">gx-1.3</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s4">
   <div class="section-number">Section 04</div>
@@ -205,10 +205,10 @@ offline = store.get_historical_features(
 
 <span class="cm"># Online (serving, &lt;10ms)</span>
 online = store.get_online_features(
-    entity_rows=[{<span class="str">"user_id"</span>:42}],
+    entity_rows=[{<span class="str">"customer_id"</span>:42}],
     features=[<span class="str">"user_stats:age"</span>]
 ).to_dict()</pre></div><div class="output-area" id="out-s7"><div class="output-label">Output:</div><pre><span class="log-step">Offline:</span> <span class="log-info">(50000, 5)</span>
-<span class="log-step">Online:</span> <span class="log-info">{user_id:[42], age:[35.0]}</span></pre></div></div><table><tr><th></th><th>Offline</th><th>Online</th></tr><tr><td>Cél</td><td>Tanítás (batch)</td><td>Serving (real-time)</td></tr><tr><td>Latencia</td><td>Perc</td><td><10ms</td></tr><tr><td>Méret</td><td>TB</td><td>GB</td></tr><tr><td>Forrás</td><td>Delta/BigQuery</td><td>Redis/DynamoDB</td></tr></table>
+<span class="log-step">Online:</span> <span class="log-info">{customer_id:[42], age:[35.0]}</span></pre></div></div><table><tr><th></th><th>Offline</th><th>Online</th></tr><tr><td>Cél</td><td>Tanítás (batch)</td><td>Serving (real-time)</td></tr><tr><td>Latencia</td><td>Perc</td><td><10ms</td></tr><tr><td>Méret</td><td>TB</td><td>GB</td></tr><tr><td>Forrás</td><td>Delta/BigQuery</td><td>Redis/DynamoDB</td></tr></table>
 </div>
 <div class="section layer-intro" id="s8">
   <div class="section-number">Section 08</div>
@@ -221,9 +221,9 @@ online = store.get_online_features(
 <span class="kw">import</span> json
 
 producer = KafkaProducer(bootstrap_servers=[<span class="str">"localhost:9092"</span>])
-event = {<span class="str">"user_id"</span>:42, <span class="str">"amount"</span>:1250}
+event = {<span class="str">"customer_id"</span>:42, <span class="str">"amount"</span>:1250}
 producer.send(<span class="str">"purchases"</span>, json.dumps(event).encode())
-<span class="fn">print</span>(<span class="str">f"Sent: {event}"</span>)</pre></div><div class="output-area" id="out-s8"><div class="output-label">Output:</div><pre><span class="log-kafka">[kafka]</span> <span class="log-ok">Sent:</span> {user_id:42, amount:1250}
+<span class="fn">print</span>(<span class="str">f"Sent: {event}"</span>)</pre></div><div class="output-area" id="out-s8"><div class="output-label">Output:</div><pre><span class="log-kafka">[kafka]</span> <span class="log-ok">Sent:</span> {customer_id:42, amount:1250}
 <span class="log-kafka">[kafka]</span> <span class="log-dim">Topic:</span> <span class="log-info">purchases</span> | <span class="log-dim">Offset:</span> <span class="log-time">15420</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s9">
@@ -313,16 +313,22 @@ consumer = KafkaConsumer(<span class="str">"purchases"</span>, bootstrap_servers
   <h2>Data Quality <span class="tool-badge"><img src="../assets/logos/greatexpectations.svg" alt="" aria-hidden="true">GE</span></h2>
   <div class="md-cell">
     <p>A <strong>Great Expectations</strong> (GE) egy Python könyvtár adatminőség-ellenőrzésre, amely "expectation-ök" (várakozások) formájában definiálja, hogy az adatoknak hogyan kell kinézniük. Az ML világban a "rossz adat = rossz modell" elv érvényesül: ha a feature-ök között null értékek, out-of-range adatok vagy duplikátumok vannak, a modell hibás predikciókat fog adni.</p>
-    <p>A példában egy <code>ExpectationSuite</code>-ot hozunk létre három ellenőrzéssel: (1) az <code>age</code> oszlop értékei 0 és 120 között kell legyenek, (2) a <code>user_id</code> oszlopban nem lehet null érték, (3) a <code>user_id</code> értékeknek egyedieknek kell lenniük. Ezek az alapelvárások minden felhasználói feature táblánál szükségesek.</p>
+    <p>A példában egy <code>ExpectationSuite</code>-ot hozunk létre három ellenőrzéssel: (1) az <code>age</code> oszlop értékei 0 és 120 között kell legyenek, (2) a <code>customer_id</code> oszlopban nem lehet null érték, (3) a <code>customer_id</code> értékeknek egyedieknek kell lenniük. Ezek az alapelvárások minden ügyfél-feature táblánál szükségesek.</p>
     <p>Éles környezetben a GE-t a pipeline minden lépésébe integrálják: a Bronze→Silver átalakításnál validálják a nyers adatokat, a Silver→Gold lépésnél az aggregált feature-öket, és a Feature Store-ba történő publikálás előtt a végleges táblákat. Ha egy expectation elbukik, a pipeline leállítja a futást, és riasztást küld, mielőtt a hibás adatok eljutnának az ML modellig.</p>
   </div><div class="code-cell" id="cell-s10"><div class="code-header"><span class="cell-number">[s10]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('s10')">Output</button></div><div class="code-body"><pre><span class="kw">import</span> great_expectations <span class="kw">as</span> gx
-suite = gx.ExpectationSuite(<span class="str">"user_features"</span>)
-suite.add_expectation(ExpectColumnValuesToBeBetween(column=<span class="str">"age"</span>,min_value=<span class="num">0</span>,max_value=<span class="num">120</span>))
-suite.add_expectation(ExpectColumnValuesToNotBeNull(column=<span class="str">"user_id"</span>))
-suite.add_expectation(ExpectColumnValuesToBeUnique(column=<span class="str">"user_id"</span>))
-<span class="fn">print</span>(<span class="str">f"Suite: {len(suite)} checks"</span>)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><pre><span class="log-ok">✅ age 0-120:</span> <span class="log-dim">100%</span>
-<span class="log-ok">✅ user_id not null:</span> <span class="log-dim">100%</span>
-<span class="log-ok">✅ user_id unique:</span> <span class="log-dim">100%</span>
+<span class="kw">from</span> great_expectations.expectations <span class="kw">import</span> (
+    ExpectColumnValuesToBeBetween,
+    ExpectColumnValuesToNotBeNull,
+    ExpectColumnValuesToBeUnique,
+)
+
+suite = gx.ExpectationSuite(name=<span class="str">"customer_features"</span>)
+suite.add_expectation(ExpectColumnValuesToBeBetween(column=<span class="str">"age"</span>, min_value=<span class="num">0</span>, max_value=<span class="num">120</span>))
+suite.add_expectation(ExpectColumnValuesToNotBeNull(column=<span class="str">"customer_id"</span>))
+suite.add_expectation(ExpectColumnValuesToBeUnique(column=<span class="str">"customer_id"</span>))
+<span class="fn">print</span>(<span class="str">f"Suite: {len(suite.expectations)} checks"</span>)</pre></div><div class="output-area" id="out-s10"><div class="output-label">Output:</div><pre><span class="log-ok">✅ age 0-120:</span> <span class="log-dim">100%</span>
+<span class="log-ok">✅ customer_id not null:</span> <span class="log-dim">100%</span>
+<span class="log-ok">✅ customer_id unique:</span> <span class="log-dim">100%</span>
 <span class="log-ok">Overall: PASSED ✓</span></pre></div></div>
 </div>
 <div class="section layer-intro" id="s11">
@@ -337,11 +343,11 @@ suite.add_expectation(ExpectColumnValuesToBeUnique(column=<span class="str">"use
     <span class="kw">SELECT</span> * <span class="kw">FROM</span> {{ source(<span class="str">'raw'</span>,<span class="str">'purchases'</span>) }}
     <span class="kw">WHERE</span> amount > <span class="num">0</span>
 )
-<span class="kw">SELECT</span> user_id,
+<span class="kw">SELECT</span> customer_id,
     <span class="fn">COUNT</span>(*) <span class="kw">AS</span> purchase_count,
     <span class="fn">AVG</span>(amount) <span class="kw">AS</span> avg_order,
     <span class="fn">SUM</span>(amount) <span class="kw">AS</span> total_spend
-<span class="kw">FROM</span> purchases <span class="kw">GROUP BY</span> user_id</pre></div><div class="output-area" id="out-s11"><div class="output-label">Output:</div><pre><span class="log-dbt">[dbt]</span> <span class="log-cmd">$ dbt run</span>
+<span class="kw">FROM</span> purchases <span class="kw">GROUP BY</span> customer_id</pre></div><div class="output-area" id="out-s11"><div class="output-label">Output:</div><pre><span class="log-dbt">[dbt]</span> <span class="log-cmd">$ dbt run</span>
 <span class="log-dbt">[dbt]</span> <span class="log-ok">OK</span> <span class="log-info">stg_purchases</span> <span class="log-time">[12k rows in 3.2s]</span>
 <span class="log-dbt">[dbt]</span> <span class="log-ok">OK</span> <span class="log-info">int_user_features</span> <span class="log-time">[50k in 5.1s]</span>
 <span class="log-dbt">[dbt]</span> <span class="log-ok">OK</span> <span class="log-info">fct_user_stats</span> <span class="log-time">[50k in 2.8s]</span></pre></div></div>

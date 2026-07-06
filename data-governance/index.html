@@ -182,7 +182,7 @@ VACUUM lefutott: time-travel history törölve 7 napon túl</pre>
   <div class="section-number">Section 03</div>
   <h2>PII detection és redaction <span class="tool-badge"><img src="../assets/logos/python.svg" alt="" aria-hidden="true">Python</span></h2>
   <div class="md-cell"><p>A <strong>PII detection</strong> (személyes adatok automatikus felismerése) elengedhetetlen, ha nagy mennyiségű strukturálatlan vagy félig strukturált adat érkezik a rendszerbe — pl. email szöveg, support chat log, szerződés-PDF, free-text comment field. Manuálisan átnézni lehetetlen, automatizált tooling kell.</p>
-<p><strong>Microsoft Presidio:</strong> Nyílt forráskódú PII detection és redaction Python library, amelyet a Microsoft fejleszt. Felismeri a <code>EMAIL_ADDRESS</code>, <code>PHONE_NUMBER</code>, <code>CREDIT_CARD</code>, <code>IP_ADDRESS</code>, <code>PERSON</code>, <code>LOCATION</code> és sok más entitást. Két komponensből áll: <em>Presidio Analyzer</em> (felismerés) és <em>Presidio Anonymizer</em> (helyettesítés/maszkolás).</p>
+<p><strong>Microsoft Presidio:</strong> Nyílt forráskódú PII detection és redaction Python library, amelyet a Microsoft fejleszt. Felismeri a <code>EMAIL_ADDRESS</code>, <code>PHONE_NUMBER</code>, <code>CREDIT_CARD</code>, <code>IP_ADDRESS</code>, <code>PERSON</code>, <code>LOCATION</code> és sok más entitást. Két komponensből áll: <em>Presidio Analyzer</em> (felismerés) és <em>Presidio Anonymizer</em> (helyettesítés/maszkolás). <strong>Fontos:</strong> az alap NER modellek angolra vannak tanítva — magyar szövegen a <code>language="en"</code> mellett a nevek és címek gyakran kimaradnak; élesben hu modell vagy custom recognizer kell.</p>
 <p><strong>AWS Comprehend és Azure AI Language:</strong> Felhő-natív alternatívák, amelyek pre-trained NER (Named Entity Recognition) modelleket biztosítanak. Az AWS Comprehend külön <em>PII detection</em> API-val rendelkezik, de a dokumentált PII nyelvi támogatása angol és spanyol; magyar adatoknál ezért validált regex, Presidio custom recognizer vagy nyelvspecifikus NER modell kell. Költségesebbek, mint a self-hosted megoldások (per-API-call), de kezelt szolgáltatásként kevesebb üzemeltetést igényelnek.</p>
 <p><strong>Regex-alapú detection:</strong> Az egyszerűbb mintáknál (email, telefon, magyar adószám, magyar TAJ) elegendő egy jól megírt regex. Hátránya, hogy false positive-ot ad (pl. egy 11 jegyű szám nem feltétlenül adószám), és nyelvi kontextust nem ismer (egy mondatban nem tudja megkülönböztetni a "Kovács Péter" nevet a "Kovács Péter Kft." cégnévtől).</p>
 <p><strong>NER modellek:</strong> Modern transformer-alapú modellek (spaCy, Hugging Face) képesek a kontextus alapján felismerni a személyneveket, helyneveket. Magyar nyelvre a <code>huBERT</code> vagy <code>hubertMedium</code> ad legjobb eredményt. Lassabbak, mint a regex, de pontosabbak.</p>
@@ -229,9 +229,9 @@ print(chat_log[["chat_id", "message_redacted"]].to_string())</pre></div>
     <div class="output-area" id="out-s3">
       <div class="output-label">Output:</div>
       <pre>chat_id  message_redacted
-0    101  Sziasztok, &lt;PERSON&gt; vagyok, az emailem ************************, kérem visszahívást: &lt;PHONE&gt;
+0    101  Sziasztok, Kovács Péter vagyok, az emailem ************************, kérem visszahívást: &lt;PHONE&gt;
 1    102  A rendelés száma 78342, a kártyaszám &lt;CARD&gt; — lehúzták duplán?
-2    103  Köszönöm a választ, a lakcímem: &lt;LOC&gt;</pre>
+2    103  Köszönöm a választ, a lakcímem: 1052 Budapest, Váci utca 12.</pre>
     </div>
   </div>
 </div>

@@ -205,13 +205,16 @@ Reason: Answer claims 90 days but context says 30 days</pre></div></div>
 <div class="section layer-general" id="s5">
   <div class="section-number">Section 05</div>
   <h2>RAG pipeline production</h2>
-  <div class="md-cell"><p>A <strong>production RAG pipeline</strong> a Retrieval-Augmented Generation ipari szabványa: a felhasználói kérdésre először releváns dokumentumokat keresünk vissza (retrieval), majd azokat kontextusként beadva generáljuk a választ (generation). A fejlett RAG rendszerek rerankingot (eredmények újrasorrendezése relevancia szerint), forráshivatkozást (citation) és kontextus-ablak optimalizációt is alkalmaznak.</p><p><strong>Miért jobb, mint a sima LLM?</strong> Egy alap LLM csak a tanító adatait „tudja" — nem ismeri a cég termékeit, árait, szabályzatait. A RAG a válaszadást a tényleges dokumentumokra alapozza, ami drasztikusan csökkenti a hallucinációt és naprakész információt biztosít a dokumentumtár frissítésével.</p><p><strong>A folyamat:</strong> A kódban a LangChain keretrendszert használjuk: ChromaDB vektor adatbázisból visszakeressük a top-5 releváns dokumentumot, majd a ChatPromptTemplate segítségével a kontextust és a kérdést egy structúrátlan promptba foglaljuk. Az LLM a kontextusra hivatkozva válaszol, és forrásokat is megjelöl.</p><p><strong>Tipp:</strong> Éles környezetben használj top-k értéket 3-5 között (túl sok kontextus rontja a minőséget és növeli a költséget), alkalmazz reranking modellt (pl. Cohere Rerank), és a chunking stratégiát optimalizáld a dokumentumtípusnak megfelelően.</p></div><div class="code-cell" id="cell-5"><div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('5')">Output</button></div><div class="code-body"><pre>from langchain_openai import ChatOpenAI
+  <div class="md-cell"><p>A <strong>production RAG pipeline</strong> a Retrieval-Augmented Generation ipari szabványa: a felhasználói kérdésre először releváns dokumentumokat keresünk vissza (retrieval), majd azokat kontextusként beadva generáljuk a választ (generation). A fejlett RAG rendszerek rerankingot (eredmények újrasorrendezése relevancia szerint), forráshivatkozást (citation) és kontextus-ablak optimalizációt is alkalmaznak.</p><p><strong>Miért jobb, mint a sima LLM?</strong> Egy alap LLM csak a tanító adatait „tudja" — nem ismeri a cég termékeit, árait, szabályzatait. A RAG a válaszadást a tényleges dokumentumokra alapozza, ami drasztikusan csökkenti a hallucinációt és naprakész információt biztosít a dokumentumtár frissítésével.</p><p><strong>A folyamat:</strong> A kódban a LangChain keretrendszert használjuk: ChromaDB vektor adatbázisból visszakeressük a top-5 releváns dokumentumot, majd a ChatPromptTemplate segítségével a kontextust és a kérdést egy structúrátlan promptba foglaljuk. Az LLM a kontextusra hivatkozva válaszol, és forrásokat is megjelöl.</p><p><strong>Tipp:</strong> Éles környezetben használj top-k értéket 3-5 között (túl sok kontextus rontja a minőséget és növeli a költséget), alkalmazz reranking modellt (pl. Cohere Rerank), és a chunking stratégiát optimalizáld a dokumentumtípusnak megfelelően.</p></div><div class="code-cell" id="cell-5"><div class="code-header"><span class="cell-number">[5]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('5')">Output</button></div><div class="code-body"><pre>from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 
 # RAG pipeline
 llm = ChatOpenAI(model='gpt-4o', temperature=0)
-retriever = Chroma(persist_directory='chroma_db').as_retriever(k=5)
+retriever = Chroma(
+    persist_directory='chroma_db',
+    embedding_function=OpenAIEmbeddings(),
+).as_retriever(search_kwargs={'k': 5})
 
 prompt = ChatPromptTemplate.from_messages([
     ('system', 'Answer based on context. If unsure, say so. Cite sources.'),
@@ -261,15 +264,16 @@ Errors: 0.2%</pre></div></div>
 <div class="section layer-general" id="s7">
   <div class="section-number">Section 07</div>
   <h2>Guardrails és safety</h2>
-  <div class="md-cell"><p>A <strong>guardrails</strong> (biztonsági korlátok) olyan szűrők, amelyek garantálják, hogy az AI ne adjon ki káros, nemkívánatos vagy jogilag problematikus választ. Három fő területet fednek le: <strong>toxicitás</strong> (sértő, agresszív tartalom szűrése), <strong>PII szivárgás</strong> (személyes adatok, email címek, telefonszámok védelme) és <strong>topic restriction</strong> (a chatbot csak a meghatározott témákban válaszoljon).</p><p><strong>Miért kritikus?</strong> Egy ügyfélszolgálati chatbot a cég arca. Ha trágár választ ad, kiszivárogtat személyes adatokat, vagy politikai kérdésekre válaszol, az márkakárosodást és jogi következményeket vonhat maga után. A guardrails a utolsó védelmi vonal a generáció után.</p><p><strong>A folyamat:</strong> A kódban a Guardrails AI könyvtárat használjuk: <code>ToxicLanguage</code> szűri a mérgező tartalmat, <code>PIIFilter</code> védi a személyes adatokat, <code>NoOffTopic</code> pedig biztosítja, hogy a chatbot csak a megengedett témákban (rendelések, termékek, visszaküldés, szállítás) válaszoljon. A szűrés mind a bemeneten (input), mind a kimeneten (output) megtörténik.</p><p><strong>Tipp:</strong> A guardrails küszöbértékokat a kockázati profilhoz igazítsd: egészségügyi chatbotnál szigorúbb, belső FAQ botnál lazább. Teszteld a guardrails-t szándékosan káros inputokkal (red teaming), hogy megbizonyosodj a hatékonyságáról.</p></div><div class="code-cell" id="cell-7"><div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('7')">Output</button></div><div class="code-body"><pre>from guardrails import Guard
-from guardrails.hub import ToxicLanguage, PIIFilter, NoOffTopic
+  <div class="md-cell"><p>A <strong>guardrails</strong> (biztonsági korlátok) olyan szűrők, amelyek garantálják, hogy az AI ne adjon ki káros, nemkívánatos vagy jogilag problematikus választ. Három fő területet fednek le: <strong>toxicitás</strong> (sértő, agresszív tartalom szűrése), <strong>PII szivárgás</strong> (személyes adatok, email címek, telefonszámok védelme) és <strong>topic restriction</strong> (a chatbot csak a meghatározott témákban válaszoljon).</p><p><strong>Miért kritikus?</strong> Egy ügyfélszolgálati chatbot a cég arca. Ha trágár választ ad, kiszivárogtat személyes adatokat, vagy politikai kérdésekre válaszol, az márkakárosodást és jogi következményeket vonhat maga után. A guardrails a utolsó védelmi vonal a generáció után.</p><p><strong>A folyamat:</strong> A kódban a Guardrails AI könyvtárat használjuk: <code>ToxicLanguage</code> szűri a mérgező tartalmat, <code>DetectPII</code> védi a személyes adatokat, <code>RestrictToTopic</code> pedig biztosítja, hogy a chatbot csak a megengedett témákban (rendelések, termékek, visszaküldés, szállítás) válaszoljon. A szűrés mind a bemeneten (input), mind a kimeneten (output) megtörténik.</p><p><strong>Tipp:</strong> A guardrails küszöbértékokat a kockázati profilhoz igazítsd: egészségügyi chatbotnál szigorúbb, belső FAQ botnál lazább. Teszteld a guardrails-t szándékosan káros inputokkal (red teaming), hogy megbizonyosodj a hatékonyságáról.</p></div><div class="code-cell" id="cell-7"><div class="code-header"><span class="cell-number">[7]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('7')">Output</button></div><div class="code-body"><pre>from guardrails import Guard
+from guardrails.hub import ToxicLanguage, DetectPII, RestrictToTopic
 
 guard = Guard().use_many(
     ToxicLanguage(threshold=0.8, validation_method='sentence'),
-    PIIFilter(pii_entities=['EMAIL', 'PHONE', 'SSN']),
-    NoOffTopic(
+    DetectPII(pii_entities=['EMAIL_ADDRESS', 'PHONE_NUMBER', 'US_SSN']),
+    RestrictToTopic(
         valid_topics=['orders', 'products', 'returns', 'shipping'],
-        model='gpt-4o-mini'
+        invalid_topics=['politics', 'religion'],
+        llm_callable='gpt-4o-mini',
     )
 )
 
@@ -282,8 +286,8 @@ def safe_chat(question):
     guard.validate(answer.content)
     return answer</pre></div><div class="output-area" id="out-7"><div class="output-label">Output:</div><pre>Guardrails active:
 - ToxicLanguage: threshold 0.8
-- PIIFilter: EMAIL, PHONE, SSN
-- NoOffTopic: orders, products, returns, shipping
+- DetectPII: EMAIL_ADDRESS, PHONE_NUMBER, US_SSN
+- RestrictToTopic: orders, products, returns, shipping
 
 All checks passed!</pre></div></div>
 </div>
@@ -344,13 +348,15 @@ Using fallback model: gpt-4o-mini</pre></div></div>
   <h2>Streaming responses</h2>
   <div class="md-cell"><p>A <strong>streaming responses</strong> (token-by-token streamelés) technika lényege, hogy a szerver nem várja meg, amíg a teljes válasz elkészül, hanem azonnal, tokenenként küldi az adatot a kliensnek. Ez drasztikusan javítja a felhasználói élményt: a felhasználó az első token megjelenésétől (Time To First Byte, TTFB) kezdve látja a válasz épülését.</p><p><strong>Miért fontos?</strong> Egy tipikus LLM válasz 1-5 másodperc alatt generálódik teljes egészében. Ha a felhasználó ennyi ideig egy üres képernyőt lát, az frusztráló. Streamelés esetén a TTFB 200-300 ms, és a válasz fokozatosan épül fel — hasonlóan a ChatGPT felhasználói élményhez.</p><p><strong>A folyamat:</strong> A kódban FastAPI <code>StreamingResponse</code>-t használunk, amely egy aszinkron generátor függvényből kapja az adatot. Az OpenAI API <code>stream=True</code> paraméterrel hívjuk, és a <code>async for chunk</code> ciklussal minden generált tokent azonnal továbbítjuk a kliensnek.</p><p><strong>Fontos:</strong> a streaming a <strong>time-to-first-byte (TTFB)</strong> percepcióját javítja, de a <strong>teljes válasz latency</strong> ugyanaz marad (vagy minimálisan rosszabb a streamelt átvitel többlete miatt). Tehát a UX érzete jobb, de a system throughput nem nő — egy chatbot user várása alatt jól, de batch inferenciánál nincs előnye.</p><p><strong>Tipp:</strong> A streamelés során is naplózd a teljes válaszidőt és a TTFB-t. Élesben fontos, hogy a hálózati buffering minimalizálva legyen — használj <code>media_type='text/event-stream'</code> formátumot SSE (Server-Sent Events) implementációhoz.</p></div><div class="code-cell" id="cell-10"><div class="code-header"><span class="cell-number">[10]</span><button class="run-btn" type="button" aria-label="Output megjelenítése" onclick="runCell('10')">Output</button></div><div class="code-body"><pre>from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from openai import AsyncOpenAI
 
 app = FastAPI()
+client = AsyncOpenAI()
 
 @app.post('/chat/stream')
 async def chat_stream(question: str):
     async def generate():
-        stream = await openai.chat.completions.create(
+        stream = await client.chat.completions.create(
             model='gpt-4o',
             messages=[{'role': 'user', 'content': question}],
             stream=True
