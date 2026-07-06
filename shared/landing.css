@@ -536,7 +536,7 @@ button { font-family: inherit; cursor: pointer; }
 .section-desc {
   font-size: 1.0625rem;
   color: var(--ink-2);
-  max-width: 58ch;
+  max-width: 100%;
   margin-bottom: 40px;
   line-height: 1.65;
 }
